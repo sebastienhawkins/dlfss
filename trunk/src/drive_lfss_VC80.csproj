@@ -48,9 +48,9 @@
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Data.SqliteClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+    <Reference Include="sqlite3_client_mono, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\Debug\Mono.Data.SqliteClient.dll</HintPath>
+      <HintPath>..\dep\sqlite3_client_mono.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -58,8 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="client\ForClientConnectionAsServerIs.cs" />
-    <Compile Include="dbs\dbs.cs" />
-    <Compile Include="dbs\dbsSet.cs" />
+    <Compile Include="database\dbs.cs" />
+    <Compile Include="database\dbsSet.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="network\packet\enum.cs" />

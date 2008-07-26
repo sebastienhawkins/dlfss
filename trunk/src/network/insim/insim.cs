@@ -1,4 +1,21 @@
-﻿namespace Drive_LFSS.InSim_
+﻿/* 
+ * Copyright (C) 2008 DLFSS <http://www.lfsforum.net/when the post is created change ME>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+namespace Drive_LFSS.InSim_
 {
     using System;
     using System.IO;
@@ -11,7 +28,7 @@
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Server_;
-    using Drive_LFSS.dbs_;
+    using Drive_LFSS.Database_;
 
     public abstract class InSim : PacketHandler
     {
@@ -216,6 +233,9 @@
             AddToUdpReceiveQueud(new Packet(Protocol_Id.UDP, data));
         }
     }
+
+    //This class is non sence, is keeped cause of Time related question
+    //She will be removed, and DB setting should goes into the Master DB Object.
     public class InSimSetting
     {
         private string _adminpass = "";
@@ -227,10 +247,10 @@
         private ushort _portnumber = 0x752f;
         private IPAddress _serverip = IPAddress.Any;
         private ushort _udpreplyport = 0x2716;
-        private dbsConnection _dbConn;
+        private DBConnection _dbConn;
         private string _pbSetName = "default";
 
-        public InSimSetting(string ServerIP, ushort PortNumber, ushort UDPReplyPort, InSim_Flag Flags, char CommandPrefix, ushort MCI_NLP_Interval, string AdminPass, string AppName, uint AutoReconnectDelayInSeconds, dbsConnection dbConn, string pbSetName )
+        public InSimSetting(string ServerIP, ushort PortNumber, ushort UDPReplyPort, InSim_Flag Flags, char CommandPrefix, ushort MCI_NLP_Interval, string AdminPass, string AppName, uint AutoReconnectDelayInSeconds, DBConnection dbConn, string pbSetName )
         {
             this._serverip = IPAddress.Parse(ServerIP);
             this._portnumber = PortNumber;
@@ -244,7 +264,7 @@
             this._dbConn = dbConn;
             this._pbSetName = pbSetName;
         }
-        public dbsConnection dbConn
+        public DBConnection dbConn
         {
             get
             {
