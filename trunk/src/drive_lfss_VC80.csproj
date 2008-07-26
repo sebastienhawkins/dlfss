@@ -1,0 +1,95 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1D9B9188-BF6D-4204-BDFA-6552233F1488}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>
+    </AppDesignerFolder>
+    <RootNamespace>Drive_LFSS</RootNamespace>
+    <AssemblyName>Drive_LFSS</AssemblyName>
+    <StartupObject>Drive_LFSS.Program</StartupObject>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <MapFileExtensions>false</MapFileExtensions>
+    <ProductName>Drive LFS Server</ProductName>
+    <ApplicationVersion>0.1.0.0</ApplicationVersion>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <Win32Resource>
+    </Win32Resource>
+  </PropertyGroup>
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>obj</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>obj\debug\</IntermediateOutputPath>
+    <UseHostCompilerIfAvailable>false</UseHostCompilerIfAvailable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <NoStdLib>false</NoStdLib>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>none</ErrorReport>
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Data.SqliteClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\Mono.Data.SqliteClient.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="client\ForClientConnectionAsServerIs.cs" />
+    <Compile Include="dbs\dbs.cs" />
+    <Compile Include="dbs\dbsSet.cs" />
+    <Compile Include="game\session.cs" />
+    <Compile Include="game\driver.cs" />
+    <Compile Include="network\packet\enum.cs" />
+    <Compile Include="network\packet\handler.cs" />
+    <Compile Include="network\packet\packet_store\store.cs" />
+    <Compile Include="drive_lfss\command_console\command.cs" />
+    <Compile Include="definition\global.cs" />
+    <Compile Include="server\command.cs" />
+    <Compile Include="config\config.cs" />
+    <Compile Include="network\outsim\outsim.cs" />
+    <Compile Include="game\race.cs" />
+    <Compile Include="server\server.cs" />
+    <Compile Include="game\car.cs" />
+    <Compile Include="game\licence.cs" />
+    <Compile Include="session_list\session_list.cs" />
+    <Compile Include="log\log.cs" />
+    <Compile Include="drive_lfss\drive_lfss.cs" />
+    <Compile Include="assembly_info.cs" />
+    <None Include="app.config" />
+    <None Include="ressource\icone.res" />
+    <Compile Include="network\insim\insim.cs" />
+    <Compile Include="network\outgauge\outgauge.cs" />
+    <Compile Include="network\packet\packet.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

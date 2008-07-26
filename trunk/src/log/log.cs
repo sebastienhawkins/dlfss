@@ -1,0 +1,202 @@
+namespace Drive_LFSS.Log_
+{
+    using System;
+    using System.Collections.Generic;
+    using Drive_LFSS.Session_;
+    using System.Threading;
+
+    public enum LogType
+    {
+        LOG_FULL = 0,
+        LOG_NORMAL = 1,
+        LOG_CHAT = 2,
+        LOG_COMMAND = 4,
+        LOG_ERROR = 8,
+        LOG_DEBUG = 16,
+        LOG_MISSING_DEFINITION,
+        LOG_NETWORK = 32,
+        LOG_PING = 64
+    }
+    //If Color Not Allways Working Good, Cause log is Used by MultiThread! and Console Color Seem to be... MS way :)
+    sealed public class sLog
+    {
+        public sLog(ushort _serverId)
+        {
+            if (!isInitialized)
+            {
+                throw new Exception("You can't Create Log Without Initializing, Please call: sLog.Init() First!");
+            }
+            serverId = _serverId;
+        }
+        public sLog()
+        {
+            if (!isInitialized)
+            {
+                throw new Exception("You can't Create Log Without Initializing, Please call: sLog.Init() First!");
+            }
+            serverId = 0;
+        }
+        public LogType logDisable = LogType.LOG_FULL;
+        public ushort serverId = 0;
+
+
+        private static Mutex mutexConsoleColor = new Mutex();
+        private const string LOG_FILE_PATH = @".\drive_lfss.log";
+        private static System.IO.StreamWriter streamWriter;
+        private static bool isInitialized = false;
+
+        public static bool Init()
+        {
+            isInitialized = true;
+            try
+            {
+                streamWriter = System.IO.File.CreateText(LOG_FILE_PATH);
+            }
+            catch (System.Exception error)
+            {
+                Console.Write(System.DateTime.Now + " - ERROR---: " + error.Message + "\r\n");
+                Console.Write("Please Check Error Comming from the Log System.\r\nDrive Life For Speed Server, can't continue without log system.\r\n");
+                return false;
+            }
+            return true;
+        }
+        public static void flush()
+        {
+            streamWriter.Flush();
+        }
+        public void error(string msg)
+        {
+            if ((logDisable & LogType.LOG_ERROR) > 0)return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + _serverName + " ERROR--: " + msg);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+            mutexConsoleColor.ReleaseMutex();
+        }
+        public void normal(string msg)
+        {
+            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + _serverName + " NORMAL-: " + msg);
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
+        public void chat(string msg)
+        {
+            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + _serverName + " NORMAL-: " + msg);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
+        public void command(string msg)
+        {
+            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + _serverName + " NORMAL-: " + msg);
+                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
+        public void debug(string msg)
+        {
+            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + _serverName + " DEBUG--: " + msg);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
+        public void missingDefinition(string msg)
+        {
+            if ((logDisable & LogType.LOG_MISSING_DEFINITION) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + _serverName + " MISSING: " + msg);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
+        public void network(string msg)
+        {
+            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + " NETWORK-: " + msg);
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
+        public void ping(string msg)
+        {
+            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + " PING----: " + msg);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
+
+        private string GetServerName()
+        {
+            if (serverId == 0)
+                return "";
+
+            //Create Function into Server Go that That Info
+            if (SessionList.sessionList.ContainsKey(serverId))
+                return "Server["+serverId+/*Session.server[serverId].settings.connectionName+*/"] -> ";
+
+            return "Unknow -> ";
+        }
+    }
+}
+/*0   BLACK
+1   BLUE
+2   GREEN
+3   CYAN
+4   RED
+5   MAGENTA
+6   BROWN
+7   LIGHTGRAY
+8   DARKGRAY
+9   LIGHTBLUE
+10  LIGHTGREEN
+11  LIGHTCYAN
+12  LIGHTRED
+13  LIGHTMAGENTA
+14  YELLOW
+15  WHITE
+*/
