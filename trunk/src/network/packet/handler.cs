@@ -26,17 +26,17 @@ namespace Drive_LFSS.Packet_
         {
             switch (_packetType)
             {
-                case Packet_Type.MCI_MULTICAR_INFORMATION:      processPacket((PacketMCI)_packet);break;
-                case Packet_Type.MSO_CHAT_RECEIVED:             processPacket((PacketMSO)_packet);break;
-                case Packet_Type.TINY_MULTI_PURPOSE:            processPacket((PacketTiny)_packet);break;
-                case Packet_Type.STA_DRIVER_RACE_STATE_CHANGE:  processPacket((PacketSTA)_packet);break;
-                case Packet_Type.NCN_NEW_CONNECTION:            processPacket((PacketNCN)_packet);break;
-                case Packet_Type.CNL_PART_CONNECTION:           processPacket((PacketCNL)_packet);break;
-                case Packet_Type.NPL_DRIVER_JOIN_RACE:          processPacket((PacketNPL)_packet);break;
-                case Packet_Type.PLL_DRIVER_LEAVE_RACE:         processPacket((PacketPLL)_packet);break;
-                case Packet_Type.RST_RACE_START:                processPacket((PacketRST)_packet);break;
+                case Packet_Type.PACKET_MCI_MULTICAR_INFORMATION:      processPacket((PacketMCI)_packet);break;
+                case Packet_Type.PACKET_MSO_CHAT_RECEIVED:             processPacket((PacketMSO)_packet);break;
+                case Packet_Type.PACKET_TINY_MULTI_PURPOSE:            processPacket((PacketTiny)_packet);break;
+                case Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE:  processPacket((PacketSTA)_packet);break;
+                case Packet_Type.PACKET_NCN_NEW_CONNECTION:            processPacket((PacketNCN)_packet);break;
+                case Packet_Type.PACKET_CNL_PART_CONNECTION:           processPacket((PacketCNL)_packet);break;
+                case Packet_Type.PACKET_NPL_DRIVER_JOIN_RACE:          processPacket((PacketNPL)_packet);break;
+                case Packet_Type.PACKET_PLL_DRIVER_LEAVE_RACE:         processPacket((PacketPLL)_packet);break;
+                case Packet_Type.PACKET_RST_RACE_START:                processPacket((PacketRST)_packet);break;
 
-                case Packet_Type.VER_SERVER_VERSION:            processPacket((PacketVER)_packet);break;
+                case Packet_Type.PACKET_VER_VERSION_SERVER:            processPacket((PacketVER)_packet);break;
                 default: ((Server)this).log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }

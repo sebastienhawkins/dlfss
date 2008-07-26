@@ -55,7 +55,7 @@ namespace Drive_LFSS.Server_
             {
                 log.debug("Request Ping!\r\n");
 
-                AddToTcpSendingQueud(new Packet( Protocol_Id.UDP, Packet_Size.TINY_PACKET_SIZE, Packet_Type.TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)) );
+                AddToTcpSendingQueud(new Packet( Protocol_Id.PROTO_UDP, Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)) );
                 pingTime = DateTime.Now.Ticks;
 
                 TimerPingPong = 0;

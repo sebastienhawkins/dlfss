@@ -29,22 +29,22 @@ namespace Drive_LFSS.Definition_
     }
     public enum Protocol_Id
     {
-        UDP,
-        TCP
+        PROTO_UDP,
+        PROTO_TCP
     }
     public enum InSim_Socket_State : byte
     {
-        INSIM_DISCONNECTED = 0,
-        INSIM_CONNECTED = 1
+        INSIM_SOCKET_DISCONNECTED = 0,
+        INSIM_SOCKET_CONNECTED = 1
     }
     public enum Licence_Camera_Mode : byte
     {
-        VIEW_FOLLOW = 0,
-        VIEW_HELI = 1,
-        VIEW_CAM = 2,
-        VIEW_DRIVER = 3,
-        VIEW_CUSTOM = 4,
-        VIEW_ANOTHER = 255
+        CAMERA_MODE_FOLLOW = 0,
+        CAMERA_MODE_HELI = 1,
+        CAMERA_MODE_CAM = 2,
+        CAMERA_MODE_DRIVER = 3,
+        CAMERA_MODE_CUSTOM = 4,
+        CAMERA_MODE_ANOTHER = 255
     }
     public enum Button_Function : byte
     {
@@ -64,11 +64,11 @@ namespace Drive_LFSS.Definition_
     }
     public enum Chat_User_Type : byte
     {
-        CHAT_USERTYPE_SYSTEM = 0,
-        CHAT_USERTYPE_USER = 1,
-        CHAT_USER_PREFIX = 2,
-        CHAT_USERTYPE_O = 3,
-        CHAT_USERTYPE_MAX = 4,
+        CHAT_USER_TYPE_SYSTEM = 0,
+        CHAT_USER_TYPE_USER = 1,
+        CHAT_USER_TYPE_PREFIX = 2,
+        CHAT_USER_TYPE_O = 3,
+        CHAT_USER_TYPE_MAX = 4,
     }
     public enum Car_Tyres : byte
     {
@@ -87,9 +87,9 @@ namespace Drive_LFSS.Definition_
     {
         PENALTY_TYPE_NONE = 0,
         PENALTY_TYPE_DRIVE_THROUGH = 1,
-        PENALTY_DRIVE_THROUGHT_VALID = 2,
+        PENALTY_TYPE_DRIVE_THROUGHT_VALID = 2,
         PENALTY_TYPE_PIT_STOP = 3,
-        PENALTY_PIT_STOP_VALID = 4,
+        PENALTY_TYPE_PIT_STOP_VALID = 4,
         PENALTY_TYPE_ADD_30_SEC = 5,
         PENALTY_TYPE_ADD_45_SEC = 6,
         PENALTY_TYPE_MAX = 7
@@ -112,7 +112,7 @@ namespace Drive_LFSS.Definition_
         PITLANE_STATE_NO_PURPOSE = 2,
         PITLANE_STATE_DRIVE_THOUGHT_PENALITY = 3,
         PITLANE_STATE_PITSTOP_PENALITY = 4,
-        PITLANE_NUM = 5
+        PITLANE_STATE_NUM = 5
     }
     public enum Racing_Flag : byte
     {
@@ -129,13 +129,13 @@ namespace Drive_LFSS.Definition_
     }
     public enum Leave_Reason : byte
     {
-        LEAVR_BANNED = 4,
-        LEAVR_DISCO = 0,
-        LEAVR_KICKED = 3,
-        LEAVR_LOSTCONN = 2,
-        LEAVR_NUM = 6,
-        LEAVR_SECURITY = 5,
-        LEAVR_TIMEOUT = 1
+        LEAVE_REASON_BANNED = 4,
+        LEAVE_REASON_DISCONNECTED = 0,
+        LEAVE_REASON_KICKED = 3,
+        LEAVE_REASON_LOSTCONNECTION = 2,
+        LEAVE_REASON_NUM = 6,
+        LEAVE_REASON_SECURITY = 5,
+        LEAVE_REASON_TIMEOUT = 1
     }
     public enum Race_In_Progress_Status : byte
     {
@@ -157,9 +157,9 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Driver_Type_Flag : byte
     {
-        FEMALE = 1,
-        AI = 2,
-        REMOTE = 4
+        DRIVER_TYPE_FEMALE = 1,
+        DRIVER_TYPE_AI = 2,
+        DRIVER_TYPE_REMOTE = 4
     }
     [Flags]public enum Button_Click_Flag : byte
     {
@@ -247,12 +247,12 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Race_Feature_Flag : ushort
     {
-        HOSTF_CAN_VOTE = 1,
-        RACE_FLAG_CAN_SELECT = 2, // Select What???
+        RACE_FLAG_CAN_VOTE = 1,
+        RACE_FLAG_CAN_SELECT_TRACK = 2,
         RACE_FLAG_UNK_1 = 4,
         RACE_FLAG_UNK_2 = 8,
         RACE_FLAG_UNK_3 = 16,
-        RACE_FLAG_MID_RACE = 32, // Mid Race and What???
+        RACE_FLAG_MID_RACE_JOIN = 32,
         RACE_FLAG_MUST_PIT = 64,
         RACE_FLAG_CAN_RESET = 128,
         RACE_FLAG_FORCE_COKPIT_VIEW = 256
@@ -283,21 +283,21 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Out_Gauge_Flag : ushort
     {
-        OG_1 = 0x400,
-        OG_2 = 0x800,
-        OG_3 = 0x1000,
-        OG_4 = 0x2000,
-        OG_BAR = 0x8000,
-        OG_FULLBEAM = 2,
-        OG_HANDBRAKE = 4,
-        OG_HEADLIGHTS = 0x20,
-        OG_KM = 0x4000,
-        OG_OILWARN = 0x200,
-        OG_PITSPEED = 8,
-        OG_REDLINE = 0x100,
-        OG_SHIFTLIGHT = 1,
-        OG_SIGNAL_L = 0x40,
+        OUTGAUGE_1 = 0x400,
+        OUTGAUGE_2 = 0x800,
+        OUTGAUGE_3 = 0x1000,
+        OUTGAUGE_4 = 0x2000,
+        OUTGAUGE_BAR = 0x8000,
+        OUTGAUGE_FULLBEAM = 2,
+        OUTGAUGE_HANDBRAKE = 4,
+        OUTGAUGE_HEADLIGHTS = 0x20,
+        OUTGAUGE_KM = 0x4000,
+        OUTGAUGE_OILWARN = 0x200,
+        OUTGAUGE_PITSPEED = 8,
+        OUTGAUGE_REDLINE = 0x100,
+        OUTGAUGE_SHIFTLIGHT = 1,
+        OUTGAUGE_SIGNAL_L = 0x40,
         OG_SIGNAL_R = 0x80,
-        OG_TC = 0x10
+        OUTGAUGE_TC = 0x10
     }
 }

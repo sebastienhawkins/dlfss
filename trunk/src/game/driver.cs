@@ -111,7 +111,7 @@ namespace Drive_LFSS.Game_
 
         public bool IsBot()
         {
-            return ((Driver_Type_Flag.AI & driverTypeMask) == Driver_Type_Flag.AI);
+            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI);
         }
     }
 }

@@ -67,12 +67,12 @@ namespace Drive_LFSS.Session_
                 {
                     keyPair.Value.session.connectionRequest = false;
 
-                    if (keyPair.Value.session.IsSocketStatus(InSim_Socket_State.INSIM_DISCONNECTED))
+                    if (keyPair.Value.session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED))
                         ConnectToServerId(keyPair.Key);
                     continue;
                 }
 
-                if ( keyPair.Value.session.IsSocketStatus(InSim_Socket_State.INSIM_DISCONNECTED) )
+                if ( keyPair.Value.session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED) )
                     continue;
 
                 keyPair.Value.session.update(diff);

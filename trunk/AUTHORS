@@ -15,13 +15,9 @@ Then, list who the contributors are and what files they have worked on.
 Indicate whether they created the file, or whether they modified it. For
 example:
 
- Greenseed:
+ Your Name:
    Authors of PACKAGE
  
- Gai-Luron:
-	entire files  -> dbs.cs, dbsset.cs
-	modifications ->
- 
- T-RonX:
-	entire files  -> outsim.cs, outgauge.cs, InSimSetting.cs
-
+ Your Name:
+	entire files  -> foo1.cs, foo2.cs
+	modifications -> foo3.cs, foo4.cs

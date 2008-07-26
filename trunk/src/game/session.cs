@@ -141,7 +141,7 @@ namespace Drive_LFSS.Game_
             }
 
             //this is first version, i expect some probleme into the case, we don't know Driver as Leave the Race or Disconnected... Let See.
-            if ((_packet.driverTypeMask & Driver_Type_Flag.AI) == Driver_Type_Flag.AI)      //AI
+            if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
             {
                 byte itr;
                 if ((itr = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 0)

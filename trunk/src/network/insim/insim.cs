@@ -66,7 +66,7 @@ namespace Drive_LFSS.InSim_
         {
             get { return ((Server)this).serverId; }
         }*/
-        private InSim_Socket_State socketStatus = InSim_Socket_State.INSIM_DISCONNECTED;
+        private InSim_Socket_State socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
         private InSimSetting inSimSetting;
         private bool runThreadSocketReceive = false;
         private Thread threadSocketReceive;
@@ -79,7 +79,7 @@ namespace Drive_LFSS.InSim_
         {
             if (tcpClient.Connected)
             {
-                AddToTcpSendingQueud(new Packet(Protocol_Id.TCP, Packet_Size.TINY_PACKET_SIZE ,Packet_Type.TINY_MULTI_PURPOSE,new PacketTiny(1, Tiny_Type.TINY_CLOSE)));
+                AddToTcpSendingQueud(new Packet(Protocol_Id.PROTO_TCP, Packet_Size.PACKET_SIZE_TINY ,Packet_Type.PACKET_TINY_MULTI_PURPOSE,new PacketTiny(1, Tiny_Type.TINY_CLOSE)));
             }
             if (udpClient != null)
             {
@@ -87,7 +87,7 @@ namespace Drive_LFSS.InSim_
                 udpClient.Send(dgram, 1, "localhost", inSimSetting.udpPort);
             }
 
-            socketStatus = InSim_Socket_State.INSIM_DISCONNECTED;
+            socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
 
             if(threadSocketReceive.ThreadState == ThreadState.Running)
             {
@@ -98,7 +98,7 @@ namespace Drive_LFSS.InSim_
         public void connect()
         {
             runThreadSocketReceive = false;
-            socketStatus = InSim_Socket_State.INSIM_DISCONNECTED;
+            socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
 
             tcpClient = new TcpClient();
             try{ tcpClient.Connect(new IPEndPoint(inSimSetting.serverIp, inSimSetting.tcpPort)); }
@@ -109,7 +109,7 @@ namespace Drive_LFSS.InSim_
             tcpSocket = tcpClient.GetStream();
             
             PacketISI packetISI = new PacketISI(1, inSimSetting.udpPort, (ushort)inSimSetting.Flags, inSimSetting.CommandPrefix, inSimSetting.MCI_NLP_Interval, inSimSetting.adminPassword, inSimSetting.connectionName);
-            AddToTcpSendingQueud(new Packet(Protocol_Id.TCP, Packet_Size.ISI_PACKET_SIZE, Packet_Type.ISI_INSIM_INITIALISE, packetISI));
+            AddToTcpSendingQueud(new Packet(Protocol_Id.PROTO_TCP, Packet_Size.PACKET_SIZE_ISI, Packet_Type.PACKET_ISI_INSIM_INITIALISE, packetISI));
 
             System.Threading.Thread.Sleep(1000);
 
@@ -122,7 +122,7 @@ namespace Drive_LFSS.InSim_
 
             if (tcpClient.Connected)
             {
-                socketStatus = InSim_Socket_State.INSIM_CONNECTED;
+                socketStatus = InSim_Socket_State.INSIM_SOCKET_CONNECTED;
                 runThreadSocketReceive = true;
 
                 if (threadSocketReceive.ThreadState == ThreadState.Unstarted)
@@ -136,10 +136,10 @@ namespace Drive_LFSS.InSim_
                 }
 
                 PacketTiny _packet = new PacketTiny(1,Tiny_Type.TINY_NCN_NEW_LICENCE_CONNECTION);
-                AddToTcpSendingQueud(new Packet(Protocol_Id.TCP,Packet_Size.TINY_PACKET_SIZE,Packet_Type.TINY_MULTI_PURPOSE,_packet));
+                AddToTcpSendingQueud(new Packet(Protocol_Id.PROTO_TCP,Packet_Size.PACKET_SIZE_TINY,Packet_Type.PACKET_TINY_MULTI_PURPOSE,_packet));
 
                 _packet = new PacketTiny(1, Tiny_Type.TINY_NPL);
-                AddToTcpSendingQueud(new Packet(Protocol_Id.TCP, Packet_Size.TINY_PACKET_SIZE, Packet_Type.TINY_MULTI_PURPOSE, _packet));
+                AddToTcpSendingQueud(new Packet(Protocol_Id.PROTO_TCP, Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
             }
         }
         public bool IsSocketStatus(InSim_Socket_State _isStatus)
@@ -213,7 +213,7 @@ namespace Drive_LFSS.InSim_
 
             byte[] data = new byte[packetSize-2];
             tcpSocket.Read(data, 0, (packetSize-2));
-            AddToTcpReceiveQueud(new Packet(Protocol_Id.TCP,(Packet_Size)packetSize, packetType, data));
+            AddToTcpReceiveQueud(new Packet(Protocol_Id.PROTO_TCP,(Packet_Size)packetSize, packetType, data));
         }
         private void UdpReceive()
         {
@@ -230,7 +230,7 @@ namespace Drive_LFSS.InSim_
                 return;
             }
             ((Server)this).log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
-            AddToUdpReceiveQueud(new Packet(Protocol_Id.UDP, data));
+            AddToUdpReceiveQueud(new Packet(Protocol_Id.PROTO_UDP, data));
         }
     }
 

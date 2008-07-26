@@ -69,7 +69,6 @@
     <Compile Include="definition\global.cs" />
     <Compile Include="server\command.cs" />
     <Compile Include="config\config.cs" />
-    <Compile Include="network\outsim\outsim.cs" />
     <Compile Include="game\race.cs" />
     <Compile Include="server\server.cs" />
     <Compile Include="game\car.cs" />
@@ -81,7 +80,6 @@
     <None Include="app.config" />
     <None Include="ressource\icone.res" />
     <Compile Include="network\insim\insim.cs" />
-    <Compile Include="network\outgauge\outgauge.cs" />
     <Compile Include="network\packet\packet.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -76,30 +76,30 @@ namespace Drive_LFSS.Packet_
         public PacketStructureList()
         {
             //Idealy Packet Sended/Received More Ofent into Top -> Bottom
-            Add(Packet_Type.MCI_MULTICAR_INFORMATION, new PacketMCI());
-            Add(Packet_Type.MSO_CHAT_RECEIVED, new PacketMSO());
-            Add(Packet_Type.VER_SERVER_VERSION, new PacketVER());
-            Add(Packet_Type.NCN_NEW_CONNECTION, new PacketNCN());
-            Add(Packet_Type.CNL_PART_CONNECTION, new PacketCNL());
-            Add(Packet_Type.NPL_DRIVER_JOIN_RACE, new PacketNPL());
-            Add(Packet_Type.PLL_DRIVER_LEAVE_RACE, new PacketPLL());
-            Add(Packet_Type.TINY_MULTI_PURPOSE, new PacketTiny());
-            Add(Packet_Type.AXI_AUTOCROSS_LAYOUT, new PacketAXI());
-            Add(Packet_Type.AXO_DRIVER_HIT_AUTOCROSS_OBJECT, new PacketAXO());
-            Add(Packet_Type.BFN_ASK_REMOVE_ADD_BUTTON, new PacketBFN());
-            Add(Packet_Type.BTC_BUTTON_CLICK, new PacketBTC());
-            Add(Packet_Type.BTN_BUTTON_DISPLAY, new PacketBTN());
-            Add(Packet_Type.BTT_BUTTON_TYPE_IN_TEXT_OK, new PacketBTT());
-            Add(Packet_Type.CCH_LICENCE_CAMERA_CHANGE, new PacketCCH());
-            Add(Packet_Type.CPP_CAMERA_POSITION, new PacketCPP());
-            Add(Packet_Type.CPR_LICENCE_DRIVER_RENAME, new PacketCPR());
-            Add(Packet_Type.CRS_DRIVER_RESET_CAR, new PacketCRS());
-            Add(Packet_Type.FIN_DRIVER_FINISH_RACE, new PacketFIN());
-            Add(Packet_Type.FLG_DRIVER_BLUE_YELLOW_FLAG, new PacketFLG());
-            Add(Packet_Type.III_HIDDEN_MESSAGE_I, new PacketIII());
-            Add(Packet_Type.ISI_INSIM_INITIALISE, new PacketISI());
-            Add(Packet_Type.RST_RACE_START, new PacketRST());
-            Add(Packet_Type.STA_DRIVER_RACE_STATE_CHANGE, new PacketSTA());
+            Add(Packet_Type.PACKET_MCI_MULTICAR_INFORMATION, new PacketMCI());
+            Add(Packet_Type.PACKET_MSO_CHAT_RECEIVED, new PacketMSO());
+            Add(Packet_Type.PACKET_VER_VERSION_SERVER, new PacketVER());
+            Add(Packet_Type.PACKET_NCN_NEW_CONNECTION, new PacketNCN());
+            Add(Packet_Type.PACKET_CNL_PART_CONNECTION, new PacketCNL());
+            Add(Packet_Type.PACKET_NPL_DRIVER_JOIN_RACE, new PacketNPL());
+            Add(Packet_Type.PACKET_PLL_DRIVER_LEAVE_RACE, new PacketPLL());
+            Add(Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny());
+            Add(Packet_Type.PACKET_AXI_AUTOCROSS_LAYOUT, new PacketAXI());
+            Add(Packet_Type.PACKET_AXO_DRIVER_HIT_AUTOCROSS_OBJECT, new PacketAXO());
+            Add(Packet_Type.PACKET_BFN_ASK_REMOVE_ADD_BUTTON, new PacketBFN());
+            Add(Packet_Type.PACKET_BTC_BUTTON_CLICK, new PacketBTC());
+            Add(Packet_Type.PACKET_BTN_BUTTON_DISPLAY, new PacketBTN());
+            Add(Packet_Type.PACKET_BTT_BUTTON_TYPE_IN_TEXT_OK, new PacketBTT());
+            Add(Packet_Type.PACKET_CCH_LICENCE_CAMERA_CHANGE, new PacketCCH());
+            Add(Packet_Type.PACKET_CPP_CAMERA_POSITION, new PacketCPP());
+            Add(Packet_Type.PACKET_CPR_LICENCE_DRIVER_RENAME, new PacketCPR());
+            Add(Packet_Type.PACKET_CRS_DRIVER_RESET_CAR, new PacketCRS());
+            Add(Packet_Type.PACKET_FIN_DRIVER_FINISH_RACE, new PacketFIN());
+            Add(Packet_Type.PACKET_FLG_DRIVER_BLUE_YELLOW_FLAG, new PacketFLG());
+            Add(Packet_Type.PACKET_III_HIDDEN_MESSAGE_I, new PacketIII());
+            Add(Packet_Type.PACKET_ISI_INSIM_INITIALISE, new PacketISI());
+            Add(Packet_Type.PACKET_RST_RACE_START, new PacketRST());
+            Add(Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE, new PacketSTA());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct CarInformation
