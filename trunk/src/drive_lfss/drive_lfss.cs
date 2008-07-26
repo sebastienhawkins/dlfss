@@ -55,41 +55,54 @@ namespace Drive_LFSS
         
         #endregion
 
-        public static sLog Log;
+        public static sLog log;
 
         [MTAThread]
         public static void Main()
 		{
-            //Start the log System
-            if (!sLog.Init()) return;
-            Log = new sLog();
-
-            //Console Trap CTRL-C
+            //Console Trap CTRL-C, //Remove Unhandle Exception
             Console.CancelKeyPress += new ConsoleCancelEventHandler(DisgraceExit);
             SetConsoleCtrlHandler(new HandlerRoutine(DisgraceExit), true);
-
-            //Remove Unhandle Exception
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnHandleException);
+
+            //Start the log System
+            if (!sLog.Initialize())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n");
+                return;
+            }
+            log = new sLog();
+            log.normal("Log System Initialized...\r\n");
 
             //Write Startup Banner
             WriteBanner();
 
             //InGame Command System
-            Log.normal("Initialization of InGame Command.\r\n");
+            log.normal("Initialization of InGame Command.\r\n");
             //Command.Init();
             
             //Console System, Purpose for MultiThreading the Console Input
-            Log.normal("Initialization of Console Command.\r\n");
+            log.normal("Initialization of Console Command.\r\n");
             ThreadCaptureConsoleCommand.Start();
 
+            //Database Initialization
+            log.normal("Initialization of SQLite Database...\r\n");
+
+            if (!Database.Initialize())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Can't Initialize the Database System, Will now QUIT.!\r\n");
+                return;
+            }
 
             //Create Object for All Configured Server
-            Log.normal("Loading Servers Config.\r\n");
+            log.normal("Loading Servers Config...\r\n");
             SessionList.LoadServerConfig( );
-            Log.normal("Initialize Servers Object.\r\n");
+            log.normal("Initialization of Servers Config...\r\n");
             //Session.InitializeServerList();
 
-            Log.normal("Starting Normal Operation!\r\n");
+            log.normal("Starting Normal Operation!\r\n");
             #region MainThread update
             uint TimerLogFlush = 0;
             while (MainRun)
@@ -116,21 +129,21 @@ namespace Drive_LFSS
         private static void WriteBanner()
         {
             //Opening Banner
-            Log.normal("              _____                             _      _____      __  \r\n");
-            Log.normal("              /    )         ,                  /      /    '   /    )\r\n");
-            Log.normal("          ---/----/---)__-------------__-------/------/__-------\\-----\r\n");
-            Log.normal("            /    /   /   ) /   | /  /___)     /      /           \\    \r\n");
-            Log.normal("          _/____/___/_____/____|/__(___ _____/____/_/________(____/___\r\n");
-            Log.normal("                                                                  v0.1\r\n");
+            log.normal("              _____                             _      _____      __  \r\n");
+            log.normal("              /    )         ,                  /      /    '   /    )\r\n");
+            log.normal("          ---/----/---)__-------------__-------/------/__-------\\-----\r\n");
+            log.normal("            /    /   /   ) /   | /  /___)     /      /           \\    \r\n");
+            log.normal("          _/____/___/_____/____|/__(___ _____/____/_/________(____/___\r\n");
+            log.normal("                                                                  v0.1\r\n");
             //Program.log.normal("                                                                      \r\n");       
-            Log.normal("                    _______________________________________\r\n");
-            Log.normal("                          __                               \r\n");
-            Log.normal("                        /    )                             \r\n");
-            Log.normal("                    ----\\--------__---)__---------__---)__-\r\n");
-            Log.normal("                         \\     /___) /   ) | /  /___) /   )\r\n");
-            Log.normal("                    _(____/___(___ _/______|/__(___ _/_____\r\n");
-            Log.normal("\r\n");
-            Log.normal("\r\n");
+            log.normal("                    _______________________________________\r\n");
+            log.normal("                          __                               \r\n");
+            log.normal("                        /    )                             \r\n");
+            log.normal("                    ----\\--------__---)__---------__---)__-\r\n");
+            log.normal("                         \\     /___) /   ) | /  /___) /   )\r\n");
+            log.normal("                    _(____/___(___ _/______|/__(___ _/_____\r\n");
+            log.normal("\r\n");
+            log.normal("\r\n");
         }
         private static void CaptureConsoleCommand()
         {
@@ -142,28 +155,28 @@ namespace Drive_LFSS
                 switch (consoleText)
                 {
                     case "exit": CommandConsole.Exit(); break;
-                    default: Log.error("Unknow Command: " + consoleText + "\r\n"); break;
+                    default: log.error("Unknow Command: " + consoleText + "\r\n"); break;
                 }
                 System.Threading.Thread.Sleep(sleep);
             }
         }
         private static void ConsoleExitTimer()
         {
-            Log.error("Exiting into 5 seconds.\r\n");
+            log.error("Exiting into 5 seconds.\r\n");
 
             byte secondeBeforeExit = 5;
             while(secondeBeforeExit > 0)
             {
                 Console.Clear();
-                Log.error("Exiting into " + --secondeBeforeExit + " seconds.\r\n");
+                log.error("Exiting into " + --secondeBeforeExit + " seconds.\r\n");
                 System.Threading.Thread.Sleep(1000);
             }
         }
         private static void UnHandleException(object sender, UnhandledExceptionEventArgs args)
         {
             Exception error = (Exception)args.ExceptionObject;
-            Log.error("Critical Error, Auto Shutdown Initiated, 30 Seconde... \"exit\".\r\n");
-            Log.error("The critical error Was: " + error.Message + "\r\n");
+            log.error("Critical Error, Auto Shutdown Initiated, 30 Seconde... \"exit\".\r\n");
+            log.error("The critical error Was: " + error.Message + "\r\n");
             SessionList.exit();
             System.Threading.Thread.Sleep(25000);
             ConsoleExitTimer();
@@ -177,7 +190,7 @@ namespace Drive_LFSS
         {
             args.Cancel = true;
             SessionList.exit();
-            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
+            log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();
@@ -189,7 +202,7 @@ namespace Drive_LFSS
         private static bool DisgraceExit(Ctrl_Types ctrlType)
         {
             SessionList.exit();
-            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
+            log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();

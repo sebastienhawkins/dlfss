@@ -35,7 +35,6 @@ namespace Drive_LFSS.Game_
             driverList.Capacity = 192;
 
             race = new Race();
-            myDbSet = new dbsSet(_inSimSetting.dbConn, _inSimSetting.pbSetName);
             commandPrefix = _inSimSetting.CommandPrefix;
 
 
@@ -43,8 +42,7 @@ namespace Drive_LFSS.Game_
         private Race race;
         private List<Driver> driverList;
         private char commandPrefix;
-        private dbsSet myDbSet;
-        
+
         private byte GetCarIndex(byte _carId)
         {
             for (byte itr = 0; itr < driverList.Count; itr++ )

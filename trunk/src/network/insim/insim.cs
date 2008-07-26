@@ -247,10 +247,8 @@ namespace Drive_LFSS.InSim_
         private ushort _portnumber = 0x752f;
         private IPAddress _serverip = IPAddress.Any;
         private ushort _udpreplyport = 0x2716;
-        private DBConnection _dbConn;
-        private string _pbSetName = "default";
 
-        public InSimSetting(string ServerIP, ushort PortNumber, ushort UDPReplyPort, InSim_Flag Flags, char CommandPrefix, ushort MCI_NLP_Interval, string AdminPass, string AppName, uint AutoReconnectDelayInSeconds, DBConnection dbConn, string pbSetName )
+        public InSimSetting(string ServerIP, ushort PortNumber, ushort UDPReplyPort, InSim_Flag Flags, char CommandPrefix, ushort MCI_NLP_Interval, string AdminPass, string AppName, uint AutoReconnectDelayInSeconds )
         {
             this._serverip = IPAddress.Parse(ServerIP);
             this._portnumber = PortNumber;
@@ -261,32 +259,7 @@ namespace Drive_LFSS.InSim_
             this._adminpass = AdminPass;
             this._appname = AppName;
             this._autoreconnectdelay = (AutoReconnectDelayInSeconds == 0) ? 0 : (AutoReconnectDelayInSeconds * 0x3e8);
-            this._dbConn = dbConn;
-            this._pbSetName = pbSetName;
         }
-        public DBConnection dbConn
-        {
-            get
-            {
-                return this._dbConn;
-            }
-            set
-            {
-                this._dbConn = value;
-            }
-        }
-        public string pbSetName
-        {
-            get
-            {
-                return this._pbSetName;
-            }
-            set
-            {
-                this._pbSetName = value;
-            }
-        }
-
         public string adminPassword
         {
             get

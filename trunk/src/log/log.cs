@@ -32,7 +32,8 @@ namespace Drive_LFSS.Log_
         LOG_DEBUG = 16,
         LOG_MISSING_DEFINITION,
         LOG_NETWORK = 32,
-        LOG_PING = 64
+        LOG_DATABASE = 64,
+        LOG_PING = 128
     }
     //If Color Not Allways Working Good, Cause log is Used by MultiThread! and Console Color Seem to be... MS way :)
     sealed public class sLog
@@ -62,7 +63,7 @@ namespace Drive_LFSS.Log_
         private static System.IO.StreamWriter streamWriter;
         private static bool isInitialized = false;
 
-        public static bool Init()
+        public static bool Initialize()
         {
             isInitialized = true;
             try
@@ -97,7 +98,7 @@ namespace Drive_LFSS.Log_
         }
         public void normal(string msg)
         {
-            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            if ((logDisable & LogType.LOG_NORMAL) > 0) return;
             string _serverName = GetServerName();
 
             mutexConsoleColor.WaitOne();
@@ -110,12 +111,12 @@ namespace Drive_LFSS.Log_
         }
         public void chat(string msg)
         {
-            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            if ((logDisable & LogType.LOG_CHAT) > 0) return;
             string _serverName = GetServerName();
 
             mutexConsoleColor.WaitOne();
             {
-                streamWriter.Write(System.DateTime.Now + _serverName + " NORMAL-: " + msg);
+                streamWriter.Write(System.DateTime.Now + _serverName + " CHAT----: " + msg);
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write(_serverName + msg);
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -123,12 +124,12 @@ namespace Drive_LFSS.Log_
         }
         public void command(string msg)
         {
-            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            if ((logDisable & LogType.LOG_COMMAND) > 0) return;
             string _serverName = GetServerName();
 
             mutexConsoleColor.WaitOne();
             {
-                streamWriter.Write(System.DateTime.Now + _serverName + " NORMAL-: " + msg);
+                streamWriter.Write(System.DateTime.Now + _serverName + " COMMAND-: " + msg);
                 Console.ForegroundColor = ConsoleColor.DarkBlue;
                 Console.Write(_serverName + msg);
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -136,7 +137,7 @@ namespace Drive_LFSS.Log_
         }
         public void debug(string msg)
         {
-            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            if ((logDisable & LogType.LOG_DEBUG) > 0) return;
             string _serverName = GetServerName();
 
             mutexConsoleColor.WaitOne();
@@ -162,7 +163,7 @@ namespace Drive_LFSS.Log_
         }
         public void network(string msg)
         {
-            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            if ((logDisable & LogType.LOG_NETWORK) > 0) return;
             string _serverName = GetServerName();
 
             mutexConsoleColor.WaitOne();
@@ -173,9 +174,22 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
+        public void database(string msg)
+        {
+            if ((logDisable & LogType.LOG_DATABASE) > 0) return;
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                streamWriter.Write(System.DateTime.Now + " DATABASE: " + msg);
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            } mutexConsoleColor.ReleaseMutex();
+        }
         public void ping(string msg)
         {
-            if ((logDisable & LogType.LOG_ERROR) > 0) return;
+            if ((logDisable & LogType.LOG_PING) > 0) return;
             string _serverName = GetServerName();
 
             mutexConsoleColor.WaitOne();

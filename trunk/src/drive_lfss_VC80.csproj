@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="client\ForClientConnectionAsServerIs.cs" />
-    <Compile Include="database\dbs.cs" />
+    <Compile Include="database\database.cs" />
     <Compile Include="database\dbsSet.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />

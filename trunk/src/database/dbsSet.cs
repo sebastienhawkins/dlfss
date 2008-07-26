@@ -23,11 +23,17 @@ using Mono.Data.SqliteClient;
 using Drive_LFSS.Packet_;
 
 
+//This must be in fact into each Object into witch she belongue!
 
+//if will PB will probaly be into Driver or Car, really depend on how we see a TOC! 
+// PB follor Car when TOC occur so i think must be Driver! but not Licence!
+
+// In fact PB will be loaded when Server Start, and then Treated from Memory, Saveds at Interval, but no Select Request
+// Only INSERT, since we don't save PB, but LAP , so we COmpute PB at Load.. and Run it From memory! Not all Lap, but the PB.
 namespace Drive_LFSS.Database_
 
 {
-    public class racerPB
+   /* public class racerPB
     {
         public long uid;
         public string userName;
@@ -51,8 +57,8 @@ namespace Drive_LFSS.Database_
         IDataReader reader;
         private string setName;
         private long setId;
-        private DBConnection myDb;
-        public dbsSet(DBConnection pmyDb, string psetName)
+        private static Database myDb;
+        public dbsSet(Database pmyDb, string psetName)
         {
 
 
@@ -285,5 +291,5 @@ namespace Drive_LFSS.Database_
                 return HMSToLong(0, 0, 0);
             }
         }
-    }
+    }*/
 }

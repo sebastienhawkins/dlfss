@@ -67,7 +67,7 @@ namespace Drive_LFSS.Game_
         {
             if (TIMER_IM_A_TEST < diff) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
             {
-                Program.Log.debug("Player: " + driverName + ", is a InGame Driver.\r\n");
+                Program.log.debug("Player: " + driverName + ", is a InGame Driver.\r\n");
                 TIMER_IM_A_TEST = INTERVAL_IM_A_TEST;
             }
             else
