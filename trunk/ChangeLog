@@ -1,6 +1,6 @@
-DLFSS 0.0    (2008) svn://svn.aleajecta.com/dlfss/trunk
+DLFSS 0.1    (2008) svn://svn.aleajecta.com/dlfss/trunk
 
- DLFSS 0.0  - Codename "Event Horizon" - adds further improvements to the
+ DLFSS 0.1  - Codename "Event Horizon" - adds further improvements to the
  core as well as to the majority of game classes and the database.
 
 
@@ -10,7 +10,6 @@ DLFSS 0.0    (2008) svn://svn.aleajecta.com/dlfss/trunk
  ==== Core Features ====
 * Multiple Server Connection
 * SQLite Database
-
 
 ==== Statistics ====
  * Fixed Bugs: ???

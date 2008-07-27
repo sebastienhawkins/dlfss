@@ -114,7 +114,6 @@ namespace Drive_LFSS.PacketStore_
             }
             object[] _return = new object[2];
             _return[0] = udpReceivedQueud[0].packetType;
-
             _return[1] = toStruct(udpReceivedQueud[0].packetType, udpReceivedQueud[0].data);
             lock (udpReceivedQueud) { udpReceivedQueud.Remove(udpReceivedQueud[0]); }
             return _return;
@@ -130,10 +129,7 @@ namespace Drive_LFSS.PacketStore_
                 lock (udpReceivedQueud) { udpReceivedQueud.Remove(udpReceivedQueud[0]); }
                 return null;
             }
-            byte[] _return = new byte[udpReceivedQueud[0].packetSize+2];
-            _return[0] = udpReceivedQueud[0].packetSize;
-            _return[1] = (byte)udpReceivedQueud[0].packetType;
-            udpReceivedQueud[0].data.CopyTo(_return, 2);
+            byte[] _return = udpReceivedQueud[0].data;
             lock (udpReceivedQueud) { udpReceivedQueud.Remove(udpReceivedQueud[0]); }
             return _return;
         }
@@ -166,10 +162,7 @@ namespace Drive_LFSS.PacketStore_
                 lock (tcpReceivedQueud) { tcpReceivedQueud.Remove(tcpReceivedQueud[0]); }
                 return null;
             }
-            byte[] _return = new byte[tcpReceivedQueud[0].packetSize + 2];
-            _return[0] = tcpReceivedQueud[0].packetSize;
-            _return[1] = (byte)tcpReceivedQueud[0].packetType;
-            tcpReceivedQueud[0].data.CopyTo(_return, 2);
+            byte[] _return = tcpReceivedQueud[0].data;
             lock (tcpReceivedQueud) { tcpReceivedQueud.Remove(tcpReceivedQueud[0]); }
             return _return;
         }

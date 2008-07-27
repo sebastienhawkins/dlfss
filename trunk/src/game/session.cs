@@ -55,9 +55,21 @@ namespace Drive_LFSS.Game_
         {
             base.processPacket(_packet); //Keep the Log
 
+            //Since we create the driver index 0 in this.construstor()
+            //will conflit with the Host NCN receive packet, so here is a overide!
+            //will have to rethink this later, that is looking like a HackFix, suck CPU for nothing.
             if (ExistLicenceId(_packet.tempLicenceId))
-                log.error("New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
-
+            {
+                if (_packet.tempLicenceId == 0)
+                {
+                    driverList[0].Init(_packet);
+                }
+                else
+                {
+                    log.error("New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
+                    return;
+                }
+            }
             Driver _driver = new Driver();
             _driver.Init(_packet);
 

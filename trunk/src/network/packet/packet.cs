@@ -95,22 +95,6 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE, new PacketSTA());
         }
     }
-    [StructLayout(LayoutKind.Sequential)]public struct CarInformation
-    {
-        public ushort trackNode;
-        public ushort lapNumber;
-        public byte carId;
-        public byte position;
-        public Car_Flag carFlag;
-        internal byte Sp3;
-        public int posX;
-        public int posY;
-        public int posZ;
-        public ushort speed;
-        public ushort direction;
-        public ushort heading;
-        public short angleVelocity;
-    }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
     {
         internal byte packetSize;
@@ -696,63 +680,5 @@ namespace Drive_LFSS.Packet_
         public Vote_Action voteAction;
         public byte Spare2;
         public byte Spare3;
-    }
-    [StructLayout(LayoutKind.Sequential)]public struct NodeLap
-    {
-        public ushort trackNode;
-        public ushort lap;
-        public byte carId;
-        public byte position;
-    }
-    [StructLayout(LayoutKind.Sequential)]public struct OutGaugePack
-    {
-        internal byte packetSize;
-        internal byte packetType;
-        public uint Time;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string Car;
-        public Out_Gauge_Flag Flags;
-        public byte Gear;
-        public byte SpareB;
-        public float Speed;
-        public float RPM;
-        public float Turbo;
-        public float EngTemp;
-        public float Fuel;
-        public float OilPress;
-        public float Spare1;
-        public float Spare2;
-        public float Spare3;
-        public float Throttle;
-        public float Brake;
-        public float Clutch;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string Display1;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string Display2;
-        public int ID;
-    }
-    [StructLayout(LayoutKind.Sequential)]public struct OutSimPack
-    {
-        internal byte packetSize;
-        internal byte packetType;
-        public uint Time;
-        public VectorF AngVel;
-        public float Heading;
-        public float Pitch;
-        public float Roll;
-        public VectorF Accel;
-        public VectorF Vel;
-        public VectorI Pos;
-        public int ID;
-    }
-    [StructLayout(LayoutKind.Sequential)]public struct VectorF
-    {
-        public float x;
-        public float y;
-        public float z;
-    }
-    [StructLayout(LayoutKind.Sequential)]public struct VectorI
-    {
-        public int x;
-        public int y;
-        public int z;
     }
 }

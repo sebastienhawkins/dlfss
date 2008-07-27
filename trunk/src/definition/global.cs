@@ -15,10 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+using System;
+using System.Runtime.InteropServices;
 namespace Drive_LFSS.Definition_
 {
-    using System;
-
     public enum Ctrl_Types
     {
         CTRL_C_EVENT = 0,
@@ -299,5 +299,45 @@ namespace Drive_LFSS.Definition_
         OUTGAUGE_SIGNAL_L = 0x40,
         OG_SIGNAL_R = 0x80,
         OUTGAUGE_TC = 0x10
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CarInformation
+    {
+        public ushort trackNode;
+        public ushort lapNumber;
+        public byte carId;
+        public byte position;
+        public Car_Flag carFlag;
+        internal byte Sp3;
+        public int posX;
+        public int posY;
+        public int posZ;
+        public ushort speed;
+        public ushort direction;
+        public ushort heading;
+        public short angleVelocity;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct NodeLap
+    {
+        public ushort trackNode;
+        public ushort lap;
+        public byte carId;
+        public byte position;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VectorF
+    {
+        public float x;
+        public float y;
+        public float z;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VectorI
+    {
+        public int x;
+        public int y;
+        public int z;
     }
 }
