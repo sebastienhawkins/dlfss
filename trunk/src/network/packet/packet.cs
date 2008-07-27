@@ -57,11 +57,8 @@ namespace Drive_LFSS.Packet_
 
             packetSize = _data[0];
             packetType = (Packet_Type)_data[1];
-            
-            byte[] reformatedData = new byte[_data.Length - 2];
-            for (byte itr = 2; itr < packetSize; itr++)
-                reformatedData[itr-2] = _data[itr];
-            data = reformatedData;
+
+            data = _data;
         }
         public byte packetSize;
         public Packet_Type packetType;
