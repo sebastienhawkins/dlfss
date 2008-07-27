@@ -53,7 +53,8 @@ namespace Drive_LFSS.Game_
 
             base.Init(_packet);
         }
-        public void Init(CarInformation _carInformation)
+        
+        public void ProcessCarInformation(CarInformation _carInformation)
         {
             trackNode = _carInformation.trackNode;
             lapNumber = _carInformation.lapNumber;
@@ -67,12 +68,9 @@ namespace Drive_LFSS.Game_
             heading = _carInformation.heading;
             angleVelocity = _carInformation.angleVelocity;
 
-
-
-
             //base.Init(_packet);
         }
-        public void Init(PacketPLL _packet)
+        public void LeaveRace(PacketPLL _packet)
         {
             carId = 0;
         }

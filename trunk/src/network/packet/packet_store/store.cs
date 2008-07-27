@@ -34,11 +34,6 @@ namespace Drive_LFSS.PacketStore_
             tcpReceivedQueud = new List<Packet>();
             tcpSendingQueud = new List<Packet>();
         }
-
-        /*public ushort serverId
-        {
-            get{return ((Server)this).serverId;}
-        }*/
         private PacketStructureList struturedPacket;
         private List<Packet> udpReceivedQueud;      //Replace List with Queud
         private List<Packet> udpSendingQueud;       //Replace List with Queud
@@ -189,16 +184,16 @@ namespace Drive_LFSS.PacketStore_
         {
             //Program.Log.network("toStruct(), Constructor For packetType->" + _packetType + "\r\n");
 
-            object _packet = Activator.CreateInstance(struturedPacket[_packetType].GetType(), new string[] { });
+            object _struct = Activator.CreateInstance(struturedPacket[_packetType].GetType(), new string[] { });
 
-            IntPtr pStruct = Marshal.AllocHGlobal(Marshal.SizeOf(_packet));
+            IntPtr pStruct = Marshal.AllocHGlobal(Marshal.SizeOf(_struct));
             GCHandle hStruct = GCHandle.Alloc(pStruct, GCHandleType.Pinned);
             Marshal.Copy(_data, 0, pStruct, _data.Length);
-            _packet = Marshal.PtrToStructure(pStruct, _packet.GetType());
+            _struct = Marshal.PtrToStructure(pStruct, _struct.GetType());
             hStruct.Free();
             Marshal.FreeHGlobal(pStruct);
 
-            return _packet;
+            return _struct;
         }
 
     }

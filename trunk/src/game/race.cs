@@ -20,13 +20,22 @@ namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
+    using Drive_LFSS.Session_;
 
     public sealed class Race
 	{
-        private Licence_View_Option viewOptionMask;
+        public Race(ushort _serverId)
+        {
+            serverId = _serverId;
+        }
+        private ushort serverId;
+        private bool isRacing;
+        private uint timeStart;
+        private static uint guid; //Have to be initialized at Start, and we increment at each RaceEnd(Saving)
+
+        //LFS Insim Defined var
         private Race_Feature_Flag raceFeatureMask;
         private ushort nodeFinishIndex;
-        private Licence_Camera_Mode cameraMode;
         private byte connectionCount;
         private byte finishedCount;
         private ushort nodeCount;
@@ -48,7 +57,7 @@ namespace Drive_LFSS.Game_
             finishedCount = _packet.finishedCount;
             carCount = _packet.carCount;
             qualificationMinute = _packet.qualificationMinute;
-            raceInProgress = _packet.raceInProgress;
+            raceInProgress = (Race_In_Progress_Status)_packet.raceInProgress;
             racelaps = _packet.raceLaps;
             replaySpeed = _packet.replaySpeed;
             trackName = _packet.trackName;
@@ -73,10 +82,27 @@ namespace Drive_LFSS.Game_
             nodeSplit1Index = _packet.nodeSplit1Index;
             nodeSplit2Index = _packet.nodeSplit2Index;
             nodeSplit3Index = _packet.nodeSplit3Index;
+
+            RaceStart();
         }
         public void update(uint diff)
         {
+            if (isRacing)
+            {
+                if (raceInProgress == Race_In_Progress_Status.RACE_PROGRESS_NONE)
+                    SessionList.sessionList[serverId].session.log.error("Just for Fun\r\n");  
+            }
+        }
 
+        private void RaceStart()
+        {
+            timeStart = (uint)(System.DateTime.Now.Ticks / 10000);
+            isRacing = true;
+        }
+        private void RaceEnd()
+        {
+            timeStart = 0;
+            isRacing = false;
         }
 	}
 }

@@ -32,74 +32,28 @@ namespace Drive_LFSS.Game_
         public  Session(ushort _serverId, InSimSetting _inSimSetting) : base(_serverId, _inSimSetting)
         {
             driverList = new List<Driver>();
+            driverList.Add(new Driver()); //put Default Driver 0, will save some If.
             driverList.Capacity = 192;
 
-            race = new Race();
+            race = new Race(_serverId);
             commandPrefix = _inSimSetting.CommandPrefix;
         }
-        private Race race;
-        private List<Driver> driverList;
         private char commandPrefix;
 
-        private byte GetCarIndex(byte _carId)
-        {
-            for (byte itr = 0; itr < driverList.Count; itr++ )
-            {
-                if (driverList[itr].prCarId == _carId)
-                    return itr;
-            }
-            return 0;
-        }
-        private List<byte> GetLicenceIndex(byte _licenceId)
-        {
-            List<byte> _return = new List<byte>();
+        private Race race;
+        private List<Driver> driverList;
 
-            for (byte itr = 0; itr < driverList.Count; itr++)
-            {
-                if ( ((Licence)driverList[itr]).LicenceId == _licenceId)
-                    _return.Add(itr);
-            }
-            return _return;
-        }
-        private byte GetLicenceIndexWithName(byte _licenceId, string _driverName)
-        {
-            for (byte itr = 0; itr < driverList.Count; itr++)
-            {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId && ((Driver)driverList[itr]).prDriverName == _driverName )
-                    return itr;
-            }
-            return 0;
-        }
-        private byte GetFirstLicenceIndex(byte _licenceId)
-        {
-            for (byte itr = 0; itr < driverList.Count; itr++)
-            {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId)
-                    return itr;
-            }
-            return 0;
-        }
-        private bool ExistLicenceId(byte _licenceId)
-        {
-            byte itrEnd = (byte)driverList.Count;
-
-            for (byte itr = 0; itr < itrEnd; itr++)
-            {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId)
-                    return true;
-            }
-            return false;
-        }
         new public void update(uint diff)
         {
             base.update(diff);
             foreach (Driver _driver in driverList)
                 _driver.update(diff);
-        }
 
+            race.update(diff);
+        }
         protected sealed override void processPacket(PacketNCN _packet)
         {
-            base.processPacket(_packet); // Will Reprocess the Old One
+            base.processPacket(_packet); //Keep the Log
 
             if (ExistLicenceId(_packet.tempLicenceId))
                 log.error("New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
@@ -112,7 +66,7 @@ namespace Drive_LFSS.Game_
         protected sealed override void processPacket(PacketCNL _packet)
         {
             //TODO: use _packet.Total as a Debug check to be sure we have same racer count into our memory as the server do. 
-            base.processPacket(_packet); // Will Reprocess the Old One
+            base.processPacket(_packet); //Keep the Log
 
             if (!ExistLicenceId(_packet.tempLicenceId))
             {
@@ -126,9 +80,9 @@ namespace Drive_LFSS.Game_
             while((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)          
                 driverList.RemoveAt((int)itr);
         }
-        protected sealed override void processPacket(PacketNPL _packet)
+        protected sealed override void processPacket(PacketNPL _packet) //New Car Join Race
         {
-            base.processPacket(_packet); // Will Reprocess the Old One
+            base.processPacket(_packet); //Keep the Log
 
             if (!ExistLicenceId(_packet.tempLicenceId))
             {
@@ -156,9 +110,9 @@ namespace Drive_LFSS.Game_
                 driverList[GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)].Init(_packet);
             }
         }
-        protected sealed override void processPacket(PacketPLL _packet)
+        protected sealed override void processPacket(PacketPLL _packet) // player leave (spectate - loses slot)
         {
-            base.processPacket(_packet); // Will Reprocess the Old One
+            base.processPacket(_packet); //Keep the Log
 
             byte itr;
             if ((itr = GetCarIndex(_packet.carId)) == 0)
@@ -168,19 +122,17 @@ namespace Drive_LFSS.Game_
             }
 
             //Do a Init in case we need a Action happen into Car when leave race....
-            ((Car)driverList[itr]).Init(_packet); //Static Cast Car object since only him is needed into that case.
+            ((Car)driverList[itr]).LeaveRace(_packet);
         }
-        protected sealed override void processPacket(PacketMCI _packet)
+        protected sealed override void processPacket(PacketMCI _packet) // Multiple Car Information
         {
             base.processPacket(_packet); // Will Reprocess the Old One
 
             CarInformation[] carInformation = _packet.carInformation;
             for (byte itr = 0; itr < carInformation.Length; itr++)
-                driverList[GetCarIndex(carInformation[itr].carId)].Init(carInformation[itr]);
-
-            //log.network("Received MCI Packet... From Session\r\n");
+                ((Car)driverList[GetCarIndex(carInformation[itr].carId)]).ProcessCarInformation(carInformation[itr]);
         }
-        protected sealed override void processPacket(PacketMSO _packet)
+        protected sealed override void processPacket(PacketMSO _packet) //message out
         {
             base.processPacket(_packet);
             //Chat_User_Type chatUserType = allo;
@@ -215,6 +167,58 @@ namespace Drive_LFSS.Game_
             //Can receive some info about the Car that triggered this State Change...
             //TODO: Add this Init into Driver If carId is Found into STA.
         }
+
+        #region Driver/Car/Licence Association Tool
+        private byte GetCarIndex(byte _carId)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+            {
+                if (driverList[itr].prCarId == _carId)
+                    return itr;
+            }
+            return 0;
+        }
+        private List<byte> GetLicenceIndex(byte _licenceId)
+        {
+            List<byte> _return = new List<byte>();
+
+            for (byte itr = 0; itr < driverList.Count; itr++)
+            {
+                if (((Licence)driverList[itr]).LicenceId == _licenceId)
+                    _return.Add(itr);
+            }
+            return _return;
+        }
+        private byte GetLicenceIndexWithName(byte _licenceId, string _driverName)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+            {
+                if (((Licence)driverList[itr]).LicenceId == _licenceId && ((Driver)driverList[itr]).prDriverName == _driverName)
+                    return itr;
+            }
+            return 0;
+        }
+        private byte GetFirstLicenceIndex(byte _licenceId)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+            {
+                if (((Licence)driverList[itr]).LicenceId == _licenceId)
+                    return itr;
+            }
+            return 0;
+        }
+        private bool ExistLicenceId(byte _licenceId)
+        {
+            byte itrEnd = (byte)driverList.Count;
+
+            for (byte itr = 0; itr < itrEnd; itr++)
+            {
+                if (((Licence)driverList[itr]).LicenceId == _licenceId)
+                    return true;
+            }
+            return false;
+        }
+        #endregion
     }
 }
 /* Text Color

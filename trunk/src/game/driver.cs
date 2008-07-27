@@ -76,7 +76,6 @@ namespace Drive_LFSS.Game_
             base.update(diff);
         }
         
-        
         private bool adminFlag;
         private string driverName;
         private byte driverModel;
@@ -87,12 +86,12 @@ namespace Drive_LFSS.Game_
         public bool prAdminFlag
         {
             get { return adminFlag; }
-            set { adminFlag = value; }
+            //set { adminFlag = value; }
         }
         public string prDriverName
         {
             get { return driverName; }
-            set { driverName = value; }
+           // set { driverName = value; }
         }
 
 

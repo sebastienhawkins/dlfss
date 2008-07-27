@@ -154,7 +154,7 @@ namespace Drive_LFSS.InSim_
                 TcpReceive();
                 UdpReceive();
                 TcpSend();
-                UdpSend();
+                //UdpSend();
             }
         }
         private void TcpSend()

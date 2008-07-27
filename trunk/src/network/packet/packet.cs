@@ -206,7 +206,7 @@ namespace Drive_LFSS.Packet_
         public byte InGameCam;
         public float FOV;
         public ushort Time;
-        public Licence_View_Option Flags;
+        public Licence_View_Flag Flags;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCPR
     {
@@ -548,8 +548,8 @@ namespace Drive_LFSS.Packet_
     {
         public byte requestId;
         internal byte zero;
-        public float replaySpeed;
-        public Licence_View_Option viewOptionMask;
+        public uint replaySpeed;
+        public Licence_View_Flag viewOptionMask;
         public Licence_Camera_Mode cameraMode;
         public byte currentCarId;
         public byte carCount;
@@ -557,14 +557,14 @@ namespace Drive_LFSS.Packet_
         public byte finishedCount;  //Not sure if this is , Finished Position or Number of Car who finish.
         public Race_In_Progress_Status raceInProgress;
         public byte qualificationMinute;
-        
+
         // 0       : practice
         // 1-99    : number of laps...   laps  = rl
         // 100-190 : 100 to 1000 laps... laps  = (rl - 100) * 10 + 100
         // 191-238 : 1 to 48 hours...    hours = rl - 190
         public byte raceLaps;
-        internal byte spare2;
-        internal byte spare3;
+        public byte spare2;
+        public byte spare3;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=6)]public string trackName;
         public Weather_Status weatherStatus;
         public Wind_Status windStatus;

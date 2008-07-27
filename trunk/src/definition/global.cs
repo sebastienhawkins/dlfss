@@ -263,7 +263,7 @@ namespace Drive_LFSS.Definition_
         KEY_NONE = 0,
         KEY_SHIFT = 1
     }
-    [Flags]public enum Licence_View_Option : ushort
+    [Flags]public enum Licence_View_Flag : ushort
     {
         ISS_FRONT_END = 0x100,
         ISS_GAME = 1,
