@@ -61,8 +61,8 @@ namespace Drive_LFSS.Game_
             racelaps = _packet.raceLaps;
             replaySpeed = _packet.replaySpeed;
             trackName = _packet.trackName;
-            weatherStatus = _packet.weatherStatus;
-            windStatus = _packet.windStatus;
+            weatherStatus = (Weather_Status)_packet.weatherStatus;
+            windStatus = (Wind_Status)_packet.windStatus;
             
             //viewOptionMask = _packet.viewOptionMask;  //This is about the Driver/Car/Licence
             //cameraMode = _packet.cameraMode;          //This is about the Driver/Car/Licence

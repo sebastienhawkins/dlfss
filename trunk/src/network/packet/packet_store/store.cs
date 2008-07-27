@@ -81,10 +81,7 @@ namespace Drive_LFSS.PacketStore_
                 lock (udpSendingQueud) { udpSendingQueud.Remove(udpSendingQueud[0]); }
                 return null;
             }
-            byte[] _return = new byte[udpSendingQueud[0].packetSize+2];
-            _return[0] = (byte)(udpSendingQueud[0].packetSize+2);
-            _return[1] = (byte)udpSendingQueud[0].packetType;
-            udpSendingQueud[0].data.CopyTo(_return, 2);
+            byte[] _return = udpSendingQueud[0].data;
             lock (udpSendingQueud) { udpSendingQueud.Remove(udpSendingQueud[0]); }
             return _return;
         }
@@ -99,10 +96,7 @@ namespace Drive_LFSS.PacketStore_
                 lock (tcpSendingQueud) { tcpSendingQueud.Remove(tcpSendingQueud[0]); }
                 return null;
             }
-            byte[] _return = new byte[tcpSendingQueud[0].packetSize + 2];
-            _return[0] = (byte)(tcpSendingQueud[0].packetSize + 2);
-            _return[1] = (byte)tcpSendingQueud[0].packetType;
-            tcpSendingQueud[0].data.CopyTo(_return, 2);
+            byte[] _return = tcpSendingQueud[0].data;
             lock (tcpSendingQueud) { tcpSendingQueud.Remove(tcpSendingQueud[0]); }
             return _return;
         }

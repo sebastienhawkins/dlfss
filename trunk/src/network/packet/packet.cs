@@ -25,20 +25,18 @@ namespace Drive_LFSS.Packet_
 
     sealed public class Packet                               ///<summary>This is a test ho what a test!</summary><returns></returns>                                  
     {
-        public Packet(Protocol_Id _protocolId, Packet_Size _packetSize, Packet_Type _packetType, byte[] _data)
+        public Packet(Packet_Size _packetSize, Packet_Type _packetType, byte[] _data)
         {
             //((Server)this).log.debug("Packet(), PacketType->" + _packetType + "\r\n");
 
-            protocolId = _protocolId;
             packetSize = (byte)_packetSize;
             packetType = _packetType;
             data = _data;
         }
-        public Packet(Protocol_Id _protocolId, Packet_Size _packetSize, Packet_Type _packetType, object _packet)
+        public Packet(Packet_Size _packetSize, Packet_Type _packetType, object _packet)
         {
             //((Server)this).log.debug("Packet(), Destructor->PacketType->" + _packetType + "\r\n");
 
-            protocolId = _protocolId;
             packetSize = (byte)_packetSize;
             packetType = _packetType;
 
@@ -53,11 +51,10 @@ namespace Drive_LFSS.Packet_
 
             data = _byteBuffer;
         }
-        public Packet(Protocol_Id _protocolId, byte[] _data)
+        public Packet(byte[] _data)
         {
             //((Server)this).log.debug("Packet(), PacketType->" + (Packet_Type)_data[1] + "\r\n");
 
-            protocolId = _protocolId;
             packetSize = _data[0];
             packetType = (Packet_Type)_data[1];
             
@@ -66,7 +63,6 @@ namespace Drive_LFSS.Packet_
                 reformatedData[itr-2] = _data[itr];
             data = reformatedData;
         }
-        public Protocol_Id protocolId;
         public byte packetSize;
         public Packet_Type packetType;
         public byte[] data;
@@ -120,6 +116,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte AXStart;
@@ -129,11 +127,15 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXO
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBFN
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public Button_Function SubT;
         public byte UCID;
@@ -143,6 +145,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTC
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte UCID;
         public byte ClickID;
@@ -152,6 +156,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTN
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte UCID;
         public byte ClickID;
@@ -166,6 +172,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTT
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte UCID;
         public byte ClickID;
@@ -176,6 +184,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCCH
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
         public Licence_Camera_Mode Camera;
@@ -185,6 +195,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCNL
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte tempLicenceId;
         public Leave_Reason Reason;
@@ -194,6 +206,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCPP
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public int X;
@@ -210,6 +224,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCPR
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte UCID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string PName;
@@ -217,11 +233,15 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCRS
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketFIN
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
         public uint TTime;
@@ -235,6 +255,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketFLG
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
         public byte OffOn;
@@ -244,6 +266,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketIII
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte UCID;
@@ -254,30 +278,36 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketISI
     {
-        public PacketISI(byte _requestId, ushort _udpPort, ushort _flags, char _commandPrefix, ushort _interval, string _adminPassword, string _connectionName)
+        public PacketISI(byte _resquestId, ushort _udpPort, ushort _flags, char _prefix, ushort _interval, string _admin, string _iname)
         {
-            ReqI = _requestId;
+            packetSize = Packet_Size.PACKET_SIZE_ISI;
+            packetType = Packet_Type.PACKET_ISI_INSIM_INITIALISE;
+            ReqI = _resquestId;
             Zero = 0;
             UDPPort = _udpPort;
             Flags = _flags;
             Sp0 = 0;
-            Prefix = (byte)_commandPrefix;
+            Prefix = _prefix;
             Interval = _interval;
-            Admin = _adminPassword;
-            IName = _connectionName;
+            Admin = _admin;
+            IName = _iname;
         }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
         public byte ReqI;
         internal byte Zero;
         public ushort UDPPort;
         public ushort Flags;
         internal byte Sp0;
-        public byte Prefix;
+        public char Prefix;
         public ushort Interval;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string Admin;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string IName;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketISM
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte Host;
@@ -288,6 +318,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketLAP
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
         public uint LTime;
@@ -301,12 +333,16 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMCI
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte NumC;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst=8)]public CarInformation[] carInformation;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMOD
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public int Bits16;
@@ -316,12 +352,16 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSL
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public Chat_Console_Sound Sound;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x80)]public string Msg;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSO
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte tempLicenceId;
@@ -333,6 +373,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMST
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]
@@ -340,6 +382,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSX
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x60)]
@@ -347,6 +391,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMTC
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte UCID;
@@ -357,6 +403,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketNCN
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         public byte tempLicenceId;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string licenceName;
@@ -368,12 +416,16 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketNLP
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte NumP;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst=0x20)]public NodeLap[] Info;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketNPL
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         public byte carId;
         public byte tempLicenceId;
@@ -399,6 +451,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPEN
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
         public Penalty_Type OldPen;
@@ -408,6 +462,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPFL
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
         public Driver_Flag Flags;
@@ -415,6 +471,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPIT
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte PLID;
         public ushort LapsDone;
@@ -432,6 +490,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPLA
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte carId;
         public Pit_Lane_State Fact;
@@ -441,16 +501,22 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPLL
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         public byte carId;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPLP
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         public byte carId;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPSF
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         public byte carId;
         public uint STime;
@@ -458,6 +524,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketREO
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte NumP;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst=0x20)]
@@ -465,6 +533,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketRES
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte carId;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string UName;
@@ -485,6 +555,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketRST
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte raceLaps;
@@ -503,6 +575,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSCC
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte ViewPLID;
@@ -512,6 +586,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSCH
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public byte CharB;
@@ -521,6 +597,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSFP
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         internal byte Zero;
         public ushort Flag;
@@ -529,12 +607,16 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSmall
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public Small_Type SubT;
         public uint UVal;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSPX
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte ReqI;
         public byte carId;
         public uint STime;
@@ -546,9 +628,11 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSTA
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         internal byte zero;
-        public uint replaySpeed;
+        public float replaySpeed;
         public Licence_View_Flag viewOptionMask;
         public Licence_Camera_Mode cameraMode;
         public byte currentCarId;
@@ -568,19 +652,26 @@ namespace Drive_LFSS.Packet_
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=6)]public string trackName;
         public Weather_Status weatherStatus;
         public Wind_Status windStatus;
+        //internal byte zero2;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketTiny
     {
         public PacketTiny(byte _resquestId, Tiny_Type _subTinyType)
         {
+            packetSize = Packet_Size.PACKET_SIZE_TINY;
+            packetType = Packet_Type.PACKET_TINY_MULTI_PURPOSE;
             requestId = _resquestId;
             subTinyType = _subTinyType;
         }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
         public byte requestId;
         public Tiny_Type subTinyType;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketTOC
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         public byte carId;
         public byte oldTLID;
@@ -590,6 +681,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketVER
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         internal byte zero;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string serverVersion;
@@ -598,6 +691,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketVTN
     {
+        internal byte packetSize;
+        internal byte packetType;
         public byte requestId;
         internal byte Zero;
         public byte tempLicenceId;
@@ -614,6 +709,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct OutGaugePack
     {
+        internal byte packetSize;
+        internal byte packetType;
         public uint Time;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string Car;
         public Out_Gauge_Flag Flags;
@@ -637,6 +734,8 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct OutSimPack
     {
+        internal byte packetSize;
+        internal byte packetType;
         public uint Time;
         public VectorF AngVel;
         public float Heading;
