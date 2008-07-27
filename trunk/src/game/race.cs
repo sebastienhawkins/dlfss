@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+using System.Collections.Generic;
 namespace Drive_LFSS.Game_
 {
-    using System.Collections.Generic;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
 

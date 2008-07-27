@@ -16,22 +16,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 using System;
+using System.Collections.Generic;
+using System.Timers;
 using System.Threading;
 using System.Runtime.InteropServices;
 
-//using MySql.Data.MySqlClient;
-//using MySql.Data.Types;
-
 namespace Drive_LFSS
 {
-    using System.Timers;
-    using System.Collections.Generic;
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Log_;
     using Drive_LFSS.CommandConsole_;
     using Drive_LFSS.Session_;
     using Drive_LFSS.Database_;
-
+    using Mono.Data.SqliteClient;
     internal static class Program
     {
         #region Loop / Console / TrapSIGNTerm
@@ -69,40 +66,35 @@ namespace Drive_LFSS
             if (!sLog.Initialize())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n");
+                Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n\r\n");
+                CommandConsole.Exec("exit");
                 return;
             }
             log = new sLog();
-            log.normal("Log System Initialized...\r\n");
+            log.normal("Log System Initialized...\r\n\r\n");
 
             //Write Startup Banner
             WriteBanner();
 
             //InGame Command System
-            log.normal("Initialization of InGame Command.\r\n");
+            log.normal("Initialization of InGame Command.\r\n\r\n");
             //Command.Init();
             
             //Console System, Purpose for MultiThreading the Console Input
-            log.normal("Initialization of Console Command.\r\n");
+            log.normal("Initialization of Console Command.\r\n\r\n");
             ThreadCaptureConsoleCommand.Start();
 
             //Database Initialization
-            log.normal("Initialization of SQLite Database...\r\n");
-
-            if (!Database.Initialize())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Can't Initialize the Database System, Will now QUIT.!\r\n");
-                return;
-            }
+            log.normal("Initialization of SQLite Database...\r\n\r\n");
+            Database.Initialize();
 
             //Create Object for All Configured Server
             log.normal("Loading Servers Config...\r\n");
             SessionList.LoadServerConfig( );
-            log.normal("Initialization of Servers Config...\r\n");
+            log.normal("Initialization of Servers Config...\r\n\r\n");
             //Session.InitializeServerList();
 
-            log.normal("Starting Normal Operation!\r\n");
+            log.normal("Starting Normal Operation!\r\n\r\n");
             #region MainThread update
             uint TimerLogFlush = 0;
             while (MainRun)
@@ -152,11 +144,7 @@ namespace Drive_LFSS
             {
                 consoleText = Console.ReadLine();
                 if (consoleText != null && consoleText.Length < 1) continue;
-                switch (consoleText)
-                {
-                    case "exit": CommandConsole.Exit(); break;
-                    default: log.error("Unknow Command: " + consoleText + "\r\n"); break;
-                }
+                CommandConsole.Exec(consoleText);
                 System.Threading.Thread.Sleep(sleep);
             }
         }
@@ -212,6 +200,7 @@ namespace Drive_LFSS
             System.Environment.Exit(-1);
             return true;
         }
+        //Call this: CommandConsole.Exec("exit");
         public static void Exit()
         {
             MainRun = false;

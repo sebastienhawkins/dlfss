@@ -17,13 +17,26 @@
  */
 namespace Drive_LFSS.CommandConsole_
 {
-    //using System;
+    using Drive_LFSS;
     //using System.Collections.Generic;
     //using System.Text;
 
-    sealed class CommandConsole
+    static class CommandConsole
     {
-        public static void Exit()
+        public static void Exec(string _commandText)
+        {
+            switch (_commandText)
+            {
+                case "exit": Exit(); break;
+                default:
+                {
+                    if (_commandText != " ")
+                        Program.log.error("Unknow Command: " + _commandText + "\r\n");
+                    break;
+                }
+            }
+        }
+        private static void Exit()
         {
             Program.log.normal("Exiting Requested, Please Wait For All Thread Too Close...\n\r");
             Program.Exit();

@@ -36,8 +36,6 @@ namespace Drive_LFSS.Game_
 
             race = new Race();
             commandPrefix = _inSimSetting.CommandPrefix;
-
-
         }
         private Race race;
         private List<Driver> driverList;

@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+using System;
+using System.Collections.Generic;
+using System.Threading;
 namespace Drive_LFSS.Log_
 {
-    using System;
-    using System.Collections.Generic;
     using Drive_LFSS.Session_;
-    using System.Threading;
 
     public enum LogType
     {

@@ -19,9 +19,9 @@ using System;
 using System.Text;
 using System.Data;
 using Mono.Data.SqliteClient;
-
 namespace Drive_LFSS.Database_
 {
+
     //In fact connection should be a Object inside the ServerDatabase Object, so other object related to the DB
     //become Child of each other...
     public static class Database
@@ -31,26 +31,13 @@ namespace Drive_LFSS.Database_
         private static IDbCommand command;
 
         //Create a Initialisation Proc for the DB...
-        public static bool Initialize()
+        public static void Initialize()
         {
             //When config.cs is complete will take this value from there!
-            try{(connection = (IDbConnection)new SqliteConnection("URI=file:dlfss.db,version=3")).Open();}
-            catch (Exception _exception)
-            {
-                Program.log.error(_exception.Message);
-                return false;
-            }
-            
+            connection = (IDbConnection)new SqliteConnection("URI=file:dlfss.sqlite,version=3");
+            connection.Open();
             command = connection.CreateCommand();
-
-            try { CreateEachTable(); }
-            catch (Exception _exception)
-            {
-                Program.log.error(_exception.Message);
-                return false;
-            }
-
-            return true;
+            CreateEachTable();
         }
         //This is not good desing i think,
         //must be created from Array, Const, Config  or External SQL file, What ever and have just 1 Proc doing the job.
