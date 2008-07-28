@@ -72,9 +72,13 @@ namespace Drive_LFSS.Server_
         
         #endregion
 
-        public void commandExec(bool _adminStatus, string _driverName, string _commandText)
+        new public void AddToTcpSendingQueud(Packet _serverPacket)
         {
-            command.Exec(_adminStatus, _driverName, _commandText);
+            base.AddToUdpSendingQueud(_serverPacket);
+        }
+        protected void commandExec(bool _adminStatus, string _licenceName, string _commandText)
+        {
+            command.Exec(_adminStatus, _licenceName, _commandText);
         }
         private void SimiliButtonTesting(byte uCID)
         {

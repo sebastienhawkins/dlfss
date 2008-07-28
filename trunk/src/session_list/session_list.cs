@@ -40,6 +40,11 @@ namespace Drive_LFSS.Session_
             public ushort sessionId;
             public InSimSetting inSimSetting;
             public Session session;
+
+            internal void Send_MST_Message(string p)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
         }
 
         //ServerId To "Server"

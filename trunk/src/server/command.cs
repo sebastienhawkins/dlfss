@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+using System;
+using System.Collections.Generic;
 namespace Drive_LFSS.Server_
 {
-    using System;
-    using System.Collections.Generic;
-    //using System.Text;
+    //using Drive_LFSS.PacketStore_;
+    using Drive_LFSS.Packet_;
     using Drive_LFSS.Game_;
     using Drive_LFSS.Session_;
 
@@ -46,7 +47,7 @@ namespace Drive_LFSS.Server_
             public CommandDelegate cmd;
         }
 
-        private delegate void CommandDelegate(bool _adminStatus, string _driverName, string _commandText);
+        private delegate void CommandDelegate(bool _adminStatus, string _licenceName, string _commandText);
         
         private Dictionary<string,CommandName> command = new Dictionary<string,CommandName> ();
 
@@ -54,25 +55,26 @@ namespace Drive_LFSS.Server_
         {
             return serverId;
         }
-        public void Exec(bool _adminStatus, string _driverName, string _commandText)
+        public void Exec(bool _adminStatus, string _licenceName, string _commandText)
         {
-           /* string[] args = commandText.Split(' ');                 //Can Be little faster... since we need only left to first white space
+            string[] args = _commandText.Split(' ');                 //Can Be little faster... since we need only left to first white space
             args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
 
-            if (args.Length < 1 || !command.ContainsKey(args[0].ToLower()) || (command[args[0]].level > 0 && !licence.admin()))
+            if (args.Length < 1 || !command.ContainsKey(args[0].ToLower()) || (command[args[0]].level > 0 && !_adminStatus))
             {
-                SessionList.serverList[serverId].server.log.debug("Command.Exec(), Bad Command Call From User: " + licence.GetConnectionPlayerName() + ", AccessLevel: " + (licence.IsAdmin()?"1":"0") + ", CommandSend: " + commandText + "\r\n");
+                SessionList.sessionList[serverId].session.log.debug("Command.Exec(), Bad Command Call From User: " + _licenceName + ", AccessLevel: " + (_adminStatus ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
-            command[args[0]].cmd(licence, commandText);*/
+            command[args[0]].cmd(_adminStatus,_licenceName, _commandText);
         }
         #region Commands
-        private void Exit(bool _adminStatus, string _driverName, string _commandText)
+        private void Exit(bool _adminStatus, string _licenceName, string _commandText)
         {
-            //Program.log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
+            //SessionList.sessionList[serverId].session.log.command(
+            Program.log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
             Program.Exit();
         }
-        private void Kick(bool _adminStatus, string _driverName, string _commandText)
+        private void Kick(bool _adminStatus, string _licenceName, string _commandText)
         {
 
             string[] args = _commandText.Split(' ');
@@ -83,9 +85,8 @@ namespace Drive_LFSS.Server_
             }
             args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
 
-            //Program.log.command("Command.Kick(), User: " + client.pName + ", Kicked User: " + args[1] + "\r\n");
-
-            //Session.server[serverId].Send_MST_Message("/kick " + args[1]);
+            SessionList.sessionList[serverId].session.log.command("Command.Kick(), User: " + _licenceName + ", Kicked User: " + args[1] + "\r\n");
+            SessionList.sessionList[serverId].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST("/kick" + args[1])));
         }
         #endregion
     }

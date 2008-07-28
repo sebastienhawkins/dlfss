@@ -160,7 +160,7 @@ namespace Drive_LFSS.Game_
                 log.debug("Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
 
                 
-                ((Server)this).commandExec(_driver.prAdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
+                commandExec(_driver.prAdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
             }
             else
             {

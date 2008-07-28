@@ -354,12 +354,28 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMST
     {
-        internal byte packetSize;
-        internal byte packetType;
-        public byte ReqI;
-        internal byte Zero;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]
-        public string Msg;
+        public PacketMST(byte _requestId, string _message)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_MST;
+            packetType = Packet_Type.PACKET_MST_SEND_NORMAL_CHAT;
+            requestId = _requestId;
+            zero = 0;
+            message = _message;
+
+        }
+        public PacketMST(string _message)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_MST;
+            packetType = Packet_Type.PACKET_MST_SEND_NORMAL_CHAT;
+            requestId = 0;
+            zero = 0;
+            message = _message;
+        }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
+        public byte requestId;
+        internal byte zero;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSX
     {
