@@ -105,7 +105,7 @@ namespace Drive_LFSS
                 ticks = DateTime.Now.Ticks;
 
                 TimerLogFlush += diff;
-                if (TimerLogFlush > 8000)
+                if (TimerLogFlush > 30000)
                 {
                     TimerLogFlush = 0;
                     sLog.flush();
