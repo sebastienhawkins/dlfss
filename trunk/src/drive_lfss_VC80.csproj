@@ -59,7 +59,7 @@
     <Compile Include="database\database.cs" />
     <Compile Include="database\database_sqlite.cs" />
     <Compile Include="database\dbsSet.cs" />
-    <Compile Include="database\database_storage.cs" />
+    <Compile Include="database\storage_sqlite.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="network\packet\enum.cs" />
