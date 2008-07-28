@@ -74,7 +74,7 @@ namespace Drive_LFSS.Server_
 
         new public void AddToTcpSendingQueud(Packet _serverPacket)
         {
-            base.AddToUdpSendingQueud(_serverPacket);
+            base.AddToTcpSendingQueud(_serverPacket);
         }
         protected void commandExec(bool _adminStatus, string _licenceName, string _commandText)
         {

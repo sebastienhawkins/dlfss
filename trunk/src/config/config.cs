@@ -17,14 +17,17 @@
  */
 namespace Drive_LFSS.Config_
 {
-    //using System;
-    //using System.Collections.Generic;
-    //using System.Text;
+    using System.Collections.Generic;
 
-    sealed class config
+
+using System.Collections.Specialized;
+
+    sealed class Config
     {
-        private const string configPath = ".\\config.cfg";
+        private const string configPath = "./config.cfg";
 
+        //System.Configuration.ConfigXmlDocument
+        //ConfigurationFileReader.ParmProcessor
         // Delete the file if it exists.
        /* public config()
         {

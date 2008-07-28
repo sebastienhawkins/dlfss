@@ -93,6 +93,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_ISI_INSIM_INITIALISE, new PacketISI());
             Add(Packet_Type.PACKET_RST_RACE_START, new PacketRST());
             Add(Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE, new PacketSTA());
+            Add(Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -375,7 +376,7 @@ namespace Drive_LFSS.Packet_
         internal Packet_Type packetType;
         public byte requestId;
         internal byte zero;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string message;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=64)]public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSX
     {

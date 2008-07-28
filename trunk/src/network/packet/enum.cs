@@ -19,7 +19,7 @@ namespace Drive_LFSS.Packet_
 {
     public enum Packet_Size : byte  //packetSize Must NOT Include: packetSize and PacketType
     {
-        PACKET_SIZE_MST = 44,
+        PACKET_SIZE_MST = 68,
         PACKET_SIZE_ISI = 44,
         PACKET_SIZE_TINY = 4
     }

@@ -86,7 +86,7 @@ namespace Drive_LFSS.Server_
             args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
 
             SessionList.sessionList[serverId].session.log.command("Command.Kick(), User: " + _licenceName + ", Kicked User: " + args[1] + "\r\n");
-            SessionList.sessionList[serverId].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST("/kick" + args[1])));
+            SessionList.sessionList[serverId].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST("/kick " + args[1])));
         }
         #endregion
     }

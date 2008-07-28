@@ -92,6 +92,7 @@
     <None Include="..\sql\dlfss.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="drive_lfss\dlfss.cfg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
