@@ -57,7 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="database\database.cs" />
+    <Compile Include="database\database_sqlite.cs" />
     <Compile Include="database\dbsSet.cs" />
+    <Compile Include="database\database_storage.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="network\packet\enum.cs" />
@@ -77,16 +79,19 @@
     <Compile Include="assembly_info.cs" />
     <None Include="app.config" />
     <None Include="res\icone.res" />
-    <None Include="..\dep\lib\sqlite3.6.0.so">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <Compile Include="network\insim\insim.cs" />
     <Compile Include="network\packet\packet.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\dep\lib\sqlite3.dll">
+    <None Include="..\dep\lib\sqlite3.6.0.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Include="..\dep\lib\sqlite3.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\sql\dlfss.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

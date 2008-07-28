@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 using System;
 using System.Collections.Generic;
 using System.Timers;
@@ -77,21 +78,21 @@ namespace Drive_LFSS
             WriteBanner();
 
             //InGame Command System
-            log.normal("Initialization of InGame Command.\r\n\r\n");
+            log.normal("Initializating InGame Command.\r\n\r\n");
             //Command.Init();
             
             //Console System, Purpose for MultiThreading the Console Input
-            log.normal("Initialization of Console Command.\r\n\r\n");
+            log.normal("Initializating Console Command.\r\n\r\n");
             ThreadCaptureConsoleCommand.Start();
 
             //Database Initialization
-            log.normal("Initialization of SQLite Database...\r\n\r\n");
-            Database.Initialize();
+            log.normal("Initializating Database...\r\n\r\n");
+            DatabaseStorage.Initialize();
 
             //Create Object for All Configured Server
-            log.normal("Loading Servers Config...\r\n");
+            log.normal("Initializating Servers Config...\r\n\r\n");
             SessionList.LoadServerConfig( );
-            log.normal("Initialization of Servers Config...\r\n\r\n");
+            
             //Session.InitializeServerList();
 
             log.normal("Starting Normal Operation!\r\n\r\n");

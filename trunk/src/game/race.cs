@@ -21,12 +21,14 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Session_;
+    using Drive_LFSS.Database_;
 
     public sealed class Race
 	{
         public Race(ushort _serverId)
         {
             serverId = _serverId;
+            gridOrder = "";
         }
         private ushort serverId;
         private bool isRacing;
@@ -50,6 +52,7 @@ namespace Drive_LFSS.Game_
         private string trackName;
         private Weather_Status weatherStatus;
         private Wind_Status windStatus;
+        private string gridOrder;
 
         public void Init(PacketSTA _packet)
         {
@@ -90,7 +93,7 @@ namespace Drive_LFSS.Game_
             if (isRacing)
             {
                 if (raceInProgress == Race_In_Progress_Status.RACE_PROGRESS_NONE)
-                    SessionList.sessionList[serverId].session.log.error("Just for Fun\r\n");  
+                    SessionList.sessionList[serverId].session.log.error("System Think Race is Starded, But LFS Server Say:" + raceInProgress + "\r\n");  
             }
         }
 
@@ -98,6 +101,10 @@ namespace Drive_LFSS.Game_
         {
             timeStart = (uint)(System.DateTime.Now.Ticks / 10000);
             isRacing = true;
+        }
+        private void RaceFinish()
+        {
+            DatabaseStorage.race.Save((uint)1, timeStart, (uint)(System.DateTime.Now.Ticks / 10000), gridOrder);
         }
         private void RaceEnd()
         {

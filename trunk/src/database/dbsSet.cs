@@ -292,4 +292,20 @@ namespace Drive_LFSS.Database_
             }
         }
     }*/
+    //Specific LFS action should not be mixed with the DB... i mean here should be only DB related question IMPLICITE
+    //So this Proc should goes into Player Connection, or something like this!
+    //I will probaly create this into Licence.cs!
+    /*public static long retreiveRacerUID(string userName, string nickName)
+    {
+        IDataReader reader;
+        while (true)
+        {
+            reader = ExecuteQuery("SELECT uid FROM uid_license WHERE username = '" + userName.ToLower() + "'"
+                                    + " AND nickname = '" + nickName + "'");
+            if (reader.Read())
+                return reader.GetInt64(reader.GetOrdinal("uid"));
+            else
+                ExecuteNonQuery("INSERT INTO uid_license ( username,nickname ) VALUES ( '" + userName.ToLower() + "','" + nickName + "')");
+        }
+    }*/
 }
