@@ -173,7 +173,7 @@ namespace Drive_LFSS
             sLog.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
-            System.Environment.Exit(-2);
+            System.Environment.Exit(0);
         }
         private static void DisgraceExit(object sender, ConsoleCancelEventArgs args)
         {
@@ -186,7 +186,7 @@ namespace Drive_LFSS
             sLog.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
-            System.Environment.Exit(-1);
+            System.Environment.Exit(0);
         }
         private static bool DisgraceExit(Ctrl_Types ctrlType)
         {
@@ -198,10 +198,9 @@ namespace Drive_LFSS
             sLog.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
-            System.Environment.Exit(-1);
+            System.Environment.Exit(0);
             return true;
         }
-        //Call this: CommandConsole.Exec("exit");
         public static void Exit()
         {
             MainRun = false;

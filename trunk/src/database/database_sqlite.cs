@@ -31,6 +31,8 @@ namespace Drive_LFSS.Database_
         {
             if (connection == null)
             {
+                if (!System.IO.File.Exists("./dlfss.db"))
+                    throw new Exception("SQLite Database can't be found, File: dlfss.db");
                 connection = (IDbConnection)new SqliteConnection("URI=file:dlfss.db,version=3");
                 connection.Open();
             }
