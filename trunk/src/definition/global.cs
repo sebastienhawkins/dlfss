@@ -201,12 +201,12 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum InSim_Flag : byte
     {
-        ISF_LOCAL = 4,
-        ISF_MCI = 0x20,
-        ISF_MSO_COLS = 8,
-        ISF_NLP = 0x10,
-        ISF_RES_0 = 1,
-        ISF_RES_1 = 2
+        INSIM_FLAG_SPARE_0 = 1,
+        INSIM_FLAG_SPARE_1 = 2,
+        INSIM_FLAG_LOCAL = 4,
+        INSIM_FLAG_KEEP_MESSAGE_COLOR = 8,
+        INSIM_FLAG_RECEIVE_NLP = 16,
+        INSIM_FLAG_RECEIVE_MCI = 32
     }
     [Flags]public enum Pit_Work_Flag : uint
     {

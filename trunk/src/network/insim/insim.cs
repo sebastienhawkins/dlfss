@@ -150,7 +150,7 @@ namespace Drive_LFSS.InSim_
         {
             while (runThreadSocketReceive && Program.MainRun)
             {
-                System.Threading.Thread.Sleep(Program.sleep);
+                System.Threading.Thread.Sleep(10);
                 TcpReceive();
                 UdpReceive();
                 TcpSend();
