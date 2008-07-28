@@ -18,7 +18,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <ApplicationIcon>
     </ApplicationIcon>
-    <Win32Resource>C:\inwork\dlfss\trunk\src\res\icone.res</Win32Resource>
+    <Win32Resource>res\icone.res</Win32Resource>
   </PropertyGroup>
   <PropertyGroup>
     <BaseIntermediateOutputPath>obj</BaseIntermediateOutputPath>
