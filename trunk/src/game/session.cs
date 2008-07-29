@@ -26,6 +26,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
     //using Drive_LFSS.DatabaseSQLite_;
+    
 
     public sealed class Session : Server
     {
@@ -38,19 +39,64 @@ namespace Drive_LFSS.Game_
             race = new Race(_serverId);
             commandPrefix = _inSimSetting.CommandPrefix;
         }
+        struct Ping
+        {
+            public Ping(uint _diff)
+            {
+                pingTime = DateTime.Now.Ticks;
+                pingRequestId = 1;
+                sessionLatency = 0;
+                diff = _diff;
+            }
+            public long Received()
+            {
+                return (sessionLatency = (DateTime.Now.Ticks - pingTime)/10000);
+            }
+            public long GetReactionTime()
+            {
+                return sessionLatency - diff;
+            }
+            private long pingTime;
+            private byte pingRequestId;
+            private long sessionLatency;
+            private uint diff;
+            public long GetSessionLatency
+            {
+                get{return sessionLatency;}
+            }
+        }
         private char commandPrefix;
 
         private Race race;
         private List<Driver> driverList;
 
+        private Ping ping;
+
+        #region Update/Timer
+
+        private const uint TIMER_PING_PONG = 30000;
+        private uint TimerPingPong = 0;
+
         new public void update(uint diff)
         {
+            if (TIMER_PING_PONG < (TimerPingPong += diff))
+            {
+                log.ping("Ping!\r\n");
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)));
+                ping = new Ping(diff);
+                TimerPingPong = 0;
+            }
+
             base.update(diff);
+
             foreach (Driver _driver in driverList)
                 _driver.update(diff);
 
             race.update(diff);
         }
+        #endregion
+
+        #region Process packet
         protected sealed override void processPacket(PacketNCN _packet)
         {
             base.processPacket(_packet); //Keep the Log
@@ -179,6 +225,32 @@ namespace Drive_LFSS.Game_
             //Can receive some info about the Car that triggered this State Change...
             //TODO: Add this Init into Driver If carId is Found into STA.
         }
+        protected sealed override void processPacket(PacketTiny _packet)
+        {
+            base.processPacket(_packet);
+            switch (_packet.subTinyType)
+            {
+                case Tiny_Type.TINY_REPLY: PingReceived(); break;
+                case Tiny_Type.TINY_NONE: break;
+                default: Program.log.missingDefinition("Missing case for TinyPacket: " + _packet.subTinyType+"\r\n"); break;
+            }
+        }
+        #endregion
+
+        #region Other
+        private void PingReceived()
+        {
+            log.ping("Pong! " + ping.Received() + "ms\r\n");
+        }
+        public long GetLatency()
+        {
+            return ping.GetSessionLatency;
+        }
+        public long GetReactionTime()
+        {
+            return ping.GetReactionTime();
+        }
+        #endregion
 
         #region Driver/Car/Licence Association Tool
         private byte GetCarIndex(byte _carId)
@@ -230,7 +302,12 @@ namespace Drive_LFSS.Game_
             }
             return false;
         }
+        public int GetNbrOfDrivers()
+        {
+            return driverList.Count - 1;
+        }
         #endregion
+
     }
 }
 /* Text Color

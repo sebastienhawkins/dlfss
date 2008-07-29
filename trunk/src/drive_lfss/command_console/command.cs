@@ -22,6 +22,8 @@ namespace Drive_LFSS.CommandConsole_
     using System.Collections.Generic;
     using System;
     using Drive_LFSS.Packet_;
+    using Drive_LFSS.Game_;
+    using Drive_LFSS.Definition_;
     //using System.Collections.Generic;
     //using System.Text;
 
@@ -33,7 +35,8 @@ namespace Drive_LFSS.CommandConsole_
 
             switch (args[0])
             {
-                case "announce": Announce(args[1]); break;
+                case "status": Status(args); break;
+                case "say": Say(args); break;
                 case "exit": Exit(); break;
                 default:
                 {
@@ -42,13 +45,55 @@ namespace Drive_LFSS.CommandConsole_
                 }
             }
         }
-        private static void Announce(string _commandText)
+        private static void Status(string[] args)
         {
-            string[] args = _commandText.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries);
-
             if (args.Length != 2)
             {
-                Program.log.normal("Command Announce, Syntax Error.\r\n  Usage:\r\n    announce #serverId $Message\r\n");
+                Program.log.normal("Command Status, Syntax Error.\r\n  Usage:\r\n    status #serverId\r\n");
+                return;
+            }
+
+            if (args[1] == "*")
+            {
+                //Maybe you Real Iterator<Session>
+                foreach (KeyValuePair<ushort, SessionList.SessionStruct> keyPair in SessionList.sessionList)
+                {
+                    Session session = SessionList.sessionList[keyPair.Key].session;
+
+                    if(session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
+                        Program.log.normal("ServerId: " + keyPair.Key + ", Status: online, ReactionTime: " + session.GetReactionTime() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
+                    else
+                        Program.log.error("ServerId: " + keyPair.Key + ", Status: offline, ReactionTime+/-: -ms, DriversCount: -\r\n");
+                }
+            }
+            else
+            {
+                ushort serverId;
+                try { serverId = Convert.ToUInt16(args[1]); }
+                catch (Exception _exception)
+                {
+                    Program.log.normal("Command Status, Syntax Error.\r\n  Usage:\r\n    status #serverId\r\n");
+                    return;
+                }
+
+                if (SessionList.sessionList.ContainsKey(serverId))
+                {
+                    Session session = SessionList.sessionList[serverId].session;
+
+                    if (session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
+                        Program.log.normal("ServerId: " + serverId + ", Status: online, Latency: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
+                    else
+                        Program.log.error("ServerId: " + serverId + ", Status: offline, Latency: -ms, DriversCount: -\r\n");
+                }
+                else
+                    Program.log.command("Command Status, ServerId Not Found, Server Requested was: " + serverId + "\r\n");
+            }
+        }
+        private static void Say(string[] args)
+        {
+            if (args.Length != 2)
+            {
+                Program.log.normal("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverId $Message\r\n");
                 return;
             }
 

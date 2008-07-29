@@ -34,7 +34,7 @@ namespace Drive_LFSS.Log_
         LOG_NETWORK = 64,
         LOG_DATABASE = 128,
         LOG_PING = 256,
-        LOG_DISABLE = 0xFFFF
+        LOG_DISABLE = 0xFEFF
     }
     //If Color Not Allways Working Good, Cause log is Used by MultiThread! and Console Color Seem to be... MS way :)
     sealed public class sLog

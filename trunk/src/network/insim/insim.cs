@@ -235,6 +235,11 @@ namespace Drive_LFSS.InSim_
             ((Server)this).log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
             AddToUdpReceiveQueud(new Packet(data));
         }
+
+        public InSim_Socket_State GetSocketStatus()
+        {
+            return socketStatus;
+        }
     }
 
     //This class is non sence, is keeped cause of Time related question

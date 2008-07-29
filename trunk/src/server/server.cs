@@ -40,27 +40,13 @@ namespace Drive_LFSS.Server_
         {
             get { return serverId; }
         }
-        private long pingTime;
         public sLog log;
         private CommandServer command;
 
         #region update
-        
-        private const uint TIMER_PING_PONG = 30000; 
-        private uint TimerPingPong = 0;
 
         public void update(uint diff)                       //update called By Session
         {
-            if (TIMER_PING_PONG < (TimerPingPong += diff))
-            {
-                log.debug("Request Ping!\r\n");
-
-                AddToTcpSendingQueud(new Packet( Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)) );
-                pingTime = DateTime.Now.Ticks;
-
-                TimerPingPong = 0;
-            }
-
             object[] _nextTcpPacket = NextTcpReceiveQueud(true);
             if (_nextTcpPacket != null)
                 ProcessPacket((Packet_Type)_nextTcpPacket[0], _nextTcpPacket[1]);
