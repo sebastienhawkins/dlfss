@@ -18,7 +18,6 @@
 namespace Drive_LFSS.CommandConsole_
 {
     using Drive_LFSS;
-    using Drive_LFSS.Session_;
     using System.Collections.Generic;
     using System;
     using Drive_LFSS.Packet_;
@@ -99,7 +98,7 @@ namespace Drive_LFSS.CommandConsole_
 
             if (args[0] == "*")
             {
-                foreach (KeyValuePair<ushort, Drive_LFSS.Session_.SessionList.SessionStruct> keyPair in SessionList.sessionList)
+                foreach (KeyValuePair<ushort, SessionList.SessionStruct> keyPair in SessionList.sessionList)
                     SessionList.sessionList[keyPair.Key].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
             }
             else

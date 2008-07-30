@@ -18,10 +18,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Drive_LFSS;
 
 namespace Drive_LFSS.Log_
 {
-    using Drive_LFSS.Session_;
     [Flags]public enum Log_Type : ushort
     {
         LOG_FULL = 0,

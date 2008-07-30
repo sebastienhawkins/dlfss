@@ -22,12 +22,13 @@ namespace Drive_LFSS.Game_
 
     public abstract class Licence
 	{
-        public Licence()
+        public Licence(ref Session _session)
         {
             licenceName = "";
             licenceId = 0;
             unkFlag = 0;
             quitReason = 0;
+            session = _session;
         }
         protected void Init(PacketNCN _packet)
         {
@@ -42,11 +43,14 @@ namespace Drive_LFSS.Game_
                 licenceId = _packet.tempLicenceId;
         }
 
+        #region Update
         protected virtual void update(uint diff)
         {
             //Don't see any feature that can be implement here... but futur will tell
         }
+        #endregion
 
+        private Session session;
         private string licenceName;
         private byte licenceId;
         private byte unkFlag;

@@ -33,39 +33,45 @@ namespace Drive_LFSS.Game_
         public  Session(ushort _serverId, InSimSetting _inSimSetting) : base(_serverId, _inSimSetting)
         {
             commandPrefix = _inSimSetting.CommandPrefix;
+
             race = new Race(_serverId);
-
             driverList = new List<Driver>();
-            driverList.Add(new Driver()); //put Default Driver 0, will save some If.
+            driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
             driverList.Capacity = 192;
-
             script = new ScriptSession();
-            //script
+
+            ping = new Ping();
         }
-        struct Ping
+        private class Ping
         {
-            public Ping(uint _diff)
+            public Ping()
             {
                 pingTime = DateTime.Now.Ticks;
                 pingRequestId = 1;
                 sessionLatency = 0;
-                diff = _diff;
-            }
-            public long Received()
-            {
-                return (sessionLatency = (DateTime.Now.Ticks - pingTime)/10000);
-            }
-            public long GetReactionTime()
-            {
-                return sessionLatency - diff;
+                diff = 0;
             }
             private long pingTime;
             private byte pingRequestId;
             private long sessionLatency;
             private uint diff;
-            public long GetSessionLatency
+            public void Sending(uint _diff)
+            {
+                pingTime = DateTime.Now.Ticks;
+                diff = _diff;
+
+            }
+            public long Received()
+            {
+                return (sessionLatency = (DateTime.Now.Ticks - pingTime) / 10000);
+            }
+            public long SessionLatency
             {
                 get{return sessionLatency;}
+            }
+            public long GetReactionTime()
+            {
+                return sessionLatency - diff;
             }
         }
         private char commandPrefix;
@@ -73,7 +79,6 @@ namespace Drive_LFSS.Game_
         private iScriptSession script;
         private Race race;
         private List<Driver> driverList;
-
         private Ping ping;
 
         #region Update/Timer
@@ -87,9 +92,8 @@ namespace Drive_LFSS.Game_
             {
                 log.ping("Ping!\r\n");
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)));
-                ping = new Ping(diff);
+                ping.Sending(diff);
                 TimerPingPong = 0;
-                //script.CarFinishRace(driverList[0]);
             }
 
             base.update(diff);
@@ -114,6 +118,7 @@ namespace Drive_LFSS.Game_
                 if (_packet.tempLicenceId == 0)
                 {
                     driverList[0].Init(_packet);
+                    return;
                 }
                 else
                 {
@@ -121,7 +126,7 @@ namespace Drive_LFSS.Game_
                     return;
                 }
             }
-            Driver _driver = new Driver();
+            Driver _driver = new Driver(this);
             _driver.Init(_packet);
 
             driverList.Add(_driver);
@@ -163,7 +168,7 @@ namespace Drive_LFSS.Game_
                 }
                 else
                 {
-                    Driver _driver = new Driver();
+                    Driver _driver = new Driver(this);
                     _driver.Init(_packet);
                     driverList.Add(_driver);
                 }
@@ -189,7 +194,7 @@ namespace Drive_LFSS.Game_
         }
         protected sealed override void processPacket(PacketMCI _packet) // Multiple Car Information
         {
-            base.processPacket(_packet); // Will Reprocess the Old One
+            //base.processPacket(_packet); // Will Reprocess the Old One
 
             CarInformation[] carInformation = _packet.carInformation;
             for (byte itr = 0; itr < carInformation.Length; itr++)
@@ -249,7 +254,7 @@ namespace Drive_LFSS.Game_
         }
         public long GetLatency()
         {
-            return ping.GetSessionLatency;
+            return ping.SessionLatency;
         }
         public long GetReactionTime()
         {
@@ -262,7 +267,7 @@ namespace Drive_LFSS.Game_
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
             {
-                if (driverList[itr].prCarId == _carId)
+                if (driverList[itr].CarId == _carId)
                     return itr;
             }
             return 0;

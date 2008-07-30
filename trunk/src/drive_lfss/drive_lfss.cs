@@ -27,9 +27,9 @@ namespace Drive_LFSS
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Log_;
     using Drive_LFSS.CommandConsole_;
-    using Drive_LFSS.Session_;
     using Drive_LFSS.Database_;
     using Mono.Data.SqliteClient;
+
     public static class Program
     {
         #region Loop / Console / TrapSIGNTerm

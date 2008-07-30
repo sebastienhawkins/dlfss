@@ -23,8 +23,7 @@ namespace Drive_LFSS.Game_
 
     public abstract class Car : Licence
     {
-        public Car()
-            : base()
+        public Car(ref Session _session) : base(ref _session)
         {
             carId = 0;
             plate = "";
@@ -36,6 +35,7 @@ namespace Drive_LFSS.Game_
             tyreFrontRight = 0;
             tyreRearLeft = 0;
             tyreRearRight = 0;
+            session = _session;
         }
         new protected void Init(PacketNCN _packet)
         {
@@ -55,7 +55,6 @@ namespace Drive_LFSS.Game_
 
             base.Init(_packet);
         }
-        
         public void ProcessCarInformation(CarInformation _carInformation)
         {
             trackNode = _carInformation.trackNode;
@@ -72,18 +71,19 @@ namespace Drive_LFSS.Game_
 
             //base.Init(_packet);
         }
-        public void LeaveRace(PacketPLL _packet)
-        {
-            carId = 0;
-        }
 
-        protected virtual void update(uint diff)
+
+        #region Update
+        new protected virtual void update(uint diff)
         {
             //Car Update Feature Process... For Car
             //ScriptMgr.CarFinishRace((Driver)this);
+            //session.log("");
             base.update(diff);
         }
-        
+        #endregion
+
+        private Session session;
         private byte carId;
         private string plate;
         private string skin;
@@ -107,9 +107,13 @@ namespace Drive_LFSS.Game_
         private ushort heading;
         private short angleVelocity;
 
-        public byte prCarId
+        public byte CarId
         {
             get { return carId; }
+        }
+        public void LeaveRace(PacketPLL _packet)
+        {
+            carId = 0;
         }
 	}
 }

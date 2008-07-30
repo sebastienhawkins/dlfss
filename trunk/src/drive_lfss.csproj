@@ -47,10 +47,6 @@
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DLFSSScript, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Mono.Data.SqliteClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\dep\Mono.Data.SqliteClient.dll</HintPath>
@@ -78,7 +74,7 @@
     <Compile Include="server\server.cs" />
     <Compile Include="game\car.cs" />
     <Compile Include="game\licence.cs" />
-    <Compile Include="session_list\session_list.cs" />
+    <Compile Include="drive_lfss\session_list.cs" />
     <Compile Include="log\log.cs" />
     <Compile Include="drive_lfss\drive_lfss.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -100,6 +96,13 @@
     <None Include="dlfss.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="binding\script\script.csproj">
+      <Project>{22E335A5-3502-4537-8410-7EC0BABD555C}</Project>
+      <Name>script</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
