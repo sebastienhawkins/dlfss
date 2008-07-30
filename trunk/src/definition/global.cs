@@ -304,6 +304,18 @@ namespace Drive_LFSS.Definition_
     [StructLayout(LayoutKind.Sequential)]
     public struct CarInformation
     {
+        /*CarInformation(byte[] _data)
+        {
+            trackNode = 0; lapNumber = 0; carId = 0; position = 0; carFlag = 0; Sp3 = 0;
+            posX = 0; posY = 0; posZ = 0; speed = 0; direction = 0; heading = 0; angleVelocity = 0;
+
+            IntPtr pStruct = Marshal.AllocHGlobal(Marshal.SizeOf(this));
+            GCHandle hStruct = GCHandle.Alloc(pStruct, GCHandleType.Pinned);
+            Marshal.Copy(_data, 0, pStruct, _data.Length);
+            this = (CarInformation)Marshal.PtrToStructure(pStruct, this.GetType());
+            hStruct.Free();
+            Marshal.FreeHGlobal(pStruct);
+        }*/
         public ushort trackNode;
         public ushort lapNumber;
         public byte carId;

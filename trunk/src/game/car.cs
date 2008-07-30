@@ -21,16 +21,17 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Script_;
 
-    public abstract class Car : Licence
+    public abstract class Car : Licence, ICar
     {
         public Car(ref Session _session) : base(ref _session)
         {
             //Object
             session = _session;
+            script = new ScriptCar();
 
             //Packet Data
             carId = 0;
-            plate = "";
+            carPlate = "";
             skin = "";
             addedMass = 0;
             addedIntakeRestriction = 0;
@@ -50,7 +51,8 @@ namespace Drive_LFSS.Game_
         new protected void Init(PacketNPL _packet)
         {
             carId = _packet.carId;
-            plate = _packet.carPlate;
+            carName = _packet.carName;
+            carPlate = _packet.carPlate;
             addedIntakeRestriction = _packet.addedIntakeRestriction;
             addedMass = _packet.addedMass;
             passenger = _packet.passenger;
@@ -72,7 +74,8 @@ namespace Drive_LFSS.Game_
             posZ = _carInformation.posZ;
 
             speed = _carInformation.speed;
-            if (speed < 1 && timerAcceleration_0_100 != 0)
+            speedKhm = SpeedToKmh();
+            if (speedKhm < 0.1 && timerAcceleration_0_100 != 1)
                 timerAcceleration_0_100 = 1;
 
             direction = _carInformation.direction;
@@ -84,11 +87,12 @@ namespace Drive_LFSS.Game_
 
         //Object
         private Session session;
-        private iScriptCar script;
-        
+        private ScriptCar script;
+
         //Packet data
         private byte carId;
-        private string plate;
+        private string carName;
+        private string carPlate;
         private string skin;
         private byte addedMass;
         private byte addedIntakeRestriction;
@@ -105,6 +109,7 @@ namespace Drive_LFSS.Game_
         private int posY;
         private int posZ;
         private ushort speed;
+        private double speedKhm;
         private ushort direction;
         private ushort heading;
         private short angleVelocity;
@@ -119,13 +124,16 @@ namespace Drive_LFSS.Game_
         #region Update(uint diff)
         new protected virtual void update(uint diff)
         {
-            //Car Update Feature Process... For Car
-            if (speed > 0 && timerAcceleration_0_100 != 0)
+            //Acceleration 0 - 100 Khm
+            if (SpeedToKmh() > 0.1 && timerAcceleration_0_100 != 0)
             {
                 timerAcceleration_0_100 += diff;
-                if (SpeedToKmh() > 99.9d)
+                if (speedKhm > 99.9d)
                     Acceleration_0_100();
+                else if(timerAcceleration_0_100 > 60000) //MaxAccelerationTime
+                    timerAcceleration_0_100 = 0;
             }
+
             //Script.CarFinishRace((Driver)this);
             //session.log("");
             base.update(diff);
@@ -136,7 +144,7 @@ namespace Drive_LFSS.Game_
 
         public void FinishRace()
         {
-            if(script.CarFinishRace(this))
+            if(script.CarFinishRace((ICar)this))
                 return;
         }
         public void LeaveRace(PacketPLL _packet)
@@ -146,13 +154,12 @@ namespace Drive_LFSS.Game_
         private void Acceleration_0_100()
         {
             //If Script then don't do normal Process!
-            if (script.CarAcceleration_0_100(this))
+            if (script.CarAcceleration_0_100((ICar)this))
             {
                 timerAcceleration_0_100 = 0;
                 return;
             }
-
-            session.log.gameFeature(((Driver)this).prDriverName + ", Done  0-100Km/h In: " + (timerAcceleration_0_100 - (uint)session.GetReactionTime()));
+            session.log.gameFeature(((Driver)this).prDriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
             timerAcceleration_0_100 = 0;
         }
         #endregion

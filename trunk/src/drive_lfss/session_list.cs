@@ -40,11 +40,6 @@ namespace Drive_LFSS
             public ushort sessionId;
             public InSimSetting inSimSetting;
             public Session session;
-
-            internal void Send_MST_Message(string p)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
         }
 
         //ServerId To "Server"
@@ -52,11 +47,11 @@ namespace Drive_LFSS
 
         public static void LoadServerConfig( )
         {
-            sessionList.Add(5, new SessionStruct(5, new InSimSetting("91.121.7.73", 20003, 20003, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "yourpass", "DriveLFSS", 5)));
-            sessionList.Add(1, new SessionStruct(1, new InSimSetting("67.212.66.26", 30001, 30001, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
-            sessionList.Add(2, new SessionStruct(2, new InSimSetting("67.212.66.26", 29999, 29999, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
-            sessionList.Add(3, new SessionStruct(3, new InSimSetting("67.212.66.26", 29989, 29989, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
-            sessionList.Add(4, new SessionStruct(4, new InSimSetting("67.212.66.26", 30000, 30000, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
+           // sessionList.Add(5, new SessionStruct(5, new InSimSetting("91.121.7.73", 20003, 20003, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "yourpass", "DriveLFSS", 5)));
+           // sessionList.Add(1, new SessionStruct(1, new InSimSetting("67.212.66.26", 30001, 30001, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
+            sessionList.Add(2, new SessionStruct(2, new InSimSetting("67.212.66.26", 29999, 29999, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 100, "dexxa", "DriveLFSS", 5)));
+           // sessionList.Add(3, new SessionStruct(3, new InSimSetting("67.212.66.26", 29989, 29989, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
+           // sessionList.Add(4, new SessionStruct(4, new InSimSetting("67.212.66.26", 30000, 30000, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
         }
 
         public static void update(uint diff)

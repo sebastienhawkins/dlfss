@@ -1,33 +1,32 @@
 namespace Drive_LFSS.Script_
 {
-    using Drive_LFSS.Game_;
-    using Drive_LFSS;
-
-    public sealed class ScriptSession : iScriptSession
+    public sealed class ScriptSession : IScriptSession
     {
         public bool HasComeOnline()
         {
-            Program.log.error("Session Comming Online\r\n");
             return false;
         }
     }
-    public sealed class ScriptRace : iScriptRace
+    public sealed class ScriptRace : IScriptRace
     {
 
     }
-    public sealed class ScriptDriver : iScriptDriver
+    public sealed class ScriptDriver : IScriptDriver
     {
 
     }
-    public sealed class ScriptCar : iScriptCar
+    public sealed class ScriptCar : IScriptCar
     {
-        public bool CarFinishRace(Driver allo)
+        public bool CarFinishRace(ICar _car)
         {
-            Program.log.error("CarFinishRace Race Fropm Script\r\n");
             return false;
         }
+        public bool CarAcceleration_0_100(ICar _car)
+        {
+            return false; //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
+        }
     }
-    public sealed class ScriptLicence : iScriptLicence
+    public sealed class ScriptLicence : IScriptLicence
     {
 
     }

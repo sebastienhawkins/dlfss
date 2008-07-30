@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Script Template Rename Me")]
-[assembly: AssemblyDescription("Script Template Tell Me")]
+[assembly: AssemblyTitle("DLFSS Script")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("---")]
-[assembly: AssemblyProduct("ScriptMgr")]
+[assembly: AssemblyProduct("DLFSS Script")]
 [assembly: AssemblyCopyright("Copyright © --- 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

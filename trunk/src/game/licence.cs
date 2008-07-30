@@ -19,8 +19,9 @@ namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
+    using Drive_LFSS.Script_;
 
-    public abstract class Licence
+    public abstract class Licence : ILicence
 	{
         public Licence(ref Session _session)
         {
@@ -39,6 +40,9 @@ namespace Drive_LFSS.Game_
         {
             if (licenceId != _packet.tempLicenceId)
                 licenceId = _packet.tempLicenceId;
+
+            if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
+                licenceName = "AI"; 
         }
 
         #region Update

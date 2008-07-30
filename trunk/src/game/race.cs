@@ -21,8 +21,9 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Database_;
+    using Drive_LFSS.Script_;
 
-    public sealed class Race
+    public sealed class Race : IRace
 	{
         public Race(ushort _serverId)
         {

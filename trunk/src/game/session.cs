@@ -28,7 +28,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Script_;
     
 
-    public sealed class Session : Server
+    public sealed class Session : Server, ISession
     {
         public  Session(ushort _serverId, InSimSetting _inSimSetting) : base(_serverId, _inSimSetting)
         {
@@ -76,7 +76,7 @@ namespace Drive_LFSS.Game_
         }
         private char commandPrefix;
 
-        private iScriptSession script;
+        private ScriptSession script;
         private Race race;
         private List<Driver> driverList;
         private Ping ping;
@@ -163,9 +163,7 @@ namespace Drive_LFSS.Game_
             {
                 byte itr;
                 if ((itr = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 0)
-                {
                     driverList[itr].Init(_packet);
-                }
                 else
                 {
                     Driver _driver = new Driver(this);
@@ -174,9 +172,7 @@ namespace Drive_LFSS.Game_
                 }
             }
             else                                                                            //Human
-            {
                 driverList[GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)].Init(_packet);
-            }
         }
         protected sealed override void processPacket(PacketPLL _packet) // player leave (spectate - loses slot)
         {
@@ -196,12 +192,19 @@ namespace Drive_LFSS.Game_
         {
             //base.processPacket(_packet); // Will Reprocess the Old One
 
+            
             CarInformation[] carInformation = _packet.carInformation;
+            byte carIndex;
             for (byte itr = 0; itr < carInformation.Length; itr++)
             {
                 if (carInformation[itr].carId == 0)
                     continue;
-                ((Car)driverList[GetCarIndex(carInformation[itr].carId)]).ProcessCarInformation(carInformation[itr]);
+
+                carIndex = GetCarIndex(carInformation[itr].carId);
+                if (driverList[carIndex].prDriverName == "host") //Will have to check here if we change Host name...
+                    continue;
+                    
+                ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
             }
         }
         protected sealed override void processPacket(PacketMSO _packet) //message out
