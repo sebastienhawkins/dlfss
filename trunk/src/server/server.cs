@@ -70,6 +70,6 @@ namespace Drive_LFSS.Server_
         {
             //Send_BTN_CreateButton("Welcome On ^5Aleajecta", Button_Styles_Flag.ISB_DARK | Button_Styles_Flag.ISB_RIGHT, 20, 60, 0, 10, 1, uCID, 40, false);
             //Send_BTN_CreateButton("ButtonText", Button_Styles_Flag.ISB_DARK | Button_Styles_Flag.ISB_CLICK, 20, 60, 100, 10, 2, uCID, 40, false);
-        }  
+        } 
 	}
 }

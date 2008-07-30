@@ -34,7 +34,7 @@ namespace Drive_LFSS.Database_
             tableCheck.Add("race", "SELECT `guid`,`entry_track`,`start_time`,`end_time`,`grid_order`,`start_car_count`,`end_car_count`,`start_connection_count`,`end_connection_count` FROM `race` LIMIT 1");
             tableCheck.Add("driver", "SELECT `guid`,`guid_licence`,`name` FROM `driver` LIMIT 1");
             race = new Race();
-        
+            driver = new Driver();
         }
     }
 

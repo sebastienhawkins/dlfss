@@ -20,7 +20,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
 
-    sealed class Driver : Car
+    public sealed class Driver : Car
     {
         public Driver() : base()
         {

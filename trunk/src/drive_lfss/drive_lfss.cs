@@ -30,7 +30,7 @@ namespace Drive_LFSS
     using Drive_LFSS.Session_;
     using Drive_LFSS.Database_;
     using Mono.Data.SqliteClient;
-    internal static class Program
+    public static class Program
     {
         #region Loop / Console / TrapSIGNTerm
         public static readonly int sleep = 50; // Speed of Operation

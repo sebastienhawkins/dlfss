@@ -20,9 +20,9 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
 
-    abstract class Licence
+    public abstract class Licence
 	{
-        protected Licence()
+        public Licence()
         {
             licenceName = "";
             licenceId = 0;

@@ -81,7 +81,7 @@ namespace Drive_LFSS.Database_
         }
         protected uint GetGuidLast(string _tableName)
         {
-            IDataReader result = ExecuteQuery("SELECT MAX(`guid`) FROM `" + _tableName + "`");
+            IDataReader result = ExecuteQuery("SELECT MAX(`rowid`) FROM `" + _tableName + "`");
             if (result.Read())
                 return (uint)result.GetInt32(0);
 

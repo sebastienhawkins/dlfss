@@ -25,19 +25,22 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.InSim_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
-    //using Drive_LFSS.DatabaseSQLite_;
+    using Drive_LFSS.Script_;
     
 
     public sealed class Session : Server
     {
         public  Session(ushort _serverId, InSimSetting _inSimSetting) : base(_serverId, _inSimSetting)
         {
+            commandPrefix = _inSimSetting.CommandPrefix;
+            race = new Race(_serverId);
+
             driverList = new List<Driver>();
             driverList.Add(new Driver()); //put Default Driver 0, will save some If.
             driverList.Capacity = 192;
 
-            race = new Race(_serverId);
-            commandPrefix = _inSimSetting.CommandPrefix;
+            script = new ScriptSession();
+            //script
         }
         struct Ping
         {
@@ -67,6 +70,7 @@ namespace Drive_LFSS.Game_
         }
         private char commandPrefix;
 
+        private iScriptSession script;
         private Race race;
         private List<Driver> driverList;
 
@@ -75,7 +79,7 @@ namespace Drive_LFSS.Game_
         #region Update/Timer
 
         private const uint TIMER_PING_PONG = 30000;
-        private uint TimerPingPong = 0;
+        private uint TimerPingPong = 30000;
 
         new public void update(uint diff)
         {
@@ -85,6 +89,7 @@ namespace Drive_LFSS.Game_
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)));
                 ping = new Ping(diff);
                 TimerPingPong = 0;
+                //script.CarFinishRace(driverList[0]);
             }
 
             base.update(diff);

@@ -19,10 +19,12 @@ namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
+    using Drive_LFSS.Script_;
 
-    abstract class Car : Licence
+    public abstract class Car : Licence
     {
-        protected Car() : base()
+        public Car()
+            : base()
         {
             carId = 0;
             plate = "";
@@ -78,7 +80,7 @@ namespace Drive_LFSS.Game_
         protected virtual void update(uint diff)
         {
             //Car Update Feature Process... For Car
-
+            //ScriptMgr.CarFinishRace((Driver)this);
             base.update(diff);
         }
         
