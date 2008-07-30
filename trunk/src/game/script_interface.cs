@@ -19,7 +19,8 @@ namespace Drive_LFSS.Script_
     }
     public interface iScriptCar
     {
-        bool CarFinishRace(Driver allo);
+        bool CarFinishRace(Car _car);
+        bool CarAcceleration_0_100(Car _car);
     }
     public interface iScriptLicence
     {

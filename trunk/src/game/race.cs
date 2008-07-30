@@ -92,7 +92,10 @@ namespace Drive_LFSS.Game_
             if (isRacing)
             {
                 if (raceInProgress == Race_In_Progress_Status.RACE_PROGRESS_NONE)
-                    SessionList.sessionList[serverId].session.log.error("System Think Race is Starded, But LFS Server Say:" + raceInProgress + "\r\n");  
+                {
+                    SessionList.sessionList[serverId].session.log.error("System Think Race is Starded, But LFS Server Say:" + raceInProgress + "\r\n");
+                    isRacing = false;
+                }
             }
         }
 

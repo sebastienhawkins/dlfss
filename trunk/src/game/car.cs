@@ -25,6 +25,10 @@ namespace Drive_LFSS.Game_
     {
         public Car(ref Session _session) : base(ref _session)
         {
+            //Object
+            session = _session;
+
+            //Packet Data
             carId = 0;
             plate = "";
             skin = "";
@@ -35,7 +39,9 @@ namespace Drive_LFSS.Game_
             tyreFrontRight = 0;
             tyreRearLeft = 0;
             tyreRearRight = 0;
-            session = _session;
+
+            //Game Feature
+            timerAcceleration_0_100 = 0;
         }
         new protected void Init(PacketNCN _packet)
         {
@@ -64,26 +70,23 @@ namespace Drive_LFSS.Game_
             posX = _carInformation.posX;
             posY = _carInformation.posY;
             posZ = _carInformation.posZ;
+
             speed = _carInformation.speed;
-            Direction = _carInformation.direction;
+            if (speed < 1 && timerAcceleration_0_100 != 0)
+                timerAcceleration_0_100 = 1;
+
+            direction = _carInformation.direction;
             heading = _carInformation.heading;
             angleVelocity = _carInformation.angleVelocity;
 
             //base.Init(_packet);
         }
 
-
-        #region Update
-        new protected virtual void update(uint diff)
-        {
-            //Car Update Feature Process... For Car
-            //ScriptMgr.CarFinishRace((Driver)this);
-            //session.log("");
-            base.update(diff);
-        }
-        #endregion
-
+        //Object
         private Session session;
+        private iScriptCar script;
+        
+        //Packet data
         private byte carId;
         private string plate;
         private string skin;
@@ -94,7 +97,6 @@ namespace Drive_LFSS.Game_
         private Car_Tyres tyreFrontRight;
         private Car_Tyres tyreRearLeft;
         private Car_Tyres tyreRearRight;
-
         private ushort trackNode;
         private ushort lapNumber;
         private byte position;
@@ -103,17 +105,94 @@ namespace Drive_LFSS.Game_
         private int posY;
         private int posZ;
         private ushort speed;
-        private ushort Direction;
+        private ushort direction;
         private ushort heading;
         private short angleVelocity;
+
+        //GameFeature
+        private uint timerAcceleration_0_100;
 
         public byte CarId
         {
             get { return carId; }
         }
+        #region Update(uint diff)
+        new protected virtual void update(uint diff)
+        {
+            //Car Update Feature Process... For Car
+            if (speed > 0 && timerAcceleration_0_100 != 0)
+            {
+                timerAcceleration_0_100 += diff;
+                if (SpeedToKmh() > 99.9d)
+                    Acceleration_0_100();
+            }
+            //Script.CarFinishRace((Driver)this);
+            //session.log("");
+            base.update(diff);
+        }
+        #endregion
+
+        #region Game Feature Function
+
+        public void FinishRace()
+        {
+            if(script.CarFinishRace(this))
+                return;
+        }
         public void LeaveRace(PacketPLL _packet)
         {
             carId = 0;
         }
-	}
+        private void Acceleration_0_100()
+        {
+            //If Script then don't do normal Process!
+            if (script.CarAcceleration_0_100(this))
+            {
+                timerAcceleration_0_100 = 0;
+                return;
+            }
+
+            session.log.gameFeature(((Driver)this).prDriverName + ", Done  0-100Km/h In: " + (timerAcceleration_0_100 - (uint)session.GetReactionTime()));
+            timerAcceleration_0_100 = 0;
+        }
+        #endregion
+
+        #region Tool
+
+        //Speed
+        private double SpeedToKmh()
+        {
+            return speed / 327.68 * 3.6;
+        }
+
+        //X,Y,Z Coordonate
+        private double PosXToCoord()
+        {
+            return posX / 65536.0d;
+        }
+        private double PosYToCoord()
+        {
+            return posY / 65536.0d;
+        }
+        private double PosZToCoord()
+        {
+            return posZ / 65536.0d;
+        }
+
+        //Trajectoire / Direction / Velocity
+        private double DirectionToTrajectoryAngle()
+        {
+            return direction * 180.0d / 32768.0d;
+        }
+        private double HeadingToOnPathOrientation()
+        {
+            return heading * 180.0d / 32768.0d;
+        }
+        private double AngleVelocityToHeadindVelovity()
+        {
+            return angleVelocity * 180.0d / 8192.0d;
+        }
+
+        #endregion
+    }
 }

@@ -431,7 +431,7 @@ namespace Drive_LFSS.Packet_
         public Driver_Flag driverMask;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string driverName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string licenceName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string carName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string SName;
         public Car_Tyres tyreRearLeft;
         public Car_Tyres tyreRearRight;

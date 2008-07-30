@@ -34,6 +34,7 @@ namespace Drive_LFSS.Log_
         LOG_NETWORK = 64,
         LOG_DATABASE = 128,
         LOG_PING = 256,
+        LOG_GAME_FEATURE = 512,
         LOG_DISABLE = 0xFEFF
     }
     //If Color Not Allways Working Good, Cause log is Used by MultiThread! and Console Color Seem to be... MS way :)
@@ -210,7 +211,22 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
+        public void gameFeature(string msg)
+        {
 
+            string _serverName = GetServerName();
+
+            mutexConsoleColor.WaitOne();
+            {
+                if ((logDisable & Log_Type.LOG_GAME_FEATURE) == 0)
+                    streamWriter.Write(System.DateTime.Now + _serverName + " GAMEFEAT: " + msg);
+
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write(_serverName + msg);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+            mutexConsoleColor.ReleaseMutex();
+        }
         private string GetServerName()
         {
             if (serverId == 0)

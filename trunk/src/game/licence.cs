@@ -37,8 +37,6 @@ namespace Drive_LFSS.Game_
         }
         protected void Init(PacketNPL _packet)
         {
-            if (licenceName != _packet.licenceName)
-                licenceName = _packet.licenceName;
             if (licenceId != _packet.tempLicenceId)
                 licenceId = _packet.tempLicenceId;
         }

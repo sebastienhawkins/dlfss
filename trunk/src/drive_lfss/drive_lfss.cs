@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 
 namespace Drive_LFSS
 {
+    using Drive_LFSS.Config_;
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Log_;
     using Drive_LFSS.CommandConsole_;
@@ -68,11 +69,23 @@ namespace Drive_LFSS
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n\r\n");
+                System.Threading.Thread.Sleep(10000);
                 CommandConsole.Exec("exit");
                 return;
             }
             log = new sLog();
             log.normal("Log System Initialized...\r\n\r\n");
+
+            if (!Config.Initialize())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Can't Initialize the Config, Will now QUIT.!\r\n\r\n");
+                System.Threading.Thread.Sleep(10000);
+                CommandConsole.Exec("exit");
+                return;
+            }
+            log.normal("Config Initialized...\r\n\r\n");
+
 
             //Write Startup Banner
             WriteBanner();

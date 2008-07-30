@@ -98,8 +98,8 @@ namespace Drive_LFSS.Game_
 
             base.update(diff);
 
-            foreach (Driver _driver in driverList)
-                _driver.update(diff);
+            for (byte itr = 1; itr < driverList.Count; ++itr)
+                driverList[itr].update(diff);
 
             race.update(diff);
         }
@@ -198,7 +198,11 @@ namespace Drive_LFSS.Game_
 
             CarInformation[] carInformation = _packet.carInformation;
             for (byte itr = 0; itr < carInformation.Length; itr++)
+            {
+                if (carInformation[itr].carId == 0)
+                    continue;
                 ((Car)driverList[GetCarIndex(carInformation[itr].carId)]).ProcessCarInformation(carInformation[itr]);
+            }
         }
         protected sealed override void processPacket(PacketMSO _packet) //message out
         {
