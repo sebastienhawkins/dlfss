@@ -4,7 +4,7 @@ namespace Drive_LFSS.Script_
     {
         public bool HasComeOnline()
         {
-            return false;
+            return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
         }
     }
     public sealed class ScriptRace : IScriptRace
@@ -19,11 +19,11 @@ namespace Drive_LFSS.Script_
     {
         public bool CarFinishRace(ICar _car)
         {
-            return false;
+            return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
         }
         public bool CarAcceleration_0_100(ICar _car)
         {
-            return false; //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
+            return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
         }
     }
     public sealed class ScriptLicence : IScriptLicence

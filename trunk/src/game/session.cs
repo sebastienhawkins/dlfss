@@ -39,7 +39,6 @@ namespace Drive_LFSS.Game_
             driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
             driverList.Capacity = 192;
             script = new ScriptSession();
-
             ping = new Ping();
         }
         private class Ping
@@ -201,7 +200,7 @@ namespace Drive_LFSS.Game_
                     continue;
 
                 carIndex = GetCarIndex(carInformation[itr].carId);
-                if (driverList[carIndex].prDriverName == "host") //Will have to check here if we change Host name...
+                if (driverList[carIndex].DriverName == "host") //Will have to check here if we change Host name...
                     continue;
                     
                 ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
@@ -223,11 +222,11 @@ namespace Drive_LFSS.Game_
                 log.debug("Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
 
                 
-                commandExec(_driver.prAdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
+                commandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
             }
             else
             {
-                log.chat(_driver.prDriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
+                log.chat(_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
             }
         }
         protected sealed override void processPacket(PacketRST _packet) 
@@ -294,7 +293,7 @@ namespace Drive_LFSS.Game_
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
             {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId && ((Driver)driverList[itr]).prDriverName == _driverName)
+                if (((Licence)driverList[itr]).LicenceId == _licenceId && ((Driver)driverList[itr]).DriverName == _driverName)
                     return itr;
             }
             return 0;
@@ -324,9 +323,9 @@ namespace Drive_LFSS.Game_
             return driverList.Count - 1;
         }
         #endregion
-
     }
 }
+
 /* Text Color
  * Red = 1
  * Green = 2

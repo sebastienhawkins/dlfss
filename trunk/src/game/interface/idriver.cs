@@ -3,7 +3,7 @@
     public interface IDriver
     {
         bool IsBot();
-        bool prAdminFlag { get; }
-        string prDriverName { get; }
+        bool AdminFlag { get; }
+        string DriverName { get; }
     }
 }

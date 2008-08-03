@@ -117,10 +117,7 @@ namespace Drive_LFSS.Game_
         //GameFeature
         private uint timerAcceleration_0_100;
 
-        public byte CarId
-        {
-            get { return carId; }
-        }
+
         #region Update(uint diff)
         new protected virtual void update(uint diff)
         {
@@ -151,6 +148,12 @@ namespace Drive_LFSS.Game_
         {
             carId = 0;
         }
+        public byte CarId
+        {
+            get { return carId; }
+        }
+
+        //Script Call
         private void Acceleration_0_100()
         {
             //If Script then don't do normal Process!
@@ -159,9 +162,10 @@ namespace Drive_LFSS.Game_
                 timerAcceleration_0_100 = 0;
                 return;
             }
-            session.log.gameFeature(((Driver)this).prDriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
+            session.log.gameFeature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
             timerAcceleration_0_100 = 0;
         }
+
         #endregion
 
         #region Tool

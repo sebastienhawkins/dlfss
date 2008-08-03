@@ -86,12 +86,12 @@ namespace Drive_LFSS.Game_
         private Driver_Type_Flag driverTypeMask;
         private Session session;
 
-        public bool prAdminFlag
+        public bool AdminFlag
         {
             get { return adminFlag; }
             //set { adminFlag = value; }
         }
-        public string prDriverName
+        public string DriverName
         {
             get { return driverName; }
            // set { driverName = value; }
