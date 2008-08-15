@@ -15,20 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+using System;
+using System.IO;
+using System.ComponentModel;
+using System.Net;
+using System.Net.Sockets;
+
+using System.Threading;
+
 namespace Drive_LFSS.InSim_
 {
-    using System;
-    using System.IO;
-    using System.ComponentModel;
-    using System.Net;
-    using System.Net.Sockets;
-    //using System.Runtime.CompilerServices;
-    using System.Threading;
-    //using Drive_LFSS.PacketStore_;
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Server_;
-   // using Drive_LFSS.Database_;
+    using Drive_LFSS.Log_;
 
     public abstract class InSim : PacketHandler
     {
@@ -165,17 +165,17 @@ namespace Drive_LFSS.InSim_
 
             if (!tcpClient.Connected)
             {
-                ((Server)this).log.debug("TcpSend(), Disconnection Detected...\r\n");
+                Log.debug("TcpSend(), Disconnection Detected...\r\n");
                 return;
             }
 
-            ((Server)this).log.network("TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+            Log.network("TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
             try{tcpSocket.Write(_packet,0,_packet.Length);}
             catch(Exception _exception)
             {
                 tcpSocket.Dispose();
                 tcpClient.Close();
-                ((Server)this).log.error("TcpSend(), Exception received when writing on the TCP socket, exception:"+_exception+"\r\n");
+                Log.error("TcpSend(), Exception received when writing on the TCP socket, exception:"+_exception+"\r\n");
             }
         }
         private void UdpSend() // This is very not usefull, UDP is a receive only .... from what i know now!
@@ -184,7 +184,7 @@ namespace Drive_LFSS.InSim_
             if (_packet == null)
                 return;
 
-            ((Server)this).log.network("UdpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+            Log.network("UdpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
             udpClient.Send(_packet, _packet.Length);
         }
         private void TcpReceive()
@@ -198,18 +198,18 @@ namespace Drive_LFSS.InSim_
             {
                 tcpSocket.Dispose();
                 tcpClient.Close();
-                ((Server)this).log.error("Tcpreceive(), Exception received when reading on the TCP socket, exception:"+_exception+"\r\n");
+                Log.error("Tcpreceive(), Exception received when reading on the TCP socket, exception:"+_exception+"\r\n");
             }
 
             if (packetSize  < 4) //maybe add a size/4 Check to be sure the Size is Conform to Scawen standart
             {
-                ((Server)this).log.network("TcpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
+                Log.network("TcpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
                 return;
             }
 
             Packet_Type packetType = (Packet_Type)tcpSocket.ReadByte();
 
-            ((Server)this).log.network("TcpReceive, PacketSize->" + packetSize + ", PacketType->" + packetType + "\r\n");
+            Log.network("TcpReceive, PacketSize->" + packetSize + ", PacketType->" + packetType + "\r\n");
 
             byte[] data = new byte[packetSize];
             data[0] = packetSize;
@@ -229,10 +229,10 @@ namespace Drive_LFSS.InSim_
             byte packetSize;
             if ((packetSize = data[0]) < 3)
             {
-                ((Server)this).log.network("UdpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
+                Log.network("UdpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
                 return;
             }
-            ((Server)this).log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
+            Log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
             AddToUdpReceiveQueud(new Packet(data));
         }
 

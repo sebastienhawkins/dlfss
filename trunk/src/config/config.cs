@@ -15,274 +15,218 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+
 namespace Drive_LFSS.Config_
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System;
+    using Drive_LFSS.Log_;
 
-    public static class Config
+    sealed class Config
     {
-        public struct ServerConfigStruct
+        Config()
         {
-            public ServerConfigStruct(string _serverIP, ushort _portNumber, string _adminPass, char _commandPrefix, byte _inSimOptionMask, ushort _netUpdateInterval, ushort _serverUpdateInterval)
-            {
-                serverIP = _serverIP;
-                portNumber = _portNumber;
-                adminPass = _adminPass;
-                commandPrefix = _commandPrefix;
-                inSimOptionMask = _inSimOptionMask;
-                netUpdateInterval = _netUpdateInterval;
-                serverUpdateInterval = _serverUpdateInterval;
-            }
-            private string serverIP;
-            private ushort portNumber;
-            private string adminPass;
-            private char commandPrefix;
-            private byte inSimOptionMask;
-            private ushort netUpdateInterval;
-            private ushort serverUpdateInterval;
-            public string ServerIP
-            {
-                get { return serverIP; }
-                //set { serverIP = value; }
-            }
-            public ushort PortNumber
-            {
-                get { return portNumber; }
-                //set { portNumber = value; }
-            }
-            public string AdminPass
-            {
-                get { return adminPass; }
-                //set { adminPass = value; }
-            }
-            public char CommandPrefix
-            {
-                get { return commandPrefix; }
-                //set { commandPrefix = value; }
-            }
-            public byte InSimOptionMask
-            {
-                get { return inSimOptionMask; }
-                //set { InSimOptionMask = value; }
-            }
-            public ushort NetUpdateInterval
-            {
-                get { return netUpdateInterval; }
-                //set { netUpdateInterval = value; }
-            }
-            public ushort ServerUpdateInterval
-            {
-                get { return serverUpdateInterval; }
-                //set { serverUpdateInterval = value; }
-            }
         }
-
-        private const string CONFIG_FILE = "dlfss.cfg";
-        private const string CONFIG_VERSION = "07282008";
-
-        private static byte processPriority = 0;
-        private static uint playerSaveInterval = 0;
-        private static uint DLFSSSUpdateRate = 0;
-        private static int logDisable = 0; //mask variable
-
-        private static Dictionary<string, ServerConfigStruct> serverList = new Dictionary<string,ServerConfigStruct>();
-
-        public static bool Initialize()
+        ~Config()   //This will make Sure Finalize is called for Compilant class and all Object are destroyed.
         {
-            if (!File.Exists(CONFIG_FILE))
+            if (true == false) { } //Finalize won't call destructor if empty.
+        }
+        private static Dictionary<string, object> confValue = new Dictionary<string, object>();
+        private static Regex rgxIdentifier = new Regex(@"^([a-z0-9]+){1}\.{0,1}([a-z0-9]+){0,1}\.{0,1}([a-z0-9]+){0,1}\.{0,1}([a-z0-9]+){0,1}\s*=\s*([^\s#\r\n]+[^#\r\n]*[^\s#\r\n]{1}|[^\s#\r\n]*){0,1}", RegexOptions.IgnoreCase);
+        private void ReadToArray(string confFile)
+        {
+            // This is not garbage collected, if not into class compilant + good destructor call.
+            // Important to call streamReader.Dispose() if not into a [assembly: ClSCompliant(true)]
+            StreamReader streamReader = new StreamReader(confFile);
+
+            string lineReaded = "";
+
+            while (!streamReader.EndOfStream)
             {
-                Program.log.error("Unable to find the config file, path : " + CONFIG_FILE + "\r\n");
-                return false;
-            }
+                lineReaded = streamReader.ReadLine();
 
-            using (StreamReader sr = new StreamReader(CONFIG_FILE))
-            {                
-                ushort lineNumber = 0;
-                string lineReaded = "";
-                
-                while (!sr.EndOfStream)
+                Match match = rgxIdentifier.Match(lineReaded);
+
+                //sLog.debug(match.Groups[5] + "\r\n");
+                //continue;
+
+                if (match.Success)
                 {
-                    lineReaded = sr.ReadLine();
-                    lineNumber ++;
-
-                    if (!lineReaded.StartsWith("#") && lineReaded.Trim(' ') != "")
+                    if (match.Groups[4].Value != "")
                     {
-                        if (lineReaded.IndexOf('=') != -1)
-                        {
-                            if (!ValidLineSetting(lineReaded, lineNumber)) { return false; }
-                        }
+                        if (!confValue.ContainsKey(match.Groups[1].Value))
+                            confValue.Add(match.Groups[1].Value, new Dictionary<string, object>());
+                        if (!((Dictionary<string, object>)confValue[match.Groups[1].Value]).ContainsKey(match.Groups[2].Value))
+                            ((Dictionary<string, object>)confValue[match.Groups[1].Value]).Add(match.Groups[2].Value, new Dictionary<string, object>());
+                        if (!((Dictionary<string, object>)((Dictionary<string, object>)confValue[match.Groups[1].Value])[match.Groups[2].Value]).ContainsKey(match.Groups[3].Value))
+                            ((Dictionary<string, object>)((Dictionary<string, object>)confValue[match.Groups[1].Value])[match.Groups[2].Value]).Add(match.Groups[3].Value, new Dictionary<string, object>());
+                        if (!((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[match.Groups[1].Value])[match.Groups[2].Value])[match.Groups[3].Value]).ContainsKey(match.Groups[4].Value))
+                            ((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[match.Groups[1].Value])[match.Groups[2].Value])[match.Groups[3].Value]).Add(match.Groups[4].Value, match.Groups[5].Value);
+                        continue;
                     }
-                }
-            }
-            return true;
-        }
-        private static bool ValidLineSetting(string _line, ushort _lineNumber)
-        {
-            string[] args = _line.Substring(0, _line.IndexOf('=')).Trim(' ').Split(new string[] { "." }, 3, StringSplitOptions.RemoveEmptyEntries);
-
-            if (args.Length == 0)                        //Nothing Found
-            {
-                Program.log.error("Error in config file at line: " + _lineNumber + ".\r\n");
-                return false;
-            }
-            else if (args.Length == 1)                  //Simple Config Var
-            {
-                switch (args[0])
-                {
-                    case "ConfVersion":
+                    if (match.Groups[3].Value != "")
                     {
-                        if (!ValidConfVersion(_line))
-                            return false;
-                    } break;
-                    case "ProcessPriority":
-                    {
-                        if (!SetProcessPriority(_line, _lineNumber))
-                            return false;
-                    } break;
-                    case "PlayerSaveInterval":
-                    {
-                        if (!SetPlayerSaveInterval(_line, _lineNumber))
-                            return false;
-                    } break;
-                    case "DLFSSSUpdateRate":
-                    {
-                        if (!SetDLFSSSUpdateRate(_line, _lineNumber))
-                            return false;
-                    } break;
-                    case "LogDisable":
-                    {
-                        if (!SetLogDisable(_line, _lineNumber))
-                            return false;
-                    } break;
-                    default:
-                    {
-                        Program.log.error("Error in config file at line: " + _lineNumber + ", unknow config option : " + args[0] + "\r\n");
-                        return false;
+                        if (!confValue.ContainsKey(match.Groups[1].Value))
+                            confValue.Add(match.Groups[1].Value, new Dictionary<string, object>());
+                        if (!((Dictionary<string, object>)confValue[match.Groups[1].Value]).ContainsKey(match.Groups[2].Value))
+                            ((Dictionary<string, object>)confValue[match.Groups[1].Value]).Add(match.Groups[2].Value, new Dictionary<string, object>());
+                        if (!((Dictionary<string, object>)((Dictionary<string, object>)confValue[match.Groups[1].Value])[match.Groups[2].Value]).ContainsKey(match.Groups[3].Value))
+                            ((Dictionary<string, object>)((Dictionary<string, object>)confValue[match.Groups[1].Value])[match.Groups[2].Value]).Add(match.Groups[3].Value, match.Groups[5].Value);
+                        continue;
                     }
-                }
-            }
-            else                                    //Config Array
-            {
-                switch (args[0])
-                {
-                    case "LFSServer":
+                    if (match.Groups[2].Value != "")
                     {
-                        if (!DispatchServerOptions(_line, _lineNumber))
-                            return false;
-
-                    } break;
-                    default:
-                    {
-                        Program.log.error("Error in config file at line : " + _lineNumber + ", unknow config option : " + args[0] + "\r\n");
-                        return false;
+                        if (!confValue.ContainsKey(match.Groups[1].Value))
+                            confValue.Add(match.Groups[1].Value, new Dictionary<string, object>());
+                        if (!((Dictionary<string, object>)confValue[match.Groups[1].Value]).ContainsKey(match.Groups[2].Value))
+                            ((Dictionary<string, object>)confValue[match.Groups[1].Value]).Add(match.Groups[2].Value, match.Groups[5].Value);
+                        continue;
                     }
+                    if (match.Groups[1].Value != "")
+                    {
+                        if (!confValue.ContainsKey(match.Groups[1].Value))
+                            confValue.Add(match.Groups[1].Value, match.Groups[5].Value);
+                        continue;
+                    }
+                    //sLog.debug((string)((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[match.Groups[0].Value])[match.Groups[1].Value])[match.Groups[2].Value])[match.Groups[3].Value]);
                 }
             }
-            return true;
+            //streamReader.Dispose();
         }
-
-        private static bool DispatchServerOptions(string _line, ushort _lineNumber)
+        public static int GetIntValue(params string[] args)
         {
-            string[] args = _line.Substring(0, _line.IndexOf('=')).Trim(' ').Split(new string[] { "." }, 3, StringSplitOptions.RemoveEmptyEntries);
-
-            if (args.Length < 3)
+            if (args.Length == 4)
             {
-                Program.log.error("Error in config file at line: " + _lineNumber + ".\r\n");
-                return false;
+                if (confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1])
+                    && ((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]]).ContainsKey(args[2])
+                    && ((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]])[args[2]]).ContainsKey(args[3]))
+                    return Convert.ToInt32(((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]])[args[2]])[args[3]]);
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "." + args[2] + "." + args[3] + "\r\n");
+                return -1;
             }
-            switch (args[2])
+            if (args.Length == 3)
             {
-                case "ConnectionInfo": 
+                if (confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1])
+                    && ((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]]).ContainsKey(args[2]))
+                    return Convert.ToInt32(((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]])[args[2]]);
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "." + args[2] + "\r\n");
+                return -1;
+            }
+            if (args.Length == 2)
+            {
+                if (confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1]))
+                    return Convert.ToInt32(((Dictionary<string, object>)confValue[args[0]])[args[1]]);
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "\r\n");
+                return -1;
+            }
+            if (args.Length == 1)
+            {
+                if (confValue.ContainsKey(args[0]))
+                    return Convert.ToInt32(confValue[args[0]]);
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "\r\n");
+                return -1;
+            }
+            return -1;
+        }
+        public static string GetStringValue(params string[] args)
+        {
+            if (args.Length == 4)
+            {
+                if (confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1])
+                    && ((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]]).ContainsKey(args[2])
+                    && ((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]])[args[2]]).ContainsKey(args[3]))
+                    return (string)((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]])[args[2]])[args[3]];
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "."+args[2]+"."+args[3]+"\r\n");
+                return null;
+            }
+            if (args.Length == 3)
+            {
+                if (confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1])
+                    && ((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]]).ContainsKey(args[2]))
+                    return (string)((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]])[args[2]];
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "."+args[2]+"\r\n");
+                return null;
+            }
+            if (args.Length == 2)
+            {
+                if (confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1]))
+                    return (string)((Dictionary<string, object>)confValue[args[0]])[args[1]];
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "\r\n");
+                return null;
+            }
+            if (args.Length == 1)
+            {
+                if (confValue.ContainsKey(args[0]))
+                    return (string)confValue[args[0]];
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "\r\n");
+                return null;
+            }
+            return null;
+        }
+        public static List<string> GetIdentifierList(params string[] args)
+        {
+            List<string> temp = new List<string>();
+            if (args.Length == 3)
+            {
+                if (confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1])
+                    && ((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]]).ContainsKey(args[2]))
                 {
-                    if (!CreateServer(_line, _lineNumber, args[1]))
-                        return false;
-                } break;
-                default:
-                {
-                    Program.log.error("Error in config file at line: " + _lineNumber + ", unknow config option: " + args[2] + ", For Server: " + args[1] + ".\r\n");
-                    return false;
+                    Dictionary<string, object>.Enumerator itr = ((Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]])[args[2]]).GetEnumerator();
+                    while (itr.MoveNext())
+                        temp.Add(itr.Current.Key);
                 }
+                    
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "." + args[2] + "\r\n");
+                return temp;
             }
-            return true;
-        }
-        private static bool CreateServer(string _line, ushort _lineNumber, string _serverName)
-        {
-            string tempoConf = _line.Substring(_line.IndexOf('=') + 1, _line.Length - (_line.IndexOf('=') + 1)).Trim(' ');
-            string[] args = tempoConf.Split(new string[] { ";" }, 7, StringSplitOptions.RemoveEmptyEntries);
+            if (args.Length == 2)
+            {
+                if ( confValue.ContainsKey(args[0]) && ((Dictionary<string, object>)confValue[args[0]]).ContainsKey(args[1]) )
+                {
+                    Dictionary<string, object>.Enumerator itr = ((Dictionary<string, object>)((Dictionary<string, object>)confValue[args[0]])[args[1]]).GetEnumerator();
+                    while (itr.MoveNext())
+                        temp.Add(itr.Current.Key);
+                }
 
-            if (args.Length != 7)
-            {
-                Program.log.error("Error in config file at line: " + _lineNumber + ", incorrect parameter count: " + tempoConf + ".\r\n");
-                return false;
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "\r\n");
+                return temp;
             }
+            if (args.Length == 1)
+            {
+                if (confValue.ContainsKey(args[0]))
+                {
+                    Dictionary<string, object>.Enumerator itr = ((Dictionary<string, object>)confValue[args[0]]).GetEnumerator();
+                    while (itr.MoveNext())
+                        temp.Add(itr.Current.Key);
+                }
 
-            try 
-            {
-                serverList.Add(_serverName, new ServerConfigStruct(args[0], Convert.ToUInt16(args[1]), args[2], Convert.ToChar(args[3]), Convert.ToByte(args[4]), Convert.ToUInt16(args[5]), Convert.ToUInt16(args[6])));
-                //Program.log.normal("CreateServer name : " + _serverName + ", value : " + tempoConf + "\r\n"); //FOR DEBUG IF U NEED
+                else
+                    Log.error("Configuration unable to find value for key: " + args[0] + "." + args[1] + "\r\n");
+                return temp;
             }
-            catch (Exception _exception)
+            return null;
+        }
+        public static bool Initialize(string confFile)
+        {
+            if (!File.Exists(confFile))
             {
-                Program.log.error("Error in config file at line: " + _lineNumber + ", incorrect parameter: " + tempoConf + "\r\n");
+                Log.error("Unable to find the config file: " + confFile + "\r\n");
                 return false;
             }
-            return true;
-        }
-        private static bool ValidConfVersion(string _line)
-        {
-            if (CONFIG_VERSION != (_line.Substring(_line.IndexOf('=') + 1, _line.Length - (_line.IndexOf('=') + 1)).Trim(' ')) )
-                Program.log.error("Error Config File is Out of Date!, current version is : " + CONFIG_VERSION + "\r\n");
-                
-            return true;
-        }
-        private static bool SetProcessPriority(string _line, ushort _lineNumber)
-        {
-            string valueToConvert = _line.Substring(_line.IndexOf('=') + 1, _line.Length - (_line.IndexOf('=') + 1)).Trim(' ');
-            
-            try {processPriority = Convert.ToByte(valueToConvert);}
-            catch (Exception _exception)
-            {
-                Program.log.error("Error in config file at line : " + _lineNumber + ", incorrect parameter : " + valueToConvert + "\r\n");
-                return false;
-            }
-            return true;
-        }
-        private static bool SetPlayerSaveInterval(string _line, ushort _lineNumber)
-        {
-            string valueToConvert = _line.Substring(_line.IndexOf('=') + 1, _line.Length - (_line.IndexOf('=') + 1)).Trim(' ');
-
-            try{playerSaveInterval = Convert.ToUInt32(valueToConvert);}
-            catch (Exception _exception)
-            {
-                Program.log.error("Error in config file at line : " + _lineNumber + ", incorrect parameter : " + valueToConvert + "ms \r\n");
-                return false;
-            }
-            return true;
-        }
-        private static bool SetDLFSSSUpdateRate(string _line, ushort _lineNumber)
-        {
-            string valueToConvert = _line.Substring(_line.IndexOf('=') + 1, _line.Length - (_line.IndexOf('=') + 1)).Trim(' ');
-            
-            try{DLFSSSUpdateRate = Convert.ToUInt32(valueToConvert);}
-            catch (Exception _exception)
-            {
-                Program.log.error("Error in config file at line : " + _lineNumber + ", incorrect parameter : " + valueToConvert + "ms \r\n");
-                return false;
-            }
-            return true;
-        }
-        private static bool SetLogDisable(string _line, ushort _lineNumber)
-        {
-            string valueToConvert = _line.Substring(_line.IndexOf('=') + 1, _line.Length - (_line.IndexOf('=') + 1)).Trim(' ');
-            
-            try{logDisable = Convert.ToInt32(valueToConvert);}
-            catch (Exception _exception)
-            {
-                Program.log.error("Error in config file at line : " + _lineNumber + ", incorrect parameter : " + valueToConvert + "\r\n");
-                return false;
-            }
+            Config config = new Config();
+            config.ReadToArray(confFile);
             return true;
         }
     }

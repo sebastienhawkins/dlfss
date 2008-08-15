@@ -22,6 +22,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Database_;
     using Drive_LFSS.Script_;
+    using Drive_LFSS.Log_;
 
     public sealed class Race : IRace
 	{
@@ -94,7 +95,7 @@ namespace Drive_LFSS.Game_
             {
                 if (raceInProgress == Race_In_Progress_Status.RACE_PROGRESS_NONE)
                 {
-                    SessionList.sessionList[serverId].session.log.error("System Think Race is Starded, But LFS Server Say:" + raceInProgress + "\r\n");
+                    Log.error("System Think Race is Starded, But LFS Server Say:" + raceInProgress + "\r\n");
                     isRacing = false;
                 }
             }

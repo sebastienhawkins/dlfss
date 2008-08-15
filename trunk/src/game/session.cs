@@ -26,7 +26,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Script_;
-    
+    using Drive_LFSS.Log_;
 
     public sealed class Session : Server, ISession
     {
@@ -89,7 +89,7 @@ namespace Drive_LFSS.Game_
         {
             if (TIMER_PING_PONG < (TimerPingPong += diff))
             {
-                log.ping("Ping!\r\n");
+                Log.progress("Ping!\r\n");
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)));
                 ping.Sending(diff);
                 TimerPingPong = 0;
@@ -121,7 +121,7 @@ namespace Drive_LFSS.Game_
                 }
                 else
                 {
-                    log.error("New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
+                    Log.error("New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
                     return;
                 }
             }
@@ -137,7 +137,7 @@ namespace Drive_LFSS.Game_
 
             if (!ExistLicenceId(_packet.tempLicenceId))
             {
-                log.error("Licence Disconnection, But no LicenceID associated with It, What todo???");
+                Log.error("Licence Disconnection, But no LicenceID associated with It, What todo???");
                 return;
             }
 
@@ -153,7 +153,7 @@ namespace Drive_LFSS.Game_
 
             if (!ExistLicenceId(_packet.tempLicenceId))
             {
-                log.error("New Car Join Race, But Not LicenceId Associated What todo???");
+                Log.error("New Car Join Race, But Not LicenceId Associated What todo???");
                 return;
             }
 
@@ -180,7 +180,7 @@ namespace Drive_LFSS.Game_
             byte itr;
             if ((itr = GetCarIndex(_packet.carId)) == 0)
             {
-                log.error("Car Leave race, But no Car Association Found , what todo???");
+                Log.error("Car Leave race, But no Car Association Found , what todo???");
                 return;
             }
 
@@ -219,14 +219,14 @@ namespace Drive_LFSS.Game_
 
             if (_packet.message[_packet.textStart] == commandPrefix)
             {
-                log.debug("Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
+                Log.debug("Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
 
                 
                 commandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
             }
             else
             {
-                log.chat(_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
+                Log.chat(_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
             }
         }
         protected sealed override void processPacket(PacketRST _packet) 
@@ -248,7 +248,7 @@ namespace Drive_LFSS.Game_
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
                 case Tiny_Type.TINY_NONE: break;
-                default: Program.log.missingDefinition("Missing case for TinyPacket: " + _packet.subTinyType+"\r\n"); break;
+                default: Log.missingDefinition("Missing case for TinyPacket: " + _packet.subTinyType+"\r\n"); break;
             }
         }
         #endregion
@@ -256,7 +256,7 @@ namespace Drive_LFSS.Game_
         #region Other
         private void PingReceived()
         {
-            log.ping("Pong! " + ping.Received() + "ms\r\n");
+            Log.progress("Pong! " + ping.Received() + "ms\r\n");
         }
         public long GetLatency()
         {

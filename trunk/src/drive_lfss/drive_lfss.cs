@@ -54,8 +54,6 @@ namespace Drive_LFSS
         
         #endregion
 
-        public static sLog log;
-
         [MTAThread]
         public static void Main()
 		{
@@ -64,51 +62,51 @@ namespace Drive_LFSS
             SetConsoleCtrlHandler(new HandlerRoutine(DisgraceExit), true);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnHandleException);
 
-            //Start the log System
-            if (!sLog.Initialize())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n\r\n");
-                System.Threading.Thread.Sleep(10000);
-                CommandConsole.Exec("exit");
-                return;
-            }
-            log = new sLog();
-            log.normal("Log System Initialized...\r\n\r\n");
+            //So user won't have working folder probleme.
+            string processPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            processPath = processPath.Substring(0, processPath.LastIndexOf('\\'));
 
-            if (!Config.Initialize())
+            //Write Startup Banner
+            WriteBanner();
+
+            //Configuration
+            if (!Config.Initialize(processPath + "\\Drive_LFSS.cfg"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Can't Initialize the Config, Will now QUIT.!\r\n\r\n");
                 System.Threading.Thread.Sleep(10000);
                 CommandConsole.Exec("exit");
                 return;
-            }
-            log.normal("Config Initialized...\r\n\r\n");
+            } Log.normal("Config Initialized...\r\n\r\n");
 
-
-            //Write Startup Banner
-            WriteBanner();
+            //Loggin
+            if (!Log.Initialize(processPath+"\\dlfss.log"))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n\r\n");
+                System.Threading.Thread.Sleep(10000);
+                CommandConsole.Exec("exit");
+                return;
+            } Log.normal("Log System Initialized...\r\n\r\n");
 
             //InGame Command System
-            log.normal("Initializating InGame Command.\r\n\r\n");
+            Log.normal("Initializating InGame Command.\r\n\r\n");
             //Command.Init();
             
             //Console System, Purpose for MultiThreading the Console Input
-            log.normal("Initializating Console Command.\r\n\r\n");
+            Log.normal("Initializating Console Command.\r\n\r\n");
             ThreadCaptureConsoleCommand.Start();
 
             //Database Initialization
-            log.normal("Initializating Database...\r\n\r\n");
+            Log.normal("Initializating Database...\r\n\r\n");
             DatabaseStorage.Initialize();
 
             //Create Object for All Configured Server
-            log.normal("Initializating Servers Config...\r\n\r\n");
+            Log.normal("Initializating Servers Config...\r\n\r\n");
             SessionList.LoadServerConfig( );
             
             //Session.InitializeServerList();
-
-            log.normal("Starting Normal Operation!\r\n\r\n");
+            Log.normal("Starting Normal Operation!\r\n\r\n");
             #region MainThread update
             uint TimerLogFlush = 0;
             while (MainRun)
@@ -121,7 +119,7 @@ namespace Drive_LFSS
                 if (TimerLogFlush > 30000)
                 {
                     TimerLogFlush = 0;
-                    sLog.flush();
+                    Log.flush();
                 }
                 
                 //update This Thread Process
@@ -135,21 +133,21 @@ namespace Drive_LFSS
         private static void WriteBanner()
         {
             //Opening Banner
-            log.normal("              _____                             _      _____      __  \r\n");
-            log.normal("              /    )         ,                  /      /    '   /    )\r\n");
-            log.normal("          ---/----/---)__-------------__-------/------/__-------\\-----\r\n");
-            log.normal("            /    /   /   ) /   | /  /___)     /      /           \\    \r\n");
-            log.normal("          _/____/___/_____/____|/__(___ _____/____/_/________(____/___\r\n");
-            log.normal("                                                                  v0.1\r\n");
-            //Program.log.normal("                                                                      \r\n");       
-            log.normal("                    _______________________________________\r\n");
-            log.normal("                          __                               \r\n");
-            log.normal("                        /    )                             \r\n");
-            log.normal("                    ----\\--------__---)__---------__---)__-\r\n");
-            log.normal("                         \\     /___) /   ) | /  /___) /   )\r\n");
-            log.normal("                    _(____/___(___ _/______|/__(___ _/_____\r\n");
-            log.normal("\r\n");
-            log.normal("\r\n");
+            Log.normal("              _____                             _      _____      __  \r\n");
+            Log.normal("              /    )         ,                  /      /    '   /    )\r\n");
+            Log.normal("          ---/----/---)__-------------__-------/------/__-------\\-----\r\n");
+            Log.normal("            /    /   /   ) /   | /  /___)     /      /           \\    \r\n");
+            Log.normal("          _/____/___/_____/____|/__(___ _____/____/_/________(____/___\r\n");
+            Log.normal("                                                                  v0.1\r\n");
+            //sLog.normal("                                                                      \r\n");       
+            Log.normal("                    _______________________________________\r\n");
+            Log.normal("                          __                               \r\n");
+            Log.normal("                        /    )                             \r\n");
+            Log.normal("                    ----\\--------__---)__---------__---)__-\r\n");
+            Log.normal("                         \\     /___) /   ) | /  /___) /   )\r\n");
+            Log.normal("                    _(____/___(___ _/______|/__(___ _/_____\r\n");
+            Log.normal("\r\n");
+            Log.normal("\r\n");
         }
         private static void CaptureConsoleCommand()
         {
@@ -164,26 +162,26 @@ namespace Drive_LFSS
         }
         private static void ConsoleExitTimer()
         {
-            log.error("Exiting into 5 seconds.\r\n");
+            Log.error("Exiting into 5 seconds.\r\n");
 
             byte secondeBeforeExit = 5;
             while(secondeBeforeExit > 0)
             {
                 Console.Clear();
-                log.error("Exiting into " + --secondeBeforeExit + " seconds.\r\n");
+                Log.error("Exiting into " + --secondeBeforeExit + " seconds.\r\n");
                 System.Threading.Thread.Sleep(1000);
             }
         }
         private static void UnHandleException(object sender, UnhandledExceptionEventArgs args)
         {
             Exception error = (Exception)args.ExceptionObject;
-            log.error("Critical Error, Auto Shutdown Initiated, 30 Seconde... \"exit\".\r\n");
-            log.error("The critical error Was: " + error.Message + "\r\n");
+            Log.error("Critical Error, Auto Shutdown Initiated, 30 Seconde... \"exit\".\r\n");
+            Log.error("The critical error Was: " + error.Message + "\r\n");
             SessionList.exit();
             System.Threading.Thread.Sleep(25000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();
-            sLog.flush();
+            Log.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
             System.Environment.Exit(0);
@@ -192,11 +190,11 @@ namespace Drive_LFSS
         {
             args.Cancel = true;
             SessionList.exit();
-            log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
+            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();
-            sLog.flush();
+            Log.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
             System.Environment.Exit(0);
@@ -204,11 +202,11 @@ namespace Drive_LFSS
         private static bool DisgraceExit(Ctrl_Types ctrlType)
         {
             SessionList.exit();
-            log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
+            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();
-            sLog.flush();
+            Log.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
             System.Environment.Exit(0);
@@ -219,24 +217,9 @@ namespace Drive_LFSS
             MainRun = false;
             
             SessionList.exit();
-            sLog.flush();
+            Log.flush();
 
             System.Environment.Exit(0);
         }
     }
 }
-/*public void InsertRow(string myConnectionString) 
-{
-  // If the connection string is null, use a default.
-  if(myConnectionString == "Persist Security Info=False;database=MyDB;server=MySqlServer;user id=myUser;Password=myPass") 
-  {
-    myConnectionString = "Database=Test;Data Source=localhost;User Id=username;Password=pass";
-  }
-  MySqlConnection myConnection = new MySqlConnection(myConnectionString);
-  string myInsertQuery = "INSERT INTO Orders (id, customerId, amount) Values(1001, 23, 30.66)";
-  MySqlCommand myCommand = new MySqlCommand(myInsertQuery);
-  myCommand.Connection = myConnection;
-  myConnection.Open();
-  myCommand.ExecuteNonQuery();
-  myCommand.Connection.Exit();
-}*/

@@ -27,7 +27,7 @@ namespace Drive_LFSS.Packet_
     {
         public Packet(Packet_Size _packetSize, Packet_Type _packetType, byte[] _data)
         {
-            //((Server)this).log.debug("Packet(), PacketType->" + _packetType + "\r\n");
+            //sLog.debug("Packet(), PacketType->" + _packetType + "\r\n");
 
             packetSize = (byte)_packetSize;
             packetType = _packetType;
@@ -35,7 +35,7 @@ namespace Drive_LFSS.Packet_
         }
         public Packet(Packet_Size _packetSize, Packet_Type _packetType, object _packet)
         {
-            //((Server)this).log.debug("Packet(), Destructor->PacketType->" + _packetType + "\r\n");
+            //sLog.debug("Packet(), Destructor->PacketType->" + _packetType + "\r\n");
 
             packetSize = (byte)_packetSize;
             packetType = _packetType;
@@ -53,7 +53,7 @@ namespace Drive_LFSS.Packet_
         }
         public Packet(byte[] _data)
         {
-            //((Server)this).log.debug("Packet(), PacketType->" + (Packet_Type)_data[1] + "\r\n");
+            //sLog.debug("Packet(), PacketType->" + (Packet_Type)_data[1] + "\r\n");
 
             packetSize = _data[0];
             packetType = (Packet_Type)_data[1];

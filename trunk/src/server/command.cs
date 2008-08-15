@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 namespace Drive_LFSS.Server_
 {
-    //using Drive_LFSS.PacketStore_;
+    using Drive_LFSS.Log_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Game_;
 
@@ -61,7 +61,7 @@ namespace Drive_LFSS.Server_
 
             if (args.Length < 1 || !command.ContainsKey(args[0].ToLower()) || (command[args[0]].level > 0 && !_adminStatus))
             {
-                SessionList.sessionList[serverId].session.log.debug("Command.Exec(), Bad Command Call From User: " + _licenceName + ", AccessLevel: " + (_adminStatus ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
+                Log.debug("Command.Exec(), Bad Command Call From User: " + _licenceName + ", AccessLevel: " + (_adminStatus ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
             command[args[0]].cmd(_adminStatus,_licenceName, _commandText);
@@ -70,7 +70,7 @@ namespace Drive_LFSS.Server_
         private void Exit(bool _adminStatus, string _licenceName, string _commandText)
         {
             //SessionList.sessionList[serverId].session.log.command(
-            Program.log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
+            Log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
             Program.Exit();
         }
         private void Kick(bool _adminStatus, string _licenceName, string _commandText)
@@ -84,7 +84,7 @@ namespace Drive_LFSS.Server_
             }
             args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
 
-            SessionList.sessionList[serverId].session.log.command("Command.Kick(), User: " + _licenceName + ", Kicked User: " + args[1] + "\r\n");
+            Log.command("Command.Kick(), User: " + _licenceName + ", Kicked User: " + args[1] + "\r\n");
             SessionList.sessionList[serverId].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST("/kick " + args[1])));
         }
         #endregion

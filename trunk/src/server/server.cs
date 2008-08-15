@@ -30,7 +30,6 @@ namespace Drive_LFSS.Server_
         public Server(ushort _serverId, InSimSetting _inSimSetting): base(_inSimSetting)
         {
             serverId = _serverId;
-            log = new sLog(serverId);
             command = new CommandServer(serverId);
         }
 
@@ -40,7 +39,6 @@ namespace Drive_LFSS.Server_
         {
             get { return serverId; }
         }
-        public sLog log;
         private CommandServer command;
 
         #region update

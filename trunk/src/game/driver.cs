@@ -20,6 +20,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Script_;
+    using Drive_LFSS.Log_;
 
     public sealed class Driver : Car, IDriver
     {
@@ -69,7 +70,7 @@ namespace Drive_LFSS.Game_
         {
             if (TIMER_IM_A_TEST < diff) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
             {
-                session.log.debug("Player: " + driverName + ", is a InGame Driver.\r\n");
+                Log.debug("Player: " + driverName + ", is a InGame Driver.\r\n");
                 TIMER_IM_A_TEST = INTERVAL_IM_A_TEST;
             }
             else

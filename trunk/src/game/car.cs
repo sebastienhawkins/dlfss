@@ -20,6 +20,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Script_;
+    using Drive_LFSS.Log_;
 
     public abstract class Car : Licence, ICar
     {
@@ -162,7 +163,7 @@ namespace Drive_LFSS.Game_
                 timerAcceleration_0_100 = 0;
                 return;
             }
-            session.log.gameFeature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
+            Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
             timerAcceleration_0_100 = 0;
         }
 
