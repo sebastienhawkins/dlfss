@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "drive_lfss", "src\drive_lfss.csproj", "{1D9B9188-BF6D-4204-BDFA-6552233F1488}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "script", "src\binding\script\script.csproj", "{22E335A5-3502-4537-8410-7EC0BABD555C}"

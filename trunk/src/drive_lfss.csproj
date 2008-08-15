@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -25,6 +25,12 @@
     <ManifestKeyFile>drive_lfss_TemporaryKey.pfx</ManifestKeyFile>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup>
     <BaseIntermediateOutputPath>obj</BaseIntermediateOutputPath>
@@ -67,18 +73,12 @@
     <Compile Include="database\database_sqlite.cs" />
     <Compile Include="database\dbsSet.cs" />
     <Compile Include="database\storage_sqlite.cs" />
-    <None Include="game\interface\icar.cs" />
-    <None Include="game\interface\idriver.cs" />
-    <None Include="game\interface\ilicence.cs" />
-    <None Include="game\interface\irace.cs" />
-    <None Include="game\interface\iscript.cs" />
-    <None Include="game\interface\isession.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="network\packet\enum.cs" />
     <Compile Include="network\packet\handler.cs" />
     <Compile Include="network\packet\packet_store\store.cs" />
-    <Compile Include="drive_lfss\command_console\command.cs" />
+    <Compile Include="drive_lfss\command.cs" />
     <Compile Include="definition\global.cs" />
     <Compile Include="server\command.cs" />
     <Compile Include="config\config.cs" />

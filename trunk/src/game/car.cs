@@ -154,17 +154,14 @@ namespace Drive_LFSS.Game_
             get { return carId; }
         }
 
-        //Script Call
         private void Acceleration_0_100()
         {
+            timerAcceleration_0_100 = 0;
+            Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
+
             //If Script then don't do normal Process!
             if (script.CarAcceleration_0_100((ICar)this))
-            {
-                timerAcceleration_0_100 = 0;
                 return;
-            }
-            Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
-            timerAcceleration_0_100 = 0;
         }
 
         #endregion

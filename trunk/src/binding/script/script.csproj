@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -12,6 +12,12 @@
     <SignAssembly>false</SignAssembly>
     <StartupObject>
     </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,16 +45,20 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="script_car.cs" />
+    <Compile Include="script_licence.cs" />
+    <Compile Include="script_session.cs" />
+    <Compile Include="script_driver.cs" />
+    <Compile Include="script_race.cs" />
+    <Compile Include="external\icar.cs" />
+    <Compile Include="external\idriver.cs" />
+    <Compile Include="external\ilicence.cs" />
+    <Compile Include="external\irace.cs" />
+    <Compile Include="external\isession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="script.cs" />
-    <Compile Include="..\..\game\interface\iscript.cs" />
-    <Compile Include="..\..\game\interface\isession.cs" />
-    <Compile Include="..\..\game\interface\irace.cs" />
-    <Compile Include="..\..\game\interface\idriver.cs" />
-    <Compile Include="..\..\game\interface\icar.cs" />
-    <Compile Include="..\..\game\interface\ilicence.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
