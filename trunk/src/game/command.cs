@@ -23,18 +23,18 @@ namespace Drive_LFSS.Server_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Game_;
 
-    sealed class CommandServer
+    sealed class CommandInGame
     {
-        public CommandServer(ushort _serverId)
+        public CommandInGame(string _serverName)
         {
-            serverId = _serverId;
+            serverName = _serverName;
 
             //       CommandName                CommandLevel                    CommandReference
             command["exit"] = new CommandName(0, new CommandDelegate(Exit));
             command["kick"] = new CommandName(0, new CommandDelegate(Kick));
         }
         
-        private ushort serverId;
+        private string serverName;
         private struct CommandName
         {
             public CommandName(byte _level, CommandDelegate _cmd)
@@ -50,9 +50,9 @@ namespace Drive_LFSS.Server_
         
         private Dictionary<string,CommandName> command = new Dictionary<string,CommandName> ();
 
-        public ushort GetServerId()
+        public string GetServerName()
         {
-            return serverId;
+            return serverName;
         }
         public void Exec(bool _adminStatus, string _licenceName, string _commandText)
         {
@@ -69,7 +69,6 @@ namespace Drive_LFSS.Server_
         #region Commands
         private void Exit(bool _adminStatus, string _licenceName, string _commandText)
         {
-            //SessionList.sessionList[serverId].session.log.command(
             Log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
             Program.Exit();
         }
@@ -85,7 +84,7 @@ namespace Drive_LFSS.Server_
             args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
 
             Log.command("Command.Kick(), User: " + _licenceName + ", Kicked User: " + args[1] + "\r\n");
-            SessionList.sessionList[serverId].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST("/kick " + args[1])));
+            SessionList.sessionList[serverName].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST("/kick " + args[1])));
         }
         #endregion
     }

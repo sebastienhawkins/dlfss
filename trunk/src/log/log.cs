@@ -37,7 +37,6 @@ namespace Drive_LFSS.Log_
         LOG_FEATURE = 128,
         LOG_DISABLE = unchecked((ushort)-1)
     }
-
     static class Log
     {
         private static Log_Type logDisable = Log_Type.LOG_DISABLE;

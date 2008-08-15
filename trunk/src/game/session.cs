@@ -28,19 +28,22 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Script_;
     using Drive_LFSS.Log_;
 
-    public sealed class Session : Server, ISession
+    public sealed class Session : InSim, ISession
     {
-        public  Session(ushort _serverId, InSimSetting _inSimSetting) : base(_serverId, _inSimSetting)
+        public Session(string _serverName, InSimSetting _inSimSetting): base( _inSimSetting)
         {
-            commandPrefix = _inSimSetting.CommandPrefix;
-
-            race = new Race(_serverId);
+            serverName = _serverName;
+            commandPrefix = _inSimSetting.commandPrefix;
+            race = new Race(_serverName);
             driverList = new List<Driver>();
             driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
             driverList.Capacity = 192;
             script = new ScriptSession();
             ping = new Ping();
+            command = new CommandInGame(serverName);
+            connectionRequest = true;
         }
+
         private class Ping
         {
             public Ping()
@@ -73,20 +76,45 @@ namespace Drive_LFSS.Game_
                 return sessionLatency - diff;
             }
         }
+        private string serverName;
         private char commandPrefix;
-
         private ScriptSession script;
         private Race race;
         private List<Driver> driverList;
         private Ping ping;
+        private CommandInGame command;
+        public bool connectionRequest;   
+
+        new public void AddToTcpSendingQueud(Packet _serverPacket)
+        {
+            base.AddToTcpSendingQueud(_serverPacket);
+        }
+        private void commandExec(bool _adminStatus, string _licenceName, string _commandText)
+        {
+            command.Exec(_adminStatus, _licenceName, _commandText);
+        }
+        private void PingReceived()
+        {
+            Log.progress("Pong! " + ping.Received() + "ms\r\n");
+        }
+        public long GetLatency()
+        {
+            return ping.SessionLatency;
+        }
+        public long GetReactionTime()
+        {
+            return ping.GetReactionTime();
+        }
 
         #region Update/Timer
 
         private const uint TIMER_PING_PONG = 30000;
         private uint TimerPingPong = 30000;
 
-        new public void update(uint diff)
+        public void update(uint diff)
         {
+            ProcessReceivedPacket();
+
             if (TIMER_PING_PONG < (TimerPingPong += diff))
             {
                 Log.progress("Ping!\r\n");
@@ -94,8 +122,6 @@ namespace Drive_LFSS.Game_
                 ping.Sending(diff);
                 TimerPingPong = 0;
             }
-
-            base.update(diff);
 
             for (byte itr = 1; itr < driverList.Count; ++itr)
                 driverList[itr].update(diff);
@@ -105,6 +131,16 @@ namespace Drive_LFSS.Game_
         #endregion
 
         #region Process packet
+        private void ProcessReceivedPacket()
+        {
+            object[] _nextTcpPacket = NextTcpReceiveQueud(true);
+            if (_nextTcpPacket != null)
+                ProcessPacket((Packet_Type)_nextTcpPacket[0], _nextTcpPacket[1]);
+
+            object[] _nextUdpPacket = NextUdpReceiveQueud(true);
+            if (_nextUdpPacket != null)
+                ProcessPacket((Packet_Type)_nextUdpPacket[0], _nextUdpPacket[1]);
+        }
         protected sealed override void processPacket(PacketNCN _packet)
         {
             base.processPacket(_packet); //Keep the Log
@@ -144,7 +180,7 @@ namespace Drive_LFSS.Game_
             //Driver object for this one, will be totaly destroyed, from is Most Base Class to the Top Most.
             //If we need to excute a function onto disconnection, i sugest doing into Class Destructor! for Each Class ;) Rock And Roll!
             byte itr;
-            while((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)          
+            while ((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)
                 driverList.RemoveAt((int)itr);
         }
         protected sealed override void processPacket(PacketNPL _packet) //New Car Join Race
@@ -191,7 +227,7 @@ namespace Drive_LFSS.Game_
         {
             //base.processPacket(_packet); // Will Reprocess the Old One
 
-            
+
             CarInformation[] carInformation = _packet.carInformation;
             byte carIndex;
             for (byte itr = 0; itr < carInformation.Length; itr++)
@@ -202,7 +238,7 @@ namespace Drive_LFSS.Game_
                 carIndex = GetCarIndex(carInformation[itr].carId);
                 if (driverList[carIndex].DriverName == "host") //Will have to check here if we change Host name...
                     continue;
-                    
+
                 ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
             }
         }
@@ -210,7 +246,7 @@ namespace Drive_LFSS.Game_
         {
             base.processPacket(_packet);
             //Chat_User_Type chatUserType = allo;
-            
+
             //_packet.chatUserType;
             if (!ExistLicenceId(_packet.tempLicenceId))
                 return;
@@ -221,7 +257,7 @@ namespace Drive_LFSS.Game_
             {
                 Log.debug("Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
 
-                
+
                 commandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
             }
             else
@@ -229,7 +265,7 @@ namespace Drive_LFSS.Game_
                 Log.chat(_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
             }
         }
-        protected sealed override void processPacket(PacketRST _packet) 
+        protected sealed override void processPacket(PacketRST _packet)
         {
             base.processPacket(_packet);
             race.Init(_packet);
@@ -248,23 +284,8 @@ namespace Drive_LFSS.Game_
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
                 case Tiny_Type.TINY_NONE: break;
-                default: Log.missingDefinition("Missing case for TinyPacket: " + _packet.subTinyType+"\r\n"); break;
+                default: Log.missingDefinition("Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }
-        }
-        #endregion
-
-        #region Other
-        private void PingReceived()
-        {
-            Log.progress("Pong! " + ping.Received() + "ms\r\n");
-        }
-        public long GetLatency()
-        {
-            return ping.SessionLatency;
-        }
-        public long GetReactionTime()
-        {
-            return ping.GetReactionTime();
         }
         #endregion
 

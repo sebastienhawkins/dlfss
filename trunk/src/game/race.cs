@@ -26,12 +26,12 @@ namespace Drive_LFSS.Game_
 
     public sealed class Race : IRace
 	{
-        public Race(ushort _serverId)
+        public Race(string _serverName)
         {
-            serverId = _serverId;
+            serverName = _serverName;
             gridOrder = "";
         }
-        private ushort serverId;
+        private string serverName;
         private bool isRacing;
         private uint timeStart;
         private static uint guid; //Have to be initialized at Start, and we increment at each RaceEnd(Saving)

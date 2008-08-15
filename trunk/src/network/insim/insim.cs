@@ -30,42 +30,48 @@ namespace Drive_LFSS.InSim_
     using Drive_LFSS.Server_;
     using Drive_LFSS.Log_;
 
+    public struct InSimSetting
+    {
+        public string serverName;
+        public IPAddress ip;
+        public ushort port;
+        public string password;
+        public char commandPrefix;
+        public string appName;
+        public InSim_Flag insimMask;
+        public ushort requestInterval;
+        public ushort networkInterval;
+
+        public InSimSetting(string _serverName, string _ip, ushort _port, string _password, char _commandPrefix, string _appName, InSim_Flag _insimMask, ushort _requestInterval, ushort _networkInterval)
+        {
+            serverName = _serverName;
+            ip = IPAddress.Parse(_ip);
+            port = _port;
+            password = _password;
+            commandPrefix = _commandPrefix;
+            appName = _appName;
+            insimMask = _insimMask;
+            requestInterval = _requestInterval;
+            networkInterval = _networkInterval;
+        }
+    }
+
     public abstract class InSim : PacketHandler
     {
         public InSim(InSimSetting _inSimSetting)
         {
-            string errorMessage = "";
-            if (_inSimSetting.adminPassword.Length > 0x10)
-            {
-                errorMessage += "Administrator Password must be 16 characters long maximun.\r\n";
-            }
-            if (_inSimSetting.connectionName.Length > 0x10)
-            {
-                errorMessage += "Connection Name must be 16 characters long maximun.\r\n";
-            }
-            if (_inSimSetting.tcpPort < 1024)
-            {
-                errorMessage += "TCP Port number must be > 1024.\r\n";
-            }
-            if (_inSimSetting.udpPort != 0 && _inSimSetting.udpPort < 1024)
-            {
-                errorMessage += "UDP Port number must be > 1024.\r\n";
-            }
-            if (errorMessage != "")
-            {
-                //TODO
-                //throw new InvalidConfigurationException(errorMessage + "\r\nVerify you InSimSettings parameters for incorrect values.");
-            }
             inSimSetting = _inSimSetting;
-            threadSocketReceive = new Thread(new ThreadStart(SocketReceive));
-            //packetStore = new Store();
-        }
-       // public InSim() { }
 
-        /*public ushort serverId
-        {
-            get { return ((Server)this).serverId; }
-        }*/
+            if (inSimSetting.password.Length > 16)
+                Log.error(inSimSetting.serverName + " bad Configuration For: password must be 16 characters long maximun.\r\n");
+            else if (inSimSetting.appName.Length > 16)
+                Log.error(inSimSetting.serverName + " bad Configuration For: appName must be 16 characters long maximun.\r\n");
+            else if (inSimSetting.port < 1024)
+                Log.error(inSimSetting.serverName + " bad Configuration For: Port must be greater 1024.\r\n");
+            else  //All Good
+                threadSocketReceive = new Thread(new ThreadStart(SocketReceive));
+        }
+
         private InSim_Socket_State socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
         private InSimSetting inSimSetting;
         private bool runThreadSocketReceive = false;
@@ -84,7 +90,7 @@ namespace Drive_LFSS.InSim_
             if (udpClient != null)
             {
                 byte[] dgram = new byte[1];
-                udpClient.Send(dgram, 1, "localhost", inSimSetting.udpPort);
+                udpClient.Send(dgram, 1, "localhost", inSimSetting.port);
             }
 
             socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
@@ -101,19 +107,19 @@ namespace Drive_LFSS.InSim_
             socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
 
             tcpClient = new TcpClient();
-            try{ tcpClient.Connect(new IPEndPoint(inSimSetting.serverIp, inSimSetting.tcpPort)); }
+            try{ tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
             catch (SocketException _exception)
             {
                 return;//throw new Exception("TCP Socket Initialization failded, Error was: " +_exception.Message); 
             }
             tcpSocket = tcpClient.GetStream();
             
-            PacketISI packetISI = new PacketISI(1, inSimSetting.udpPort, (ushort)inSimSetting.Flags, inSimSetting.CommandPrefix, inSimSetting.MCI_NLP_Interval, inSimSetting.adminPassword, inSimSetting.connectionName);
+            PacketISI packetISI = new PacketISI(1, inSimSetting.port, (ushort)inSimSetting.insimMask, inSimSetting.commandPrefix, inSimSetting.requestInterval, inSimSetting.password, inSimSetting.appName);
             AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_ISI, Packet_Type.PACKET_ISI_INSIM_INITIALISE, packetISI));
 
             System.Threading.Thread.Sleep(1000);
 
-            udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.udpPort);
+            udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.port);
             try { udpClient = new UdpClient(udpIpEndPoint); }
             catch (SocketException _exception)
             {
@@ -239,141 +245,6 @@ namespace Drive_LFSS.InSim_
         public InSim_Socket_State GetSocketStatus()
         {
             return socketStatus;
-        }
-    }
-
-    //This class is non sence, is keeped cause of Time related question
-    //She will be removed, and DB setting should goes into the Master DB Object.
-    public class InSimSetting
-    {
-        private string _adminpass = "";
-        private string _appname = "";
-        private uint _autoreconnectdelay = 0xea60;
-        private char _commandprefix = '!';
-        private InSim_Flag _flags;
-        private ushort _mci_nlp_interval = 500;
-        private ushort _portnumber = 0x752f;
-        private IPAddress _serverip = IPAddress.Any;
-        private ushort _udpreplyport = 0x2716;
-
-        public InSimSetting(string ServerIP, ushort PortNumber, ushort UDPReplyPort, InSim_Flag Flags, char CommandPrefix, ushort MCI_NLP_Interval, string AdminPass, string AppName, uint AutoReconnectDelayInSeconds )
-        {
-            this._serverip = IPAddress.Parse(ServerIP);
-            this._portnumber = PortNumber;
-            this._udpreplyport = UDPReplyPort;
-            this._flags = Flags;
-            this._commandprefix = CommandPrefix;
-            this._mci_nlp_interval = MCI_NLP_Interval;
-            this._adminpass = AdminPass;
-            this._appname = AppName;
-            this._autoreconnectdelay = (AutoReconnectDelayInSeconds == 0) ? 0 : (AutoReconnectDelayInSeconds * 0x3e8);
-        }
-        public string adminPassword
-        {
-            get
-            {
-                return this._adminpass;
-            }
-            set
-            {
-                this._adminpass = value;
-            }
-        }
-
-        public string connectionName
-        {
-            get
-            {
-                return this._appname;
-            }
-            set
-            {
-                this._appname = value;
-            }
-        }
-
-        public uint AutoReconnectDelay
-        {
-            get
-            {
-                return this._autoreconnectdelay;
-            }
-            set
-            {
-                this._autoreconnectdelay = value;
-            }
-        }
-
-        public char CommandPrefix
-        {
-            get
-            {
-                return this._commandprefix;
-            }
-            set
-            {
-                this._commandprefix = value;
-            }
-        }
-
-        public InSim_Flag Flags
-        {
-            get
-            {
-                return this._flags;
-            }
-            set
-            {
-                this._flags = value;
-            }
-        }
-
-        public ushort MCI_NLP_Interval
-        {
-            get
-            {
-                return this._mci_nlp_interval;
-            }
-            set
-            {
-                this._mci_nlp_interval = value;
-            }
-        }
-
-        public ushort tcpPort
-        {
-            get
-            {
-                return this._portnumber;
-            }
-            set
-            {
-                this._portnumber = value;
-            }
-        }
-
-        public IPAddress serverIp
-        {
-            get
-            {
-                return this._serverip;
-            }
-            set
-            {
-                this._serverip = value;
-            }
-        }
-
-        public ushort udpPort
-        {
-            get
-            {
-                return this._udpreplyport;
-            }
-            set
-            {
-                this._udpreplyport = value;
-            }
         }
     }
 }

@@ -24,46 +24,52 @@ namespace Drive_LFSS
     using Drive_LFSS.InSim_;
     using Drive_LFSS.Server_;
     using Drive_LFSS.Game_;
-    //using Drive_LFSS.Database_;
-
+    using Drive_LFSS.Config_;
+    using Drive_LFSS.Log_;
 
     public static class SessionList //Must become compatible with all Session type: ServerInSim, ClientOutGauge, ... Im not aware of all....
     {
         public struct SessionStruct
         {//(/*Racing_Flag.InSim_Flag.ISF_MSO_COLS |*/ InSim_Flag.ISF_MCI), '$', 10000, "dexxa", "Aleajecta S2", 5)))
-            public SessionStruct(ushort _sessionId, InSimSetting _inSimSetting)
+            public SessionStruct(string _sessionName, InSimSetting _inSimSetting)
             {
-                sessionId = _sessionId;
-                inSimSetting = _inSimSetting;
-                session = new Session(sessionId, inSimSetting);
+                sessionName = _sessionName;
+                session = new Session(sessionName, _inSimSetting);
             }
-            public ushort sessionId;
-            public InSimSetting inSimSetting;
+            public string sessionName;
             public Session session;
         }
 
-        //ServerId To "Server"
-        public static Dictionary<ushort, SessionStruct> sessionList = new Dictionary<ushort, SessionStruct>();
+
+        public static Dictionary<string, SessionStruct> sessionList = new Dictionary<string, SessionStruct>();
 
         public static void LoadServerConfig( )
         {
-            sessionList.Add(5, new SessionStruct(5, new InSimSetting("91.121.7.73", 20003, 20003, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "yourpass", "DriveLFSS", 5)));
-            sessionList.Add(1, new SessionStruct(1, new InSimSetting("67.212.66.26", 30001, 30001, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
-            sessionList.Add(2, new SessionStruct(2, new InSimSetting("67.212.66.26", 29999, 29999, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 100, "dexxa", "DriveLFSS", 5)));
-            sessionList.Add(3, new SessionStruct(3, new InSimSetting("67.212.66.26", 29989, 29989, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
-            sessionList.Add(4, new SessionStruct(4, new InSimSetting("67.212.66.26", 30000, 30000, InSim_Flag.INSIM_FLAG_KEEP_MESSAGE_COLOR | InSim_Flag.INSIM_FLAG_RECEIVE_MCI, '$', 10, "dexxa", "DriveLFSS", 5)));
+            List<string> lfsServer = Config.GetIdentifierList("LFSServer");
+
+            List<string>.Enumerator itr = lfsServer.GetEnumerator();
+            while (itr.MoveNext())
+            {
+                string[] serverOptions = Config.GetStringValue("LFSServer", itr.Current, "ConnectionInfo").Split(';');
+                if (serverOptions.Length != 8)
+                {
+                    Log.error("Configuration Error for Servername: " + itr.Current + ", Bad Option Count, Must be 8.\r\n");
+                    continue;
+                }                                                                                                                           //67.212.66.26;30001;dexxa;$;Drive_LFSS;40;100;100
+                sessionList.Add(itr.Current, new SessionStruct(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt16(serverOptions[5]), Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7]))));
+            }
         }
 
         public static void update(uint diff)
         {
-            foreach (KeyValuePair<ushort, SessionStruct> keyPair in sessionList)
+            foreach (KeyValuePair<string, SessionStruct> keyPair in sessionList)
             {
                 if (keyPair.Value.session.connectionRequest)
                 {
                     keyPair.Value.session.connectionRequest = false;
 
                     if (keyPair.Value.session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED))
-                        ConnectToServerId(keyPair.Key);
+                        ConnectToServerName(keyPair.Key);
                     continue;
                 }
 
@@ -73,14 +79,14 @@ namespace Drive_LFSS
                 keyPair.Value.session.update(diff);
             }
         }
-        public static void ConnectToServerId(ushort serverId)
+        public static void ConnectToServerName(string serverName)
         {
-            Thread ThreadConnectionProcess = new Thread(new ThreadStart(sessionList[serverId].session.connect));
+            Thread ThreadConnectionProcess = new Thread(new ThreadStart(sessionList[serverName].session.connect));
             ThreadConnectionProcess.Start();
         }
         public static void exit()
         {
-            foreach (KeyValuePair<ushort, SessionStruct> keyPair in sessionList)
+            foreach (KeyValuePair<string, SessionStruct> keyPair in sessionList)
             {
                 keyPair.Value.session.exit();
             }

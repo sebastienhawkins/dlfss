@@ -48,73 +48,68 @@ namespace Drive_LFSS.CommandConsole_
         {
             if (args.Length != 2)
             {
-                Log.normal("Command Status, Syntax Error.\r\n  Usage:\r\n    status #serverId\r\n");
+                Log.normal("Command Status, Syntax Error.\r\n  Usage:\r\n    status #serverName\r\n      #serverName can be \"all\".\r\n");
                 return;
             }
 
-            if (args[1] == "*")
+            if (args[1] == "all")
             {
                 //Maybe you Real Iterator<Session>
-                foreach (KeyValuePair<ushort, SessionList.SessionStruct> keyPair in SessionList.sessionList)
+                foreach (KeyValuePair<string, SessionList.SessionStruct> keyPair in SessionList.sessionList)
                 {
                     Session session = SessionList.sessionList[keyPair.Key].session;
 
                     if(session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
-                        Log.normal("ServerId: " + keyPair.Key + ", Status: online, ReactionTime: " + session.GetReactionTime() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
+                        Log.normal("ServerName: " + keyPair.Key + ", Status: online, ReactionTime: " + session.GetReactionTime() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
                     else
-                        Log.error("ServerId: " + keyPair.Key + ", Status: offline, ReactionTime+/-: -ms, DriversCount: -\r\n");
+                        Log.error("ServerName: " + keyPair.Key + ", Status: offline, ReactionTime+/-: -ms, DriversCount: -\r\n");
                 }
             }
             else
             {
-                ushort serverId;
-                try { serverId = Convert.ToUInt16(args[1]); }
-                catch (Exception _exception)
-                {
-                    Log.normal("Command Status, Syntax Error.\r\n  Usage:\r\n    status #serverId\r\n");
-                    return;
-                }
+                string serverName = args[1];
 
-                if (SessionList.sessionList.ContainsKey(serverId))
+
+                if (SessionList.sessionList.ContainsKey(serverName))
                 {
-                    Session session = SessionList.sessionList[serverId].session;
+                    Session session = SessionList.sessionList[serverName].session;
 
                     if (session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
-                        Log.normal("ServerId: " + serverId + ", Status: online, Latency: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
+                        Log.normal("serverName: " + serverName + ", Status: online, ReactionTime: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
                     else
-                        Log.error("ServerId: " + serverId + ", Status: offline, Latency: -ms, DriversCount: -\r\n");
+                        Log.error("serverName: " + serverName + ", Status: offline, ReactionTime: -ms, DriversCount: -\r\n");
                 }
                 else
-                    Log.command("Command Status, ServerId Not Found, Server Requested was: " + serverId + "\r\n");
+                    Log.command("Command Status, ServerName Not Found, Server Requested was: " + serverName + "\r\n");
             }
         }
         private static void Say(string[] args)
         {
             if (args.Length != 2)
             {
-                Log.normal("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverId $Message\r\n");
+                Log.normal("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverName $Message\r\n");
                 return;
             }
 
             if (args[0] == "*")
             {
-                foreach (KeyValuePair<ushort, SessionList.SessionStruct> keyPair in SessionList.sessionList)
+                foreach (KeyValuePair<string, SessionList.SessionStruct> keyPair in SessionList.sessionList)
                     SessionList.sessionList[keyPair.Key].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
             }
             else
             {
-                ushort serverId;
-                try { serverId = Convert.ToUInt16(args[0]); }
+                string serverName = args[0];
+                /*try { serverId = Convert.ToUInt16(args[0]); }
                 catch (Exception _exception)
                 {
                     Log.normal("Command Announce, Syntax Error.\r\n  Usage:\r\n    announce #serverId $Message\r\n");
                     return;
-                }
+                }*/
 
-                if (SessionList.sessionList.ContainsKey(serverId))
-                    SessionList.sessionList[serverId].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
+                if (SessionList.sessionList.ContainsKey(serverName))
+                    SessionList.sessionList[serverName].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
                 else
-                    Log.command("Command Announce, ServerId Not Found, Server Requested was: " + args[0] + "\r\n");
+                    Log.command("Command Announce, serverName Not Found, Server Requested was: " + args[0] + "\r\n");
             }
         }
         private static void Exit()
