@@ -391,13 +391,13 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        internal byte Zero;
-        public byte UCID;
-        public byte PLID;
-        internal byte Sp2;
-        internal byte Sp3;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string Msg;
+        public byte requestId;
+        internal byte zero;
+        public byte licenceId;
+        public byte carId;
+        internal byte spare1;
+        internal byte spare2;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketNCN
     {
