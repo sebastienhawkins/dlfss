@@ -143,7 +143,7 @@ namespace Drive_LFSS.Game_
 
             public void Update(Car car)
             {
-                if (car.speedKhm < 0.1d && !started)
+                if (car.speedKhm < 0.1d && (!started || startTime != 0))
                     Start();
 
                 else if (car.speedKhm > 0.1d && started && startTime == 0)
@@ -166,8 +166,13 @@ namespace Drive_LFSS.Game_
             {
                 long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
                 End();
+                double finalAcceleration = (((double)timeElapsed - (double)Math.Abs(((Driver)car).Session.GetReactionTime())) / 1000.0d);
 
-                Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + (((double)timeElapsed - (double)((Driver)car).Session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
+                Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + finalAcceleration + "sec.\r\n");
+                if (((Driver)car).IsBot())
+                    return;
+
+               ((Driver)car).Session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, new PacketMTC(0, car.CarId, "^7 0-100Km/h In: ^2" + finalAcceleration + " ^0 sec.\r\n")));
 
                 //If Script then don't do normal Process!
                 if (car.script.CarAcceleration_0_100((ICar)car))

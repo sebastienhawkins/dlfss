@@ -102,23 +102,9 @@ namespace Drive_LFSS.Game_
            // set { driverName = value; }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public bool IsBot()
         {
-            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI);
+            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || CarId == 0);
         }
     }
 }

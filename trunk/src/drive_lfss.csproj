@@ -77,7 +77,6 @@
     <Compile Include="database\database_mysql.cs" />
     <Compile Include="database\database_sqlite.cs" />
     <Compile Include="database\idatabase.cs" />
-    <Compile Include="database\process.cs" />
     <Compile Include="database\storage_sqlite.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />

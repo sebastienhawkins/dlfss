@@ -94,6 +94,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_RST_RACE_START, new PacketRST());
             Add(Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE, new PacketSTA());
             Add(Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST());
+            Add(Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, new PacketMTC());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -389,8 +390,32 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMTC
     {
-        internal byte packetSize;
-        internal byte packetType;
+        public PacketMTC(byte _requestId, byte _licenceId, byte _carId, string _message)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_MTC;
+            packetType = Packet_Type.PACKET_MTC_CHAT_TO_LICENCE;
+            requestId = _requestId;
+            zero = 0;
+            licenceId = _licenceId;
+            carId = _carId;
+            spare1 = 0;
+            spare2 = 0;
+            message = _message;
+        }
+        public PacketMTC(byte _licenceId, byte _carId, string _message)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_MTC;
+            packetType = Packet_Type.PACKET_MTC_CHAT_TO_LICENCE;
+            requestId = 0;
+            zero = 0;
+            licenceId = _licenceId;
+            carId = _carId;
+            spare1 = 0;
+            spare2 = 0;
+            message = _message;
+        }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
         public byte requestId;
         internal byte zero;
         public byte licenceId;
