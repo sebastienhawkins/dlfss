@@ -15,6 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+using System;
+
 namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Definition_;
@@ -29,6 +32,9 @@ namespace Drive_LFSS.Game_
             //Object
             script = new ScriptCar();
 
+            //game Feature
+            featureAcceleration_0_100 = new FeatureAcceleration_0_100();
+
             //Packet Data
             carId = 0;
             carPlate = "";
@@ -40,9 +46,6 @@ namespace Drive_LFSS.Game_
             tyreFrontRight = 0;
             tyreRearLeft = 0;
             tyreRearRight = 0;
-
-            //Game Feature
-            timerAcceleration_0_100 = 0;
         }
         new protected void Init(PacketNCN _packet)
         {
@@ -76,12 +79,12 @@ namespace Drive_LFSS.Game_
 
             speed = _carInformation.speed;
             speedKhm = SpeedToKmh();
-            if (speedKhm < 0.1 && timerAcceleration_0_100 != 1)
-                timerAcceleration_0_100 = 1;
 
             direction = _carInformation.direction;
             heading = _carInformation.heading;
             angleVelocity = _carInformation.angleVelocity;
+
+            featureAcceleration_0_100.Update(this);
 
             //base.Init(_packet);
         }
@@ -114,31 +117,66 @@ namespace Drive_LFSS.Game_
         private ushort heading;
         private short angleVelocity;
 
-        //GameFeature
-        private uint timerAcceleration_0_100;
+        //Game Feature
+        private FeatureAcceleration_0_100 featureAcceleration_0_100;
 
-
-        #region Update(uint diff)
+    #region Update
         new protected virtual void update(uint diff)
         {
-            //Acceleration 0 - 100 Khm
-            if (SpeedToKmh() > 0.1 && timerAcceleration_0_100 != 0)
-            {
-                timerAcceleration_0_100 += diff;
-                if (speedKhm > 99.9d)
-                    Acceleration_0_100();
-                else if(timerAcceleration_0_100 > 60000) //MaxAccelerationTime
-                    timerAcceleration_0_100 = 0;
-            }
 
             //Script.CarFinishRace((Driver)this);
             //session.log("");
             base.update(diff);
         }
-        #endregion
+    #endregion
 
-        #region Game Feature Function
+    #region Game Feature
+        private class FeatureAcceleration_0_100
+        {
+            public FeatureAcceleration_0_100()
+            {
+                started = false;
+                startTime = 0;
+            }
+            private bool started;
+            private long startTime;
 
+            public void Update(Car car)
+            {
+                if (car.speedKhm < 0.1d && !started)
+                    Start();
+
+                else if (car.speedKhm > 0.1d && started && startTime == 0)
+                    startTime = DateTime.Now.Ticks;
+
+                else if (car.speedKhm > 99.9d && started)
+                    Sucess(ref car);
+            }
+            private void Start()
+            {
+                startTime = 0;
+                started = true;
+            }
+            private void End()
+            {
+                startTime = 0;
+                started = false;
+            }
+            private void Sucess(ref Car car)
+            {
+                long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
+                End();
+
+                Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + (((double)timeElapsed - (double)((Driver)car).Session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
+
+                //If Script then don't do normal Process!
+                if (car.script.CarAcceleration_0_100((ICar)car))
+                    return;
+
+                //Normal Process
+                //   ...
+            }
+        }
         public void FinishRace()
         {
             if(script.CarFinishRace((ICar)this))
@@ -148,24 +186,18 @@ namespace Drive_LFSS.Game_
         {
             carId = 0;
         }
+    #endregion
+
+    #region Script Interface
+
         public byte CarId
         {
             get { return carId; }
         }
+        
+    #endregion
 
-        private void Acceleration_0_100()
-        {
-            timerAcceleration_0_100 = 0;
-            Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)((Driver)this).Session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
-
-            //If Script then don't do normal Process!
-            if (script.CarAcceleration_0_100((ICar)this))
-                return;
-        }
-
-        #endregion
-
-        #region Tool
+    #region Tool
 
         //Speed
         private double SpeedToKmh()
@@ -201,6 +233,7 @@ namespace Drive_LFSS.Game_
             return angleVelocity * 180.0d / 8192.0d;
         }
 
-        #endregion
+    #endregion
+
     }
 }
