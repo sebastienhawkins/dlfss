@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{22E335A5-3502-4537-8410-7EC0BABD555C}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -48,11 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="script_car.cs" />
-    <Compile Include="script_licence.cs" />
-    <Compile Include="script_session.cs" />
-    <Compile Include="script_driver.cs" />
-    <Compile Include="script_race.cs" />
+    <Compile Include="script.cs" />
     <Compile Include="external\icar.cs" />
     <Compile Include="external\idriver.cs" />
     <Compile Include="external\ilicence.cs" />

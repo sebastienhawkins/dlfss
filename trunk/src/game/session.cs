@@ -38,7 +38,7 @@ namespace Drive_LFSS.Game_
             driverList = new List<Driver>();
             driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
             driverList.Capacity = 192;
-            script = new ScriptSession();
+            script = new Script();
             ping = new Ping();
             command = new CommandInGame(serverName);
             connectionRequest = true;
@@ -82,7 +82,7 @@ namespace Drive_LFSS.Game_
         public bool connectionRequest;   
 
         //Object
-        private ScriptSession script;
+        public Script script;
         private CommandInGame command;
         private Race race;
         private List<Driver> driverList;

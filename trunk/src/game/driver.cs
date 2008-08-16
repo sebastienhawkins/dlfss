@@ -91,6 +91,18 @@ namespace Drive_LFSS.Game_
         {
             get { return session; }
         }
+
+        public void SendMessage(string message)
+        {
+            //Serve no Purpose sending a Message to a Bot.
+            if (IsBot()) return;
+
+            Session.AddToTcpSendingQueud
+            (
+                new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,
+                    new PacketMTC(0, CarId, message)));
+        }
+
         public bool AdminFlag
         {
             get { return adminFlag; }
@@ -101,7 +113,6 @@ namespace Drive_LFSS.Game_
             get { return driverName; }
            // set { driverName = value; }
         }
-
         public bool IsBot()
         {
             return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || CarId == 0);

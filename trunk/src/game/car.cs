@@ -29,9 +29,6 @@ namespace Drive_LFSS.Game_
     {
         public Car() : base()
         {
-            //Object
-            script = new ScriptCar();
-
             //game Feature
             featureAcceleration_0_100 = new FeatureAcceleration_0_100();
 
@@ -84,13 +81,11 @@ namespace Drive_LFSS.Game_
             heading = _carInformation.heading;
             angleVelocity = _carInformation.angleVelocity;
 
+
             featureAcceleration_0_100.Update(this);
 
             //base.Init(_packet);
         }
-
-        //Object
-        private ScriptCar script;
 
         //Packet data
         private byte carId;
@@ -165,26 +160,23 @@ namespace Drive_LFSS.Game_
             private void Sucess(ref Car car)
             {
                 long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
+                double finalAccelerationTime = (((double)timeElapsed - (double)Math.Abs(((Driver)car).Session.GetReactionTime())) / 1000.0d);
+
+                Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
+
                 End();
-                double finalAcceleration = (((double)timeElapsed - (double)Math.Abs(((Driver)car).Session.GetReactionTime())) / 1000.0d);
 
-                Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + finalAcceleration + "sec.\r\n");
-                if (((Driver)car).IsBot())
-                    return;
 
-               ((Driver)car).Session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, new PacketMTC(0, car.CarId, "^7 0-100Km/h In: ^2" + finalAcceleration + " ^0 sec.\r\n")));
-
-                //If Script then don't do normal Process!
-                if (car.script.CarAcceleration_0_100((ICar)car))
+                if (((Driver)car).Session.script.CarAcceleration_0_100((ICar)car, finalAccelerationTime))
                     return;
 
                 //Normal Process
-                //   ...
+                ((Driver)car).SendMessage("^7 0-100Km/h In: ^2" + finalAccelerationTime + " ^0 sec.");
             }
         }
         public void FinishRace()
         {
-            if(script.CarFinishRace((ICar)this))
+            if(((Driver)this).Session.script.CarFinishRace((ICar)this))
                 return;
         }
         public void LeaveRace(PacketPLL _packet)

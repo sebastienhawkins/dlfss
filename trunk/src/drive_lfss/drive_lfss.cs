@@ -179,6 +179,9 @@ namespace Drive_LFSS
             Exception error = (Exception)args.ExceptionObject;
             Log.error("Critical Error, Auto Shutdown Initiated, 30 Seconde... \"exit\".\r\n");
             Log.error("The critical error Was: " + error.Message + "\r\n");
+            Log.error("sender.ToString()== " + sender.ToString() + "\r\n");
+            Log.error("Exception.Source == " + error.Source + "\r\n");
+            Log.error("Exception.StackTrace == " + error.StackTrace + "\r\n");
             SessionList.exit();
             System.Threading.Thread.Sleep(25000);
             ConsoleExitTimer();

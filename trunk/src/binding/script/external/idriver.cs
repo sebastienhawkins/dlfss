@@ -5,5 +5,7 @@
         bool IsBot();
         bool AdminFlag { get; }
         string DriverName { get; }
+
+        void SendMessage(string message);
     }
 }
