@@ -15,15 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#define DATABASE_SQLITE
-#if DATABASE_SQLITE
 
 using System;
 using System.Collections.Generic;
 using System.Data;
+
+//This is not usefull for the moment... since DB call are made from where they are needed for read/write access.
+//This will become the Storage feature for Static Database Storage... for later usage... and will need rewrite offcourse.
 namespace Drive_LFSS.Database_
 {
-    public static class DatabaseStorage
+    /*public static class DatabaseStorage
     {
         public static Race race;
         public static Driver driver;
@@ -43,7 +44,7 @@ namespace Drive_LFSS.Database_
         public Race() : base() 
         { 
             ExecuteNonQuery(DatabaseStorage.tableCheck["race"]);
-            guidLast = GetGuidLast("race");
+            guidLast = GetLastRowId("race");
         }
         private uint guidLast;
 
@@ -57,10 +58,9 @@ namespace Drive_LFSS.Database_
         public Driver() : base()
         {
             ExecuteNonQuery(DatabaseStorage.tableCheck["driver"]);
-            guidLast = GetGuidLast("driver");
+            guidLast = GetLastRowId("driver");
         }
 
         private uint guidLast;
-    }
+    }*/
 }
-#endif

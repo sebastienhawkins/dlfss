@@ -34,7 +34,7 @@ namespace Drive_LFSS
     public static class Program
     {
         #region Loop / Console / TrapSIGNTerm
-        public static readonly int sleep = 50; // Speed of Operation
+        public static int sleep = 50; // Speed of Operation
 
         [DllImport("Kernel32")]
         public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool AddToReceiveQueud);
@@ -78,6 +78,8 @@ namespace Drive_LFSS
                 CommandConsole.Exec("exit");
                 return;
             } Log.normal("Config Initialized...\r\n\r\n");
+            Program.ConfigApply();
+
 
             //Loggin
             if (!Log.Initialize(processPath+"\\dlfss.log"))
@@ -99,7 +101,7 @@ namespace Drive_LFSS
 
             //Database Initialization
             Log.normal("Initializating Database...\r\n\r\n");
-            DatabaseStorage.Initialize();
+            //Config.GetIdentifierList("Database");
 
             //Create Object for All Configured Server
             Log.normal("Initializating Servers Config...\r\n\r\n");
@@ -157,7 +159,7 @@ namespace Drive_LFSS
                 consoleText = Console.ReadLine();
                 if (consoleText != null && consoleText.Length < 1) continue;
                 CommandConsole.Exec(consoleText);
-                System.Threading.Thread.Sleep(sleep);
+                System.Threading.Thread.Sleep(200);
             }
         }
         private static void ConsoleExitTimer()
@@ -211,6 +213,10 @@ namespace Drive_LFSS
             System.Threading.Thread.Sleep(1000);
             System.Environment.Exit(0);
             return true;
+        }
+        private static void ConfigApply()
+        {
+            sleep = Config.GetIntValue("Interval", "GameThreadUpdate");
         }
         public static void Exit()
         {

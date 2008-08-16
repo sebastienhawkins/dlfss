@@ -23,13 +23,12 @@ namespace Drive_LFSS.Game_
 
     public abstract class Licence : ILicence
 	{
-        public Licence(ref Session _session)
+        public Licence()
         {
             licenceName = "";
             licenceId = 0;
             unkFlag = 0;
             quitReason = 0;
-            session = _session;
         }
         protected void Init(PacketNCN _packet)
         {
@@ -52,7 +51,6 @@ namespace Drive_LFSS.Game_
         }
         #endregion
 
-        private Session session;
         private string licenceName;
         private byte licenceId;
         private byte unkFlag;

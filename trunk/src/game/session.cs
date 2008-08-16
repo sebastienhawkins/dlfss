@@ -78,18 +78,16 @@ namespace Drive_LFSS.Game_
         }
         private string serverName;
         private char commandPrefix;
-        private ScriptSession script;
-        private Race race;
-        private List<Driver> driverList;
         private Ping ping;
-        private CommandInGame command;
         public bool connectionRequest;   
 
-        new public void AddToTcpSendingQueud(Packet _serverPacket)
-        {
-            base.AddToTcpSendingQueud(_serverPacket);
-        }
-        private void commandExec(bool _adminStatus, string _licenceName, string _commandText)
+        //Object
+        private ScriptSession script;
+        private CommandInGame command;
+        private Race race;
+        private List<Driver> driverList;
+
+        private void CommandExec(bool _adminStatus, string _licenceName, string _commandText)
         {
             command.Exec(_adminStatus, _licenceName, _commandText);
         }
@@ -131,6 +129,10 @@ namespace Drive_LFSS.Game_
         #endregion
 
         #region Process packet
+        new public void AddToTcpSendingQueud(Packet _serverPacket)
+        {
+            base.AddToTcpSendingQueud(_serverPacket);
+        }
         private void ProcessReceivedPacket()
         {
             object[] _nextTcpPacket = NextTcpReceiveQueud(true);
@@ -258,7 +260,7 @@ namespace Drive_LFSS.Game_
                 Log.debug("Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
 
 
-                commandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
+                CommandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
             }
             else
             {

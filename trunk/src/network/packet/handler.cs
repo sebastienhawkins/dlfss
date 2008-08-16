@@ -214,7 +214,7 @@ namespace Drive_LFSS.Packet_
         // Detailed car information packet (max 8 per packet)
         protected virtual void processPacket(PacketMCI _packet)
         {
-            Log.debug("MCI_CarInformation(), MCI -> Info=" + _packet.carInformation + ", NumC=" + _packet.NumC + "\r\n");
+            //Log.debug("MCI_CarInformation(), MCI -> Info=" + _packet.carInformation + ", NumC=" + _packet.NumC + "\r\n");
         }
         // Compact car information packet
         protected virtual void processPacket(PacketNLP _packet)

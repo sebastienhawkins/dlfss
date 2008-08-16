@@ -108,7 +108,7 @@ namespace Drive_LFSS.Game_
         }
         private void RaceFinish()
         {
-            DatabaseStorage.race.Save((uint)1, timeStart, (uint)(System.DateTime.Now.Ticks / 10000), gridOrder);
+            //DatabaseStorage.race.Save((uint)1, timeStart, (uint)(System.DateTime.Now.Ticks / 10000), gridOrder);
         }
         private void RaceEnd()
         {

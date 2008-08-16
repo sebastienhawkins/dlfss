@@ -1,0 +1,115 @@
+/* 
+ * Copyright (C) 2008 DLFSS <http://www.lfsforum.net/when the post is created change ME>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+using System;
+using System.Text;
+using System.Data;
+using MySql.Data.MySqlClient;
+
+/*
+ *             string[] info = Config.GetStringValue("MySQL", "ConnectionInfo").Split(';');
+            string connectionInfo = "Database=" + info[4] + ";Data Source=" + info[0] + ";Port=" + info[1] + ";User Id=" + info[2] + ";Password=" + info[3] + ";Use Compression=" + info[5];
+ * */
+namespace Drive_LFSS.Database_
+{
+    using Drive_LFSS.Config_;
+    using Drive_LFSS.Log_;
+
+    public sealed class DatabaseMySQL : Database, IDatabase
+    {
+        DatabaseMySQL(string _connectionInfo)
+        {
+            connection = new MySqlConnection(_connectionInfo);
+            connection.Open();
+
+            command = connection.CreateCommand();
+            transaction = null;
+            Log.commandHelp("MySQL Using Compression: " + connection.UseCompression + "\r\n");
+        }
+        private MySqlConnection connection;
+        private MySqlCommand command;
+        private MySqlTransaction transaction;
+
+        public void CancelCommand()
+        {
+            try { command.Cancel(); }
+            catch(Exception _exception){}
+        }
+        public IAsyncResult NewExecuteNonQuery()
+        {
+            return command.BeginExecuteNonQuery();
+        }
+        public int EndExecuteNonQuery(IAsyncResult _iaSyncResult)
+        {
+            return command.EndExecuteNonQuery(_iaSyncResult);
+        }
+        public void NewTransaction()
+        {
+            transaction = connection.BeginTransaction(IsolationLevel.Serializable); 
+        }
+        public void EndTransaction()
+        {
+            transaction.Commit();
+            transaction.Dispose();
+        }
+        public uint GetLastRowId(string _tableName)
+        {
+            IDataReader result = ExecuteQuery("SELECT MAX(ROWID) FROM `" + _tableName + "`");
+            if (result.Read())
+                return (uint)result.GetInt32(0);
+
+            return 0;
+        }
+        public bool IsExistTable(string tableName)
+        {
+
+            command.CommandText = "SHOW TABLES LIKE '" + tableName + "'";
+            IDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+                return true;
+
+            return false;
+        }
+        public bool IsExistColum(string tableName, string colName)
+        {
+            //If a Try here and not for other... maybe will have to test it out...
+            command.CommandText = "SHOW COLUMNS FROM `" + tableName + "` LIKE '" + colName + "'";
+            try
+            {
+                IDataReader reader = command.ExecuteReader();
+                reader.Read();
+            }
+            catch
+            {
+                return false;
+            };
+            return true;
+        }
+        public IDataReader ExecuteQuery(string _command)
+        {
+            command.CommandText = _command;
+            return command.ExecuteReader(CommandBehavior.SequentialAccess);
+        }
+        public int ExecuteNonQuery(string _command)
+        {
+            command.CommandText = _command;
+            int i = command.ExecuteNonQuery();
+            return i;
+        }
+    }
+}

@@ -24,7 +24,7 @@ namespace Drive_LFSS.Game_
 
     public sealed class Driver : Car, IDriver
     {
-        public Driver(Session _session) : base(ref _session)
+        public Driver(Session _session) : base()
         {
             adminFlag = false;
             driverName = "";
@@ -87,6 +87,10 @@ namespace Drive_LFSS.Game_
         private Driver_Type_Flag driverTypeMask;
         private Session session;
 
+        public Session Session
+        {
+            get { return session; }
+        }
         public bool AdminFlag
         {
             get { return adminFlag; }

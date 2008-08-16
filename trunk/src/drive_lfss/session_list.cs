@@ -44,7 +44,7 @@ namespace Drive_LFSS
                     Log.error("Configuration Error for Servername: " + itr.Current + ", Bad Option Count, Must be 8.\r\n");
                     continue;
                 }                                                                                                                           //67.212.66.26;30001;dexxa;$;Drive_LFSS;40;100;100
-                sessionList.Add(itr.Current, new Session(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt16(serverOptions[5]), Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7]))));
+                sessionList.Add(itr.Current, new Session(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt32(serverOptions[5]), Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7]))));
             }
         }
 

@@ -1,6 +1,6 @@
 namespace Drive_LFSS.Database_
 {
-    public class Database
+    public abstract class Database
     {
 
     }

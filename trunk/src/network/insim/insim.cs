@@ -29,6 +29,7 @@ namespace Drive_LFSS.InSim_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Server_;
     using Drive_LFSS.Log_;
+    using Drive_LFSS.Config_;
 
     public struct InSimSetting
     {
@@ -40,9 +41,9 @@ namespace Drive_LFSS.InSim_
         public string appName;
         public InSim_Flag insimMask;
         public ushort requestInterval;
-        public ushort networkInterval;
+        public uint networkInterval;
 
-        public InSimSetting(string _serverName, string _ip, ushort _port, string _password, char _commandPrefix, string _appName, InSim_Flag _insimMask, ushort _requestInterval, ushort _networkInterval)
+        public InSimSetting(string _serverName, string _ip, ushort _port, string _password, char _commandPrefix, string _appName, InSim_Flag _insimMask, ushort _requestInterval, uint _networkInterval)
         {
             serverName = _serverName;
             ip = IPAddress.Parse(_ip);
@@ -69,18 +70,26 @@ namespace Drive_LFSS.InSim_
             else if (inSimSetting.port < 1024)
                 Log.error(inSimSetting.serverName + " bad Configuration For: Port must be greater 1024.\r\n");
             else  //All Good
+            {
+                ConfigApply();
                 threadSocketReceive = new Thread(new ThreadStart(SocketReceive));
+            }
         }
 
         private InSim_Socket_State socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
         private InSimSetting inSimSetting;
         private bool runThreadSocketReceive = false;
         private Thread threadSocketReceive;
+        private int networkThreadSleep;
         private TcpClient tcpClient;
         private NetworkStream tcpSocket;
         private UdpClient udpClient;
         private IPEndPoint udpIpEndPoint;
 
+        public void ConfigApply()
+        {
+            networkThreadSleep = (int)inSimSetting.networkInterval;
+        }
         public void exit()
         {
             if (tcpClient.Connected)
@@ -156,7 +165,7 @@ namespace Drive_LFSS.InSim_
         {
             while (runThreadSocketReceive && Program.MainRun)
             {
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(networkThreadSleep);
                 TcpReceive();
                 UdpReceive();
                 TcpSend();
@@ -215,7 +224,7 @@ namespace Drive_LFSS.InSim_
 
             Packet_Type packetType = (Packet_Type)tcpSocket.ReadByte();
 
-            Log.network("TcpReceive, PacketSize->" + packetSize + ", PacketType->" + packetType + "\r\n");
+            //Log.network("TcpReceive, PacketSize->" + packetSize + ", PacketType->" + packetType + "\r\n");
 
             byte[] data = new byte[packetSize];
             data[0] = packetSize;
@@ -238,7 +247,7 @@ namespace Drive_LFSS.InSim_
                 Log.network("UdpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
                 return;
             }
-            Log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
+            //Log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
             AddToUdpReceiveQueud(new Packet(data));
         }
 

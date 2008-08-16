@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#define DATABASE_SQLITE
-#if DATABASE_SQLITE
 
 using System;
 using System.Text;
@@ -25,74 +23,69 @@ using Mono.Data.SqliteClient;
 
 namespace Drive_LFSS.Database_
 {
-    public class DatabaseSQLite : Database
+    public sealed class DatabaseSQLite : Database, IDatabase
     {
-        public DatabaseSQLite()
+        public DatabaseSQLite(string connectionInfo)
         {
-            if (connection == null)
-            {
-                if (!System.IO.File.Exists("./dlfss.db"))
-                    throw new Exception("SQLite Database can't be found, File: dlfss.db");
-                connection = (IDbConnection)new SqliteConnection("URI=file:dlfss.db,version=3");
-                connection.Open();
-            }
+            if (!System.IO.File.Exists("./" + connectionInfo))
+                throw new Exception("SQLite Database can't be found, File: " + connectionInfo);
+
+            connection = (IDbConnection)new SqliteConnection("URI=file:" + connectionInfo + ",version=3");
+            connection.Open();
             transaction = null;
+
             command = (IDbCommand)new SqliteCommand();
             command.Connection = connection;
         }
-        private static IDbConnection connection = null;
-        protected IDbTransaction transaction;  //TODO: Create In Transaction Query!
-        protected IDbCommand command;
+        private IDbConnection connection = null;
+        private IDbTransaction transaction;
+        private IDbCommand command;
 
-        protected bool IsExistTable(string tableName)
+        public void CancelCommand()
+        {
+            try { command.Cancel(); }
+            catch (Exception _exception) { }
+        }
+        public void NewTransaction()
+        {
+            transaction = connection.BeginTransaction(IsolationLevel.Serializable);
+        }
+        public void EndTransaction()
+        {
+            transaction.Commit();
+            transaction.Dispose();
+        }
+        public bool IsExistTable(string tableName)
         {
 
             command.CommandText = "SELECT name FROM SQLITE_MASTER WHERE type = 'table' AND name = '" + tableName + "'";
-            IDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            if (command.ExecuteReader().Read())
                 return true;
 
             return false;
         }
-        protected bool IsExistColum(string tableName, string colName)
+        public bool IsExistColum(string tableName, string colName)
         {
-            //If a Try here and not for other... maybe will have to test it out...
             command.CommandText = "SELECT " + colName + " FROM " + tableName + " LIMIT 1";
-            try
-            {
-                IDataReader reader = command.ExecuteReader();
-                reader.Read();
-            }
-            catch
-            {
-                return false;
-            };
-            return true;
-        }
-        protected bool IsExistIndex(string indexName)
-        {
-
-            command.CommandText = "SELECT name FROM sqlite_master WHERE type = 'index' AND name = '" + indexName + "'";
-            IDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            if(command.ExecuteReader().Read())
                 return true;
 
             return false;
         }
-        protected uint GetGuidLast(string _tableName)
+        public uint GetLastRowId(string tableName)
         {
-            IDataReader result = ExecuteQuery("SELECT MAX(`rowid`) FROM `" + _tableName + "`");
+            IDataReader result = ExecuteQuery("SELECT MAX(ROWID) FROM `" + tableName + "`");
             if (result.Read())
                 return (uint)result.GetInt32(0);
 
             return 0;
         }
-        protected IDataReader ExecuteQuery(string _command)
+        public IDataReader ExecuteQuery(string _command)
         {
             command.CommandText = _command;
-            return command.ExecuteReader();
+            return command.ExecuteReader(CommandBehavior.SequentialAccess);
         }
-        protected long ExecuteNonQuery(string _command)
+        public int ExecuteNonQuery(string _command)
         {
             command.CommandText = _command;
             int i = command.ExecuteNonQuery();
@@ -100,4 +93,3 @@ namespace Drive_LFSS.Database_
         }
     }
 }
-#endif

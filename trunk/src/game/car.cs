@@ -24,10 +24,9 @@ namespace Drive_LFSS.Game_
 
     public abstract class Car : Licence, ICar
     {
-        public Car(ref Session _session) : base(ref _session)
+        public Car() : base()
         {
             //Object
-            session = _session;
             script = new ScriptCar();
 
             //Packet Data
@@ -64,6 +63,7 @@ namespace Drive_LFSS.Game_
 
             base.Init(_packet);
         }
+
         public void ProcessCarInformation(CarInformation _carInformation)
         {
             trackNode = _carInformation.trackNode;
@@ -87,7 +87,6 @@ namespace Drive_LFSS.Game_
         }
 
         //Object
-        private Session session;
         private ScriptCar script;
 
         //Packet data
@@ -157,7 +156,7 @@ namespace Drive_LFSS.Game_
         private void Acceleration_0_100()
         {
             timerAcceleration_0_100 = 0;
-            Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
+            Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + (((double)timerAcceleration_0_100 - (double)((Driver)this).Session.GetReactionTime()) / 1000.0d) + "sec.\r\n");
 
             //If Script then don't do normal Process!
             if (script.CarAcceleration_0_100((ICar)this))
