@@ -29,19 +29,7 @@ namespace Drive_LFSS
 
     public static class SessionList //Must become compatible with all Session type: ServerInSim, ClientOutGauge, ... Im not aware of all....
     {
-        public struct SessionStruct
-        {//(/*Racing_Flag.InSim_Flag.ISF_MSO_COLS |*/ InSim_Flag.ISF_MCI), '$', 10000, "dexxa", "Aleajecta S2", 5)))
-            public SessionStruct(string _sessionName, InSimSetting _inSimSetting)
-            {
-                sessionName = _sessionName;
-                session = new Session(sessionName, _inSimSetting);
-            }
-            public string sessionName;
-            public Session session;
-        }
-
-
-        public static Dictionary<string, SessionStruct> sessionList = new Dictionary<string, SessionStruct>();
+        public static Dictionary<string, Session> sessionList = new Dictionary<string, Session>();
 
         public static void LoadServerConfig( )
         {
@@ -56,39 +44,39 @@ namespace Drive_LFSS
                     Log.error("Configuration Error for Servername: " + itr.Current + ", Bad Option Count, Must be 8.\r\n");
                     continue;
                 }                                                                                                                           //67.212.66.26;30001;dexxa;$;Drive_LFSS;40;100;100
-                sessionList.Add(itr.Current, new SessionStruct(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt16(serverOptions[5]), Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7]))));
+                sessionList.Add(itr.Current, new Session(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt16(serverOptions[5]), Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7]))));
             }
         }
 
         public static void update(uint diff)
         {
-            foreach (KeyValuePair<string, SessionStruct> keyPair in sessionList)
+            foreach (KeyValuePair<string, Session> keyPair in sessionList)
             {
-                if (keyPair.Value.session.connectionRequest)
+                if (keyPair.Value.connectionRequest)
                 {
-                    keyPair.Value.session.connectionRequest = false;
+                    keyPair.Value.connectionRequest = false;
 
-                    if (keyPair.Value.session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED))
+                    if (keyPair.Value.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED))
                         ConnectToServerName(keyPair.Key);
                     continue;
                 }
 
-                if ( keyPair.Value.session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED) )
+                if ( keyPair.Value.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED) )
                     continue;
 
-                keyPair.Value.session.update(diff);
+                keyPair.Value.update(diff);
             }
         }
         public static void ConnectToServerName(string serverName)
         {
-            Thread ThreadConnectionProcess = new Thread(new ThreadStart(sessionList[serverName].session.connect));
+            Thread ThreadConnectionProcess = new Thread(new ThreadStart(sessionList[serverName].connect));
             ThreadConnectionProcess.Start();
         }
         public static void exit()
         {
-            foreach (KeyValuePair<string, SessionStruct> keyPair in sessionList)
+            foreach (KeyValuePair<string, Session> keyPair in sessionList)
             {
-                keyPair.Value.session.exit();
+                keyPair.Value.exit();
             }
         }
     }

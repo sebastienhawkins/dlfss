@@ -55,24 +55,22 @@ namespace Drive_LFSS.CommandConsole_
             if (args[1] == "all")
             {
                 //Maybe you Real Iterator<Session>
-                foreach (KeyValuePair<string, SessionList.SessionStruct> keyPair in SessionList.sessionList)
+                Dictionary<string,Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
+                while(itr.MoveNext())
                 {
-                    Session session = SessionList.sessionList[keyPair.Key].session;
-
-                    if(session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
-                        Log.normal("ServerName: " + keyPair.Key + ", Status: online, ReactionTime: " + session.GetReactionTime() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
+                    if (itr.Current.Value.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
+                        Log.normal("ServerName: " + itr.Current.Key + ", Status: online, ReactionTime: " + itr.Current.Value.GetReactionTime() + "ms" + ", DriversCount: " + itr.Current.Value.GetNbrOfDrivers() + "\r\n");
                     else
-                        Log.error("ServerName: " + keyPair.Key + ", Status: offline, ReactionTime+/-: -ms, DriversCount: -\r\n");
+                        Log.error("ServerName: " + itr.Current.Key + ", Status: offline, ReactionTime+/-: -ms, DriversCount: -\r\n");
                 }
             }
             else
             {
                 string serverName = args[1];
 
-
                 if (SessionList.sessionList.ContainsKey(serverName))
                 {
-                    Session session = SessionList.sessionList[serverName].session;
+                    Session session = SessionList.sessionList[serverName];
 
                     if (session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
                         Log.normal("serverName: " + serverName + ", Status: online, ReactionTime: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
@@ -91,23 +89,18 @@ namespace Drive_LFSS.CommandConsole_
                 return;
             }
 
-            if (args[0] == "*")
+            if (args[0] == "all")
             {
-                foreach (KeyValuePair<string, SessionList.SessionStruct> keyPair in SessionList.sessionList)
-                    SessionList.sessionList[keyPair.Key].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
+               Dictionary<string, Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
+               while(itr.MoveNext())
+                    itr.Current.Value.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
             }
             else
             {
                 string serverName = args[0];
-                /*try { serverId = Convert.ToUInt16(args[0]); }
-                catch (Exception _exception)
-                {
-                    Log.normal("Command Announce, Syntax Error.\r\n  Usage:\r\n    announce #serverId $Message\r\n");
-                    return;
-                }*/
 
                 if (SessionList.sessionList.ContainsKey(serverName))
-                    SessionList.sessionList[serverName].session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
+                    SessionList.sessionList[serverName].AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
                 else
                     Log.command("Command Announce, serverName Not Found, Server Requested was: " + args[0] + "\r\n");
             }
