@@ -33,6 +33,10 @@ namespace Drive_LFSS.Game_
             driverTypeMask = 0;
             session = _session;
         }
+        ~Driver()
+        {
+            Log.error("Driver name: " + driverName + ", was destroyed.\r\n");
+        }
         new public void Init(PacketNCN _packet)
         {
             adminFlag = _packet.adminStatus > 0 ? true : false;

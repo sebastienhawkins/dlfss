@@ -72,7 +72,7 @@ namespace Drive_LFSS.InSim_
             else  //All Good
             {
                 ConfigApply();
-                threadSocketReceive = new Thread(new ThreadStart(SocketReceive));
+                threadSocketReceive = new Thread(new ThreadStart(SocketSendReceive));
             }
         }
 
@@ -146,7 +146,7 @@ namespace Drive_LFSS.InSim_
                 }
                 else if (this.threadSocketReceive.ThreadState == ThreadState.Stopped)
                 {
-                    this.threadSocketReceive = new Thread(new ThreadStart(SocketReceive));
+                    this.threadSocketReceive = new Thread(new ThreadStart(SocketSendReceive));
                     this.threadSocketReceive.Start();
                 }
 
@@ -161,7 +161,7 @@ namespace Drive_LFSS.InSim_
         {
             return (socketStatus == _isStatus);
         }
-        private void SocketReceive()
+        private void SocketSendReceive()
         {
             while (runThreadSocketReceive && Program.MainRun)
             {
@@ -225,13 +225,24 @@ namespace Drive_LFSS.InSim_
             Packet_Type packetType = (Packet_Type)tcpSocket.ReadByte();
 
             //Log.network("TcpReceive, PacketSize->" + packetSize + ", PacketType->" + packetType + "\r\n");
+            
+            // Using the queud mean Main thread will processPacket.
+            //AddToTcpReceiveQueud(new Packet((Packet_Size)packetSize, packetType, data));
 
+            // This way make Each Server Process is Own .
             byte[] data = new byte[packetSize];
             data[0] = packetSize;
             data[1] = (byte)packetType;
 
             tcpSocket.Read(data, 2, (packetSize-2));
-            AddToTcpReceiveQueud(new Packet((Packet_Size)packetSize, packetType, data));
+
+            if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
+            {
+                Log.missingDefinition("TcpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                return;
+            }
+
+            ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
         }
         private void UdpReceive()
         {
@@ -241,14 +252,21 @@ namespace Drive_LFSS.InSim_
             byte[] data = new byte[udpClient.Available];
             data = udpClient.Receive(ref udpIpEndPoint);
             
-            byte packetSize;
-            if ((packetSize = data[0]) < 3)
+            if (data[0] < 3)
             {
-                Log.network("UdpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
+                Log.network("UdpReceive(), Droped packet, Too Short!, PacketSize->" + data[0] + "\r\n");
                 return;
             }
             //Log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
-            AddToUdpReceiveQueud(new Packet(data));
+            //AddToUdpReceiveQueud(new Packet(data));
+
+            if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
+            {
+                Log.missingDefinition("UdpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                return;
+            }
+
+            ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
         }
 
         public InSim_Socket_State GetSocketStatus()

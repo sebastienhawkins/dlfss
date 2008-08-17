@@ -36,7 +36,7 @@ namespace Drive_LFSS.PacketStore_
             tcpReceivedQueud = new List<Packet>();
             tcpSendingQueud = new List<Packet>();
         }
-        private PacketStructureList struturedPacket;
+        protected PacketStructureList struturedPacket;
         private List<Packet> udpReceivedQueud;      //Replace List with Queud
         private List<Packet> udpSendingQueud;       //Replace List with Queud
         private List<Packet> tcpReceivedQueud;      //Replace List with Queud
@@ -169,7 +169,7 @@ namespace Drive_LFSS.PacketStore_
             return _return;
         }
 
-        internal object toStruct(Packet_Type _packetType, byte[] _data)
+        public object toStruct(Packet_Type _packetType, byte[] _data)
         {
             //Program.Log.network("toStruct(), Constructor For packetType->" + _packetType + "\r\n");
 

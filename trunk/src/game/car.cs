@@ -44,6 +44,9 @@ namespace Drive_LFSS.Game_
             tyreRearLeft = 0;
             tyreRearRight = 0;
         }
+        ~Car()
+        {
+        }
         new protected void Init(PacketNCN _packet)
         {
             base.Init(_packet);

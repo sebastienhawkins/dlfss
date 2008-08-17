@@ -111,7 +111,8 @@ namespace Drive_LFSS.Game_
 
         public void update(uint diff)
         {
-            ProcessReceivedPacket();
+            // For moment will test processPacket from the network thread! gave better reaction time.
+            //ProcessReceivedPacket();
 
             if (TIMER_PING_PONG < (TimerPingPong += diff))
             {
@@ -125,6 +126,11 @@ namespace Drive_LFSS.Game_
                 driverList[itr].update(diff);
 
             race.update(diff);
+
+            //Delete Handle
+            //Since im multithreading into processPacket Delete of: Race/Driver Should take place Bellow here.
+            // Use Lock on the Object, since during Delete operation we can receive packet, this will pause other thread
+
         }
         #endregion
 
@@ -166,8 +172,9 @@ namespace Drive_LFSS.Game_
             Driver _driver = new Driver(this);
             _driver.Init(_packet);
 
-            driverList.Add(_driver);
-        }
+            //Prevent the Main thread from Doing the driverList.update()
+            lock (this){driverList.Add(_driver);}
+        }  //new Connection
         protected sealed override void processPacket(PacketCNL _packet)
         {
             //TODO: use _packet.Total as a Debug check to be sure we have same racer count into our memory as the server do. 
@@ -179,12 +186,13 @@ namespace Drive_LFSS.Game_
                 return;
             }
 
-            //Driver object for this one, will be totaly destroyed, from is Most Base Class to the Top Most.
-            //If we need to excute a function onto disconnection, i sugest doing into Class Destructor! for Each Class ;) Rock And Roll!
+            //Prevent the Main thread from Doing the driverList.update()
+            //Im not sure i love this design, since Mutex refresh time.
             byte itr;
             while ((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)
-                driverList.RemoveAt((int)itr);
-        }
+                lock (this) {driverList.RemoveAt((int)itr); }
+   
+        }   //delete Connection
         protected sealed override void processPacket(PacketNPL _packet) //New Car Join Race
         {
             base.processPacket(_packet); //Keep the Log
@@ -211,7 +219,7 @@ namespace Drive_LFSS.Game_
             else                                                                            //Human
                 driverList[GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)].Init(_packet);
         }
-        protected sealed override void processPacket(PacketPLL _packet) // player leave (spectate - loses slot)
+        protected sealed override void processPacket(PacketPLL _packet) // Delete Car leave (spectate - loses slot)
         {
             base.processPacket(_packet); //Keep the Log
 
@@ -223,6 +231,7 @@ namespace Drive_LFSS.Game_
             }
 
             //Do a Init in case we need a Action happen into Car when leave race....
+            //Do we delete the entire Driver on a Bot Leave Race???
             ((Car)driverList[itr]).LeaveRace(_packet);
         }
         protected sealed override void processPacket(PacketMCI _packet) // Multiple Car Information

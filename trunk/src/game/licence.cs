@@ -30,6 +30,9 @@ namespace Drive_LFSS.Game_
             unkFlag = 0;
             quitReason = 0;
         }
+        ~Licence() 
+        { 
+        }
         protected void Init(PacketNCN _packet)
         {
             licenceName = _packet.licenceName;

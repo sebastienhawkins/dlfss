@@ -31,7 +31,7 @@ namespace Drive_LFSS
     using Drive_LFSS.Database_;
     using Mono.Data.SqliteClient;
 
-    public static class Program
+    public sealed class Program
     {
         #region Loop / Console / TrapSIGNTerm
         public static int sleep = 50; // Speed of Operation
@@ -47,12 +47,8 @@ namespace Drive_LFSS
         public static bool MainRun = true;
         #endregion
 
-        #region Timer For Main Loop
-
-        private static long ticks = DateTime.Now.Ticks;
-        private static uint diff = 0;
-        
-        #endregion
+        //Database
+        public static IDatabase dlfssDatabase = null;
 
         [MTAThread]
         public static void Main()
@@ -81,7 +77,7 @@ namespace Drive_LFSS
             Program.ConfigApply();
 
 
-            //Loggin
+            //Logging
             if (!Log.Initialize(processPath+"\\dlfss.log"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -91,8 +87,9 @@ namespace Drive_LFSS
                 return;
             } Log.normal("Log System Initialized...\r\n\r\n");
 
+
             //InGame Command System
-            Log.normal("Initializating InGame Command.\r\n\r\n");
+            //Log.normal("Initializating InGame Command.\r\n\r\n");
             //Command.Init();
             
             //Console System, Purpose for MultiThreading the Console Input
@@ -100,8 +97,25 @@ namespace Drive_LFSS
             ThreadCaptureConsoleCommand.Start();
 
             //Database Initialization
-            Log.normal("Initializating Database...\r\n\r\n");
-            //Config.GetIdentifierList("Database");
+            Log.normal("Initializating Database...\r\n");
+            List<string> databaseChoices = Config.GetIdentifierList("Database");
+            if (databaseChoices.Contains("MySQL"))
+            {
+                Log.normal("Using MySQL Database.\r\n");
+                string[] infos = Config.GetStringValue("Database","MySQL","ConnectionInfo").Split(';');
+                if (infos.Length != 6)
+                {
+                    throw new Exception("Configuration Error, Invalide Value Count For: Database.MySQL.ConnectionInfo");
+                    return;
+                }
+                dlfssDatabase = new DatabaseMySQL("Database=" + infos[4] + ";Data Source=" + infos[0] + ";Port=" + infos[1] + ";User Id=" + infos[2] + ";Password=" + infos[3] + ";Use Compression=" + infos[5]);
+            }
+            else
+            {
+                Log.normal("Using SQLite Database.\r\n");
+                dlfssDatabase = new DatabaseSQLite(Config.GetStringValue("Database", "SQLite", "ConnectionInfo"));
+            }
+            Log.normal("Completed Initialize Database...\r\n\r\n");
 
             //Create Object for All Configured Server
             Log.normal("Initializating Servers Config...\r\n\r\n");
@@ -109,8 +123,14 @@ namespace Drive_LFSS
             
             //Session.InitializeServerList();
             Log.normal("Starting Normal Operation!\r\n\r\n");
+
             #region MainThread update
+
+            long ticks = DateTime.Now.Ticks;
+            uint diff = 0;
+            
             uint TimerLogFlush = 0;
+            
             while (MainRun)
             {
                 //Timer Thing

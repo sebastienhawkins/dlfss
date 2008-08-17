@@ -32,7 +32,7 @@ namespace Drive_LFSS.Database_
 
     public sealed class DatabaseMySQL : Database, IDatabase
     {
-        DatabaseMySQL(string _connectionInfo)
+        public DatabaseMySQL(string _connectionInfo)
         {
             connection = new MySqlConnection(_connectionInfo);
             connection.Open();
@@ -45,11 +45,7 @@ namespace Drive_LFSS.Database_
         private MySqlCommand command;
         private MySqlTransaction transaction;
 
-        public void CancelCommand()
-        {
-            try { command.Cancel(); }
-            catch(Exception _exception){}
-        }
+        //Not Thread Safe
         public IAsyncResult NewExecuteNonQuery()
         {
             return command.BeginExecuteNonQuery();
@@ -67,6 +63,13 @@ namespace Drive_LFSS.Database_
             transaction.Commit();
             transaction.Dispose();
         }
+        
+        //Thread Safe
+        public void CancelCommand()
+        {
+            try { lock (command) { command.Cancel(); } }
+            catch (Exception _exception) { }
+        }
         public uint GetLastRowId(string _tableName)
         {
             IDataReader result = ExecuteQuery("SELECT MAX(ROWID) FROM `" + _tableName + "`");
@@ -77,38 +80,46 @@ namespace Drive_LFSS.Database_
         }
         public bool IsExistTable(string tableName)
         {
-
-            command.CommandText = "SHOW TABLES LIKE '" + tableName + "'";
-            IDataReader reader = command.ExecuteReader();
+            IDataReader reader;
+            lock (command)
+            {
+                command.CommandText = "SHOW TABLES LIKE '" + tableName + "'";
+                reader = command.ExecuteReader();
+            }
             if (reader.Read())
                 return true;
-
             return false;
         }
         public bool IsExistColum(string tableName, string colName)
         {
-            //If a Try here and not for other... maybe will have to test it out...
-            command.CommandText = "SHOW COLUMNS FROM `" + tableName + "` LIKE '" + colName + "'";
-            try
-            {
-                IDataReader reader = command.ExecuteReader();
-                reader.Read();
-            }
-            catch
-            {
-                return false;
-            };
-            return true;
+            IDataReader reader;
+           lock(command)
+           {
+                command.CommandText = "SHOW COLUMNS FROM `" + tableName + "` LIKE '" + colName + "'";
+                reader = command.ExecuteReader();
+           }
+           if(reader.Read())
+               return true;
+            return false;
         }
         public IDataReader ExecuteQuery(string _command)
         {
-            command.CommandText = _command;
-            return command.ExecuteReader(CommandBehavior.SequentialAccess);
+            MySqlDataReader dataReader;
+            lock (command)
+            {
+                command.CommandText = _command;
+                dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+            }
+            return dataReader;
         }
         public int ExecuteNonQuery(string _command)
         {
-            command.CommandText = _command;
-            int i = command.ExecuteNonQuery();
+            int i;
+            lock (command)
+            {
+                command.CommandText = _command;
+                i = command.ExecuteNonQuery();
+            }
             return i;
         }
     }

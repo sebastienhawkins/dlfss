@@ -41,11 +41,7 @@ namespace Drive_LFSS.Database_
         private IDbTransaction transaction;
         private IDbCommand command;
 
-        public void CancelCommand()
-        {
-            try { command.Cancel(); }
-            catch (Exception _exception) { }
-        }
+        //Not Thread Safe
         public void NewTransaction()
         {
             transaction = connection.BeginTransaction(IsolationLevel.Serializable);
@@ -55,22 +51,21 @@ namespace Drive_LFSS.Database_
             transaction.Commit();
             transaction.Dispose();
         }
-        public bool IsExistTable(string tableName)
+        public IAsyncResult NewExecuteNonQuery()
         {
-
-            command.CommandText = "SELECT name FROM SQLITE_MASTER WHERE type = 'table' AND name = '" + tableName + "'";
-            if (command.ExecuteReader().Read())
-                return true;
-
-            return false;
+            command.ExecuteNonQuery();
+            return null;
         }
-        public bool IsExistColum(string tableName, string colName)
+        public int EndExecuteNonQuery(IAsyncResult _iaSyncResult)
         {
-            command.CommandText = "SELECT " + colName + " FROM " + tableName + " LIMIT 1";
-            if(command.ExecuteReader().Read())
-                return true;
+            return 0;
+        }
 
-            return false;
+        //Thread Safe
+        public void CancelCommand()
+        {
+            try { lock (command) { command.Cancel(); } }
+            catch (Exception _exception) { }
         }
         public uint GetLastRowId(string tableName)
         {
@@ -80,15 +75,48 @@ namespace Drive_LFSS.Database_
 
             return 0;
         }
+        public bool IsExistTable(string tableName)
+        {
+            IDataReader reader;
+            lock (command)
+            {
+                command.CommandText = "SELECT name FROM SQLITE_MASTER WHERE type = 'table' AND name = '" + tableName + "'";
+                reader = command.ExecuteReader();
+            }
+            if (reader.Read())
+                return true;
+            return false;
+        }
+        public bool IsExistColum(string tableName, string colName)
+        {
+            IDataReader reader;
+            lock (command)
+            {
+                command.CommandText = "SELECT " + colName + " FROM " + tableName + " LIMIT 1";
+                reader = command.ExecuteReader();
+            }
+            if (reader.Read())
+                return true;
+            return false;
+        }
         public IDataReader ExecuteQuery(string _command)
         {
-            command.CommandText = _command;
-            return command.ExecuteReader(CommandBehavior.SequentialAccess);
+            IDataReader reader;
+            lock (command)
+            {
+                command.CommandText = _command;
+                reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+            }
+            return reader;
         }
         public int ExecuteNonQuery(string _command)
         {
-            command.CommandText = _command;
-            int i = command.ExecuteNonQuery();
+            int i;
+            lock (command)
+            {
+                command.CommandText = _command;
+                i = command.ExecuteNonQuery();
+            }
             return i;
         }
     }

@@ -76,7 +76,7 @@
     <Compile Include="database\database.cs" />
     <Compile Include="database\database_mysql.cs" />
     <Compile Include="database\database_sqlite.cs" />
-    <Compile Include="database\idatabase.cs" />
+    <Compile Include="database\IDatabase.cs" />
     <Compile Include="database\storage_sqlite.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
@@ -105,7 +105,7 @@
     <None Include="..\dep\lib\sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\sql\dlfss.db">
+    <None Include="..\sql\sqlite\Drive_LFSS.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.config" />
