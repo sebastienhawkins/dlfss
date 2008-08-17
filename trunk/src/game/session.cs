@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Drive_LFSS.Game_
+namespace Drive_LFSS.Session_
 {
     using Drive_LFSS.Server_;
     using Drive_LFSS.InSim_;
@@ -27,12 +27,13 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Script_;
     using Drive_LFSS.Log_;
+    using Drive_LFSS.Game_;
 
     public sealed class Session : InSim, ISession
     {
         public Session(string _serverName, InSimSetting _inSimSetting): base( _inSimSetting)
         {
-            serverName = _serverName;
+            sessionName = _serverName;
             commandPrefix = _inSimSetting.commandPrefix;
             race = new Race(_serverName);
             driverList = new List<Driver>();
@@ -40,11 +41,16 @@ namespace Drive_LFSS.Game_
             driverList.Capacity = 192;
             script = new Script();
             ping = new Ping();
-            command = new CommandInGame(serverName);
+            command = new CommandInGame(sessionName);
             connectionRequest = true;
         }
         ~Session()
         {
+        }
+        new public void ConfigApply()
+        {
+            Driver.ConfigApply();
+            base.ConfigApply();
         }
         private class Ping
         {
@@ -78,7 +84,7 @@ namespace Drive_LFSS.Game_
                 return sessionLatency - diff;
             }
         }
-        private string serverName;
+        private string sessionName;
         private char commandPrefix;
         private Ping ping;
         public bool connectionRequest;   
@@ -95,7 +101,7 @@ namespace Drive_LFSS.Game_
         }
         private void PingReceived()
         {
-            Log.progress("Pong! " + ping.Received() + "ms\r\n");
+            Log.progress(GetSessionNameForLog() + " Pong! " + ping.Received() + "ms\r\n");
         }
         public long GetLatency()
         {
@@ -104,6 +110,10 @@ namespace Drive_LFSS.Game_
         public long GetReactionTime()
         {
             return ping.GetReactionTime();
+        }
+        public string GetSessionNameForLog()
+        {
+            return "["+sessionName+">";
         }
 
         #region Update/Timer
@@ -118,7 +128,7 @@ namespace Drive_LFSS.Game_
 
             if (TIMER_PING_PONG < (TimerPingPong += diff))
             {
-                Log.progress("Ping!\r\n");
+                Log.progress(GetSessionNameForLog() + " Ping!\r\n");
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)));
                 ping.Sending(diff);
                 TimerPingPong = 0;
@@ -167,7 +177,7 @@ namespace Drive_LFSS.Game_
                 }
                 else
                 {
-                    Log.error("New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
+                    Log.error(GetSessionNameForLog() + " New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
                     return;
                 }
             }
@@ -184,7 +194,7 @@ namespace Drive_LFSS.Game_
 
             if (!ExistLicenceId(_packet.tempLicenceId))
             {
-                Log.error("Licence Disconnection, But no LicenceID associated with It, What todo???");
+                Log.error(GetSessionNameForLog() + " Licence Disconnection, But no LicenceID associated with It, What todo???");
                 return;
             }
 
@@ -201,7 +211,7 @@ namespace Drive_LFSS.Game_
 
             if (!ExistLicenceId(_packet.tempLicenceId))
             {
-                Log.error("New Car Join Race, But Not LicenceId Associated What todo???");
+                Log.error(GetSessionNameForLog() + " New Car Join Race, But Not LicenceId Associated What todo???");
                 return;
             }
 
@@ -228,7 +238,7 @@ namespace Drive_LFSS.Game_
             byte itr;
             if ((itr = GetCarIndex(_packet.carId)) == 0)
             {
-                Log.error("Car Leave race, But no Car Association Found , what todo???");
+                Log.error(GetSessionNameForLog() + " Car Leave race, But no Car Association Found , what todo???");
                 return;
             }
 
@@ -268,14 +278,14 @@ namespace Drive_LFSS.Game_
 
             if (_packet.message[_packet.textStart] == commandPrefix)
             {
-                Log.debug("Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
+                Log.debug(GetSessionNameForLog() + " Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
 
 
                 CommandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
             }
             else
             {
-                Log.chat(_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
+                Log.chat(GetSessionNameForLog() + " " +_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
             }
         }
         protected sealed override void processPacket(PacketRST _packet)
@@ -297,7 +307,7 @@ namespace Drive_LFSS.Game_
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
                 case Tiny_Type.TINY_NONE: break;
-                default: Log.missingDefinition("Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
+                default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }
         }
         #endregion

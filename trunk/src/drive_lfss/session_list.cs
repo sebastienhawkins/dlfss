@@ -15,23 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
 namespace Drive_LFSS
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
     using Drive_LFSS.Definition_;
     using Drive_LFSS.InSim_;
-    using Drive_LFSS.Server_;
-    using Drive_LFSS.Game_;
     using Drive_LFSS.Config_;
     using Drive_LFSS.Log_;
+    using Drive_LFSS.Session_;
 
     public static class SessionList //Must become compatible with all Session type: ServerInSim, ClientOutGauge, ... Im not aware of all....
     {
         public static Dictionary<string, Session> sessionList = new Dictionary<string, Session>();
 
-        public static void LoadServerConfig( )
+        public static void ConfigApply()
         {
             List<string> lfsServer = Config.GetIdentifierList("LFSServer");
 
@@ -43,8 +44,12 @@ namespace Drive_LFSS
                 {
                     Log.error("Configuration Error for Servername: " + itr.Current + ", Bad Option Count, Must be 8.\r\n");
                     continue;
-                }                                                                                                                           //67.212.66.26;30001;dexxa;$;Drive_LFSS;40;100;100
-                sessionList.Add(itr.Current, new Session(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt32(serverOptions[5]), Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7]))));
+                }
+                Session session = new Session(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], 
+                                                                 Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt32(serverOptions[5]), 
+                                                                  Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7])));
+                session.ConfigApply();
+                sessionList.Add(itr.Current,session);
             }
         }
 

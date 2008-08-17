@@ -25,6 +25,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Script_;
     using Drive_LFSS.Log_;
     using Drive_LFSS.Config_;
+    using Drive_LFSS.Session_;
 
     public sealed class Driver : Car, IDriver
     {
@@ -41,13 +42,12 @@ namespace Drive_LFSS.Game_
         }
         ~Driver()
         {
-            Log.error("Driver name: " + driverName + ", was destroyed.\r\n");
         }
         public static void ConfigApply()
         {
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "DriverSave");
         }
-        
+
         //Loaded From DB
         private uint guid;
         private uint configMask;
@@ -68,6 +68,7 @@ namespace Drive_LFSS.Game_
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
             Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_mask`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', " + configMask + ", " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
+            Log.debug(session.GetSessionNameForLog()+" DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
         }
         private bool SetNewGuid()
         {
@@ -153,13 +154,8 @@ namespace Drive_LFSS.Game_
             if (!IsBot())
             {
                 if ((driverSaveInterval += diff) >= SAVE_INTERVAL) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
-                {
-
                     SaveToDB();
-                    Log.debug("DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
-                    //Is done into the Save call, since we can maybe use this function by a command, so better like this.
-                    //driverSaveInterval = 0;
-                }
+                //...
             }
 
             base.update(diff);
@@ -169,6 +165,7 @@ namespace Drive_LFSS.Game_
         {
             get { return session; }
         }
+
         public void SendMessage(string message)
         {
             //Serve no Purpose sending a Message to a Bot.
@@ -177,7 +174,7 @@ namespace Drive_LFSS.Game_
             Session.AddToTcpSendingQueud
             (
                 new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,
-                    new PacketMTC(0, CarId, message)));
+                    new PacketMTC(0, LicenceId, message)));
         }
         public bool AdminFlag
         {

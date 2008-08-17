@@ -23,7 +23,7 @@ namespace Drive_LFSS.PacketStore_
 {
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Definition_;
-    using Drive_LFSS.Server_;
+    using Drive_LFSS.Session_;
     using Drive_LFSS.Log_;
 
     public abstract class Store
@@ -79,7 +79,7 @@ namespace Drive_LFSS.PacketStore_
 
             if (!struturedPacket.ContainsKey(udpSendingQueud[0].packetType))
             {
-                Log.missingDefinition("NextUdpSendQueud(), No Structure Define for this PacketType->" + udpSendingQueud[0].packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpSendQueud(), No Structure Define for this PacketType->" + udpSendingQueud[0].packetType + "\r\n");
                 lock (udpSendingQueud) { udpSendingQueud.Remove(udpSendingQueud[0]); }
                 return null;
             }
@@ -94,7 +94,7 @@ namespace Drive_LFSS.PacketStore_
 
             if (!struturedPacket.ContainsKey(tcpSendingQueud[0].packetType))
             {
-                Log.missingDefinition("NextTcpSendQueud(), No Structure Define for this PacketType->" + tcpSendingQueud[0].packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpSendQueud(), No Structure Define for this PacketType->" + tcpSendingQueud[0].packetType + "\r\n");
                 lock (tcpSendingQueud) { tcpSendingQueud.Remove(tcpSendingQueud[0]); }
                 return null;
             }
@@ -110,7 +110,7 @@ namespace Drive_LFSS.PacketStore_
             
             if (!struturedPacket.ContainsKey(udpReceivedQueud[0].packetType))
             {
-                Log.missingDefinition("NextUdpReceiveQueud(bool _returnStruct), No Structure Define for this PacketType->" + udpReceivedQueud[0].packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpReceiveQueud(bool _returnStruct), No Structure Define for this PacketType->" + udpReceivedQueud[0].packetType + "\r\n");
                 lock (udpReceivedQueud) { udpReceivedQueud.Remove(udpReceivedQueud[0]); }
                 return null;
             }
@@ -127,7 +127,7 @@ namespace Drive_LFSS.PacketStore_
 
             if (!struturedPacket.ContainsKey(udpReceivedQueud[0].packetType))
             {
-                Log.missingDefinition("NextUdpReceiveQueud(), No Structure Define for this PacketType->" + udpReceivedQueud[0].packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpReceiveQueud(), No Structure Define for this PacketType->" + udpReceivedQueud[0].packetType + "\r\n");
                 lock (udpReceivedQueud) { udpReceivedQueud.Remove(udpReceivedQueud[0]); }
                 return null;
             }
@@ -142,7 +142,7 @@ namespace Drive_LFSS.PacketStore_
 
             if (!struturedPacket.ContainsKey(tcpReceivedQueud[0].packetType))
             {
-                Log.missingDefinition("NextTcpReceiveQueud(bool _returnStruct), No Structure Define for this PacketType->" + tcpReceivedQueud[0].packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpReceiveQueud(bool _returnStruct), No Structure Define for this PacketType->" + tcpReceivedQueud[0].packetType + "\r\n");
                 lock (tcpReceivedQueud) { tcpReceivedQueud.Remove(tcpReceivedQueud[0]); }
                 return null;
             }
@@ -160,7 +160,7 @@ namespace Drive_LFSS.PacketStore_
 
             if (!struturedPacket.ContainsKey(tcpReceivedQueud[0].packetType))
             {
-                Log.missingDefinition("NextTcpReceiveQueud(), No Structure Define for this PacketType->" + tcpReceivedQueud[0].packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpReceiveQueud(), No Structure Define for this PacketType->" + tcpReceivedQueud[0].packetType + "\r\n");
                 lock (tcpReceivedQueud) { tcpReceivedQueud.Remove(tcpReceivedQueud[0]); }
                 return null;
             }

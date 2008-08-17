@@ -30,6 +30,7 @@ namespace Drive_LFSS.InSim_
     using Drive_LFSS.Server_;
     using Drive_LFSS.Log_;
     using Drive_LFSS.Config_;
+    using Drive_LFSS.Session_;
 
     public struct InSimSetting
     {
@@ -86,7 +87,7 @@ namespace Drive_LFSS.InSim_
         private UdpClient udpClient;
         private IPEndPoint udpIpEndPoint;
 
-        public void ConfigApply()
+        protected void ConfigApply()
         {
             networkThreadSleep = (int)inSimSetting.networkInterval;
         }
@@ -178,17 +179,17 @@ namespace Drive_LFSS.InSim_
 
             if (!tcpClient.Connected)
             {
-                Log.debug("TcpSend(), Disconnection Detected...\r\n");
+                Log.debug( ((Session)this).GetSessionNameForLog() + " TcpSend(), Disconnection Detected...\r\n");
                 return;
             }
 
-            Log.network("TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+            Log.network(((Session)this).GetSessionNameForLog() + " TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
             try{tcpSocket.Write(_packet,0,_packet.Length);}
             catch(Exception _exception)
             {
                 tcpSocket.Dispose();
                 tcpClient.Close();
-                Log.error("TcpSend(), Exception received when writing on the TCP socket, exception:"+_exception+"\r\n");
+                Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception + "\r\n");
             }
         }
         private void UdpSend() // This is very not usefull, UDP is a receive only .... from what i know now!
@@ -197,7 +198,7 @@ namespace Drive_LFSS.InSim_
             if (_packet == null)
                 return;
 
-            Log.network("UdpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+            Log.network(((Session)this).GetSessionNameForLog() + " UdpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
             udpClient.Send(_packet, _packet.Length);
         }
         private void TcpReceive()
@@ -211,12 +212,12 @@ namespace Drive_LFSS.InSim_
             {
                 tcpSocket.Dispose();
                 tcpClient.Close();
-                Log.error("Tcpreceive(), Exception received when reading on the TCP socket, exception:"+_exception+"\r\n");
+                Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception + "\r\n");
             }
 
             if (packetSize  < 4) //maybe add a size/4 Check to be sure the Size is Conform to Scawen standart
             {
-                Log.network("TcpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
+                Log.network(((Session)this).GetSessionNameForLog() + " TcpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
                 return;
             }
 
@@ -236,7 +237,7 @@ namespace Drive_LFSS.InSim_
 
             if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
             {
-                Log.missingDefinition("TcpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " TcpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
                 return;
             }
 
@@ -252,7 +253,7 @@ namespace Drive_LFSS.InSim_
             
             if (data[0] < 3)
             {
-                Log.network("UdpReceive(), Droped packet, Too Short!, PacketSize->" + data[0] + "\r\n");
+                Log.network(((Session)this).GetSessionNameForLog() + " UdpReceive(), Droped packet, Too Short!, PacketSize->" + data[0] + "\r\n");
                 return;
             }
             //Log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
@@ -260,7 +261,7 @@ namespace Drive_LFSS.InSim_
 
             if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
             {
-                Log.missingDefinition("UdpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " UdpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
                 return;
             }
 

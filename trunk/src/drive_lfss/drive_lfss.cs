@@ -76,7 +76,6 @@ namespace Drive_LFSS
             } Log.normal("Config Initialized...\r\n\r\n");
             Program.ConfigApply();
 
-
             //Logging
             if (!Log.Initialize(processPath+"\\dlfss.log"))
             {
@@ -119,7 +118,7 @@ namespace Drive_LFSS
 
             //Create Object for All Configured Server
             Log.normal("Initializating Servers Config...\r\n\r\n");
-            SessionList.LoadServerConfig( );
+            SessionList.ConfigApply( );
             
             //Session.InitializeServerList();
             Log.normal("Starting Normal Operation!\r\n\r\n");

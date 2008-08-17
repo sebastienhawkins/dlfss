@@ -25,6 +25,7 @@ namespace Drive_LFSS.CommandConsole_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Game_;
     using Drive_LFSS.Definition_;
+    using Drive_LFSS.Session_;
 
     static class CommandConsole
     {
