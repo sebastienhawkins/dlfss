@@ -70,38 +70,6 @@ namespace Drive_LFSS.Database_
             try { lock (command) { command.Cancel(); } }
             catch (Exception _exception) { }
         }
-        public uint GetLastRowId(string _tableName)
-        {
-            IDataReader result = ExecuteQuery("SELECT MAX(ROWID) FROM `" + _tableName + "`");
-            if (result.Read())
-                return (uint)result.GetInt32(0);
-
-            return 0;
-        }
-        public bool IsExistTable(string tableName)
-        {
-            IDataReader reader;
-            lock (command)
-            {
-                command.CommandText = "SHOW TABLES LIKE '" + tableName + "'";
-                reader = command.ExecuteReader();
-            }
-            if (reader.Read())
-                return true;
-            return false;
-        }
-        public bool IsExistColum(string tableName, string colName)
-        {
-            IDataReader reader;
-           lock(command)
-           {
-                command.CommandText = "SHOW COLUMNS FROM `" + tableName + "` LIKE '" + colName + "'";
-                reader = command.ExecuteReader();
-           }
-           if(reader.Read())
-               return true;
-            return false;
-        }
         public IDataReader ExecuteQuery(string _command)
         {
             MySqlDataReader dataReader;

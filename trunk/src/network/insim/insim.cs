@@ -72,14 +72,14 @@ namespace Drive_LFSS.InSim_
             else  //All Good
             {
                 ConfigApply();
-                threadSocketReceive = new Thread(new ThreadStart(SocketSendReceive));
+                threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
             }
         }
 
         private InSim_Socket_State socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
         private InSimSetting inSimSetting;
         private bool runThreadSocketReceive = false;
-        private Thread threadSocketReceive;
+        private Thread threadSocketSendReceive;
         private int networkThreadSleep;
         private TcpClient tcpClient;
         private NetworkStream tcpSocket;
@@ -104,10 +104,10 @@ namespace Drive_LFSS.InSim_
 
             socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
 
-            if(threadSocketReceive.ThreadState == ThreadState.Running)
+            if(threadSocketSendReceive.ThreadState == ThreadState.Running)
             {
                 runThreadSocketReceive = false;
-                threadSocketReceive.Join();
+                threadSocketSendReceive.Join();
             }
         }
         public void connect()
@@ -140,14 +140,12 @@ namespace Drive_LFSS.InSim_
                 socketStatus = InSim_Socket_State.INSIM_SOCKET_CONNECTED;
                 runThreadSocketReceive = true;
 
-                if (threadSocketReceive.ThreadState == ThreadState.Unstarted)
+                if (threadSocketSendReceive.ThreadState == ThreadState.Unstarted)
+                    threadSocketSendReceive.Start();
+                else if (threadSocketSendReceive.ThreadState == ThreadState.Stopped)
                 {
-                    threadSocketReceive.Start();
-                }
-                else if (this.threadSocketReceive.ThreadState == ThreadState.Stopped)
-                {
-                    this.threadSocketReceive = new Thread(new ThreadStart(SocketSendReceive));
-                    this.threadSocketReceive.Start();
+                    threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
+                    threadSocketSendReceive.Start();
                 }
 
                 PacketTiny _packet = new PacketTiny(1,Tiny_Type.TINY_NCN_NEW_LICENCE_CONNECTION);

@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+using System.Data;
+
 namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Script_;
     using Drive_LFSS.Log_;
+    using Drive_LFSS.Config_;
 
     public sealed class Driver : Car, IDriver
     {
@@ -32,23 +36,85 @@ namespace Drive_LFSS.Game_
             driverMask = 0;
             driverTypeMask = 0;
             session = _session;
+            guid = 0;
+            configMask = 0;
         }
         ~Driver()
         {
             Log.error("Driver name: " + driverName + ", was destroyed.\r\n");
         }
+        public static void ConfigApply()
+        {
+            SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "DriverSave");
+        }
+        
+        //Loaded From DB
+        private uint guid;
+        private uint configMask;
+
+        private void LoadFromDB()
+        {
+            IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_mask` FROM `driver` WHERE `licence_name`='"+licenceName+"' AND `driver_name`='"+driverName+"'");
+            if (reader.Read())
+            {
+                guid = (uint)reader.GetInt32(0);
+                //...
+            }
+
+            reader.Dispose();
+        }
+        private void SaveToDB()
+        {
+            Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_mask`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', " + configMask + ", " + (System.DateTime.Now.Ticks / 10000000) + ")");
+            driverSaveInterval = 0;
+        }
+        private bool SetNewGuid()
+        {
+            IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver`");
+            if (reader.Read())
+            {
+                guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0)+1;
+                reader.Dispose();
+                return true;
+            }
+            reader.Dispose();
+            return false;
+        }
+        
+        //Loaded From packet
+        private bool adminFlag;
+        private string driverName;
+        private byte driverModel;
+        private byte driverGender;
+        private Driver_Flag driverMask;
+        private Driver_Type_Flag driverTypeMask;
+        private Session session;
+
         new public void Init(PacketNCN _packet)
         {
             adminFlag = _packet.adminStatus > 0 ? true : false;
             driverName = _packet.driverName;
             driverTypeMask = _packet.driverTypeMask;
             //_packet.total;// What is Total????
-            
+ 
             base.Init(_packet);
+
+            if (IsBot())
+                return;
+
+            LoadFromDB();
+            if (guid == 0)
+            {
+                if (SetNewGuid())
+                    SaveToDB();
+                else
+                    Log.error("Error When Creating a New GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
+            }
         }
         new public void Init(PacketNPL _packet)
         {
-            if(driverName != _packet.driverName)    //I think should be a check != null && != then Error... like custom cheater packet
+            if (driverName != _packet.driverName)    //I think should be a check != null && != then Error... like custom cheater packet
                 driverName = _packet.driverName;
 
             driverModel = _packet.driverModel;
@@ -62,40 +128,47 @@ namespace Drive_LFSS.Game_
             //_packet.numberInRaceCar_NSURE // What is That???
 
             base.Init(_packet);
+
+            if (IsBot())
+                return;
+            if (guid == 0)
+            {
+                LoadFromDB();
+                if (guid == 0)
+                {
+                    if (SetNewGuid())
+                        SaveToDB();
+                    else
+                        Log.error("Error When Creating a New GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
+                }
+            }
+
         }
-
-        #region Timer
-        private const uint INTERVAL_IM_A_TEST = 15000;
-        private uint TIMER_IM_A_TEST = 0;
         
-        #endregion
 
+        private static uint SAVE_INTERVAL = 60000;
+        private uint driverSaveInterval = 0;
         new public void update(uint diff) 
         {
-            if (TIMER_IM_A_TEST < diff) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
+            if (!IsBot())
             {
-                Log.debug("Player: " + driverName + ", is a InGame Driver.\r\n");
-                TIMER_IM_A_TEST = INTERVAL_IM_A_TEST;
+                if ((driverSaveInterval += diff) >= SAVE_INTERVAL) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
+                {
+
+                    SaveToDB();
+                    Log.debug("DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
+                    //Is done into the Save call, since we can maybe use this function by a command, so better like this.
+                    //driverSaveInterval = 0;
+                }
             }
-            else
-                TIMER_IM_A_TEST -= diff;
 
             base.update(diff);
         }
-        
-        private bool adminFlag;
-        private string driverName;
-        private byte driverModel;
-        private byte driverGender;
-        private Driver_Flag driverMask;
-        private Driver_Type_Flag driverTypeMask;
-        private Session session;
 
         public Session Session
         {
             get { return session; }
         }
-
         public void SendMessage(string message)
         {
             //Serve no Purpose sending a Message to a Bot.
@@ -106,7 +179,6 @@ namespace Drive_LFSS.Game_
                 new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,
                     new PacketMTC(0, CarId, message)));
         }
-
         public bool AdminFlag
         {
             get { return adminFlag; }
@@ -119,7 +191,7 @@ namespace Drive_LFSS.Game_
         }
         public bool IsBot()
         {
-            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || CarId == 0);
+            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || LicenceId == 0);
         }
     }
 }

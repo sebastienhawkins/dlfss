@@ -67,38 +67,6 @@ namespace Drive_LFSS.Database_
             try { lock (command) { command.Cancel(); } }
             catch (Exception _exception) { }
         }
-        public uint GetLastRowId(string tableName)
-        {
-            IDataReader result = ExecuteQuery("SELECT MAX(ROWID) FROM `" + tableName + "`");
-            if (result.Read())
-                return (uint)result.GetInt32(0);
-
-            return 0;
-        }
-        public bool IsExistTable(string tableName)
-        {
-            IDataReader reader;
-            lock (command)
-            {
-                command.CommandText = "SELECT name FROM SQLITE_MASTER WHERE type = 'table' AND name = '" + tableName + "'";
-                reader = command.ExecuteReader();
-            }
-            if (reader.Read())
-                return true;
-            return false;
-        }
-        public bool IsExistColum(string tableName, string colName)
-        {
-            IDataReader reader;
-            lock (command)
-            {
-                command.CommandText = "SELECT " + colName + " FROM " + tableName + " LIMIT 1";
-                reader = command.ExecuteReader();
-            }
-            if (reader.Read())
-                return true;
-            return false;
-        }
         public IDataReader ExecuteQuery(string _command)
         {
             IDataReader reader;

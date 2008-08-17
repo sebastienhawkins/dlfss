@@ -43,7 +43,9 @@ namespace Drive_LFSS.Game_
             command = new CommandInGame(serverName);
             connectionRequest = true;
         }
-
+        ~Session()
+        {
+        }
         private class Ping
         {
             public Ping()

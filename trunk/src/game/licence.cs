@@ -54,7 +54,7 @@ namespace Drive_LFSS.Game_
         }
         #endregion
 
-        private string licenceName;
+        protected string licenceName;
         private byte licenceId;
         private byte unkFlag;
         private Leave_Reason quitReason;

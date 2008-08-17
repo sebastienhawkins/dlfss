@@ -9,9 +9,6 @@ namespace Drive_LFSS.Database_
         System.Data.IDataReader ExecuteQuery(string _command);
         IAsyncResult NewExecuteNonQuery();
         int EndExecuteNonQuery(IAsyncResult _iaSyncResult);
-        uint GetLastRowId(string tableName);
-        bool IsExistColum(string tableName, string colName);
-        bool IsExistTable(string tableName);
         void NewTransaction();
     }
 }

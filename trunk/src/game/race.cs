@@ -31,6 +31,9 @@ namespace Drive_LFSS.Game_
             serverName = _serverName;
             gridOrder = "";
         }
+        ~Race()
+        {
+        }
         private string serverName;
         private bool isRacing;
         private uint timeStart;
