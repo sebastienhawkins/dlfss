@@ -36,7 +36,8 @@ namespace Drive_LFSS.Definition_
     public enum InSim_Socket_State : byte
     {
         INSIM_SOCKET_DISCONNECTED = 0,
-        INSIM_SOCKET_CONNECTED = 1
+        INSIM_SOCKET_CONNECTED = 1,
+        INSIM_SOCKET_RECONNECTED = 2
     }
     public enum Licence_Camera_Mode : byte
     {

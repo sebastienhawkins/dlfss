@@ -82,7 +82,7 @@ namespace Drive_LFSS.InSim_
         private bool runThreadSocketReceive = false;
         private Thread threadSocketSendReceive;
         private int networkThreadSleep;
-        private TcpClient tcpClient;
+        private TcpClient tcpClient = new TcpClient();
         private NetworkStream tcpSocket;
         private UdpClient udpClient;
         private IPEndPoint udpIpEndPoint;
@@ -113,14 +113,13 @@ namespace Drive_LFSS.InSim_
         }
         public void connect()
         {
-            runThreadSocketReceive = false;
-            socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
-
-            tcpClient = new TcpClient();
+            //runThreadSocketReceive = false;
+            //socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
             try{ tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
             catch (SocketException _exception)
             {
-                return;//throw new Exception("TCP Socket Initialization failded, Error was: " +_exception.Message); 
+                Log.error(((Session)this).GetSessionNameForLog()+" TCP Socket Initialization failded, Error was: " +_exception.Message);
+                return;
             }
             tcpSocket = tcpClient.GetStream();
             
@@ -133,12 +132,12 @@ namespace Drive_LFSS.InSim_
             try { udpClient = new UdpClient(udpIpEndPoint); }
             catch (SocketException _exception)
             {
-                return;//throw new Exception("UDP Socket Initialization failed, Error was: "+_exception.Message); 
+                Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message);
+                return;
             }
 
             if (tcpClient.Connected)
             {
-                socketStatus = InSim_Socket_State.INSIM_SOCKET_CONNECTED;
                 runThreadSocketReceive = true;
 
                 if (threadSocketSendReceive.ThreadState == ThreadState.Unstarted)
@@ -149,16 +148,16 @@ namespace Drive_LFSS.InSim_
                     threadSocketSendReceive.Start();
                 }
 
-                PacketTiny _packet = new PacketTiny(1,Tiny_Type.TINY_NCN_NEW_LICENCE_CONNECTION);
-                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY,Packet_Type.PACKET_TINY_MULTI_PURPOSE,_packet));
+                PacketTiny _packet = new PacketTiny(1, Tiny_Type.TINY_NCN_NEW_LICENCE_CONNECTION);
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
 
                 _packet = new PacketTiny(1, Tiny_Type.TINY_NPL);
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
             }
         }
-        public bool IsSocketStatus(InSim_Socket_State _isStatus)
+        public bool IsConnected()
         {
-            return (socketStatus == _isStatus);
+            return (tcpClient.Connected);
         }
         private void SocketSendReceive()
         {
@@ -173,13 +172,14 @@ namespace Drive_LFSS.InSim_
         }
         private void TcpSend()
         {
+            
             byte[] _packet = NextTcpSendQueud();
             if (_packet == null) 
                 return;
 
             if (!tcpClient.Connected)
             {
-                Log.debug( ((Session)this).GetSessionNameForLog() + " TcpSend(), Disconnection Detected...\r\n");
+                Log.debug(((Session)this).GetSessionNameForLog() + " TcpSend(), Disconnection Detected...\r\n");
                 return;
             }
 
@@ -189,10 +189,15 @@ namespace Drive_LFSS.InSim_
             {
                 tcpSocket.Dispose();
                 tcpClient.Close();
-                Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception + "\r\n");
+                udpClient.Close();
+                runThreadSocketReceive = false;
+                tcpClient = new TcpClient();
+                Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception.Message + "\r\n");
+                ((Session)this).connectionRequest = true;
+                Log.normal(((Session)this).GetSessionNameForLog() + " Trying to reconnect...\r\n");
             }
         }
-        private void UdpSend() // This is very not usefull, UDP is a receive only .... from what i know now!
+        private void UdpSend() // This is very not usefull, UDP is a receive only .... from what i know.
         {
             byte[] _packet = NextUdpSendQueud();
             if (_packet == null)
@@ -205,14 +210,20 @@ namespace Drive_LFSS.InSim_
         {
             if (!tcpClient.Connected || !tcpSocket.DataAvailable)
                 return;
-            
+
             byte packetSize = 0;
             try{packetSize = (byte)tcpSocket.ReadByte();}
             catch(Exception _exception)
             {
                 tcpSocket.Dispose();
                 tcpClient.Close();
-                Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception + "\r\n");
+                udpClient.Close();
+                runThreadSocketReceive = false;
+                tcpClient = new TcpClient();
+                Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
+                ((Session)this).connectionRequest = true;
+                Log.normal(((Session)this).GetSessionNameForLog() + " Trying to reconnect...\r\n");
+                return;
             }
 
             if (packetSize  < 4) //maybe add a size/4 Check to be sure the Size is Conform to Scawen standart
@@ -245,7 +256,7 @@ namespace Drive_LFSS.InSim_
         }
         private void UdpReceive()
         {
-            if (udpClient.Available < 1)
+            if (udpClient != null && udpClient.Available < 1)
                 return;
 
             byte[] data = new byte[udpClient.Available];
@@ -266,11 +277,6 @@ namespace Drive_LFSS.InSim_
             }
 
             ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
-        }
-
-        public InSim_Socket_State GetSocketStatus()
-        {
-            return socketStatus;
         }
     }
 }

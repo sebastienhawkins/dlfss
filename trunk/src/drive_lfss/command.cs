@@ -59,7 +59,7 @@ namespace Drive_LFSS.CommandConsole_
                 Dictionary<string,Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
                 while(itr.MoveNext())
                 {
-                    if (itr.Current.Value.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
+                    if (itr.Current.Value.IsConnected())
                         Log.normal("ServerName: " + itr.Current.Key + ", Status: online, ReactionTime: " + itr.Current.Value.GetReactionTime() + "ms" + ", DriversCount: " + itr.Current.Value.GetNbrOfDrivers() + "\r\n");
                     else
                         Log.error("ServerName: " + itr.Current.Key + ", Status: offline, ReactionTime+/-: -ms, DriversCount: -\r\n");
@@ -73,7 +73,7 @@ namespace Drive_LFSS.CommandConsole_
                 {
                     Session session = SessionList.sessionList[serverName];
 
-                    if (session.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_CONNECTED))
+                    if (session.IsConnected())
                         Log.normal("serverName: " + serverName + ", Status: online, ReactionTime: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
                     else
                         Log.error("serverName: " + serverName + ", Status: offline, ReactionTime: -ms, DriversCount: -\r\n");

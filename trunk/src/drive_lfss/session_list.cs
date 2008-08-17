@@ -61,12 +61,12 @@ namespace Drive_LFSS
                 {
                     keyPair.Value.connectionRequest = false;
 
-                    if (keyPair.Value.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED))
+                    if (!keyPair.Value.IsConnected())
                         ConnectToServerName(keyPair.Key);
                     continue;
                 }
 
-                if ( keyPair.Value.IsSocketStatus(InSim_Socket_State.INSIM_SOCKET_DISCONNECTED) )
+                if ( !keyPair.Value.IsConnected() )
                     continue;
 
                 keyPair.Value.update(diff);
