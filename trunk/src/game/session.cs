@@ -35,7 +35,7 @@ namespace Drive_LFSS.Session_
         {
             sessionName = _serverName;
             commandPrefix = _inSimSetting.commandPrefix;
-            race = new Race(_serverName);
+            race = new Race(this);
             driverList = new List<Driver>();
             driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
             driverList.Capacity = 192;
@@ -49,6 +49,7 @@ namespace Drive_LFSS.Session_
         }
         new public void ConfigApply()
         {
+            Race.ConfigApply();
             Driver.ConfigApply();
             base.ConfigApply();
         }
@@ -115,7 +116,14 @@ namespace Drive_LFSS.Session_
         {
             return "["+sessionName+">";
         }
-
+        public uint GetRaceGuid()
+        {
+            return race.GetGuid();
+        }
+        public string GetRaceTrackAbreviation()
+        {
+            return race.GetTrackAbreviation();
+        }
         #region Update/Timer
 
         private const uint TIMER_PING_PONG = 30000;
@@ -186,7 +194,7 @@ namespace Drive_LFSS.Session_
 
             //Prevent the Main thread from Doing the driverList.update()
             lock (this){driverList.Add(_driver);}
-        }  //new Connection
+        }  // new Connection
         protected sealed override void processPacket(PacketCNL _packet)
         {
             //TODO: use _packet.Total as a Debug check to be sure we have same racer count into our memory as the server do. 
@@ -204,8 +212,8 @@ namespace Drive_LFSS.Session_
             while ((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)
                 lock (this) {driverList.RemoveAt((int)itr); }
    
-        }   //delete Connection
-        protected sealed override void processPacket(PacketNPL _packet) //New Car Join Race
+        }  // delete Connection
+        protected sealed override void processPacket(PacketNPL _packet)     // New Car Join Race
         {
             base.processPacket(_packet); //Keep the Log
 
@@ -231,7 +239,7 @@ namespace Drive_LFSS.Session_
             else                                                                            //Human
                 driverList[GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)].Init(_packet);
         }
-        protected sealed override void processPacket(PacketPLL _packet) // Delete Car leave (spectate - loses slot)
+        protected sealed override void processPacket(PacketPLL _packet)     // Delete Car leave (spectate - loses slot)
         {
             base.processPacket(_packet); //Keep the Log
 
@@ -246,7 +254,7 @@ namespace Drive_LFSS.Session_
             //Do we delete the entire Driver on a Bot Leave Race???
             ((Car)driverList[itr]).LeaveRace(_packet);
         }
-        protected sealed override void processPacket(PacketMCI _packet) // Multiple Car Information
+        protected sealed override void processPacket(PacketMCI _packet)     // Multiple Car Information
         {
             //base.processPacket(_packet); // Will Reprocess the Old One
 
@@ -259,13 +267,14 @@ namespace Drive_LFSS.Session_
                     continue;
 
                 carIndex = GetCarIndex(carInformation[itr].carId);
-                if (driverList[carIndex].DriverName == "host") //Will have to check here if we change Host name...
+                if (driverList[carIndex].LicenceId == 0) // This Bypass the Host CAR.
                     continue;
 
                 ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
+                race.ProcessCarInformation(carInformation[itr]);
             }
         }
-        protected sealed override void processPacket(PacketMSO _packet) //message out
+        protected sealed override void processPacket(PacketMSO _packet)     // message out
         {
             base.processPacket(_packet);
             //Chat_User_Type chatUserType = allo;
@@ -292,14 +301,16 @@ namespace Drive_LFSS.Session_
         {
             base.processPacket(_packet);
             race.Init(_packet);
-        }
+
+            //driver.Init() //Need to tell driver race is starting
+        }  // Race Start
         protected sealed override void processPacket(PacketSTA _packet)
         {
             base.processPacket(_packet);
-            race.Init(_packet);
+            race.ProcessPacketSTA(_packet);
             //Can receive some info about the Car that triggered this State Change...
             //TODO: Add this Init into Driver If carId is Found into STA.
-        }
+        }  // State Change race/car
         protected sealed override void processPacket(PacketTiny _packet)
         {
             base.processPacket(_packet);
@@ -309,62 +320,89 @@ namespace Drive_LFSS.Session_
                 case Tiny_Type.TINY_NONE: break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }
+        } // Multipurpose 
+        protected sealed override void processPacket(PacketSmall _packet)
+        {
+            base.processPacket(_packet);
+            switch (_packet.subType)
+            {
+                case Small_Type.SMALL_VTA_VOTE_ACTION:
+                {
+                    Log.debug("processPacket(PacketSmall _packet), Vote Action: " + (Vote_Action)_packet.uintValue + "\r\n"); break;
+                } break;
+                default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;
+            }
+        } // Multipurpose 
+        protected sealed override void processPacket(PacketLAP _packet)     // Lap Completed
+        {
+            base.processPacket(_packet);
+
+            driverList[GetCarIndex(_packet.carId)].ProcessLapInformation(_packet);
+        }
+        protected sealed override void processPacket(PacketSPX _packet)     // Split Time Receive
+        {
+            base.processPacket(_packet);
+
+            driverList[GetCarIndex(_packet.carId)].ProcessSplitInformation(_packet);
         }
         #endregion
 
         #region Driver/Car/Licence Association Tool
         private byte GetCarIndex(byte _carId)
         {
-            for (byte itr = 0; itr < driverList.Count; itr++)
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
             {
-                if (driverList[itr].CarId == _carId)
+                if (((ICar)driverList[itr]).CarId == _carId)
                     return itr;
             }
             return 0;
         }
-        private List<byte> GetLicenceIndex(byte _licenceId)
+        private List<byte> GetLicenceIndexs(byte _licenceId)
         {
             List<byte> _return = new List<byte>();
 
-            for (byte itr = 0; itr < driverList.Count; itr++)
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
             {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId)
+                if (((ILicence)driverList[itr]).LicenceId == _licenceId)
                     _return.Add(itr);
             }
             return _return;
         }
         private byte GetLicenceIndexWithName(byte _licenceId, string _driverName)
         {
-            for (byte itr = 0; itr < driverList.Count; itr++)
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
             {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId && ((Driver)driverList[itr]).DriverName == _driverName)
+                if (((ILicence)driverList[itr]).LicenceId == _licenceId && ((IDriver)driverList[itr]).DriverName == _driverName)
                     return itr;
             }
             return 0;
         }
         private byte GetFirstLicenceIndex(byte _licenceId)
         {
-            for (byte itr = 0; itr < driverList.Count; itr++)
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
             {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId)
+                if (((ILicence)driverList[itr]).LicenceId == _licenceId)
                     return itr;
             }
             return 0;
         }
         private bool ExistLicenceId(byte _licenceId)
         {
-            byte itrEnd = (byte)driverList.Count;
-
-            for (byte itr = 0; itr < itrEnd; itr++)
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
             {
-                if (((Licence)driverList[itr]).LicenceId == _licenceId)
+                if (((ILicence)driverList[itr]).LicenceId == _licenceId)
                     return true;
             }
             return false;
         }
         public int GetNbrOfDrivers()
         {
-            return driverList.Count - 1;
+            return driverList.Count - 1; // -1 remove the Host but... maybe not good idea removing it from here.
         }
         #endregion
     }

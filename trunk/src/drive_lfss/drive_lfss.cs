@@ -77,7 +77,7 @@ namespace Drive_LFSS
             Program.ConfigApply();
 
             //Logging
-            if (!Log.Initialize(processPath+"\\dlfss.log"))
+            if (!Log.Initialize(processPath+"\\Drive_LFSS.log"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n\r\n");

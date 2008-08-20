@@ -103,8 +103,8 @@ namespace Drive_LFSS.Packet_
     public enum Small_Type : byte
     {
         SMALL_NONE,		                        //  0					: not used
-        SMALL_SSP_ADD_SEND_QUEUD_POSITION,	    //  1 - instruction		: start AddToSendingQueud positions
-        SMALL_SSG_ADD_SEND_QUEUD_GAUGE,		    //  2 - instruction		: start AddToSendingQueud gauges
+        SMALL_SSP_ADD_SEND_QUEUD_POSITION,	    //  1 - instruction		: start sending positions
+        SMALL_SSG_ADD_SEND_QUEUD_GAUGE,		    //  2 - instruction		: start sending gauges
         SMALL_VTA_VOTE_ACTION,		            //  3 - report			: vote action
         SMALL_TMS_TIME_STOP,		            //  4 - instruction		: time stop
         SMALL_STP_TIME_STEP,		            //  5 - instruction		: time step

@@ -3,5 +3,6 @@
     public interface ICar
     {
         byte CarId { get; }
+        string CarName { get; }
     }
 }

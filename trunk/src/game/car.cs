@@ -50,7 +50,7 @@ namespace Drive_LFSS.Game_
         new protected void Init(PacketNCN _packet)
         {
             base.Init(_packet);
-        }
+        } //When Connection
         new protected void Init(PacketNPL _packet)
         {
             carId = _packet.carId;
@@ -63,10 +63,8 @@ namespace Drive_LFSS.Game_
             tyreFrontRight = _packet.tyreFrontRight;
             tyreRearLeft = _packet.tyreRearLeft;
             tyreRearRight =_packet.tyreRearRight;
-
             base.Init(_packet);
-        }
-
+        }  //When joining Race
         public void ProcessCarInformation(CarInformation _carInformation)
         {
             trackNode = _carInformation.trackNode;
@@ -121,7 +119,6 @@ namespace Drive_LFSS.Game_
     #region Update
         new protected virtual void update(uint diff)
         {
-
             //Script.CarFinishRace((Driver)this);
             //session.log("");
             base.update(diff);
@@ -194,7 +191,10 @@ namespace Drive_LFSS.Game_
         {
             get { return carId; }
         }
-        
+        public string CarName
+        {
+            get { return carName; }
+        }
     #endregion
 
     #region Tool

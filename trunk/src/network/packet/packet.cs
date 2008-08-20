@@ -95,6 +95,9 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE, new PacketSTA());
             Add(Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST());
             Add(Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, new PacketMTC());
+            Add(Packet_Type.PACKET_LAP_DRIVER_LAP_TIME, new PacketLAP());
+            Add(Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME, new PacketSPX());
+            Add(Packet_Type.PACKET_SMALL_MULTI_PURPOSE, new PacketSmall());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -234,7 +237,7 @@ namespace Drive_LFSS.Packet_
         public byte Confirm;
         public byte SpB;
         public ushort LapsDone;
-        public Penality_Confirmation_Flag Flags;
+        public Penalty_Type Flags;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketFLG
     {
@@ -251,41 +254,41 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        internal byte Zero;
-        public byte UCID;
-        public byte PLID;
-        internal byte Sp2;
-        internal byte Sp3;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string Msg;
+        public byte requestId;
+        internal byte zero;
+        public byte licenceId;
+        public byte carId;
+        internal byte spare2;
+        internal byte spare3;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketISI
     {
-        public PacketISI(byte _resquestId, ushort _udpPort, ushort _flags, char _prefix, ushort _interval, string _admin, string _iname)
+        public PacketISI(byte _resquestId, ushort _portUDP, ushort _mask, char _commandPrefix, ushort _updateInterval, string _password, string _interfaceName)
         {
             packetSize = Packet_Size.PACKET_SIZE_ISI;
             packetType = Packet_Type.PACKET_ISI_INSIM_INITIALISE;
-            ReqI = _resquestId;
-            Zero = 0;
-            UDPPort = _udpPort;
-            Flags = _flags;
-            Sp0 = 0;
-            Prefix = _prefix;
-            Interval = _interval;
-            Admin = _admin;
-            IName = _iname;
+            requestId = _resquestId;
+            zero = 0;
+            portUDP = _portUDP;
+            mask = _mask;
+            spare0 = 0;
+            commandPrefix = _commandPrefix;
+            updateInterval = _updateInterval;
+            password = _password;
+            interfaceName = _interfaceName;
         }
         internal Packet_Size packetSize;
         internal Packet_Type packetType;
-        public byte ReqI;
-        internal byte Zero;
-        public ushort UDPPort;
-        public ushort Flags;
-        internal byte Sp0;
-        public char Prefix;
-        public ushort Interval;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string Admin;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string IName;
+        public byte requestId;
+        internal byte zero;
+        public ushort portUDP;
+        public ushort mask;
+        internal byte spare0;
+        public char commandPrefix;
+        public ushort updateInterval;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string password;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string interfaceName;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketISM
     {
@@ -303,16 +306,16 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public byte PLID;
-        public uint LTime;
-        public uint ETime;
-        public ushort LapsDone;
-        public Driver_Flag Flags;
-        internal byte Sp0;
-        public byte Penalty;
-        public byte NumStops;
-        internal byte Sp3;
+        public byte requestId;
+        public byte carId;
+        public uint lapTime;
+        public uint totalTime;
+        public ushort lapCompleted;
+        public Driver_Flag driverMask;
+        internal byte spare0;
+        public Penalty_Type currentPenality;
+        public byte pitStopCount;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMCI
     {
@@ -568,7 +571,7 @@ namespace Drive_LFSS.Packet_
         public uint BTime;
         public byte SpA;
         public byte NumStops;
-        public Penality_Confirmation_Flag Confirm;
+        public Penalty_Type Confirm;
         public byte SpB;
         public ushort LapsDone;
         public Driver_Flag Flags;
@@ -632,22 +635,22 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public Small_Type SubT;
-        public uint UVal;
+        public byte requestId;
+        public Small_Type subType;
+        public uint uintValue;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSPX
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
+        public byte requestId;
         public byte carId;
-        public uint STime;
-        public uint ETime;
-        public byte Split;
-        public Penalty_Type Penalty;
-        public byte NumStops;
-        internal byte Sp3;
+        public uint splitTime;
+        public uint totalTime;
+        public byte splitNode;
+        public Penalty_Type currentPenalty;
+        public byte pitStopCount;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSTA
     {
@@ -662,7 +665,7 @@ namespace Drive_LFSS.Packet_
         public byte carCount;
         public byte connectionCount;
         public byte finishedCount;  //Not sure if this is , Finished Position or Number of Car who finish.
-        public Race_In_Progress_Status raceInProgress;
+        public Race_In_Progress_Status raceInProgressStatus;
         public byte qualificationMinute;
 
         // 0       : practice

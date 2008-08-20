@@ -115,10 +115,15 @@ namespace Drive_LFSS.InSim_
         {
             //runThreadSocketReceive = false;
             //socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
+            tcpClient.NoDelay = false;
+            tcpClient.SendTimeout = 1000;
+            tcpClient.ReceiveTimeout = 1000;
+            tcpClient.ExclusiveAddressUse = false;
             try{ tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
             catch (SocketException _exception)
             {
                 Log.error(((Session)this).GetSessionNameForLog()+" TCP Socket Initialization failded, Error was: " +_exception.Message);
+                //Maybe a little sleep and retry connect later, this is a isolated thread Call.. so a sleep won't hurt other thread.
                 return;
             }
             tcpSocket = tcpClient.GetStream();
@@ -135,6 +140,8 @@ namespace Drive_LFSS.InSim_
                 Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message);
                 return;
             }
+
+            udpClient.Ttl = 10; // Try to influence a shorter route on the internet if possible, maybe a value from the MCI interval time, 10ms is pretty fast, and 50 it normal.
 
             if (tcpClient.Connected)
             {

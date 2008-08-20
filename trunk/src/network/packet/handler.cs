@@ -36,8 +36,11 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_NPL_DRIVER_JOIN_RACE:          processPacket((PacketNPL)_packet);break;
                 case Packet_Type.PACKET_PLL_DRIVER_LEAVE_RACE:         processPacket((PacketPLL)_packet);break;
                 case Packet_Type.PACKET_RST_RACE_START:                processPacket((PacketRST)_packet);break;
-
+                case Packet_Type.PACKET_LAP_DRIVER_LAP_TIME:           processPacket((PacketLAP)_packet);break;
+                case Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME:         processPacket((PacketSPX)_packet);break;
                 case Packet_Type.PACKET_VER_VERSION_SERVER:            processPacket((PacketVER)_packet);break;
+                case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet);break;
+
                 default: Log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
@@ -50,6 +53,10 @@ namespace Drive_LFSS.Packet_
         protected virtual void processPacket(PacketTiny _packet)
         {
             Log.debug(((Session)this).GetSessionNameForLog() + " Process packet TINY\r\n");
+        }
+        protected virtual void processPacket(PacketSmall _packet)
+        {
+            Log.debug(((Session)this).GetSessionNameForLog() + " Process packet SMALL\r\n");
         }
         protected virtual void processPacket(PacketMSO _packet)
         {
@@ -92,7 +99,7 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketLAP _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " LAP_PlayerCompletesLap(), LAP -> PLID=" + _packet.PLID + ", Flags=" + _packet.Flags + ", LTIME=" + _packet.LTime + " ms" + ", LapsDone=" + _packet.LapsDone + ", ETime=" + _packet.ETime + " ms" + " \r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " LAP_PlayerCompletesLap(), LAP -> PLID=" + _packet.carId + ", Flags=" + _packet.driverMask + ", LTIME=" + _packet.lapTime + " ms" + ", LapsDone=" + _packet.lapCompleted + ", ETime=" + _packet.totalTime + " ms" + " \r\n");
         }
         protected virtual void processPacket(PacketFIN _packet)
         {
@@ -144,7 +151,7 @@ namespace Drive_LFSS.Packet_
         // A player crossed a lap split
         protected virtual void processPacket(PacketSPX _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " SPX_SplitTime(), SPX -> PLID=" + _packet.carId + ", Split=" + _packet.Split + ", STime=" + _packet.STime + " ms" + ", ETime=" + _packet.ETime + " ms" + ",  NumStops=" + _packet.NumStops + ", Penalty=" + _packet.Penalty + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " SPX_SplitTime(), SPX -> PLID=" + _packet.carId + ", Split=" + _packet.splitNode + ", STime=" + _packet.splitTime + " ms" + ", ETime=" + _packet.totalTime + " ms" + ",  NumStops=" + _packet.pitStopCount + ", Penalty=" + _packet.currentPenalty + "\r\n");
         }
         // A player changed his camera
         protected virtual void processPacket(PacketCCH _packet)
@@ -154,7 +161,7 @@ namespace Drive_LFSS.Packet_
         // The server/race state changed
         protected virtual void processPacket(PacketSTA _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged(), STA -> Flags=" + _packet.viewOptionMask + ", RaceInProg=" + _packet.raceInProgress + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumP=" + _packet.carCount + ", QualMins=" + _packet.qualificationMinute + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged(), STA -> Flags=" + _packet.viewOptionMask + ", RaceInProg=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumP=" + _packet.carCount + ", QualMins=" + _packet.qualificationMinute + "\r\n");
         }
         // A host is started or joined
         protected virtual void processPacket(PacketISM _packet)
@@ -224,7 +231,7 @@ namespace Drive_LFSS.Packet_
         // A /i message got sent to this program
         protected virtual void processPacket(PacketIII _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " III_InSimInfo(), III -> Msg=" + _packet.Msg + ", PLID=" + _packet.PLID + ", UCID=" + _packet.UCID + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " III_InSimInfo(), III -> Msg=" + _packet.message + ", PLID=" + _packet.carId + ", UCID=" + _packet.licenceId + "\r\n");
         }
 
     }

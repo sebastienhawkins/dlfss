@@ -188,18 +188,6 @@ namespace Drive_LFSS.Definition_
         CCI_LAST = 0x80,
         CCI_YELLOW = 2
     }
-    [Flags]public enum Penality_Confirmation_Flag : byte
-    {
-        CONF_CONFIRMED = 2,
-        CONF_DID_NOT_PIT = 0x40,
-        CONF_DISQ = 0x4c,
-        CONF_MENTIONED = 1,
-        CONF_PENALTY_30 = 0x10,
-        CONF_PENALTY_45 = 0x20,
-        CONF_PENALTY_DT = 4,
-        CONF_PENALTY_SG = 8,
-        CONF_TIME = 0x30
-    }
     [Flags]public enum InSim_Flag : byte
     {
         INSIM_FLAG_SPARE_0 = 1,
