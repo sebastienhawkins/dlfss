@@ -122,7 +122,7 @@ namespace Drive_LFSS.Session_
         }
         public string GetRaceTrackAbreviation()
         {
-            return race.GetTrackAbreviation();
+            return race.GetTrackPrefix();
         }
         #region Update/Timer
 
@@ -276,7 +276,7 @@ namespace Drive_LFSS.Session_
         }
         protected sealed override void processPacket(PacketMSO _packet)     // message out
         {
-            base.processPacket(_packet);
+            //base.processPacket(_packet);
             //Chat_User_Type chatUserType = allo;
 
             //_packet.chatUserType;
@@ -297,37 +297,63 @@ namespace Drive_LFSS.Session_
                 Log.chat(GetSessionNameForLog() + " " +_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
             }
         }
+        protected sealed override void processPacket(PacketREO _packet)     // Race Grid Order
+        {
+            base.processPacket(_packet);
+            race.Init(_packet);
+        }
         protected sealed override void processPacket(PacketRST _packet)
         {
             base.processPacket(_packet);
             race.Init(_packet);
 
-            //driver.Init() //Need to tell driver race is starting
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                driverList[itr].ProcessRaceStart();
+            }
+
+            script.RaceStart();
         }  // Race Start
         protected sealed override void processPacket(PacketSTA _packet)
         {
             base.processPacket(_packet);
-            race.ProcessPacketSTA(_packet);
-            //Can receive some info about the Car that triggered this State Change...
-            //TODO: Add this Init into Driver If carId is Found into STA.
+            if (_packet.currentCarId == 0)
+                race.Init(_packet);
+            else
+                ;//driver Case
+
         }  // State Change race/car
         protected sealed override void processPacket(PacketTiny _packet)
         {
-            base.processPacket(_packet);
+            //base.processPacket(_packet);
             switch (_packet.subTinyType)
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
+                case Tiny_Type.TINY_REN: race.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
+                case Tiny_Type.TINY_VTC: Log.debug(GetSessionNameForLog() + " A VOTE was CANCEL.\r\n"); break;
                 case Tiny_Type.TINY_NONE: break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }
         } // Multipurpose 
         protected sealed override void processPacket(PacketSmall _packet)
         {
-            base.processPacket(_packet);
+            //base.processPacket(_packet);
             switch (_packet.subType)
             {
                 case Small_Type.SMALL_VTA_VOTE_ACTION:
                 {
+                    switch ((Vote_Action)_packet.uintValue)
+                    {
+                        case Vote_Action.VOTE_NONE:
+                            break;
+                        case Vote_Action.VOTE_END:
+                            break;
+                        case Vote_Action.VOTE_QUALIFY:
+                            break;
+                        case Vote_Action.VOTE_RESTART:
+                            break;
+                    }
                     Log.debug("processPacket(PacketSmall _packet), Vote Action: " + (Vote_Action)_packet.uintValue + "\r\n"); break;
                 } break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;

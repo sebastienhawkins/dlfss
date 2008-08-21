@@ -123,11 +123,11 @@ namespace Drive_LFSS.Definition_
     }
     public enum Vote_Action : byte
     {
-        VOTE_END = 1,
         VOTE_NONE = 0,
-        VOTE_NUM = 4,
+        VOTE_END = 1,
+        VOTE_RESTART = 2,
         VOTE_QUALIFY = 3,
-        VOTE_RESTART = 2
+        VOTE_MAX = 4
     }
     public enum Leave_Reason : byte
     {
@@ -156,6 +156,18 @@ namespace Drive_LFSS.Definition_
         WIND_NONE,
         WIND_WEAK,
         WIND_HIGH
+    }
+    [Flags]public enum Confirm_Flag : byte
+    {
+        CONFIRM_MENTIONED = 1,
+        CONFIRM_CONFIRMED = 2,
+        CONFIRM_PENALTY_DT = 4,
+        CONFIRM_PENALTY_SG = 8,
+        CONFIRM_PENALTY_30 = 16,
+        CONFIRM_PENALTY_45 = 32,
+        CONFIRM_DID_NOT_PIT = 64,
+        CONFIRM_DISQ = 4+8+64,
+        CONFIRM_TIME = 16+32
     }
     [Flags]public enum Driver_Type_Flag : byte
     {
@@ -319,7 +331,6 @@ namespace Drive_LFSS.Definition_
         public ushort heading;
         public short angleVelocity;
     }
-
     [StructLayout(LayoutKind.Sequential)]
     public struct NodeLap
     {

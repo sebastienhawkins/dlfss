@@ -22,6 +22,7 @@ namespace Drive_LFSS.Packet_
         PACKET_SIZE_MTC = 72,
         PACKET_SIZE_MST = 68,
         PACKET_SIZE_ISI = 44,
+        PACKET_SIZE_REO = 36,
         PACKET_SIZE_TINY = 4
     }
     public enum Packet_Type : byte
@@ -61,7 +62,7 @@ namespace Drive_LFSS.Packet_
         PACKET_FLG_DRIVER_BLUE_YELLOW_FLAG,	        // 32 - info			: flag (yellow or blue)
         PACKET_PFL_DRIVER_FLAG,		                // 33 - info			: player flags (help flags)
         PACKET_FIN_DRIVER_FINISH_RACE,		        // 34 - info			: finished race
-        PACKET_RES_RESULT_CONFIRMED_RESULT_OF_WHAT, // 35 - info			: result confirmed
+        PACKET_RES_RESULT_CONFIRMED, // 35 - info			: result confirmed
         PACKET_REO_RACE_GRID_ORDER,		            // 36 - both ways		: reorder (info or instruction)
         PACKET_NLP_DRIVER_NODE_LAP,		            // 37 - info			: node and lap packet
         PACKET_MCI_MULTICAR_INFORMATION,		    // 38 - info			: multi car info

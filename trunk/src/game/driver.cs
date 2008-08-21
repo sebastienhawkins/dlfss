@@ -28,24 +28,30 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Session_;
     public struct Lap
     {
-        public void Reset()
+        public void Reset(bool forSameRace)
         {
-            raceGuid = 0;
-            driverGuid = 0;
-            carAbreviation = "";
-            trackAbreviation = "";
-            lapTime = 0;
-            totalTime = 0;
-            lapCompleted = 0;
-            driverMask = 0;
-            currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
+            if (!forSameRace)
+            {
+                raceGuid = 0;
+                driverGuid = 0;
+                carAbreviation = "";
+                trackAbreviation = "";
+                pitStopTotal = 0;
+                pitStopTotalCount = 0;
+                lapCompleted = 0;
+                totalTime = 0;
+                driverMask = 0;
+                currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
+            }
             pitStopCount = 0;
-            splitTime = new uint[3] { 0, 0, 0 };
+            lapTime = 0;
+            splitTime = new uint[4] { 0, 0, 0,0};
             yellowFlagCount = 0;
             blueFlagCount = 0;
         }
         public void Set(uint _raceGuid, uint _driverGuid, string _carAbreviation, string _trackAbreaviation, Driver_Flag _driverMask)
         {
+            Reset(false);
             raceGuid = _raceGuid;
             driverGuid = _driverGuid;
             carAbreviation = _carAbreviation;
@@ -59,29 +65,70 @@ namespace Drive_LFSS.Game_
             lapCompleted = _packet.lapCompleted;
             driverMask = _packet.driverMask;
             currentPenality = _packet.currentPenality;
-            pitStopCount = _packet.pitStopCount;
+            pitStopTotal = _packet.pitStopTotal;
+            SetPitStopCount();
+            if (raceGuid != 0)
+            {
+                if (!SetNewGuid())
+                    Log.error("Database Error, unable to Create new GUID for Lap.\r\n");
+            }
         }
         public void ProcessPacketSplit(PacketSPX _packet)
         {
-            splitTime[_packet.splitNode - 1] = _packet.splitTime;
+            splitTime[_packet.splitNode] = _packet.splitTime;
             totalTime = _packet.totalTime;
-            pitStopCount = _packet.pitStopCount;
+            pitStopTotal = _packet.pitStopTotal;
+            SetPitStopCount();
             currentPenality = _packet.currentPenalty;
         }
 
-        uint driverGuid;
-        uint raceGuid;
-        string carAbreviation;
-        string trackAbreviation;
-        public uint lapTime;
-        public uint totalTime;
-        public ushort lapCompleted;
-        public Driver_Flag driverMask;
-        public Penalty_Type currentPenality;
-        public byte pitStopCount;
-        public uint[] splitTime;
-        public ushort yellowFlagCount;
-        public ushort blueFlagCount;
+        private uint guid;
+        private uint driverGuid;
+        private uint raceGuid;
+        private string carAbreviation;
+        private string trackAbreviation;
+        private uint lapTime;
+        private uint totalTime;
+        private ushort lapCompleted;
+        private Driver_Flag driverMask;
+        private Penalty_Type currentPenality;
+        private uint[] splitTime;
+        private ushort yellowFlagCount;
+        private ushort blueFlagCount;
+        private byte pitStopTotal;      //current race total pitstop.
+        private byte pitStopTotalCount; //To help make PitStop by lap and not by race.
+        private byte pitStopCount;      //this is the Current Lap Pitstop, cen be more then 2, since on a cruise server is possible i think so.
+
+        //It important this is called eachTime we change: private byte pitStopTotal, since we count pisStop that happen during this lap.
+        private void SetPitStopCount()
+        {
+            if (pitStopTotal > pitStopTotalCount)
+            {
+                pitStopCount = (byte)(pitStopTotal - pitStopTotalCount);
+                pitStopTotalCount = pitStopTotal;
+            }
+        }
+        private void SaveToDB()
+        {
+            Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver_lap` WHERE `guid`=" + guid);
+            string query = "INSERT INTO `driver_lap` (`guid`,`guid_race`,`guid_driver`,`car_abreviation`,`track_abreviation`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
+            query += "VALUES ("+ guid + "," + raceGuid + "," + driverGuid + ",'" + carAbreviation + "','" + trackAbreviation+"'," + (byte)driverMask+"," + splitTime[1]+"," +splitTime[2] +"," + splitTime[3]+"," + lapTime+"," + totalTime+"," + lapCompleted+"," + (byte)currentPenality+"," + pitStopCount+"," + yellowFlagCount+"," + blueFlagCount+")";
+            Program.dlfssDatabase.ExecuteNonQuery(query);
+            Log.database("LapGuid: " + guid + ", DriverGuid: " + driverGuid + ", carAbreviation:" + carAbreviation + ", trackAbreviation: " + trackAbreviation + ", saved To Database.\r\n");
+        }
+        private bool SetNewGuid()
+        {
+            IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver_lap`");
+            if (reader.Read())
+            {
+                guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
+                reader.Dispose();
+                SaveToDB();
+                return true;
+            }
+            reader.Dispose();
+            return false;
+        }
     }
     public sealed class Driver : Car, IDriver
     {
@@ -96,8 +143,8 @@ namespace Drive_LFSS.Game_
             guid = 0;
             configMask = 0;
 
-            currentLap.Reset();
-            fastestLap.Reset();
+            currentLap.Reset(false);
+            fastestLap.Reset(false);
         }
         ~Driver()
         {
@@ -142,7 +189,7 @@ namespace Drive_LFSS.Game_
 
             base.Init(_packet);
 
-            currentLap.Set(session.GetRaceGuid(), guid, session.GetRaceTrackAbreviation(), CarName, driverMask);
+            currentLap.Set(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackAbreviation(), driverMask);
 
             if (IsBot())
                 return;
@@ -161,14 +208,18 @@ namespace Drive_LFSS.Game_
         public void ProcessLapInformation(PacketLAP _packet)
         {
             currentLap.ProcessPacketLap(_packet);
+
             // Check for fastest
             // do other thing we need
-            // SaveToDB
-            currentLap.Reset();
+            currentLap.Reset(true);
         }
         public void ProcessSplitInformation(PacketSPX _packet)
         {
             currentLap.ProcessPacketSplit(_packet);
+        }
+        public void ProcessRaceStart()
+        {
+            currentLap.Set(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackAbreviation(), driverMask);
         }
 
         //Loaded From packet
@@ -205,7 +256,7 @@ namespace Drive_LFSS.Game_
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
             Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_mask`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', " + configMask + ", " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
-            Log.debug(session.GetSessionNameForLog() + " DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
+            Log.database(session.GetSessionNameForLog() + " DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
         }
         private bool SetNewGuid()
         {

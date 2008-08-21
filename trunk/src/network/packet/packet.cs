@@ -98,6 +98,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_LAP_DRIVER_LAP_TIME, new PacketLAP());
             Add(Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME, new PacketSPX());
             Add(Packet_Type.PACKET_SMALL_MULTI_PURPOSE, new PacketSmall());
+            Add(Packet_Type.PACKET_REO_RACE_GRID_ORDER, new PacketREO());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -234,7 +235,7 @@ namespace Drive_LFSS.Packet_
         public uint BTime;
         public byte SpA;
         public byte NumStops;
-        public byte Confirm;
+        public Confirm_Flag Confirm;
         public byte SpB;
         public ushort LapsDone;
         public Penalty_Type Flags;
@@ -314,7 +315,7 @@ namespace Drive_LFSS.Packet_
         public Driver_Flag driverMask;
         internal byte spare0;
         public Penalty_Type currentPenality;
-        public byte pitStopCount;
+        public byte pitStopTotal;
         internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMCI
@@ -552,32 +553,31 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public byte NumP;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst=0x20)]
-        public byte[] carId;
+        public byte requestId;
+        public byte carCount;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst=0x32)]public byte[] carIds;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketRES
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
+        public byte requestId;
         public byte carId;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string UName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string PName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string Plate;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string CName;
-        public uint TTime;
-        public uint BTime;
-        public byte SpA;
-        public byte NumStops;
-        public Penalty_Type Confirm;
-        public byte SpB;
-        public ushort LapsDone;
-        public Driver_Flag Flags;
-        public byte ResultNum;
-        public byte NumRes;
-        public ushort PSeconds;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string licenceName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string driverName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string skinPrefix;
+        public uint totalTime;
+        public uint fastestLapTime;
+        public byte spare0;
+        public byte pitStopCount;
+        public Confirm_Flag confirmMask;
+        public byte spare1;
+        public ushort lapCount;
+        public Driver_Flag driverMask;
+        public byte positionFinal;
+        public byte resultCount;
+        public ushort penalitySecTotal;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketRST
     {
@@ -649,7 +649,7 @@ namespace Drive_LFSS.Packet_
         public uint totalTime;
         public byte splitNode;
         public Penalty_Type currentPenalty;
-        public byte pitStopCount;
+        public byte pitStopTotal;
         internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketSTA

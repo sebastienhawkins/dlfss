@@ -40,6 +40,8 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME:         processPacket((PacketSPX)_packet);break;
                 case Packet_Type.PACKET_VER_VERSION_SERVER:            processPacket((PacketVER)_packet);break;
                 case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet);break;
+                case Packet_Type.PACKET_REO_RACE_GRID_ORDER:           processPacket((PacketREO)_packet);break;
+                case Packet_Type.PACKET_RES_RESULT_CONFIRMED:          processPacket((PacketRES)_packet);break;
 
                 default: Log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
@@ -151,7 +153,7 @@ namespace Drive_LFSS.Packet_
         // A player crossed a lap split
         protected virtual void processPacket(PacketSPX _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " SPX_SplitTime(), SPX -> PLID=" + _packet.carId + ", Split=" + _packet.splitNode + ", STime=" + _packet.splitTime + " ms" + ", ETime=" + _packet.totalTime + " ms" + ",  NumStops=" + _packet.pitStopCount + ", Penalty=" + _packet.currentPenalty + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " SPX_SplitTime(), SPX -> PLID=" + _packet.carId + ", Split=" + _packet.splitNode + ", STime=" + _packet.splitTime + " ms" + ", ETime=" + _packet.totalTime + " ms" + ",  NumStops=" + _packet.pitStopTotal + ", Penalty=" + _packet.currentPenalty + "\r\n");
         }
         // A player changed his camera
         protected virtual void processPacket(PacketCCH _packet)
@@ -161,7 +163,7 @@ namespace Drive_LFSS.Packet_
         // The server/race state changed
         protected virtual void processPacket(PacketSTA _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged(), STA -> Flags=" + _packet.viewOptionMask + ", RaceInProg=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumP=" + _packet.carCount + ", QualMins=" + _packet.qualificationMinute + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged() -> ViewOptionMask=" + _packet.viewOptionMask + ", RaceInProgStatus=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumP=" + _packet.carCount + ", QualMins=" + _packet.qualificationMinute + ", raceLaps="+ _packet.raceLaps+", ReplaySpeed="+_packet.replaySpeed+", TrackName="+_packet.trackName+", WeatherStatus="+_packet.weatherStatus+"\r\n");
         }
         // A host is started or joined
         protected virtual void processPacket(PacketISM _packet)
@@ -178,7 +180,7 @@ namespace Drive_LFSS.Packet_
         // Sent at the start of every race or qualifying session, listing the start order
         protected virtual void processPacket(PacketREO _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " REO_RaceStartOrder(), REO -> PLID=" + _packet.carId + ", NumP=" + _packet.NumP + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " REO_RaceStartOrder(), REO -> PLID=" + _packet.carIds + ", NumP=" + _packet.carCount + "\r\n");
         }
         // Race start information
         protected virtual void processPacket(PacketRST _packet)
@@ -188,7 +190,7 @@ namespace Drive_LFSS.Packet_
         // Qualify or confirmed finish
         protected virtual void processPacket(PacketRES _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " RES_RaceOrQualifyingResult(), RES -> PLID=" + _packet.carId + ", UName=" + _packet.UName + ", PName=" + _packet.PName + ", PSeconds=" + _packet.PSeconds + ", ResultNum=" + _packet.ResultNum + ", SpA=" + _packet.SpA + ", SpB=" + _packet.SpB + ", TTime=" + _packet.TTime + " ms" + ", BTime=" + _packet.BTime + " ms" + ", Plate=" + _packet.Plate + ", LapsDone=" + _packet.LapsDone + ", NumRes=" + _packet.NumRes + ", NumStops=" + _packet.NumStops + ", Flags=" + _packet.Flags + ", Confirm=" + _packet.Confirm + ", CName=" + _packet.CName + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " RES_RaceOrQualifyingResult(),-> PLID=" + _packet.carId + ", UName=" + _packet.licenceName + ", PName=" + _packet.driverName + ", PSeconds=" + _packet.penalitySecTotal + ", PositionFinal=" + _packet.positionFinal + ", TTime=" + _packet.totalTime + " ms" + ", bestTime=" + _packet.fastestLapTime + " ms" + ", Plate=" + _packet.carPlate + ", LapsDone=" + _packet.lapCount + ", NumRes=" + _packet.resultCount + ", NumStops=" + _packet.pitStopCount + ", driverMask=" + _packet.driverMask + ", Confirm=" + _packet.confirmMask + ", skinName=" + _packet.skinPrefix + "\r\n");
         }
         // A race ends (return to game setup screen)
         // Current race time progress in hundredths
