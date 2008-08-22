@@ -99,6 +99,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME, new PacketSPX());
             Add(Packet_Type.PACKET_SMALL_MULTI_PURPOSE, new PacketSmall());
             Add(Packet_Type.PACKET_REO_RACE_GRID_ORDER, new PacketREO());
+            Add(Packet_Type.PACKET_RES_RESULT_CONFIRMED, new PacketRES());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -229,16 +230,16 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public byte PLID;
-        public uint TTime;
-        public uint BTime;
-        public byte SpA;
-        public byte NumStops;
-        public Confirm_Flag Confirm;
+        public byte requestId;
+        public byte carId;
+        public uint totalTime;
+        public uint fastestLap;
+        public byte spare0;
+        public byte pitStopCount;
+        public Confirm_Flag confirmMask;
         public byte SpB;
-        public ushort LapsDone;
-        public Penalty_Type Flags;
+        public ushort totalLap;
+        public Driver_Flag driverMask;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketFLG
     {

@@ -41,7 +41,9 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_VER_VERSION_SERVER:            processPacket((PacketVER)_packet);break;
                 case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet);break;
                 case Packet_Type.PACKET_REO_RACE_GRID_ORDER:           processPacket((PacketREO)_packet);break;
+                case Packet_Type.PACKET_FIN_DRIVER_FINISH_RACE:        processPacket((PacketFIN)_packet); break;
                 case Packet_Type.PACKET_RES_RESULT_CONFIRMED:          processPacket((PacketRES)_packet);break;
+
 
                 default: Log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
@@ -105,7 +107,7 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketFIN _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " FIN_PlayerFinishedRaces(), FIN -> PLID=" + _packet.PLID + ", Confirm=" + _packet.Confirm + ", Flags=" + _packet.Flags + ", BTIME=" + _packet.BTime + " ms" + ", TTIME=" + _packet.TTime + " ms" + ", LapsDone=" + _packet.LapsDone + ", NumStops=" + _packet.NumStops + ",  \r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " FIN_PlayerFinishedRaces(), FIN -> PLID=" + _packet.carId + ", Confirm=" + _packet.confirmMask + ", Flags=" + _packet.driverMask + ", BTIME=" + _packet.fastestLap + " ms" + ", TTIME=" + _packet.totalTime + " ms" + ", LapsDone=" + _packet.totalLap + ", NumStops=" + _packet.pitStopCount + ",  \r\n");
         }
         protected virtual void processPacket(PacketCRS _packet)
         {
@@ -163,7 +165,7 @@ namespace Drive_LFSS.Packet_
         // The server/race state changed
         protected virtual void processPacket(PacketSTA _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged() -> ViewOptionMask=" + _packet.viewOptionMask + ", RaceInProgStatus=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumP=" + _packet.carCount + ", QualMins=" + _packet.qualificationMinute + ", raceLaps="+ _packet.raceLaps+", ReplaySpeed="+_packet.replaySpeed+", TrackName="+_packet.trackName+", WeatherStatus="+_packet.weatherStatus+"\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged() -> ViewOptionMask=" + _packet.viewOptionMask + ", RaceInProgStatus=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumCar=" + _packet.carCount + ", FinishCount="+_packet.finishedCount+", QualMins=" + _packet.qualificationMinute + ", raceLaps="+ _packet.raceLaps+", ReplaySpeed="+_packet.replaySpeed+", TrackName="+_packet.trackName+", WeatherStatus="+_packet.weatherStatus+"\r\n");
         }
         // A host is started or joined
         protected virtual void processPacket(PacketISM _packet)

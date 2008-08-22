@@ -17,6 +17,7 @@
  */
 using System.Collections.Generic;
 using System.Data;
+using System;
 namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Packet_;
@@ -29,10 +30,10 @@ namespace Drive_LFSS.Game_
 
     public enum PositionIndex : byte
     {
-        POSITION_START = 1,
-        POSITION_FIRST = 1,
-        POSITION_LAST = 192,
-        POSITION_END = 194,
+        POSITION_FIRST = 0,
+        POSITION_LAST = 254,
+        POSITION_NONE = 255,
+        POSITION_MAX = 255,
     }
     public sealed class Race : IRace
 	{
@@ -45,33 +46,33 @@ namespace Drive_LFSS.Game_
         }
         public static void ConfigApply()
         {
-            SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "DriverSave");
+            SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "RaceSave");
         }
 
-        // Thoses REO/RST Init should be called into this order REO Then RST
         public void Init(PacketREO _packet)
         {
-            timeStart = (uint)(System.DateTime.Now.Ticks / 10000);
-            for (byte itr = (byte)PositionIndex.POSITION_START; itr < (byte)PositionIndex.POSITION_END; )
+            for (byte itr = (byte)PositionIndex.POSITION_FIRST; itr < (byte)PositionIndex.POSITION_MAX; )
                 carPosition[itr++] = 0;
 
-            carCount = _packet.carCount;
             gridOrder = "";
-            for (byte itr = 0; itr < carCount; )
+            carCount = _packet.carCount;
+            for (byte itr = 0; itr < carCount; itr++)
             {
                 gridOrder += _packet.carIds[itr] + " ";
-                carPosition[itr + 1] = _packet.carIds[itr++];
+                carPosition[itr] = _packet.carIds[itr];
             }
-            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
-                qualifyRaceGuid = guid;
-            else if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_NONE)
-                qualifyRaceGuid = 0;
+            if (gridOrder.EndsWith(" "))
+                gridOrder = gridOrder.TrimEnd(' ');
 
-            if (!SetNewGuid())
-                Log.error("Error When Creating a New GUID for Race.\r\n");
+            stateHasChange = true;
         } //Is the Main RaceSTART Procedure
         public void Init(PacketRST _packet)
         {
+            timeStart = (uint)(System.DateTime.Now.Ticks / 10000);
+            requestedFinalResult = false;
+            finalResultCount = 0;
+            finishOrder = "";
+
             trackPrefix = _packet.trackName;
             carCount = _packet.carCount;
             nodeCount = _packet.nodeCount;
@@ -86,47 +87,65 @@ namespace Drive_LFSS.Game_
             nodeSplit3Index = _packet.nodeSplit3Index;
             relatedRaceGuid = 0;
             hasToBeSavedIntoPPSTA = true;
+
+            if (!SetNewGuid())
+                Log.error("Error When Creating a New GUID for Race.\r\n");
         }
         public void Init(PacketSTA _packet)
         {
+            if(connectionCount != _packet.connectionCount || 
+                finishedCount != _packet.finishedCount ||
+                carCount != _packet.carCount ||
+                qualificationMinute != _packet.qualificationMinute ||
+                raceInProgressStatus != (Race_In_Progress_Status)_packet.raceInProgressStatus ||
+                raceLaps != _packet.raceLaps ||
+                trackPrefix != _packet.trackName ||
+                weatherStatus != (Weather_Status)_packet.weatherStatus ||
+                windStatus != (Wind_Status)_packet.windStatus)
+                stateHasChange = true;
+
             connectionCount = _packet.connectionCount;
             finishedCount = _packet.finishedCount;
             carCount = _packet.carCount;
             qualificationMinute = _packet.qualificationMinute;
-
-            /*if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY
-                && (Race_In_Progress_Status)_packet.raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING)
-            {
-                relatedRaceGuid = qualifyRaceGuid;
-                qualifyRaceGuid = 0;
-            }*/
-
             raceInProgressStatus = (Race_In_Progress_Status)_packet.raceInProgressStatus;
-            
             raceLaps = _packet.raceLaps;
             trackPrefix = _packet.trackName;
             weatherStatus = (Weather_Status)_packet.weatherStatus;
             windStatus = (Wind_Status)_packet.windStatus;
+
+            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_NONE)
+                return;
 
             if (hasToBeSavedIntoPPSTA)
             {
                 SaveToDB();
                 hasToBeSavedIntoPPSTA = false;
             }
-            //replaySpeed = _packet.replaySpeed;        //This is about the Driver/Car/Licence
-            //viewOptionMask = _packet.viewOptionMask;  //This is about the Driver/Car/Licence
-            //cameraMode = _packet.cameraMode;          //This is about the Driver/Car/Licence
-            //currentCarId = _packet.currentCarId;      //This is about the Driver/Car/Licence
+            if (finishedCount >= carCount && !requestedFinalResult) //This is not working good in all condition during qualify
+            {
+                RequestFinalResult();
+            }
         }
         public void ProcessCarInformation(CarInformation _carInformation)
         {
-            if (_carInformation.position == 0) //Position is Unknow for that Car.
+            if (_carInformation.position == 0 || _carInformation.position == 255) //Position is Unknow for that Car.
                 return;
-            ProcessPosition(_carInformation.carId,_carInformation.position);
+            SetCarPosition(_carInformation.carId,(byte)(_carInformation.position-1));
+        }
+        public void ProcessResult(PacketRES _packet)
+        {
+            SetCarPosition(_packet.carId, _packet.positionFinal);
+            if (_packet.requestId == 1 && ++finalResultCount == (finishedCount))
+                RaceFinish();
+        }
+        public void ProcessResult(PacketFIN _packet)
+        {
+            //In fact this packet is more needed into Lap/Driver
         }
         public void ProcessRaceEnd()
         {
-            //RaceEnd();
+            RaceEnd();
         }
         
         //LFS Insim Defined var
@@ -148,16 +167,34 @@ namespace Drive_LFSS.Game_
         private string gridOrder = "";
         private string finishOrder = "";
         //
+        private bool requestedFinalResult = false;
+        private byte finalResultCount = 0;
+        private bool stateHasChange = false;
         private bool hasToBeSavedIntoPPSTA = false;
         private uint guid = 0;
         private uint qualifyRaceGuid = 0;
         private uint relatedRaceGuid = 0;
         private Session session;
         private uint timeStart = 0;
-        private byte[] carPosition = new byte[(int)PositionIndex.POSITION_END]; //index 0, mean nothing and index 193 mean Nothing too.
-        
-        private static uint SAVE_INTERVAL = 60000;
-        private uint raceSaveInterval = 0;
+        private byte[] carPosition = new byte[(int)PositionIndex.POSITION_MAX]; //index 0, mean nothing and index 193 mean Nothing too.
+
+        private static uint SAVE_INTERVAL = 5000;
+        private uint raceSaveInterval = 5000;
+        public void update(uint diff)
+        {
+
+            if (raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE)
+            {
+                if (guid != 0 )
+                {
+                    if(stateHasChange)
+                    {
+                        if ((raceSaveInterval += diff) >= SAVE_INTERVAL)
+                            SaveToDB();
+                    }
+                }
+            }
+        }
         
         public uint GetGuid()
         {
@@ -167,50 +204,52 @@ namespace Drive_LFSS.Game_
         {
             return trackPrefix;
         }
-        
-        public void update(uint diff)
+        private void RaceFinish()
         {
-           /* if (guid != 0)
-            {
-                if ((raceSaveInterval += diff) >= SAVE_INTERVAL) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
-                    SaveToDB();
-            }*/
-            
-            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING)
-            {
+            Log.debug("Race: " + guid + ", was Finished SucessFull.\r\n");
 
-            }
-        }
+            for (byte itr = (byte)PositionIndex.POSITION_FIRST; itr < finishedCount; itr++)
+                finishOrder += carPosition[itr]+" ";
 
-        private void RaceEnd() //Is the Main RaceEND Procedure
+            if (finishOrder.EndsWith(" "))
+                finishOrder = finishOrder.TrimEnd(' ');
+
+            if (guid != 0)
+                SaveToDB();
+
+            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
+                qualifyRaceGuid = guid;
+            guid = 0;
+        }            //Is The Finish Race Procudure(A Sucess CompletedRace)
+        private void RaceEnd()
         {
+            Log.debug("Race: " + guid + ", was Fully Ended.\r\n");
+            guid = 0;
             qualifyRaceGuid = 0;
-            SaveToDB();
-        }
-
-        private void ProcessPosition(byte _carId, byte _position)
+        }               //Is the RaceEND Procedure(Setup Screen)
+        private void SetCarPosition(byte _carId, byte _position)
         {
             if (carPosition[_position] == _carId)   //Same Position
                 return;
             else if (carPosition[_position] == 0)   //Not same position, but don't take positon of anyone... a weird case
             {
                 carPosition[_position] = _carId;
-                Log.error("Race.ProcessPosition(), Weird Case happen. CarId: " + _carId + ", PositionAsked:" + _position + ", the old Position carId was 0.\r\n");
+                Log.error("Race.SetCarPosition(), Weird Case happen. CarId: " + _carId + ", PositionAsked:" + _position + ", the old Position carId was 0.\r\n");
                 return;
             }
 
             byte oldCarId = carPosition[_position];
             byte oldPosition = FindCarPosition(_carId);
-            if (oldPosition == (byte)PositionIndex.POSITION_END)
-                return;
+            if (oldPosition != (byte)PositionIndex.POSITION_NONE)
+                carPosition[oldPosition] = oldCarId;
             carPosition[_position] = _carId;
-            carPosition[oldPosition] = oldCarId;
 
+            Log.progress("Race.SetCarPosition(),  CarId: " + _carId + ", PositionAsked:" + _position + ", the old CarID/Position:" + oldCarId + "/" + oldPosition + ".\r\n");
         }
         private byte FindCarPosition(byte _carId)
         {
-            byte itr = (byte)PositionIndex.POSITION_START;
-            for (; itr < (byte)PositionIndex.POSITION_END && carPosition[itr++] != _carId;);
+            byte itr = (byte)PositionIndex.POSITION_FIRST;
+            for(  ;carPosition[itr] != _carId && ++itr < (byte)PositionIndex.POSITION_MAX;);
             return itr;
         }
         private bool SetNewGuid()
@@ -232,8 +271,22 @@ namespace Drive_LFSS.Game_
             string query = "INSERT INTO `race` (`guid`,`qualify_race_guid`,`track_prefix`,`start_timestamp`,`end_timestamp`,`grid_order`,`finish_order`,`race_laps`,`race_status`,`race_feature`,`qualification_minute`,`weather_status`,`wind_status`)";
             query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / 10000000) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
             Program.dlfssDatabase.ExecuteNonQuery(query);
-            
+            raceSaveInterval = 0;
+            stateHasChange = false;
             Log.database(session.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps:" + raceLaps + ", saved To Database.\r\n");
+        }
+        private void RequestFinalResult()
+        {
+            requestedFinalResult = true;
+            session.AddToTcpSendingQueud
+            (
+                new Packet
+                (
+                    Packet_Size.PACKET_SIZE_TINY,
+                    Packet_Type.PACKET_TINY_MULTI_PURPOSE,
+                    new PacketTiny(1, Tiny_Type.TINY_RES)
+                )
+            );
         }
     }
 }

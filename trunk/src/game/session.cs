@@ -38,7 +38,7 @@ namespace Drive_LFSS.Session_
             race = new Race(this);
             driverList = new List<Driver>();
             driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
-            driverList.Capacity = 192;
+            driverList.Capacity = 256;
             script = new Script();
             ping = new Ping();
             command = new CommandInGame(sessionName);
@@ -330,7 +330,7 @@ namespace Drive_LFSS.Session_
             switch (_packet.subTinyType)
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
-                case Tiny_Type.TINY_REN: race.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
+                case Tiny_Type.TINY_REN: Log.debug(GetSessionNameForLog() + " RACE END RACE END RACE END.\r\n"); race.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
                 case Tiny_Type.TINY_VTC: Log.debug(GetSessionNameForLog() + " A VOTE was CANCEL.\r\n"); break;
                 case Tiny_Type.TINY_NONE: break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
@@ -370,6 +370,16 @@ namespace Drive_LFSS.Session_
             base.processPacket(_packet);
 
             driverList[GetCarIndex(_packet.carId)].ProcessSplitInformation(_packet);
+        }
+        protected sealed override void processPacket(PacketRES _packet)
+        {
+            base.processPacket(_packet);
+            race.ProcessResult(_packet);
+        }
+        protected sealed override void processPacket(PacketFIN _packet)
+        {
+            base.processPacket(_packet);
+            race.ProcessResult(_packet);
         }
         #endregion
 

@@ -159,6 +159,7 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Confirm_Flag : byte
     {
+        CONFIRM_NONE = 0,
         CONFIRM_MENTIONED = 1,
         CONFIRM_CONFIRMED = 2,
         CONFIRM_PENALTY_DT = 4,

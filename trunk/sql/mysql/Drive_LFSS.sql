@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/08/20 01:25:26
+Date:                  2008/08/21 22:02:35
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -30,7 +30,7 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL,
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 #----------------------------
 # Table structure for driver_ban
 #----------------------------
@@ -61,25 +61,27 @@ CREATE TABLE `driver_lap` (
   `split_time_3` int(12) unsigned NOT NULL default '0',
   `lap_time` int(12) unsigned NOT NULL,
   `total_time` int(12) unsigned NOT NULL,
-  `lap_completed` tinyint(2) unsigned NOT NULL default '0',
+  `lap_completed` mediumint(5) unsigned NOT NULL default '0',
   `current_penalty` smallint(2) unsigned NOT NULL default '0',
   `pit_stop_count` smallint(3) unsigned NOT NULL,
   `yellow_flag_count` mediumint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=768 DEFAULT CHARSET=utf8;
 #----------------------------
 # Table structure for race
 #----------------------------
 drop table if exists race;
 CREATE TABLE `race` (
   `guid` int(11) unsigned NOT NULL,
-  `track_abreviation` varchar(4) NOT NULL,
+  `qualify_race_guid` int(11) unsigned NOT NULL,
+  `track_prefix` varchar(4) NOT NULL,
   `start_timestamp` bigint(12) unsigned NOT NULL,
   `end_timestamp` bigint(12) unsigned NOT NULL,
   `grid_order` blob NOT NULL COMMENT 'Driver GUID seperated by Space.',
   `finish_order` blob NOT NULL,
   `race_laps` tinyint(3) unsigned NOT NULL,
+  `race_status` tinyint(1) unsigned NOT NULL default '0',
   `race_feature` mediumint(4) unsigned NOT NULL default '0',
   `qualification_minute` tinyint(3) unsigned NOT NULL,
   `weather_status` tinyint(2) unsigned NOT NULL,

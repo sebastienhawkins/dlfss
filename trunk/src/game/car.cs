@@ -114,7 +114,7 @@ namespace Drive_LFSS.Game_
         private short angleVelocity;
 
         //Game Feature
-        private FeatureAcceleration_0_100 featureAcceleration_0_100;
+        private FeatureAcceleration_0_100 featureAcceleration_0_100 = new FeatureAcceleration_0_100();
 
     #region Update
         new protected virtual void update(uint diff)
@@ -128,13 +128,8 @@ namespace Drive_LFSS.Game_
     #region Game Feature
         private class FeatureAcceleration_0_100
         {
-            public FeatureAcceleration_0_100()
-            {
-                started = false;
-                startTime = 0;
-            }
-            private bool started;
-            private long startTime;
+            private bool started = false;
+            private long startTime = 0;
 
             public void Update(Car car)
             {
@@ -179,7 +174,7 @@ namespace Drive_LFSS.Game_
             if(((Driver)this).Session.script.CarFinishRace((ICar)this))
                 return;
         }
-        public void LeaveRace(PacketPLL _packet)
+        public void LeaveRace(PacketPLL _packet) //to be called when a car is removed from a race
         {
             carId = 0;
         }
