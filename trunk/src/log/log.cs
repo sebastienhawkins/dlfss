@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 
 namespace Drive_LFSS.Log_
@@ -94,7 +95,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " ERROR--: " + msg);
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
             mutexConsoleColor.ReleaseMutex();
@@ -105,7 +106,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " NORMAL-: " + msg);
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
@@ -118,7 +119,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " CHAT----: " + msg);
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
@@ -131,7 +132,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " COMMAND-: " + msg);
                 Console.ForegroundColor = ConsoleColor.DarkBlue;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
@@ -153,7 +154,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " DEBUG--: " + msg);
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
@@ -178,7 +179,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " NETWORK-: " + msg);
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
@@ -190,7 +191,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " DATABASE: " + msg);
                 Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
@@ -203,7 +204,7 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " PROGRESS: " + msg);
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
         }
@@ -215,10 +216,26 @@ namespace Drive_LFSS.Log_
             {
                 stringWriter.Add(System.DateTime.Now + " FEATURE: " + msg);
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write(msg);
+                Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
             mutexConsoleColor.ReleaseMutex();
+        }
+        private static string ToASCII(string text)
+        {
+            byte[] utf8String = Encoding.UTF8.GetBytes(text);
+            byte[] asciiString = Encoding.ASCII.GetBytes(text);
+
+            // Write the UTF-8 and ASCII encoded byte arrays. 
+            //output.WriteLine("UTF-8  Bytes: {0}", BitConverter.ToString(utf8String));
+            //output.WriteLine("ASCII  Bytes: {0}", BitConverter.ToString(asciiString));
+
+
+            // Convert UTF-8 and ASCII encoded bytes back to UTF-16 encoded  
+            // string and write.
+
+            //return Encoding.UTF8.GetString(utf8String);
+            return Encoding.ASCII.GetString(asciiString);
         }
     }
 }

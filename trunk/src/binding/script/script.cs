@@ -11,7 +11,7 @@ namespace Drive_LFSS.Script_
             return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
         }
         
-        public bool CarFinishRace(ICar _car)
+        public bool CarFinishRace(ICar car)
         {
             return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
         }

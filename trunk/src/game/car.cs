@@ -29,20 +29,6 @@ namespace Drive_LFSS.Game_
     {
         public Car() : base()
         {
-            //game Feature
-            featureAcceleration_0_100 = new FeatureAcceleration_0_100();
-
-            //Packet Data
-            carId = 0;
-            carPlate = "";
-            skin = "";
-            addedMass = 0;
-            addedIntakeRestriction = 0;
-            passenger = 0;
-            tyreFrontLeft = 0;
-            tyreFrontRight = 0;
-            tyreRearLeft = 0;
-            tyreRearRight = 0;
         }
         ~Car()
         {
@@ -89,29 +75,29 @@ namespace Drive_LFSS.Game_
         }
 
         //Packet data
-        private byte carId;
-        private string carName;
-        private string carPlate;
-        private string skin;
-        private byte addedMass;
-        private byte addedIntakeRestriction;
-        private byte passenger;
-        private Car_Tyres tyreFrontLeft;
-        private Car_Tyres tyreFrontRight;
-        private Car_Tyres tyreRearLeft;
-        private Car_Tyres tyreRearRight;
-        private ushort trackNode;
-        private ushort lapNumber;
-        private byte position;
-        private Car_Flag carFlag;
-        private int posX;
-        private int posY;
-        private int posZ;
-        private ushort speed;
-        private double speedKhm;
-        private ushort direction;
-        private ushort heading;
-        private short angleVelocity;
+        private byte carId = 0;
+        private string carName = "";
+        private string carPlate = "";
+        private string skin = "";
+        private byte addedMass = 0;
+        private byte addedIntakeRestriction = 0;
+        private byte passenger = 0;
+        private Car_Tyres tyreFrontLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
+        private Car_Tyres tyreFrontRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
+        private Car_Tyres tyreRearLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
+        private Car_Tyres tyreRearRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
+        private ushort trackNode = 0;
+        private ushort lapNumber = 0;
+        private byte position = 0;
+        private Car_Racing_Flag carFlag = Car_Racing_Flag.CAR_RACING_FLAG_NONE;
+        private int posX = 0;
+        private int posY = 0;
+        private int posZ = 0;
+        private ushort speed = 0;
+        private double speedKhm = 0.0d;
+        private ushort direction = 0;
+        private ushort heading = 0;
+        private short angleVelocity = 0;
 
         //Game Feature
         private FeatureAcceleration_0_100 featureAcceleration_0_100 = new FeatureAcceleration_0_100();
@@ -155,7 +141,7 @@ namespace Drive_LFSS.Game_
             private void Sucess(ref Car car)
             {
                 long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
-                double finalAccelerationTime = (((double)timeElapsed - (double)Math.Abs(((Driver)car).Session.GetReactionTime())) / 1000.0d);
+                double finalAccelerationTime = (((double)timeElapsed - 5.0d) / 1000.0d); //5.0d Should be MCI interval /2 
 
                 Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
 

@@ -25,10 +25,6 @@ namespace Drive_LFSS.Game_
 	{
         public Licence()
         {
-            licenceName = "";
-            licenceId = 0;
-            unkFlag = 0;
-            quitReason = 0;
         }
         ~Licence() 
         { 
@@ -54,10 +50,10 @@ namespace Drive_LFSS.Game_
         }
         #endregion
 
-        protected string licenceName;
-        private byte licenceId;
-        private byte unkFlag;
-        private Leave_Reason quitReason;
+        protected string licenceName = "";
+        private byte licenceId = 0;
+        private byte unkFlag = 0;
+        private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
 
         public string LicenceName 
         { 

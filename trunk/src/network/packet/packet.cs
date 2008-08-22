@@ -395,26 +395,26 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMTC
     {
-        public PacketMTC(byte _requestId, byte _licenceId, byte _carId, string _message)
+        public PacketMTC(byte _carId, string _message)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_MTC;
+            packetType = Packet_Type.PACKET_MTC_CHAT_TO_LICENCE;
+            requestId = 0;
+            zero = 0;
+            licenceId = 0;
+            carId = _carId;
+            spare1 = 0;
+            spare2 = 0;
+            message = _message;
+        }
+        public PacketMTC(byte _licenceId, string _message, byte _requestId)
         {
             packetSize = Packet_Size.PACKET_SIZE_MTC;
             packetType = Packet_Type.PACKET_MTC_CHAT_TO_LICENCE;
             requestId = _requestId;
             zero = 0;
             licenceId = _licenceId;
-            carId = _carId;
-            spare1 = 0;
-            spare2 = 0;
-            message = _message;
-        }
-        public PacketMTC(byte _licenceId, byte _carId, string _message)
-        {
-            packetSize = Packet_Size.PACKET_SIZE_MTC;
-            packetType = Packet_Type.PACKET_MTC_CHAT_TO_LICENCE;
-            requestId = 0;
-            zero = 0;
-            licenceId = _licenceId;
-            carId = _carId;
+            carId = 0;
             spare1 = 0;
             spare2 = 0;
             message = _message;

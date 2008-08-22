@@ -131,13 +131,13 @@ namespace Drive_LFSS.Definition_
     }
     public enum Leave_Reason : byte
     {
-        LEAVE_REASON_BANNED = 4,
         LEAVE_REASON_DISCONNECTED = 0,
-        LEAVE_REASON_KICKED = 3,
+        LEAVE_REASON_TIMEOUT = 1,
         LEAVE_REASON_LOSTCONNECTION = 2,
-        LEAVE_REASON_NUM = 6,
+        LEAVE_REASON_KICKED = 3,
+        LEAVE_REASON_BANNED = 4,
         LEAVE_REASON_SECURITY = 5,
-        LEAVE_REASON_TIMEOUT = 1
+        LEAVE_REASON_MAX = 6,
     }
     public enum Race_In_Progress_Status : byte
     {
@@ -172,6 +172,7 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Driver_Type_Flag : byte
     {
+        DRIVER_TYPE_NONE = 0,
         DRIVER_TYPE_FEMALE = 1,
         DRIVER_TYPE_AI = 2,
         DRIVER_TYPE_REMOTE = 4
@@ -194,12 +195,14 @@ namespace Drive_LFSS.Definition_
         ISB_LIGHT = 0x10,
         ISB_RIGHT = 0x80
     }
-    [Flags]public enum Car_Flag : byte
+    [Flags]public enum Car_Racing_Flag : byte
     {
-        CCI_BLUE = 1,
-        CCI_FIRST = 0x40,
-        CCI_LAST = 0x80,
-        CCI_YELLOW = 2
+        CAR_RACING_FLAG_NONE = 0,
+        CAR_RACING_FLAG_BLUE = 1,
+        CAR_RACING_FLAG_YELLOW = 2,
+        CAR_RACING_FLAG_LAG = 32,
+        CAR_RACING_FLAG_FIRST = 64,
+        CAR_RACING_FLAG_LAST = 128,
     }
     [Flags]public enum InSim_Flag : byte
     {
@@ -233,6 +236,7 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Driver_Flag : ushort
     {
+        DRIVER_FLAG_NONE = 0,
         DRIVER_FLAG_SWAPSIDE = 1,
         DRIVER_FLAG_GC_CUT = 2,
         DRIVER_FLAG_GC_BLIP = 4,
@@ -322,7 +326,7 @@ namespace Drive_LFSS.Definition_
         public ushort lapNumber;
         public byte carId;
         public byte position;
-        public Car_Flag carFlag;
+        public Car_Racing_Flag carFlag;
         internal byte Sp3;
         public int posX;
         public int posY;

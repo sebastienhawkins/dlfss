@@ -31,7 +31,7 @@ namespace Drive_LFSS.CommandConsole_
     {
         public static void Exec(string _commandText)
         {
-            string[] args = _commandText.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] args = _commandText.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
 
             switch (args[0])
             {
@@ -84,26 +84,28 @@ namespace Drive_LFSS.CommandConsole_
         }
         private static void Say(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length < 3)
             {
-                Log.normal("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverName $Message\r\n");
+                Log.normal("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverName $Message\r\n      #serverName can be \"all\".\r\n");
                 return;
             }
 
-            if (args[0] == "all")
+            string message = String.Join(" ", args, 2, args.Length-2);
+
+            if (args[1] == "all")
             {
                Dictionary<string, Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
                while(itr.MoveNext())
-                    itr.Current.Value.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
+                   itr.Current.Value.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
             }
             else
             {
-                string serverName = args[0];
+                string serverName = args[1];
 
                 if (SessionList.sessionList.ContainsKey(serverName))
-                    SessionList.sessionList[serverName].AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(args[1])));
+                    SessionList.sessionList[serverName].AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
                 else
-                    Log.command("Command Announce, serverName Not Found, Server Requested was: " + args[0] + "\r\n");
+                    Log.command("Command Announce, serverName Not Found, Server Requested was: " + args[1] + "\r\n");
             }
         }
         private static void Exit()

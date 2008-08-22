@@ -137,7 +137,10 @@ namespace Drive_LFSS.Game_
         {
             SetCarPosition(_packet.carId, _packet.positionFinal);
             if (_packet.requestId == 1 && ++finalResultCount == (finishedCount))
-                RaceFinish();
+            {
+                lock (carPosition)
+                    RaceFinish();
+            }
         }
         public void ProcessResult(PacketFIN _packet)
         {
@@ -244,7 +247,7 @@ namespace Drive_LFSS.Game_
                 carPosition[oldPosition] = oldCarId;
             carPosition[_position] = _carId;
 
-            Log.progress("Race.SetCarPosition(),  CarId: " + _carId + ", PositionAsked:" + _position + ", the old CarID/Position:" + oldCarId + "/" + oldPosition + ".\r\n");
+            //Log.progress("Race.SetCarPosition(),  CarId: " + _carId + ", PositionAsked:" + _position + ", the old CarID/Position:" + oldCarId + "/" + oldPosition + ".\r\n");
         }
         private byte FindCarPosition(byte _carId)
         {
