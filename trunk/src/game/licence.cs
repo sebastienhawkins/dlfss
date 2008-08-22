@@ -75,5 +75,7 @@ namespace Drive_LFSS.Game_
             set { quitReason = value; } 
             get { return quitReason; } 
         }
+
+
 	}
 }

@@ -41,10 +41,11 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_VER_VERSION_SERVER:            processPacket((PacketVER)_packet);break;
                 case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet);break;
                 case Packet_Type.PACKET_REO_RACE_GRID_ORDER:           processPacket((PacketREO)_packet);break;
-                case Packet_Type.PACKET_FIN_DRIVER_FINISH_RACE:        processPacket((PacketFIN)_packet); break;
+                case Packet_Type.PACKET_FIN_DRIVER_FINISH_RACE:        processPacket((PacketFIN)_packet);break;
                 case Packet_Type.PACKET_RES_RESULT_CONFIRMED:          processPacket((PacketRES)_packet);break;
-
-
+                case Packet_Type.PACKET_BTC_BUTTON_CLICK:              processPacket((PacketBTC)_packet);break;
+                case Packet_Type.PACKET_BTT_BUTTON_TYPE_IN_TEXT_OK:    processPacket((PacketBTT)_packet);break;
+                case Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE: processPacket((PacketBFN)_packet);break;
                 default: Log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
@@ -128,15 +129,15 @@ namespace Drive_LFSS.Packet_
         // A player pressed KEY_SHIFT+I or KEY_SHIFT+B
         protected virtual void processPacket(PacketBFN _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " BFN_PlayerRequestsButtons(), BFN -> UCID=" + _packet.UCID + ", ClickID=" + _packet.ClickID + ", SubT=" + _packet.SubT + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " BFN_PlayerRequestsButtons(), BFN -> UCID=" + _packet.licenceId + ", MultiId=" + _packet.buttonId + ", ButtonFunc=" + _packet.buttonFunction + "\r\n");
         }
         protected virtual void processPacket(PacketBTC _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " BTC_ButtonClicked(), BTC -> UCID=" + _packet.UCID + ",ClickID=" + _packet.ClickID + ", CFlags=" + _packet.CFlags + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " BTC_ButtonClicked(), BTC -> UCID=" + _packet.licenceId + ",ClickID=" + _packet.buttonId + ", CFlags=" + _packet.clickMask + "\r\n");
         }
         protected virtual void processPacket(PacketBTT _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " BTT_TextBoxOkClicked(), BTT -> UCID=" + _packet.UCID + ", ClickID=" + _packet.ClickID + ", Text=" + _packet.Text + ", TypeIn=" + _packet.TypeIn + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " BTT_TextBoxOkClicked(), BTT -> UCID=" + _packet.licenceId + ", ClickID=" + _packet.buttonId + ", Text=" + _packet.typedText + ", TypeIn=" + _packet.originalTextLength + "\r\n");
         }
         protected virtual void processPacket(PacketPEN _packet)
         {

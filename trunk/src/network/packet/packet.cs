@@ -79,7 +79,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny());
             Add(Packet_Type.PACKET_AXI_AUTOCROSS_LAYOUT, new PacketAXI());
             Add(Packet_Type.PACKET_AXO_DRIVER_HIT_AUTOCROSS_OBJECT, new PacketAXO());
-            Add(Packet_Type.PACKET_BFN_ASK_REMOVE_ADD_BUTTON, new PacketBFN());
+            Add(Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE, new PacketBFN());
             Add(Packet_Type.PACKET_BTC_BUTTON_CLICK, new PacketBTC());
             Add(Packet_Type.PACKET_BTN_BUTTON_DISPLAY, new PacketBTN());
             Add(Packet_Type.PACKET_BTT_BUTTON_TYPE_IN_TEXT_OK, new PacketBTT());
@@ -122,53 +122,80 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBFN
     {
-        internal byte packetSize;
-        internal byte packetType;
-        public byte ReqI;
-        public Button_Function SubT;
-        public byte UCID;
-        public byte ClickID;
-        public byte Inst;
-        internal byte Sp3;
+        public PacketBFN(byte _licenceId, byte _buttonId, Button_Function _buttonFunction)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_BFN;
+            packetType = Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE;
+            requestId = 0;
+            buttonFunction = _buttonFunction;
+            licenceId = _licenceId;
+            buttonId = _buttonId;
+            inst = 0;
+            spare3 = 0;
+        }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
+        public byte requestId;
+        public Button_Function buttonFunction;
+        public byte licenceId;
+        public byte buttonId;
+        internal byte inst;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTC
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public byte UCID;
-        public byte ClickID;
-        public byte Inst;
-        public Button_Click_Flag CFlags;
-        internal byte Sp3;
+        public byte requestId;
+        public byte licenceId;
+        public byte buttonId;
+        public byte extendedMask;
+        public Button_Click_Flag clickMask;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTN
     {
-        internal byte packetSize;
-        internal byte packetType;
-        public byte ReqI;
-        public byte UCID;
-        public byte ClickID;
-        public byte Inst;
-        public Button_Styles_Flag BStyle;
-        public byte TypeIn;
-        public byte L;
-        public byte T;
-        public byte W;
-        public byte H;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=240)]public string Text;
+        public PacketBTN(byte _licenceId, byte _requestId, byte _buttonId, Button_Styles_Flag _buttonStyle, byte _maxTextLength, byte _left, byte _top, byte _width, byte _height, string _text)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_BTN;
+            packetType = Packet_Type.PACKET_BTN_BUTTON_DISPLAY;
+            requestId = _requestId;
+            licenceId = _licenceId;
+            buttonId = _buttonId;
+            inst = 0;
+            styleMask = _buttonStyle;
+            maxTextLength = _maxTextLength; // if 0x80 mean DialogBox???? have to test this
+            left = _left;
+            top = _top;
+            width = _width;
+            height = _height;
+            text = _text;
+        }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
+        public byte requestId;
+        public byte licenceId;
+        public byte buttonId;
+        public byte inst;
+        public Button_Styles_Flag styleMask;
+        public byte maxTextLength;
+        public byte left;
+        public byte top;
+        public byte width;
+        public byte height;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=240)]public string text;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTT
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public byte UCID;
-        public byte ClickID;
-        public byte Inst;
-        public byte TypeIn;
-        internal byte Sp3;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x60)]public string Text;
+        public byte requestId;
+        public byte licenceId;
+        public byte buttonId;
+        public byte extendedMask;
+        public byte originalTextLength;
+        internal byte spare3;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x60)]public string typedText;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCCH
     {

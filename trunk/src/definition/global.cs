@@ -20,6 +20,13 @@ using System;
 using System.Runtime.InteropServices;
 namespace Drive_LFSS.Definition_
 {
+    public enum Button_Safe_Coord_Range
+    {
+        BUTTON_COORD_X_MIN = 0,
+        BUTTON_COORD_X_MAX = 110,
+        BUTTON_COORD_Y_MIN = 30,
+        BUTTON_COORD_Y_MAX = 170,
+    }
     public enum Ctrl_Types
     {
         CTRL_C_EVENT = 0,

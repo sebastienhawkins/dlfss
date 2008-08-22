@@ -19,6 +19,8 @@ namespace Drive_LFSS.Packet_
 {
     public enum Packet_Size : byte  //packetSize Must NOT Include: packetSize and PacketType
     {
+        PACKET_SIZE_BTN = 252,
+        PACKET_SIZE_BFN = 8,
         PACKET_SIZE_MTC = 72,
         PACKET_SIZE_MST = 68,
         PACKET_SIZE_ISI = 44,
@@ -69,7 +71,7 @@ namespace Drive_LFSS.Packet_
         PACKET_ISP_MSX,		                        // 39 - instruction		: type message
         PACKET_MSL_MESSAGE_TO_CONSOLE,		        // 40 - instruction		: message to local computer
         PACKET_CRS_DRIVER_RESET_CAR,		        // 41 - info			: car reset
-        PACKET_BFN_ASK_REMOVE_ADD_BUTTON,		    // 42 - both ways		: delete buttons / receive button requests
+        PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,		    // 42 - both ways		: delete buttons / receive button requests
         PACKET_AXI_AUTOCROSS_LAYOUT,		        // 43 - info			: autocross layout information
         PACKET_AXO_DRIVER_HIT_AUTOCROSS_OBJECT,	    // 44 - info			: hit an autocross object
         PACKET_BTN_BUTTON_DISPLAY,		            // 45 - instruction		: show a button on local or remote screen
