@@ -21,7 +21,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Script_;
 
-    public abstract class Licence : ILicence
+    public abstract class Licence : Button, ILicence
 	{
         public Licence()
         {

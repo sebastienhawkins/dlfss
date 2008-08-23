@@ -45,7 +45,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoStdLib>false</NoStdLib>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
@@ -77,7 +77,8 @@
     <Compile Include="database\database_mysql.cs" />
     <Compile Include="database\database_sqlite.cs" />
     <Compile Include="database\IDatabase.cs" />
-    <Compile Include="database\storage_sqlite.cs" />
+    <Compile Include="database\storage.cs" />
+    <Compile Include="game\button.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="network\packet\enum.cs" />

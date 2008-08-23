@@ -131,7 +131,7 @@ namespace Drive_LFSS.Log_
             mutexConsoleColor.WaitOne();
             {
                 stringWriter.Add(System.DateTime.Now + " COMMAND-: " + msg);
-                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
@@ -140,7 +140,7 @@ namespace Drive_LFSS.Log_
         {
             mutexConsoleColor.WaitOne();
             {
-                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.Write(msg);
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
@@ -153,7 +153,7 @@ namespace Drive_LFSS.Log_
             mutexConsoleColor.WaitOne();
             {
                 stringWriter.Add(System.DateTime.Now + " DEBUG--: " + msg);
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
@@ -178,7 +178,7 @@ namespace Drive_LFSS.Log_
             mutexConsoleColor.WaitOne();
             {
                 stringWriter.Add(System.DateTime.Now + " NETWORK-: " + msg);
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();
@@ -190,7 +190,7 @@ namespace Drive_LFSS.Log_
             mutexConsoleColor.WaitOne();
             {
                 stringWriter.Add(System.DateTime.Now + " DATABASE: " + msg);
-                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
             } mutexConsoleColor.ReleaseMutex();

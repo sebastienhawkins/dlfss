@@ -29,7 +29,7 @@ namespace Drive_LFSS
     using Drive_LFSS.Log_;
     using Drive_LFSS.CommandConsole_;
     using Drive_LFSS.Database_;
-    using Mono.Data.SqliteClient;
+    using Drive_LFSS.Storage_;
 
     public sealed class Program
     {
@@ -41,7 +41,7 @@ namespace Drive_LFSS
         public delegate bool HandlerRoutine(Ctrl_Types CtrlType);
 
         //MultiThread Console Command
-        private static Thread ThreadCaptureConsoleCommand = new Thread(new ThreadStart(CaptureConsoleCommand));
+        private static readonly Thread ThreadCaptureConsoleCommand = new Thread(new ThreadStart(CaptureConsoleCommand));
 
         //Used to Stop The Program and is Thread!
         public static bool MainRun = true;
@@ -50,15 +50,19 @@ namespace Drive_LFSS
         //Database
         public static IDatabase dlfssDatabase = null;
 
+        //Storage, Any Storage FMT need a 'p' value this is representing is Unique Index into the Array, the value must be a uint32
+        public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "psuuuuuus" });
+
         [MTAThread]
-        public static void Main()
+        private static void Main()
 		{
             //Console Trap CTRL-C, //Remove Unhandle Exception
             Console.CancelKeyPress += new ConsoleCancelEventHandler(DisgraceExit);
+              //this one should not be done under MONO... will cause a error...
             SetConsoleCtrlHandler(new HandlerRoutine(DisgraceExit), true);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnHandleException);
 
-            //So user won't have working folder probleme.
+            //Put static working folder.
             string processPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             processPath = processPath.Substring(0, processPath.LastIndexOf('\\'));
 
@@ -86,17 +90,14 @@ namespace Drive_LFSS
                 return;
             } Log.normal("Log System Initialized...\r\n\r\n");
 
-
-            //InGame Command System
-            //Log.normal("Initializating InGame Command.\r\n\r\n");
-            //Command.Init();
-            
+           
             //Console System, Purpose for MultiThreading the Console Input
             Log.normal("Initializating Console Command.\r\n\r\n");
             ThreadCaptureConsoleCommand.Start();
 
             //Database Initialization
             Log.normal("Initializating Database...\r\n");
+
             List<string> databaseChoices = Config.GetIdentifierList("Database");
             if (databaseChoices.Contains("MySQL"))
             {
@@ -115,6 +116,14 @@ namespace Drive_LFSS
                 dlfssDatabase = new DatabaseSQLite(Config.GetStringValue("Database", "SQLite", "ConnectionInfo"));
             }
             Log.normal("Completed Initialize Database...\r\n\r\n");
+
+
+            //Initialize Storage
+            Log.normal("Initializating Storage...\r\n");
+            buttonTemplate.Load();
+            Log.normal("Completed Initialize Storage...\r\n\r\n");
+
+
 
             //Create Object for All Configured Server
             Log.normal("Initializating Servers Config...\r\n\r\n");
@@ -151,6 +160,7 @@ namespace Drive_LFSS
             }
             #endregion
 		}
+
         private static void WriteBanner()
         {
             //Opening Banner

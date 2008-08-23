@@ -3,10 +3,32 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/08/21 22:02:35
+Date:                  2008/08/23 01:47:48
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+#----------------------------
+# Table structure for button_template
+#----------------------------
+drop table if exists button_template;
+CREATE TABLE `button_template` (
+  `entry` mediumint(8) unsigned NOT NULL,
+  `description` varchar(255) default NULL,
+  `style_mask` tinyint(3) unsigned NOT NULL default '0',
+  `max_input_char` tinyint(3) unsigned NOT NULL,
+  `left` tinyint(3) unsigned NOT NULL,
+  `top` tinyint(3) unsigned NOT NULL,
+  `width` tinyint(3) unsigned NOT NULL,
+  `height` tinyint(3) unsigned NOT NULL,
+  `text` varchar(240) NOT NULL,
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#----------------------------
+# Records for table button_template
+#----------------------------
+
+
+insert  into button_template values (1, 'banner', 0, 0, 10, 10, 80, 30, 'Aleajecta Testing') ;
 #----------------------------
 # Table structure for car_template
 #----------------------------
@@ -19,6 +41,10 @@ CREATE TABLE `car_template` (
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
+# No records for table car_template
+#----------------------------
+
+#----------------------------
 # Table structure for driver
 #----------------------------
 drop table if exists driver;
@@ -30,7 +56,11 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL,
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+#----------------------------
+# No records for table driver
+#----------------------------
+
 #----------------------------
 # Table structure for driver_ban
 #----------------------------
@@ -45,6 +75,10 @@ CREATE TABLE `driver_ban` (
   `expired` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#----------------------------
+# No records for table driver_ban
+#----------------------------
+
 #----------------------------
 # Table structure for driver_lap
 #----------------------------
@@ -69,6 +103,10 @@ CREATE TABLE `driver_lap` (
   PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM AUTO_INCREMENT=768 DEFAULT CHARSET=utf8;
 #----------------------------
+# No records for table driver_lap
+#----------------------------
+
+#----------------------------
 # Table structure for race
 #----------------------------
 drop table if exists race;
@@ -89,6 +127,10 @@ CREATE TABLE `race` (
   PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
+# No records for table race
+#----------------------------
+
+#----------------------------
 # Table structure for track_template
 #----------------------------
 drop table if exists track_template;
@@ -103,4 +145,8 @@ CREATE TABLE `track_template` (
   PRIMARY KEY  (`entry`),
   UNIQUE KEY `abreviation_name` (`abreviation_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#----------------------------
+# No records for table track_template
+#----------------------------
+
 
