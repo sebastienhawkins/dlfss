@@ -36,7 +36,7 @@ namespace Drive_LFSS.Storage_
         private char[] tableFormat;
         private Dictionary<uint, object[]> data = new Dictionary<uint, object[]>();
 
-        public bool Load()
+        public bool Load(bool errorOnEmpty)
         {
             bool returnValue = false;
 
@@ -70,7 +70,7 @@ namespace Drive_LFSS.Storage_
                                     if (reader.GetFieldType(index) == typeof(UInt32) || reader.GetFieldType(index) == typeof(byte))
                                         value.Add(reader.IsDBNull(index) ? 0 : (uint)reader.GetInt32(index));
                                     else
-                                        Log.error("\r\nUINT Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  UINT Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                                 case 'p':
                                     if (reader.GetFieldType(index) == typeof(UInt32))
@@ -79,13 +79,13 @@ namespace Drive_LFSS.Storage_
                                         dataIndex = (reader.IsDBNull(index) ? 0 : (uint)reader.GetInt32(index));
                                     }
                                     else
-                                        Log.error("\r\nPrimary Key Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  Primary Key Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                                 case 'i':
                                     if (reader.GetFieldType(index) == typeof(Int32) || reader.GetFieldType(index) == typeof(byte))
                                         value.Add(reader.IsDBNull(index) ? 0 : reader.GetInt32(index));
                                     else
-                                        Log.error("\r\nINT Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  INT Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                                 case 's':
                                     value.Add((reader.IsDBNull(index) ? "NULL" : "" + reader.GetString(index)));
@@ -96,7 +96,7 @@ namespace Drive_LFSS.Storage_
                                     else if (reader.GetFieldType(index) == typeof(Decimal))
                                         value.Add((float)(reader.IsDBNull(index) ? 0 : reader.GetDecimal(index)));
                                     else
-                                        Log.error("\r\nUnsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                             }
                             valueIndex++;
@@ -108,10 +108,12 @@ namespace Drive_LFSS.Storage_
                     returnValue = true;
                 }
                 else
-                    Log.error("Storage System, Database Table:'" + tableName + "', has a invalide field count, she has: " + reader.FieldCount + ", it should be at: " + tableFormat.Length + "\r\n");
+                    Log.error("  Storage System, Database Table:'" + tableName + "', has a invalide field count, she has: " + reader.FieldCount + ", it should be at: " + tableFormat.Length + "\r\n");
             }
+            else if (errorOnEmpty)
+                Log.error("  Storage System, Database Table:'" + tableName + "', Is Empty.\r\n");
             else
-                Log.error("Storage System, Database Table:'" + tableName + "', Is Empty.\r\n");
+                Log.commandHelp("  Loading Storage \"" + tableName + "\"\r\n");
 
             reader.Dispose();
             return returnValue;
@@ -123,9 +125,10 @@ namespace Drive_LFSS.Storage_
             return null;
         }
     }
-    public class ButtonTemplate : Storage
+
+    public sealed class ButtonTemplate : Storage
     {
-        public ButtonTemplate(string[] buttonTemplateFmt) : base(buttonTemplateFmt) { }
+        public ButtonTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
         new public ButtonTemplateInfo GetEntry(uint entry)
         {
             object[] _temp = base.GetEntry(entry);
@@ -135,19 +138,19 @@ namespace Drive_LFSS.Storage_
                 return null;
         }
     }
-    public class ButtonTemplateInfo
+    public sealed class ButtonTemplateInfo
     {
-        public ButtonTemplateInfo(object[] buttonInfos)
+        public ButtonTemplateInfo(object[] rowInfos)
         {
-            entry = Convert.ToUInt16(buttonInfos[0]);
-            description = (string)(buttonInfos[1]);
-            styleMask = (Button_Styles_Flag)Convert.ToUInt16(buttonInfos[2]);
-            maxInputChar = (byte)Convert.ToUInt16(buttonInfos[3]);
-            left = (byte)Convert.ToUInt16(buttonInfos[4]);
-            top = (byte)Convert.ToUInt16(buttonInfos[5]);
-            width = (byte)Convert.ToUInt16(buttonInfos[6]);
-            height = (byte)Convert.ToUInt16(buttonInfos[7]);
-            text = (string)buttonInfos[8];
+            entry = Convert.ToUInt16(rowInfos[0]);
+            description = (string)(rowInfos[1]);
+            styleMask = (Button_Styles_Flag)Convert.ToUInt16(rowInfos[2]);
+            maxInputChar = (byte)Convert.ToUInt16(rowInfos[3]);
+            left = (byte)Convert.ToUInt16(rowInfos[4]);
+            top = (byte)Convert.ToUInt16(rowInfos[5]);
+            width = (byte)Convert.ToUInt16(rowInfos[6]);
+            height = (byte)Convert.ToUInt16(rowInfos[7]);
+            text = (string)rowInfos[8];
         }
         private ushort entry;
         private string description;
@@ -195,5 +198,137 @@ namespace Drive_LFSS.Storage_
         {
             get { return text; }
         }
+    }
+
+    public sealed class TrackTemplate : Storage
+    {
+        public TrackTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        new public TrackTemplateInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new TrackTemplateInfo(_temp);
+            else
+                return null;
+        }
+    }
+    public sealed class TrackTemplateInfo
+    {
+        public TrackTemplateInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt32(rowInfos[0]);
+            namePrefix = (string)rowInfos[1];
+            name = (string)rowInfos[2];
+            nodeIndex = new byte[3]
+            {
+                (byte)Convert.ToUInt16(rowInfos[3]),
+                (byte)Convert.ToUInt16(rowInfos[4]),
+                (byte)Convert.ToUInt16(rowInfos[5])
+            };
+            totalLength = (uint)Convert.ToUInt16(rowInfos[5]);
+
+        }
+        private uint entry;
+        private string namePrefix;
+        private string name;
+        public byte[] nodeIndex;
+        private uint totalLength;
+    }
+
+    public sealed class CarTemplate : Storage
+    {
+        public CarTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        new public CarTemplateInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new CarTemplateInfo(_temp);
+            else
+                return null;
+        }
+    }
+    public sealed class CarTemplateInfo
+    {
+        public CarTemplateInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt32(rowInfos[0]);
+            namePrefix = (string)rowInfos[1];
+            name = (string)rowInfos[2];
+            traction = (Car_Traction)Convert.ToUInt16(rowInfos[3]);
+        }
+        private uint entry;
+        private string namePrefix;
+        private string name;
+        private Car_Traction traction;
+    }
+
+    public sealed class RaceTemplate : Storage
+    {
+        public RaceTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        new public RaceTemplateInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new RaceTemplateInfo(_temp);
+            else
+                return null;
+        }
+    }
+    public sealed class RaceTemplateInfo
+    {
+        public RaceTemplateInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt32(rowInfos[0]);
+            description = (string)(rowInfos[1]);
+            trackEntry = (byte)Convert.ToUInt16(rowInfos[2]);
+            car_entry_allowed = (string)rowInfos[3];
+            weather = (Weather_Status)Convert.ToUInt16(rowInfos[4]);
+            wind = (Wind_Status)Convert.ToUInt16(rowInfos[5]);
+            lapCount = (byte)Convert.ToUInt16(rowInfos[6]);
+            qualifyMinute = (byte)Convert.ToUInt16(rowInfos[7]);
+            gridStartBeviator = (Grid_Start_Beviator)Convert.ToUInt16(rowInfos[8]);
+        }
+        private uint entry;
+        private string description;
+        private byte trackEntry;
+        private string car_entry_allowed;
+        private Weather_Status weather;
+        private Wind_Status wind;
+        private byte lapCount;
+        private byte qualifyMinute;
+        private Grid_Start_Beviator gridStartBeviator;
+    }
+
+    public sealed class DriverBan : Storage
+    {
+        public DriverBan(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        new public DriverBanInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new DriverBanInfo(_temp);
+            else
+                return null;
+        }
+    }
+    public sealed class DriverBanInfo
+    {
+        public DriverBanInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt32(rowInfos[0]);
+            licenceName = (string)rowInfos[1];
+            fromLicenceName = (string)rowInfos[2];
+            reason = (string)rowInfos[3];
+            startTime = Convert.ToUInt32(rowInfos[4]);
+            endTime = Convert.ToUInt32(rowInfos[5]);
+            expired = Convert.ToUInt16(rowInfos[6]) == 1 ? true : false;
+        }
+        private uint entry;
+        private string licenceName;
+        private string fromLicenceName;
+        private string reason;
+        private uint startTime;
+        private uint endTime;
+        private bool expired;
     }
 }

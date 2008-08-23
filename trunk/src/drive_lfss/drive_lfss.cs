@@ -47,12 +47,16 @@ namespace Drive_LFSS
         public static bool MainRun = true;
         #endregion
 
+
         //Database
         public static IDatabase dlfssDatabase = null;
 
         //Storage, Any Storage FMT need a 'p' value this is representing is Unique Index into the Array, the value must be a uint32
+        public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "pssuuuu" });
+        public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssu" });
         public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "psuuuuuus" });
-
+        public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psusuuuuu" });
+        public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
         [MTAThread]
         private static void Main()
 		{
@@ -101,7 +105,7 @@ namespace Drive_LFSS
             List<string> databaseChoices = Config.GetIdentifierList("Database");
             if (databaseChoices.Contains("MySQL"))
             {
-                Log.normal("Using MySQL Database.\r\n");
+                Log.commandHelp("  Using MySQL Database.\r\n");
                 string[] infos = Config.GetStringValue("Database","MySQL","ConnectionInfo").Split(';');
                 if (infos.Length != 6)
                 {
@@ -112,7 +116,7 @@ namespace Drive_LFSS
             }
             else
             {
-                Log.normal("Using SQLite Database.\r\n");
+                Log.commandHelp("  Using SQLite Database.\r\n");
                 dlfssDatabase = new DatabaseSQLite(Config.GetStringValue("Database", "SQLite", "ConnectionInfo"));
             }
             Log.normal("Completed Initialize Database...\r\n\r\n");
@@ -120,7 +124,11 @@ namespace Drive_LFSS
 
             //Initialize Storage
             Log.normal("Initializating Storage...\r\n");
-            buttonTemplate.Load();
+            trackTemplate.Load(true);
+            carTemplate.Load(true);
+            buttonTemplate.Load(true);
+            raceTemplate.Load(false);
+            driverBan.Load(false);
             Log.normal("Completed Initialize Storage...\r\n\r\n");
 
 

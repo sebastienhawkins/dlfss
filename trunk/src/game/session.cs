@@ -127,7 +127,7 @@ namespace Drive_LFSS.Session_
         #region Update/Timer
 
         private const uint TIMER_PING_PONG = 30000;
-        private uint TimerPingPong = 30000;
+        private uint TimerPingPong = 28000;
 
         public void update(uint diff)
         {
@@ -158,6 +158,10 @@ namespace Drive_LFSS.Session_
         new public void AddToTcpSendingQueud(Packet _serverPacket)
         {
             base.AddToTcpSendingQueud(_serverPacket);
+        }
+        new public void AddToUdpSendingQueud(Packet _serverPacket)
+        {
+            base.AddToUdpSendingQueud(_serverPacket);
         }
         private void ProcessReceivedPacket()
         {

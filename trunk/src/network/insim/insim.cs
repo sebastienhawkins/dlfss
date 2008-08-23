@@ -134,7 +134,7 @@ namespace Drive_LFSS.InSim_
             System.Threading.Thread.Sleep(1000);
 
             udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.port);
-            try { udpClient = new UdpClient(udpIpEndPoint); }
+            try { udpClient = new UdpClient(udpIpEndPoint); /*udpClient.Connect(inSimSetting.ip, (int)inSimSetting.port);*/ }
             catch (SocketException _exception)
             {
                 Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message);

@@ -110,8 +110,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.config" />
-    <None Include="Drive_LFSS.cfg">
+    <None Include="..\dep\Drive_LFSS.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\sql\mysql\Drive_LFSS.sql">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

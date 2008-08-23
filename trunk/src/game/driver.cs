@@ -282,7 +282,7 @@ namespace Drive_LFSS.Game_
             (
                 new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,
                     new PacketMTC(CarId, message)));
-            Log.progress("Sending MTC packet to:"+CarId + ", with Licence: "+LicenceId);
+            Log.progress("Sending MTC packet to:"+CarId + ", with Licence: "+LicenceId+"\r\n");
         }
         public bool AdminFlag
         {

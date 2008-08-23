@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/08/23 01:47:48
+Date:                  2008/08/23 04:09:15
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -28,14 +28,15 @@ CREATE TABLE `button_template` (
 #----------------------------
 
 
-insert  into button_template values (1, 'banner', 0, 0, 10, 10, 80, 30, 'Aleajecta Testing') ;
+insert  into button_template (entry,description,style_mask,max_input_char,`left`,top,width,height,`text`) values 
+(1, 'banner', 0, 0, 10, 10, 80, 30, 'Aleajecta Testing');
 #----------------------------
 # Table structure for car_template
 #----------------------------
 drop table if exists car_template;
 CREATE TABLE `car_template` (
   `entry` smallint(2) unsigned NOT NULL,
-  `abreviation_name` varchar(3) NOT NULL,
+  `name_prefix` varchar(3) NOT NULL,
   `name` varchar(16) NOT NULL,
   `traction_flag` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
@@ -131,19 +132,39 @@ CREATE TABLE `race` (
 #----------------------------
 
 #----------------------------
+# Table structure for race_template
+#----------------------------
+drop table if exists race_template;
+CREATE TABLE `race_template` (
+  `entry` int(11) unsigned NOT NULL,
+  `description` varchar(100) NOT NULL,
+  `track_entry` tinyint(2) unsigned NOT NULL,
+  `car_entry_allowed` varchar(128) NOT NULL,
+  `weather` tinyint(2) unsigned NOT NULL,
+  `wind` tinyint(2) unsigned NOT NULL,
+  `lap_count` tinyint(3) unsigned NOT NULL,
+  `qualify_minute` tinyint(3) unsigned NOT NULL,
+  `grid_start_beviator` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#----------------------------
+# No records for table race_template
+#----------------------------
+
+#----------------------------
 # Table structure for track_template
 #----------------------------
 drop table if exists track_template;
 CREATE TABLE `track_template` (
   `entry` tinyint(2) unsigned NOT NULL,
-  `abreviation_name` varchar(4) NOT NULL,
+  `name_prefix` varchar(4) NOT NULL,
   `name` varchar(16) NOT NULL,
-  `split_node_index_1` tinyint(3) NOT NULL default '0',
+  `split_node_index_1` tinyint(3) unsigned NOT NULL default '0',
   `split_node_index_2` tinyint(3) unsigned NOT NULL default '0',
   `split_node_index_3` tinyint(3) unsigned NOT NULL default '0',
   `total_length` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY  (`entry`),
-  UNIQUE KEY `abreviation_name` (`abreviation_name`)
+  UNIQUE KEY `abreviation_name` (`name_prefix`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table track_template

@@ -164,6 +164,17 @@ namespace Drive_LFSS.Definition_
         WIND_WEAK,
         WIND_HIGH
     }
+    public enum Grid_Start_Beviator : byte
+    {
+        GRID_START_BEVIATOR_NONE = 0,
+    }
+    [Flags]public enum Car_Traction : byte
+    {
+        CAR_TRACTION_NONE = 0,
+        CAR_TRACTION_FRONT = 1,
+        CAR_TRACTION_REAR = 2,
+        CAR_TRACTION_4x4 = 1+2,
+    }
     [Flags]public enum Confirm_Flag : byte
     {
         CONFIRM_NONE = 0,
