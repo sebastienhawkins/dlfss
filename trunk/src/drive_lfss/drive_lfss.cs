@@ -30,6 +30,8 @@ namespace Drive_LFSS
     using Drive_LFSS.CommandConsole_;
     using Drive_LFSS.Database_;
     using Drive_LFSS.Storage_;
+    using Drive_LFSS.Irc_;
+    using Drive_LFSS.Irc_.Data_;
 
     public sealed class Program
     {
@@ -57,6 +59,10 @@ namespace Drive_LFSS
         public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "psuuuuuus" });
         public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psusuuuuu" });
         public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
+        
+        //mIRC
+        public static IrcClient ircClient = new IrcClient();
+        
         [MTAThread]
         private static void Main()
 		{
@@ -121,7 +127,6 @@ namespace Drive_LFSS
             }
             Log.normal("Completed Initialize Database...\r\n\r\n");
 
-
             //Initialize Storage
             Log.normal("Initializating Storage...\r\n");
             trackTemplate.Load(true);
@@ -129,8 +134,16 @@ namespace Drive_LFSS
             buttonTemplate.Load(true);
             raceTemplate.Load(false);
             driverBan.Load(false);
-            Log.normal("Completed Initialize Storage...\r\n\r\n");
+            Log.normal("Completed Initialize Storage.\r\n\r\n");
 
+            //Irc Client
+            Log.normal("Initializating mIRC Client...\r\n");
+            string isActivated = Config.GetStringValue("mIRC", "Activate").ToLowerInvariant();
+            if (isActivated == "yes" || isActivated == "1" || isActivated == "true" || isActivated == "on" || isActivated == "activate")
+                IrcConnect();
+            else
+                Log.commandHelp("  mIRC Client is Disable.\r\n");
+            Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
 
 
             //Create Object for All Configured Server
@@ -199,6 +212,19 @@ namespace Drive_LFSS
                 System.Threading.Thread.Sleep(200);
             }
         }
+        private static void IrcConnect()
+        {
+            ircClient.ConfigApply();
+
+            //This is simply Sucking CPU for no purpose into that project... have to get rid of this.
+            //Subscribe to the irc server events
+            ircClient.eOnServerText += new ServerTextHandler(ircClient.OnServerText);
+            ircClient.eOnConnect += new ConnectHandler(ircClient.OnConnect);
+            ircClient.eOnDataSend += new DataSendHandler(ircClient.OnDataSend);
+            ircClient.eOnDisconnect += new DisconnectHandler(ircClient.OnDisconnect);
+
+            ircClient.Connect();
+        }
         private static void ConsoleExitTimer()
         {
             Log.error("Exiting into 5 seconds.\r\n");
@@ -223,6 +249,8 @@ namespace Drive_LFSS
             System.Threading.Thread.Sleep(25000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();
+            if (ircClient != null && ircClient.IsConnected)
+                ircClient.Disconnect();
             Log.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
@@ -236,6 +264,8 @@ namespace Drive_LFSS
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();
+            if (ircClient != null && ircClient.IsConnected)
+                ircClient.Disconnect();
             Log.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
@@ -248,24 +278,28 @@ namespace Drive_LFSS
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();
             ThreadCaptureConsoleCommand.Abort();
+            if (ircClient != null && ircClient.IsConnected)
+                ircClient.Disconnect();
             Log.flush();
             MainRun = false;
             System.Threading.Thread.Sleep(1000);
             System.Environment.Exit(0);
             return true;
         }
-        private static void ConfigApply()
-        {
-            sleep = Config.GetIntValue("Interval", "GameThreadUpdate");
-        }
         public static void Exit()
         {
             MainRun = false;
             
             SessionList.exit();
+            if (ircClient != null && ircClient.IsConnected)
+                ircClient.Disconnect();
             Log.flush();
 
             System.Environment.Exit(0);
+        }
+        private static void ConfigApply()
+        {
+            sleep = Config.GetIntValue("Interval", "GameThreadUpdate");
         }
     }
 }

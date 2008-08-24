@@ -71,6 +71,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="database\database.cs" />
@@ -81,6 +83,11 @@
     <Compile Include="game\button.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
+    <Compile Include="irc\data\const_commands.cs" />
+    <Compile Include="irc\data\events_delegates.cs" />
+    <Compile Include="irc\data\event_input_handler.cs" />
+    <Compile Include="irc\data\server_info.cs" />
+    <Compile Include="irc\irc_client.cs" />
     <Compile Include="network\packet\enum.cs" />
     <Compile Include="network\packet\handler.cs" />
     <Compile Include="network\packet\packet_store\store.cs" />

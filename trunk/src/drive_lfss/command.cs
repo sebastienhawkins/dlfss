@@ -98,6 +98,10 @@ namespace Drive_LFSS.CommandConsole_
                while(itr.MoveNext())
                    itr.Current.Value.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
             }
+            else if (args[1] == "irc")
+            {
+                Program.ircClient.SendServerData(message);
+            }
             else
             {
                 string serverName = args[1];
@@ -108,6 +112,7 @@ namespace Drive_LFSS.CommandConsole_
                     Log.command("Command Announce, serverName Not Found, Server Requested was: " + args[1] + "\r\n");
             }
         }
+        
         private static void Exit()
         {
             Log.normal("Exiting Requested, Please Wait For All Thread Too Close...\n\r");
