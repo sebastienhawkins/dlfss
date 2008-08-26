@@ -114,10 +114,8 @@ namespace Drive_LFSS
                 Log.commandHelp("  Using MySQL Database.\r\n");
                 string[] infos = Config.GetStringValue("Database","MySQL","ConnectionInfo").Split(';');
                 if (infos.Length != 6)
-                {
                     throw new Exception("Configuration Error, Invalide Value Count For: Database.MySQL.ConnectionInfo");
-                    return;
-                }
+
                 dlfssDatabase = new DatabaseMySQL("Database=" + infos[4] + ";Data Source=" + infos[0] + ";Port=" + infos[1] + ";User Id=" + infos[2] + ";Password=" + infos[3] + ";Use Compression=" + infos[5]);
             }
             else

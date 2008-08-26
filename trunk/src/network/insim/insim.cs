@@ -80,7 +80,6 @@ namespace Drive_LFSS.InSim_
         {
             if (true == false) { }
         }
-        private InSim_Socket_State socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
         private InSimSetting inSimSetting;
         private bool runThreadSocketReceive = false;
         private Thread threadSocketSendReceive;
@@ -105,8 +104,6 @@ namespace Drive_LFSS.InSim_
                 byte[] dgram = new byte[1];
                 udpClient.Send(dgram, 1, "localhost", inSimSetting.port);
             }
-
-            socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
 
             if(threadSocketSendReceive.ThreadState == ThreadState.Running)
             {

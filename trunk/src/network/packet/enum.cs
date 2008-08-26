@@ -19,6 +19,7 @@ namespace Drive_LFSS.Packet_
 {
     public enum Packet_Size : byte  //packetSize Must NOT Include: packetSize and PacketType
     {
+        PACKET_SIZE_MSL = 132,
         PACKET_SIZE_BTN = 252,
         PACKET_SIZE_BFN = 8,
         PACKET_SIZE_MTC = 72,
@@ -69,7 +70,7 @@ namespace Drive_LFSS.Packet_
         PACKET_NLP_DRIVER_NODE_LAP,		            // 37 - info			: node and lap packet
         PACKET_MCI_MULTICAR_INFORMATION,		    // 38 - info			: multi car info
         PACKET_ISP_MSX,		                        // 39 - instruction		: type message
-        PACKET_MSL_MESSAGE_TO_CONSOLE,		        // 40 - instruction		: message to local computer
+        PACKET_MSL_MESSAGE_TO_LOCAL,		        // 40 - instruction		: message to local computer
         PACKET_CRS_DRIVER_RESET_CAR,		        // 41 - info			: car reset
         PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,		    // 42 - both ways		: delete buttons / receive button requests
         PACKET_AXI_AUTOCROSS_LAYOUT,		        // 43 - info			: autocross layout information

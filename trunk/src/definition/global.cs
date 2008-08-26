@@ -40,12 +40,6 @@ namespace Drive_LFSS.Definition_
         PROTO_UDP,
         PROTO_TCP
     }
-    public enum InSim_Socket_State : byte
-    {
-        INSIM_SOCKET_DISCONNECTED = 0,
-        INSIM_SOCKET_CONNECTED = 1,
-        INSIM_SOCKET_RECONNECTED = 2
-    }
     public enum Licence_Camera_Mode : byte
     {
         CAMERA_MODE_FOLLOW = 0,
@@ -62,7 +56,7 @@ namespace Drive_LFSS.Definition_
         BUTTON_FUNCTION_USER_CLEAR = 2,
         BUTTON_FUNCTION_REQUEST = 3,
     }
-    public enum Chat_Console_Sound : byte
+    public enum Message_Sound : byte
     {
         SOUND_CONSOLE_SILENT = 0,
         SOUND_CONSOLE_MESSAGE = 1,

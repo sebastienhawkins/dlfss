@@ -43,6 +43,7 @@ namespace Drive_LFSS.Game_
             carId = _packet.carId;
             carName = _packet.carName;
             carPlate = _packet.carPlate;
+            carSkin = _packet.skinName;
             addedIntakeRestriction = _packet.addedIntakeRestriction;
             addedMass = _packet.addedMass;
             passenger = _packet.passenger;
@@ -79,7 +80,7 @@ namespace Drive_LFSS.Game_
         private byte carId = 0;
         private string carName = "";
         private string carPlate = "";
-        private string skin = "";
+        private string carSkin = "";
         private byte addedMass = 0;
         private byte addedIntakeRestriction = 0;
         private byte passenger = 0;
@@ -120,10 +121,10 @@ namespace Drive_LFSS.Game_
 
             public void Update(Car car)
             {
-                if (car.speedKhm < 0.1d && (!started || startTime != 0))
+                if (car.speedKhm < 0.9d && (!started || startTime != 0))
                     Start();
 
-                else if (car.speedKhm > 0.1d && started && startTime == 0)
+                else if (car.speedKhm > 1.0d && started && startTime == 0)
                     startTime = DateTime.Now.Ticks;
 
                 else if (car.speedKhm > 99.9d && started)

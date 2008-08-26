@@ -86,7 +86,6 @@ namespace Drive_LFSS.Game_
             nodeSplit1Index = _packet.nodeSplit1Index;
             nodeSplit2Index = _packet.nodeSplit2Index;
             nodeSplit3Index = _packet.nodeSplit3Index;
-            relatedRaceGuid = 0;
             hasToBeSavedIntoPPSTA = true;
 
             if (!SetNewGuid())
@@ -177,7 +176,6 @@ namespace Drive_LFSS.Game_
         private bool hasToBeSavedIntoPPSTA = false;
         private uint guid = 0;
         private uint qualifyRaceGuid = 0;
-        private uint relatedRaceGuid = 0;
         private Session session;
         private uint timeStart = 0;
         private byte[] carPosition = new byte[(int)PositionIndex.POSITION_MAX]; //index 0, mean nothing and index 193 mean Nothing too.

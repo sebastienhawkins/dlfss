@@ -59,12 +59,10 @@ namespace Drive_LFSS.Session_
             public Ping()
             {
                 pingTime = DateTime.Now.Ticks;
-                pingRequestId = 1;
                 sessionLatency = 0;
                 diff = 0;
             }
             private long pingTime;
-            private byte pingRequestId;
             private long sessionLatency;
             private uint diff;
             public void Sending(uint _diff)
@@ -103,7 +101,8 @@ namespace Drive_LFSS.Session_
         }
         private void PingReceived()
         {
-            Log.progress(GetSessionNameForLog() + " Pong! " + ping.Received() + "ms\r\n");
+            long msTime = ping.Received();
+            Log.network(GetSessionNameForLog() + " Pong! " +  msTime + "ms\r\n");
         }
         public long GetLatency()
         {
@@ -127,8 +126,8 @@ namespace Drive_LFSS.Session_
         }
         #region Update/Timer
 
-        private const uint TIMER_PING_PONG = 30000;
-        private uint TimerPingPong = 28000;
+        private const uint TIMER_PING_PONG = 50000;
+        private uint TimerPingPong = 48000;
 
         public void update(uint diff)
         {
@@ -137,7 +136,6 @@ namespace Drive_LFSS.Session_
 
             if (TIMER_PING_PONG < (TimerPingPong += diff))
             {
-                Log.progress(GetSessionNameForLog() + " Ping!\r\n");
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)));
                 ping.Sending(diff);
                 TimerPingPong = 0;
@@ -297,10 +295,17 @@ namespace Drive_LFSS.Session_
 
                 CommandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
             }
+            else if (_packet.chatUserType == Chat_User_Type.CHAT_USER_TYPE_SYSTEM)
+            {
+                Program.ircClient.SendToChannel(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
+                Log.chat(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
+            
+            }
             else
             {
                 Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + _driver.DriverName.Replace("^", "\x03") + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
                 Log.chat(GetSessionNameForLog() + " " + _driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
+            
             }
         }
         protected sealed override void processPacket(PacketREO _packet)     // Race Grid Order

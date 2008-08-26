@@ -94,6 +94,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_RST_RACE_START, new PacketRST());
             Add(Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE, new PacketSTA());
             Add(Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST());
+            Add(Packet_Type.PACKET_MSL_MESSAGE_TO_LOCAL, new PacketMSL());
             Add(Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, new PacketMTC());
             Add(Packet_Type.PACKET_LAP_DRIVER_LAP_TIME, new PacketLAP());
             Add(Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME, new PacketSPX());
@@ -367,11 +368,27 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSL
     {
-        internal byte packetSize;
-        internal byte packetType;
-        public byte ReqI;
-        public Chat_Console_Sound Sound;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x80)]public string Msg;
+        public PacketMSL(string _message, Message_Sound _sound)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_MSL;
+            packetType = Packet_Type.PACKET_MSL_MESSAGE_TO_LOCAL;
+            requestId = 0;
+            sound = _sound;
+            /*if (!_message.EndsWith("\x00"))
+            {
+                if (_message.Length > 126)
+                    _message = _message.Substring(0, _message.Length - 2);
+                _message += "\x00";
+            }*/
+            message = _message;
+            zero = 0;
+        }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
+        public byte requestId;
+        public Message_Sound sound;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=127)]public string message;
+        internal byte zero;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSO
     {
@@ -489,7 +506,7 @@ namespace Drive_LFSS.Packet_
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string driverName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string carName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string SName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string skinName;
         public Car_Tyres tyreRearLeft;
         public Car_Tyres tyreRearRight;
         public Car_Tyres tyreFrontLeft;

@@ -123,7 +123,6 @@ namespace Drive_LFSS.Game_
         private bool adminFlag = false;
         private string driverName = "";
         private byte driverModel = 0;
-        private byte driverGender = 0;
         public Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
         private Session session;

@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- * This File Original Author: Gilad Lavian
  */
 
 using System;
@@ -31,11 +30,6 @@ namespace Drive_LFSS.Irc_
     using Drive_LFSS.Config_;
     using Drive_LFSS.Log_;
 
-    public enum ServerType
-    {
-        Regular,
-        Special
-    }
     public sealed class IrcClient
     {
         public IrcClient()
@@ -60,7 +54,6 @@ namespace Drive_LFSS.Irc_
         private Socket socket;
         private IrcServerInfo ircServerInfo = null;
         private Thread thrdListener;
-        private Thread thrdPinger;
         private bool registrationSend = false;
 
         public bool IsConnected
@@ -72,28 +65,20 @@ namespace Drive_LFSS.Irc_
 
         public void Connect()
         {
-            IPEndPoint iepLocal = new IPEndPoint(IPAddress.Any, 0);
-            IPEndPoint iepRemote = new IPEndPoint(ircServerInfo.ServerHostName, ircServerInfo.Port);
-            DoConnect(iepLocal, iepRemote);
-        }
-        private void DoConnect(IPEndPoint iepLocal, IPEndPoint iepRemote)
-        {
             try
-            {
+            {  
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                socket.Bind(iepLocal);
-                socket.Connect(iepRemote);
+                socket.Bind(new IPEndPoint(IPAddress.Any, 0));
+                socket.Connect(new IPEndPoint(ircServerInfo.ServerHostName, ircServerInfo.Port));
             }
-            catch (Exception){}
+            catch (Exception _exception)
+            {
+                Log.error("IRC Connection: "+_exception.Message+"\r\n");
+                return;
+            }
 
-            //Start listening to incoming sockect data from server
             thrdListener = new Thread(new ThreadStart(StartSocketListening));
-            thrdListener.IsBackground = true;
             thrdListener.Start();
-
-            //Start pinging the server to keep connection alive
-            thrdPinger = new Thread(new ThreadStart(RunPinging));
-            thrdPinger.Start();
         }
         private void SendRegistration()
         {
@@ -105,7 +90,7 @@ namespace Drive_LFSS.Irc_
         {
             SendServerData("PONG " + data);
 
-            SendServerData("JOIN #test"); // for debug purpose will need to be at is right place.
+            SendServerData("JOIN #"+ircServerInfo.Channel); // for debug purpose will need to be at is right place.
             registrationSend = false;
         }
         public void Disconnect()
@@ -118,64 +103,36 @@ namespace Drive_LFSS.Irc_
             }
 
             thrdListener.Join();
-            thrdPinger.Join();
         }
 
         #endregion
 
-        #region Thread
-        //heu??? a thread for a ping... is that so important, lol... let get rid of this.
-        private void RunPinging()
-        {
-            uint pingTimer = 8000;
-            while (socket != null && socket.Connected && Program.MainRun)
-            {
-                if ((pingTimer += 100) > 10000)
-                {
-                    SendServerData(string.Format("PING : {0}", ircServerInfo.ServerHostName));
-                    pingTimer = 0;
-                }
-                Thread.Sleep(100);
-            }
-        }
         private void StartSocketListening()
         {
-
-            if (socket == null || !socket.Connected) 
-                return;
-
-            string input = null;
-
             if (socket.Poll(-1, SelectMode.SelectRead))
             {
+                const int sleepTimer = 40;
+                const uint TIMER_PING_PONG = 8000;
+                uint TimerPingPong = 6000;
+
                 while (socket.Connected && Program.MainRun)
                 {
-                    while (!string.IsNullOrEmpty((input = GetRecievedServerData(socket))))
+                    if (TIMER_PING_PONG < (TimerPingPong += sleepTimer))
                     {
-                        ProcessData(input);
-                        input = null;
+                        SendServerData("PING :"+ ircServerInfo.ServerHostName);
+                        TimerPingPong = 0;
                     }
-                    Thread.Sleep(50);
+                    if(socket.Available > 0)
+                    {
+                        byte[] buffer = new byte[socket.Available];
+                        int bytesRead = socket.Receive(buffer);
+                        ProcessData(Encoding.Default.GetString(buffer, 0, bytesRead));
+                    }
+                    Thread.Sleep(sleepTimer);
                 }
             }
 
         }
-        private string GetRecievedServerData(Socket socket)
-        {
-            if (socket == null || !socket.Connected) 
-                return string.Empty;
-
-            string data = string.Empty;
-
-            byte[] buffer = new byte[socket.Available];
-            int bytesRead = socket.Receive(buffer);
-
-            data = Encoding.Default.GetString(buffer, 0, bytesRead);
-
-            return data;
-        }
-        #endregion
-
         private void ProcessData(string rawLine)
         {
             string[] rawLines = rawLine.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
