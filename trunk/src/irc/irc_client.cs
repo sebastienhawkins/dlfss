@@ -229,7 +229,7 @@ namespace Drive_LFSS.Irc_
                     } break;
                     case Irc_Command.PRIVMSG:
                     {
-                        rawDatas = rawDatas[1].Split(new char[] { ':' });
+                        rawDatas = rawDatas[1].Split(new char[] { ':' },2);
                         ircMessage.to = rawDatas[0].TrimEnd();
                         ircMessage.data = rawDatas[1];
                         if (ircMessage.to[0] == '#')
@@ -238,16 +238,28 @@ namespace Drive_LFSS.Irc_
                             ReceiveFromNick(ircMessage.data, ircMessage.from.Split(new char[]{'!'})[0]);
 
                     } break;
-                    case Irc_Command.REPLY_CODE:
+                    case Irc_Command.NOTICE:
                     {
-                        switch (ircMessage.replyCode)
-                        {
-                            case Irc_Reply_Code.NOT_REGISTERED:
-                            {
-                                SendRegistration();
-                            } break;
-                        }
+                        
                     } break;
+                    case Irc_Command.JOIN:
+                    {
+
+                    } break;
+                    case Irc_Command.MODE:
+                    {
+
+                    } break;
+                    case Irc_Command.REPLY_CODE:
+                        {
+                            switch (ircMessage.replyCode)
+                            {
+                                case Irc_Reply_Code.NOT_REGISTERED:
+                                    {
+                                        SendRegistration();
+                                    } break;
+                            }
+                        } break;
                     default:
                     {
                         Log.missingDefinition("Mirc Missing Definition for Command: " + ircMessage.commands[0] + "\r\n");
@@ -278,7 +290,7 @@ namespace Drive_LFSS.Irc_
         public void ReceiveFromChannel(string message, string from ,string forChannel)
         {
             Log.chat("[IRC!" + from + forChannel + "> " + message + "\r\n");
-            Drive_LFSS.CommandConsole_.CommandConsole.Exec("say all [IRC!" + from + forChannel + "> " + message);
+            Drive_LFSS.CommandConsole_.CommandConsole.Exec("say all [IRC!" + from + forChannel + "> " + message.Replace("\x03","^"));
         }
         public void ReceiveFromNick(string message, string from)
         {

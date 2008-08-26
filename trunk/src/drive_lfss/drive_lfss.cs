@@ -154,7 +154,13 @@ namespace Drive_LFSS
             SessionList.ConfigApply( );
             
             //Session.InitializeServerList();
-            Log.normal("Starting Normal Operation!\r\n\r\n");
+            Log.normal("DEPART|");
+            for (float itr = 200; (itr /= 1.1f) > 1;)
+            {
+                Log.progress(".");
+                System.Threading.Thread.Sleep((int)itr);
+            }
+            Log.normal("|FINISH\r\n\r\n");
 
             #region MainThread update
 

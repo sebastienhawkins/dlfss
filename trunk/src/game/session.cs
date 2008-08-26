@@ -299,7 +299,8 @@ namespace Drive_LFSS.Session_
             }
             else
             {
-                Log.chat(GetSessionNameForLog() + " " +_driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart) + "\r\n");
+                Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + _driver.DriverName.Replace("^", "\x03") + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
+                Log.chat(GetSessionNameForLog() + " " + _driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
             }
         }
         protected sealed override void processPacket(PacketREO _packet)     // Race Grid Order

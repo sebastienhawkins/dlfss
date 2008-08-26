@@ -84,7 +84,6 @@
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="irc\enum.cs" />
-    <Compile Include="irc\server_info.cs" />
     <Compile Include="irc\irc_client.cs" />
     <Compile Include="network\packet\enum.cs" />
     <Compile Include="network\packet\handler.cs" />
