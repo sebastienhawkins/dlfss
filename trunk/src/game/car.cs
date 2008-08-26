@@ -32,6 +32,7 @@ namespace Drive_LFSS.Game_
         }
         ~Car()
         {
+            if (true == false) { }
         }
         new protected void Init(PacketNCN _packet)
         {

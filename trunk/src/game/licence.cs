@@ -27,7 +27,8 @@ namespace Drive_LFSS.Game_
         {
         }
         ~Licence() 
-        { 
+        {
+            if (true == false) { }
         }
         protected void Init(PacketNCN _packet)
         {

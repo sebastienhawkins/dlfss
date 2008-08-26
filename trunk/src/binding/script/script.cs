@@ -6,6 +6,13 @@ namespace Drive_LFSS.Script_
 {
     public sealed class Script
     {
+        public Script()
+        {
+        }
+        ~Script()
+        {
+            if (true == false) { }
+        }
         public bool RaceStart()
         {
             return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!

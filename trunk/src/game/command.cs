@@ -33,7 +33,10 @@ namespace Drive_LFSS.Server_
             command["exit"] = new CommandName(0, new CommandDelegate(Exit));
             command["kick"] = new CommandName(0, new CommandDelegate(Kick));
         }
-        
+        ~CommandInGame()
+        {
+            if (true == false) { }
+        }
         private string serverName;
         private struct CommandName
         {

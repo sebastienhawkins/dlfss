@@ -76,7 +76,10 @@ namespace Drive_LFSS.InSim_
                 threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
             }
         }
-
+        ~InSim()
+        {
+            if (true == false) { }
+        }
         private InSim_Socket_State socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
         private InSimSetting inSimSetting;
         private bool runThreadSocketReceive = false;

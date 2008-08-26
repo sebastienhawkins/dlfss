@@ -43,6 +43,7 @@ namespace Drive_LFSS.Game_
         }
         ~Race()
         {
+            if (true == false) { }
         }
         public static void ConfigApply()
         {

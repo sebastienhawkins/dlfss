@@ -36,6 +36,10 @@ namespace Drive_LFSS.PacketStore_
             tcpReceivedQueud = new List<Packet>();
             tcpSendingQueud = new List<Packet>();
         }
+        ~Store()
+        {
+            if (true == false) { }
+        }
         protected PacketStructureList struturedPacket;
         private List<Packet> udpReceivedQueud;      //Replace List with Queud
         private List<Packet> udpSendingQueud;       //Replace List with Queud

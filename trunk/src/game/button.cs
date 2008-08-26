@@ -25,8 +25,12 @@ namespace Drive_LFSS.Game_
 
     public abstract class Button 
     {
-        public Button() { }
-        ~Button() { }
+        public Button() 
+        { }
+        ~Button() 
+        {
+            if (true == false) { }
+        }
 
         private List<byte> permanentList = new List<byte>();
         private List<byte> nonPermanentList = new List<byte>();

@@ -23,6 +23,13 @@ namespace Drive_LFSS.Packet_
 
     public abstract class PacketHandler : Store
     {
+        public PacketHandler()
+        {
+        }
+        ~PacketHandler()
+        {
+            if (true == false) { }
+        }
         public void ProcessPacket(Packet_Type _packetType, object _packet)
         {
             switch (_packetType)

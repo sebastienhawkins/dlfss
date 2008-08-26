@@ -25,7 +25,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-
 namespace Drive_LFSS.Irc_
 {
     using Drive_LFSS.Irc_.Data_;
@@ -41,22 +40,28 @@ namespace Drive_LFSS.Irc_
     {
         public IrcClient()
         {
-            this.eOnConnect += new ConnectHandler(IrcClient_OnConnect);
-            this.eOnServerText += new ServerTextHandler(IrcClient_OnServerText);
+        }
+        ~IrcClient()
+        {
+            if (true == false) { }
         }
         public void ConfigApply()
         {
             string[] confvalue = Config.GetStringValue("mIRC", "ConnectionInfo").Split(new char[]{';'});
             if (confvalue.Length != 7)
                 throw new Exception("mIRC.ConnectionInfo has a Bad Value count\r\n");
+            IPAddress  ipAddress;
+            try{ipAddress = IPAddress.Parse(confvalue[0]);}
+            catch(Exception){ipAddress = Dns.GetHostAddresses(confvalue[0])[0];}
 
-            ircServerInfo = new IrcServerInfo(confvalue[0],Convert.ToUInt16(confvalue[1]),confvalue[2],confvalue[3],confvalue[4],confvalue[5],Convert.ToUInt16(confvalue[6]));
+            ircServerInfo = new IrcServerInfo(ipAddress, Convert.ToUInt16(confvalue[1]), confvalue[2], confvalue[3], confvalue[4], confvalue[5], Convert.ToUInt16(confvalue[6]));
         }
 
-        protected Socket socket;
-        protected IrcServerInfo ircServerInfo = null;
-        protected Thread thrdListener;
-        protected Thread thrdPinger;
+        private Socket socket;
+        private IrcServerInfo ircServerInfo = null;
+        private Thread thrdListener;
+        private Thread thrdPinger;
+        private bool registrationSend = false;
 
         public bool IsConnected
         {
@@ -67,8 +72,8 @@ namespace Drive_LFSS.Irc_
 
         public void Connect()
         {
-            IPEndPoint iepLocal = CreateEndPoint(IPAddress.Any, 0);
-            IPEndPoint iepRemote = CreateEndPoint(ircServerInfo.ServerHostName, ircServerInfo.Port);
+            IPEndPoint iepLocal = new IPEndPoint(IPAddress.Any, 0);
+            IPEndPoint iepRemote = new IPEndPoint(ircServerInfo.ServerHostName, ircServerInfo.Port);
             DoConnect(iepLocal, iepRemote);
         }
         private void DoConnect(IPEndPoint iepLocal, IPEndPoint iepRemote)
@@ -78,26 +83,9 @@ namespace Drive_LFSS.Irc_
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 socket.Bind(iepLocal);
                 socket.Connect(iepRemote);
+            }
+            catch (Exception){}
 
-                if (eOnConnect != null)
-                    eOnConnect(ircServerInfo.NickName);
-            }
-            catch (Exception)
-            {
-                if (eOnConnectFailed != null)
-                    eOnConnectFailed(ircServerInfo.NickName);
-            }
-        }
-        
-        //This function suck and is incomplete.
-        private void InitializeServerNegotiation()
-        {
-            SendServerData("NICK "+ircServerInfo.NickName); //Rght after this, server should send us a PING :0F0F0F0F id , important we return with a PONG
-            SendServerData("USER "+ircServerInfo.NickName+" *!* * :Drive Live For Speed Server");
-            //SendServerData(string.Format(ConstCommands.JOIN, ircServerInfo.Channel));
-        }
-        private void IrcClient_OnConnect(string userName)
-        {
             //Start listening to incoming sockect data from server
             thrdListener = new Thread(new ThreadStart(StartSocketListening));
             thrdListener.IsBackground = true;
@@ -107,53 +95,36 @@ namespace Drive_LFSS.Irc_
             thrdPinger = new Thread(new ThreadStart(RunPinging));
             thrdPinger.Start();
         }
-        private void IrcClient_OnServerText(string serverText)
+        private void SendRegistration()
         {
-            ServerEventData eventData = EventInputHandler.GetServerEventData(serverText, ircServerInfo);
+            SendServerData("NICK " + ircServerInfo.NickName);
+            SendServerData("USER " + ircServerInfo.NickName + " *!* * :Drive Live For Speed Server");
+            registrationSend = true;
+        }
+        private void CompleteRegistration(string data)
+        {
+            SendServerData("PONG " + data);
 
-            switch (eventData.EventType)
-            {
-                case ServerEventType.ConnectionStart:
-                    InitializeServerNegotiation();
-                    break;
-                case ServerEventType.Unknown:
-                    break;
-                case ServerEventType.Join:
-                    break;
-                case ServerEventType.Past:
-                    break;
-                case ServerEventType.ChannelMessage:
-                    break;
-                case ServerEventType.PrivateMessage:
-                    break;
-                case ServerEventType.NicknameChanged:
-                    break;
-                default:
-                    break;
-            }
+            SendServerData("JOIN #test"); // for debug purpose will need to be at is right place.
+            registrationSend = false;
         }
         public void Disconnect()
         {
             if (socket.Connected)
             {
-                //Quite session within server
                 SendServerData("QUIT");
-
-                //Kill all proccess and abort threads
-                thrdListener.Join();
-                thrdPinger.Join();
-
                 if (socket != null && !socket.Connected)
                     socket.Close();
             }
 
-            if (eOnDisconnect != null)
-                eOnDisconnect(ircServerInfo.NickName);
+            thrdListener.Join();
+            thrdPinger.Join();
         }
 
         #endregion
 
         #region Thread
+        //heu??? a thread for a ping... is that so important, lol... let get rid of this.
         private void RunPinging()
         {
             uint pingTimer = 8000;
@@ -181,9 +152,7 @@ namespace Drive_LFSS.Irc_
                 {
                     while (!string.IsNullOrEmpty((input = GetRecievedServerData(socket))))
                     {
-                        if (eOnServerText != null)
-                            eOnServerText(input);
-
+                        ProcessData(input);
                         input = null;
                     }
                     Thread.Sleep(50);
@@ -207,94 +176,219 @@ namespace Drive_LFSS.Irc_
         }
         #endregion
 
-        public void SendServerData(string data)
+        private void ProcessData(string rawLine)
+        {
+            string[] rawLines = rawLine.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string rawData = "";
+
+            IrcMessage ircMessage;
+
+            for (byte lineCount = 0; lineCount < rawLines.Length; lineCount++)
+            {
+                rawData = rawLines[lineCount];
+                ircMessage = new IrcMessage();
+
+                //:from
+                string[] rawDatas = rawData.Split(new char[] { ' ' }, 2);
+                if (rawDatas[0][0] == ':')
+                {
+                    ircMessage.from = rawDatas[0].Substring(1); //Rip off the ':'
+                    rawDatas = rawDatas[1].Split(new char[] { ' ' }, 2);
+                }
+                //Command or Reply Code
+                try
+                {
+                    ircMessage.replyCode = (Irc_Reply_Code)Convert.ToUInt16(rawDatas[0]);
+                    ircMessage.commands[0] = Irc_Command.REPLY_CODE;
+
+                    rawDatas = rawDatas[1].Split(new char[] { ' ' }, 2);
+                }
+                catch (Exception)
+                { ircMessage.commands[0] = ToCommandType(rawDatas[0]); }
+
+
+                if (ircMessage.commands[0] == Irc_Command.NONE ||
+                    ircMessage.commands[0] == Irc_Command.UNKNOW)
+                {
+                    Log.missingDefinition("Mirc Command is '" + rawDatas[0] + "', Detected as:" + ircMessage.commands[0] + "\r\n");
+                    continue;
+                }
+                switch (ircMessage.commands[0])
+                {
+                    case Irc_Command.PONG:
+                    {
+                        rawDatas = rawDatas[1].Split(new char[] { ':' }, 2);
+                        ircMessage.to = rawDatas[0];
+                        ircMessage.data = rawDatas[1];
+                    } break;
+                    case Irc_Command.PING:
+                    {
+                        ircMessage.data = rawDatas[1];
+                        if (registrationSend)
+                            CompleteRegistration(ircMessage.data);
+                    } break;
+                    case Irc_Command.PRIVMSG:
+                    {
+                        rawDatas = rawDatas[1].Split(new char[] { ':' });
+                        ircMessage.to = rawDatas[0].TrimEnd();
+                        ircMessage.data = rawDatas[1];
+                        if (ircMessage.to[0] == '#')
+                            ReceiveFromChannel(ircMessage.data, ircMessage.from.Split(new char[] { '!' })[0], ircMessage.to);
+                        else
+                            ReceiveFromNick(ircMessage.data, ircMessage.from.Split(new char[]{'!'})[0]);
+
+                    } break;
+                    case Irc_Command.REPLY_CODE:
+                    {
+                        switch (ircMessage.replyCode)
+                        {
+                            case Irc_Reply_Code.NOT_REGISTERED:
+                            {
+                                SendRegistration();
+                            } break;
+                        }
+                    } break;
+                    default:
+                    {
+                        Log.missingDefinition("Mirc Missing Definition for Command: " + ircMessage.commands[0] + "\r\n");
+                        ircMessage.data = String.Concat(rawDatas);
+                    } break;
+                }
+
+                //Log.debug("From: " + ircMessage.from + ", To:" + ircMessage.to + ", Command[0]:" + ircMessage.commands[0] + ", Command[1]:" + ircMessage.commands[1] + ", Command[2]:" + ircMessage.commands[2] + ", ReplyCode:" + ircMessage.replyCode + ", Data:" + ircMessage.data + "\r\n");
+            }
+        }
+        private void SendServerData(string data)
         {
             if (socket == null || !socket.Connected) return;
 
             byte[] buffer = null;
-
-            //If its server command
-            /*if (data.StartsWith("/"))
-            {
-                string[] clientInput = data.Split(' ');
-
-                switch (clientInput[0].ToLower())
-                {
-                    case "/join":
-                        buffer = Encoding.ASCII.GetBytes(string.Format(ConstCommands.JOIN, clientInput[1]) + Environment.NewLine);
-                        break;
-
-                    case "/part":
-                        buffer = Encoding.ASCII.GetBytes(string.Format(ConstCommands.PART, clientInput[1]) + Environment.NewLine);
-                        break;
-
-                    case "/nick":
-                        buffer = Encoding.ASCII.GetBytes(string.Format(ConstCommands.NICK, clientInput[1]) + Environment.NewLine);
-                        break;
-
-                    default:
-                        return;
-                }
-            }
-            else*/
-            {
-                buffer = Encoding.ASCII.GetBytes(data + "\r\n");
-            }
+            buffer = Encoding.ASCII.GetBytes(data + "\r\n");
 
             socket.Send(buffer);
 
-            if (eOnDataSend != null)
-                eOnDataSend(data);
+            //Log.debug("Send Data:"+data+"\r\n");
         }
-
-        public void OnDisconnect(string userName)
+        
+        
+        public void SendToChannel(string message)
         {
-
+            SendServerData("PRIVMSG #"+ircServerInfo.Channel+" :"+message);
         }
-        public void OnDataSend(string data)
+        public void ReceiveFromChannel(string message, string from ,string forChannel)
         {
-
+            Log.chat("[IRC!" + from + forChannel + "> " + message + "\r\n");
+            Drive_LFSS.CommandConsole_.CommandConsole.Exec("say all [IRC!" + from + forChannel + "> " + message);
         }
-        public void OnConnect(string userName)
+        public void ReceiveFromNick(string message, string from)
         {
-            Log.chat("Irc Client Connected with username: "+userName+"\r\n");
+            Log.chat("[IRC!" + from + "> " + message + "\r\n");
         }
-        public void OnServerText(string serverText)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        private Irc_Command ToCommandType(string _command)
         {
-            //This is the missing part for a sucess user Registration on IRC server
-            if (serverText.StartsWith("PING :"))
+            if (ircCommandMap.ContainsKey(_command))
+                return ircCommandMap[_command];
+            else
+                return Irc_Command.UNKNOW;
+        }
+        private static Dictionary<string,Irc_Command> ircCommandMap = new Dictionary<string,Irc_Command>()
+        {
+            {"NOTICE", Irc_Command.NOTICE},
+            {"AUTH", Irc_Command.AUTH},
+            {"PING", Irc_Command.PING},
+            {"PONG", Irc_Command.PONG},
+            {"INFO", Irc_Command.INFO},
+            {"PRIVMSG", Irc_Command.PRIVMSG},
+            {"JOIN", Irc_Command.JOIN},
+            {"MODE", Irc_Command.MODE},
+        };
+        private class IrcMessage
+        {
+            public IrcMessage()
             {
-                SendServerData("PONG " + serverText.Split(new char[]{':'})[1]);
-                SendServerData("JOIN #"+ircServerInfo.Channel);
             }
-            Log.chat(serverText + "\r\n");
+            ~IrcMessage()
+            {
+                if (true == false) { }
+            }
+            public string from = "";
+            public string to = "";
+            public string data = "";
+            public Irc_Command[] commands = new Irc_Command[] { Irc_Command.NONE, Irc_Command.NONE, Irc_Command.NONE };
+            public Irc_Reply_Code replyCode = Irc_Reply_Code.NONE;
+        }
+    }
+}
+namespace Drive_LFSS.Irc_.Data_
+{
+    public class IrcServerInfo
+    {
+        private IPAddress _serverHostName;
+        private int _port;
+        private string _nickName;
+        private string _fullName;
+        private string _emailAddress;
+        private string _channel;
+        private ushort _configFlag;
+
+        public IPAddress ServerHostName
+        {
+            get { return _serverHostName; }
         }
 
-        #region IRC Event Handlers
-        public event ConnectHandler eOnConnect;
-        public event ConnectHandler eOnConnectFailed;
-        public event DisconnectHandler eOnDisconnect;
-        public event JoinHandler eOnJoin;
-        public event PartHandler eOnPart;
-        public event ChannelMessageHandler eOnChannelMessage;
-        public event PrivateMessageHandler eOnPrivateMessage;
-        public event ServerTextHandler eOnServerText;
-        public event NicknameChangeHandler eOnNicknameChanged;
-        public event PingHandler eOnPing;
-        public event DataSendHandler eOnDataSend;
-        #endregion
+        public int Port
+        {
+            get { return _port; }
+        }
 
-        #region Create IP EndPoint
-        IPEndPoint CreateEndPoint(IPAddress ipAddress, int port)
+        public string NickName
         {
-            return new IPEndPoint(ipAddress, 0);
+            get { return _nickName; }
+            set { _nickName = value; }
         }
-        IPEndPoint CreateEndPoint(string serverHostName, int port)
+
+        public string FullName
         {
-            long ipAddress;
-            long.TryParse(Dns.Resolve(serverHostName).AddressList[0].Address.ToString(), out ipAddress);
-            return new IPEndPoint(ipAddress, port);
+            get { return _fullName; }
         }
-        #endregion
+
+        public string EmailAddress
+        {
+            get { return _emailAddress; }
+        }
+
+        public string Channel
+        {
+            get { return _channel; }
+        }
+        public ushort ConfigFlag
+        {
+            get { return _configFlag; }
+        }
+        public IrcServerInfo(IPAddress serverHostName, ushort port, string nickName, string fullName, string emailAddress, string channel, ushort configFlag)
+        {
+            this._serverHostName = serverHostName;
+            this._port = port;
+            this._nickName = nickName;
+            this._fullName = fullName;
+            this._emailAddress = emailAddress;
+            this._channel = channel;
+            this._configFlag = configFlag;
+        }
     }
 }

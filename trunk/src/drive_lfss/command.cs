@@ -100,7 +100,7 @@ namespace Drive_LFSS.CommandConsole_
             }
             else if (args[1] == "irc")
             {
-                Program.ircClient.SendServerData(message);
+                Program.ircClient.SendToChannel(message);
             }
             else
             {

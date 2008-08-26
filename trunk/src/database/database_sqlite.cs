@@ -65,7 +65,7 @@ namespace Drive_LFSS.Database_
         public void CancelCommand()
         {
             try { lock (command) { command.Cancel(); } }
-            catch (Exception _exception) { }
+            catch (Exception) { }
         }
         public IDataReader ExecuteQuery(string _command)
         {

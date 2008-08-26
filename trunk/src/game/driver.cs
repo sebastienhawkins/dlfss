@@ -36,6 +36,7 @@ namespace Drive_LFSS.Game_
         }
         ~Driver()
         {
+            if (true == false) { }
         }
         public static void ConfigApply()
         {

@@ -29,9 +29,9 @@ namespace Drive_LFSS.Config_
         Config()
         {
         }
-        ~Config()   //This will make Sure Finalize is called for Compilant class and all Object are destroyed.
+        ~Config()
         {
-            if (true == false) { } //Finalize won't call destructor if empty.
+            if (true == false) { }
         }
         private static Dictionary<string, object> confValue = new Dictionary<string, object>();
         private static Regex rgxIdentifier = new Regex(@"^([a-z0-9]+){1}\.{0,1}([a-z0-9]+){0,1}\.{0,1}([a-z0-9]+){0,1}\.{0,1}([a-z0-9]+){0,1}\s*=\s*([^\s#\r\n]+[^#\r\n]*[^\s#\r\n]{1}|[^\s#\r\n]*){0,1}", RegexOptions.IgnoreCase);

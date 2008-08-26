@@ -140,7 +140,10 @@ namespace Drive_LFSS
             Log.normal("Initializating mIRC Client...\r\n");
             string isActivated = Config.GetStringValue("mIRC", "Activate").ToLowerInvariant();
             if (isActivated == "yes" || isActivated == "1" || isActivated == "true" || isActivated == "on" || isActivated == "activate")
-                IrcConnect();
+            {
+                ircClient.ConfigApply();
+                ircClient.Connect();
+            }
             else
                 Log.commandHelp("  mIRC Client is Disable.\r\n");
             Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
@@ -211,19 +214,6 @@ namespace Drive_LFSS
                 CommandConsole.Exec(consoleText);
                 System.Threading.Thread.Sleep(200);
             }
-        }
-        private static void IrcConnect()
-        {
-            ircClient.ConfigApply();
-
-            //This is simply Sucking CPU for no purpose into that project... have to get rid of this.
-            //Subscribe to the irc server events
-            ircClient.eOnServerText += new ServerTextHandler(ircClient.OnServerText);
-            ircClient.eOnConnect += new ConnectHandler(ircClient.OnConnect);
-            ircClient.eOnDataSend += new DataSendHandler(ircClient.OnDataSend);
-            ircClient.eOnDisconnect += new DisconnectHandler(ircClient.OnDisconnect);
-
-            ircClient.Connect();
         }
         private static void ConsoleExitTimer()
         {

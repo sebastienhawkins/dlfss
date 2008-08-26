@@ -46,6 +46,7 @@ namespace Drive_LFSS.Session_
         }
         ~Session()
         {
+            if (true == false) { }
         }
         new public void ConfigApply()
         {
@@ -324,8 +325,8 @@ namespace Drive_LFSS.Session_
             base.processPacket(_packet);
             if (_packet.currentCarId == 0)
                 race.Init(_packet);
-            else
-                ;//driver Case
+            //else
+            //    ;//driver Case
 
         }  // State Change race/car
         protected sealed override void processPacket(PacketTiny _packet)
@@ -358,7 +359,7 @@ namespace Drive_LFSS.Session_
                         case Vote_Action.VOTE_RESTART:
                             break;
                     }
-                    Log.debug("processPacket(PacketSmall _packet), Vote Action: " + (Vote_Action)_packet.uintValue + "\r\n"); break;
+                    Log.debug("processPacket(PacketSmall _packet), Vote Action: " + (Vote_Action)_packet.uintValue + "\r\n");
                 } break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;
             }
