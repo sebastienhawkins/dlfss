@@ -60,6 +60,7 @@ namespace Drive_LFSS.Game_
 
             //Removing This Site banner
             RemoveButton((ushort)Button_Entry.BANNER);
+            RemoveGui((ushort)Gui_Entry.MOTD);
         }  //When joining Race
         public void ProcessCarInformation(CarInformation _carInformation)
         {

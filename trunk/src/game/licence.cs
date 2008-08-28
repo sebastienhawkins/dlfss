@@ -20,6 +20,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Script_;
+    using Drive_LFSS.Storage_;
 
     public abstract class Licence : Button, ILicence
 	{
@@ -34,6 +35,13 @@ namespace Drive_LFSS.Game_
         {
             licenceName = _packet.licenceName;
             licenceId = _packet.tempLicenceId;
+
+            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)Gui_Entry.MOTD);
+
+            for (byte itr = 0; ++itr < 5; )
+                SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
+
+           SendGui(guiInfo);
         }
         protected void Init(PacketNPL _packet)
         {

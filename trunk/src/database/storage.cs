@@ -148,27 +148,29 @@ namespace Drive_LFSS.Storage_
                 return null;
         }
     }
-    public sealed class ButtonTemplateInfo
+    public sealed class ButtonTemplateInfo : ICloneable
     {
         public ButtonTemplateInfo(object[] rowInfos)
         {
             entry = Convert.ToUInt16(rowInfos[0]);
-            description = (string)(rowInfos[1]);
-            styleMask = (Button_Styles_Flag)Convert.ToUInt16(rowInfos[2]);
-            isAllwaysVisible = Convert.ToUInt16(rowInfos[3]) > 0 ? true : false;
-            maxInputChar = (byte)Convert.ToUInt16(rowInfos[4]);
-            left = (byte)Convert.ToUInt16(rowInfos[5]);
-            top = (byte)Convert.ToUInt16(rowInfos[6]);
-            width = (byte)Convert.ToUInt16(rowInfos[7]);
-            height = (byte)Convert.ToUInt16(rowInfos[8]);
-            text = (string)rowInfos[9];
+            styleMask = (Button_Styles_Flag)Convert.ToUInt16(rowInfos[1]);
+            isAllwaysVisible = Convert.ToUInt16(rowInfos[2]) > 0 ? true : false;
+            maxInputChar = (byte)Convert.ToUInt16(rowInfos[3]);
+            left = (byte)Convert.ToUInt16(rowInfos[4]);
+            top = (byte)Convert.ToUInt16(rowInfos[5]);
+            width = (byte)Convert.ToUInt16(rowInfos[6]);
+            height = (byte)Convert.ToUInt16(rowInfos[7]);
+            text = (string)rowInfos[8];
         }
         ~ButtonTemplateInfo()
         {
             if (true == false) { }
         }
+        public object Clone() // ICloneable implementation
+        {
+            return this.MemberwiseClone() as ButtonTemplateInfo;
+        }
         private ushort entry;
-        private string description;
         private Button_Styles_Flag styleMask;
         private bool isAllwaysVisible;
         private byte maxInputChar;
@@ -181,10 +183,6 @@ namespace Drive_LFSS.Storage_
         public ushort Entry
         {
             get { return entry; }
-        }
-        public string Description
-        {
-            get { return description; }
         }
         public Button_Styles_Flag StyleMask
         {
@@ -214,12 +212,67 @@ namespace Drive_LFSS.Storage_
         public byte Width
         {
             get { return width; }
-            set { Width = value; }
+            set { width = value; }
         }
         public byte Height
         {
             get { return height; }
             set { height = value; }
+        }
+        public string Text
+        {
+            get { return text; }
+            set { text = value; }
+        }
+    }
+
+    public sealed class GuiTemplate : Storage
+    {
+        public GuiTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~GuiTemplate()
+        {
+            if (true == false) { }
+        }
+        new public GuiTemplateInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new GuiTemplateInfo(_temp);
+            else
+                return null;
+        }
+    }
+    public sealed class GuiTemplateInfo
+    {
+        public GuiTemplateInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt16(rowInfos[0]);
+            buttonEntry = (string)rowInfos[1];
+            textButtonEntry = Convert.ToUInt16(rowInfos[2]);
+            text = (string)rowInfos[3];
+        }
+        ~GuiTemplateInfo()
+        {
+            if (true == false) { }
+        }
+        private ushort entry;
+        private string buttonEntry;
+        private ushort textButtonEntry;
+        private string text;
+
+        public ushort Entry
+        {
+            get { return entry; }
+        }
+        public string ButtonEntry
+        {
+            get { return buttonEntry; }
+            set { buttonEntry = value; }
+        }
+        public ushort TextButtonEntry
+        {
+            get { return textButtonEntry; }
+            set { textButtonEntry = value; }
         }
         public string Text
         {

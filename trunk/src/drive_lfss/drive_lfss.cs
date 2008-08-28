@@ -54,9 +54,10 @@ namespace Drive_LFSS
         public static IDatabase dlfssDatabase = null;
 
         //Storage, All Storage FMT need a 'p' value, this is representing is Unique Index into the Array, the value must be a uint32
+        public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "pxuuuuuuus" });
+        public static readonly GuiTemplate guiTemplate = new GuiTemplate(new string[2] { "gui_template", "pxsus" });
         public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "pssuuuu" });
         public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssu" });
-        public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "psuuuuuuus" });
         public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psusuuuuu" });
         public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
         
@@ -130,6 +131,7 @@ namespace Drive_LFSS
             trackTemplate.Load(true);
             carTemplate.Load(true);
             buttonTemplate.Load(true);
+            guiTemplate.Load(true);
             raceTemplate.Load(false);
             driverBan.Load(false);
             Log.normal("Completed Initialize Storage.\r\n\r\n");

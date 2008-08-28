@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/08/23 04:09:15
+Date:                  2008/08/28 12:01:29
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -15,6 +15,7 @@ CREATE TABLE `button_template` (
   `entry` mediumint(8) unsigned NOT NULL,
   `description` varchar(255) default NULL,
   `style_mask` tinyint(3) unsigned NOT NULL default '0',
+  `is_allways_visible` tinyint(1) unsigned NOT NULL default '0',
   `max_input_char` tinyint(3) unsigned NOT NULL,
   `left` tinyint(3) unsigned NOT NULL,
   `top` tinyint(3) unsigned NOT NULL,
@@ -27,9 +28,14 @@ CREATE TABLE `button_template` (
 # Records for table button_template
 #----------------------------
 
+lock tables button_template write ;
 
-insert  into button_template (entry,description,style_mask,max_input_char,`left`,top,width,height,`text`) values 
-(1, 'banner', 0, 0, 10, 10, 80, 30, 'Aleajecta Testing');
+insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (1, 'banner', 66, 0, 0, 25, 189, 50, 12, '^7A^3leajecta') ;
+insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (2, 'motd background', 98, 1, 0, 0, 0, 200, 200, '') ;
+insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta') ;
+insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (5, 'motd button', 26, 1, 0, 75, 125, 50, 12, '^2Drive') ;
+insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, '') ;
+unlock tables ;
 #----------------------------
 # Table structure for car_template
 #----------------------------
@@ -107,6 +113,26 @@ CREATE TABLE `driver_lap` (
 # No records for table driver_lap
 #----------------------------
 
+#----------------------------
+# Table structure for gui_template
+#----------------------------
+drop table if exists gui_template;
+CREATE TABLE `gui_template` (
+  `entry` int(11) unsigned NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `button_entry` varchar(255) NOT NULL COMMENT 'space separated value',
+  `text_button_entry` mediumint(5) unsigned NOT NULL default '0',
+  `text` blob NOT NULL,
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#----------------------------
+# Records for table gui_template
+#----------------------------
+
+lock tables gui_template write ;
+
+insert  into gui_template (entry,description,button_entry,text_button_entry,`text`) values (1, 'motd', '2 3 5', 4, '^7Lorem Ipsum is simply dummy text of the printing and typesetting industry.\r\n^7Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, \r\n^7when an unknown printer took a galley of type and scrambled it to make a type specimen book.\r\n ^7It has survived not only five centuries, but also the leap into electronic typesetting,\r\n ^7remaining essentially unchanged. It was popularised in the 1960s with the release of\r\n ^7Letraset sheets containing Lorem Ipsum passages, and more recently with desktop\r\n^7 publishing software like Aldus PageMaker including versions of Lorem Ipsum.') ;
+unlock tables ;
 #----------------------------
 # Table structure for race
 #----------------------------

@@ -24,6 +24,13 @@ namespace Drive_LFSS.Definition_
     {
         NONE = 0,
         BANNER = 1,
+        MOTD_BACKGROUND = 2,
+        MOTD_BUTTON_DRIVE = 5,
+    }
+    public enum Gui_Entry : ushort
+    {
+        NONE = 0,
+        MOTD = 1,
     }
     public enum Button_Safe_Coord_Range
     {

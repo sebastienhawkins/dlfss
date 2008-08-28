@@ -388,11 +388,28 @@ namespace Drive_LFSS.Session_
         {
             base.processPacket(_packet);
             race.ProcessResult(_packet);
-        }
+        }  //Result, Confimation is only working for a race not qualify
         protected sealed override void processPacket(PacketFIN _packet)
         {
             base.processPacket(_packet);
             race.ProcessResult(_packet);
+        }  //Final Result
+        protected sealed override void processPacket(PacketBTC _packet)
+        {
+            
+            byte driverIndex = GetLicenceIndexNoBot(_packet.licenceId);
+
+            switch((Button_Entry)((Button)driverList[driverIndex]).GetButtonEntry(_packet.buttonId))
+            {
+                case Button_Entry.MOTD_BUTTON_DRIVE:
+                {
+                    ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
+                } break;
+                default:
+                {
+                    Log.error("We recevied a button ClickId, from unknow source, licenceName:" + driverList[driverIndex].LicenceName + "\r\n");
+                } break;
+            }
         }
         #endregion
 
@@ -425,6 +442,16 @@ namespace Drive_LFSS.Session_
             for (byte itr = 0; itr < count; itr++)
             {
                 if (((ILicence)driverList[itr]).LicenceId == _licenceId && ((IDriver)driverList[itr]).DriverName == _driverName)
+                    return itr;
+            }
+            return 0;
+        }
+        private byte GetLicenceIndexNoBot(byte _licenceId)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (!driverList[itr].IsBot())
                     return itr;
             }
             return 0;

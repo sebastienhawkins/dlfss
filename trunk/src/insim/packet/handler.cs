@@ -140,7 +140,7 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketBTC _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " BTC_ButtonClicked(), BTC -> UCID=" + _packet.licenceId + ",ClickID=" + _packet.buttonId + ", CFlags=" + _packet.clickMask + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " BTC_ButtonClicked(), extendedmask=" +_packet.extendedMask+", requestId="+_packet.requestId+", UCID=" + _packet.licenceId + ",ClickID=" + _packet.buttonId + ", CFlags=" + _packet.clickMask + "\r\n");
         }
         protected virtual void processPacket(PacketBTT _packet)
         {

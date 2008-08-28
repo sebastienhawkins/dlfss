@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+using System;
 using System.Collections.Generic;
 namespace Drive_LFSS.Game_
 {
@@ -24,7 +25,8 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Script_;
     using Drive_LFSS.Storage_;
     using Drive_LFSS.Log_;
-    public abstract class Button
+
+    public abstract class Button : IButton
     {
         private const byte BUTTON_MAX_COUNT = 240;
         public Button() 
@@ -40,39 +42,81 @@ namespace Drive_LFSS.Game_
             if (true == false) { }
         }
         private ushort[] buttonList = new ushort[BUTTON_MAX_COUNT];
-        private Dictionary<ushort, uint> buttonTimed = new Dictionary<ushort, uint>(BUTTON_MAX_COUNT);
+
+        private class ButtonTimed
+        {
+            public ButtonTimed(ushort _buttonEntry,uint _time)
+            {
+                buttonEntry = _buttonEntry;
+                time = _time;
+            }
+            ~ButtonTimed()
+            {
+                if (true == false) { }
+            }
+            private ushort buttonEntry;
+            private uint time;
+
+            public ushort ButtonEntry
+            {
+                get { return buttonEntry; }
+                set { buttonEntry = value; }
+            }
+            public uint Time
+            {
+                get { return time; }
+                set { time = value; }
+            }
+
+        }
+        private List<ButtonTimed> buttonTimedList = new List<ButtonTimed>(BUTTON_MAX_COUNT);
 
         protected virtual void update(uint diff)
         {
-            if (buttonTimed.Count > 0)
+            if (buttonTimedList.Count > 0)
             {
-                foreach (KeyValuePair<ushort, uint> keyPair in buttonTimed)
+                for (byte itr = 0; itr < buttonTimedList.Count; itr++ )
                 {
-                    if (keyPair.Value <= diff)
+                    if (buttonTimedList[itr].Time <= diff)
                     {
-                        buttonTimed[keyPair.Key] = 0;
-                        RemoveButton(keyPair.Key);
+                        buttonTimedList[itr].Time = 0;
+                        RemoveButton(buttonTimedList[itr].ButtonEntry);
                     }
                     else
-                        buttonTimed[keyPair.Key] -= diff;
+                        buttonTimedList[itr].Time -= diff;
                 }
-
-                Dictionary<ushort, uint>.Enumerator itr = buttonTimed.GetEnumerator();
-                while (itr.MoveNext())
+                List<ButtonTimed>.Enumerator clrItr = buttonTimedList.GetEnumerator();
+                while (clrItr.MoveNext())
                 {
-                    if (itr.Current.Value == 0)
+                    if (clrItr.Current.Time == 0)
                     {
-                        buttonTimed.Remove(itr.Current.Key);
-                        itr = buttonTimed.GetEnumerator();
+                        buttonTimedList.Remove(clrItr.Current);
+                        clrItr = buttonTimedList.GetEnumerator();
                     }
                 }
             }
         }
 
-        public void AddTimedButton(ushort buttonEntry, uint time, ButtonTemplateInfo buttonInfo)
+        public void RemoveGui(ushort guiEntry)
         {
-            SendButton(buttonInfo);
-            buttonTimed.Add(buttonEntry, time);
+            if (((Driver)this).IsBot())
+                return;
+
+            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry(guiEntry);
+            string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
+
+            System.Collections.IEnumerator itr = buttonEntrys.GetEnumerator();
+            ushort buttonEntry;
+            while (itr.MoveNext())
+            {
+                buttonEntry = System.Convert.ToUInt16(itr.Current);
+                RemoveButton(buttonEntry);
+            }
+            if (guiInfo.TextButtonEntry > 0 && guiInfo.Text.Length > 0)
+            {
+                RemoveButton(guiInfo.TextButtonEntry);
+            }
+
         }
         public void RemoveButton(ushort buttonEntry)
         {
@@ -80,32 +124,101 @@ namespace Drive_LFSS.Game_
                 return;
 
             byte buttonId = removeButtonEntry(buttonEntry);
-
-            ((Driver)this).Session.AddToTcpSendingQueud
-            (
-                new Packet
+            while (buttonId != 0xFF)
+            {
+                ((Driver)this).Session.AddToTcpSendingQueud
                 (
-                    Packet_Size.PACKET_SIZE_BFN,
-                    Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,
-                    new PacketBFN(((Driver)this).LicenceId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
-                )
-            );
+                    new Packet
+                    (
+                        Packet_Size.PACKET_SIZE_BFN,
+                        Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,
+                        new PacketBFN(((Driver)this).LicenceId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
+                    )
+                );
+                buttonId = removeButtonEntry(buttonEntry);
+            }
+        }
+
+        public void SendGui(ushort guiEntry)
+        {
+            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
+            SendGui(guiInfo);
+        }
+        public void SendGui(GuiTemplateInfo guiInfo)
+        {
+            if (((Driver)this).IsBot())
+                return;
+
+            string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
+            ButtonTemplateInfo buttonInfo;
+            
+            System.Collections.IEnumerator itr =  buttonEntrys.GetEnumerator();
+            ushort buttonEntry;
+            while (itr.MoveNext())
+            {
+                buttonEntry = System.Convert.ToUInt16(itr.Current);
+                buttonInfo = Program.buttonTemplate.GetEntry(buttonEntry);
+                SendButton(buttonInfo);
+            }
+            if (guiInfo.TextButtonEntry > 0 && guiInfo.Text.Length > 0)
+            {
+                buttonInfo = Program.buttonTemplate.GetEntry(guiInfo.TextButtonEntry);
+                ButtonTemplateInfo buttonInfoCopy;
+
+                string[] lines = guiInfo.Text.Split(new string[]{Environment.NewLine},StringSplitOptions.RemoveEmptyEntries);
+                for (byte lineItr = 0; lineItr < lines.Length; lineItr++)
+                {
+                    buttonInfoCopy = (ButtonTemplateInfo)buttonInfo.Clone();
+                    buttonInfoCopy.Top = (byte) (((lineItr) * buttonInfoCopy.Height) + buttonInfoCopy.Top + 1);
+                    buttonInfoCopy.Text = lines[lineItr];
+                    SendButton(buttonInfoCopy);
+                }
+            }
+        }
+        public void AddTimedButton(ushort buttonEntry, uint time)
+        {
+            ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry(buttonEntry);
+            AddTimedButton(time, buttonInfo);
+        }
+        public void AddTimedButton(uint time, ButtonTemplateInfo buttonInfo)
+        {
+            SendButton(buttonInfo);
+            lock (buttonTimedList) { buttonTimedList.Add(new ButtonTimed(buttonInfo.Entry, time)); }
         }
         public void SendUniqueButton(ButtonTemplateInfo buttonInfo)
         {
-            if(!isButtonSended(buttonInfo.Entry))
+            if (!isButtonSended(buttonInfo.Entry))
                 SendButton(buttonInfo);
+        }
+        public void SendUpdateButton(ButtonTemplateInfo buttonInfo)
+        {
+            if (isButtonSended(buttonInfo.Entry))
+            {
+                RemoveButton(buttonInfo.Entry);
+                SendButton(buttonInfo);
+            }
+            else
+                SendButton(buttonInfo);
+        }
+        public void SendButton(ushort buttonEntry)
+        {
+            ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
+            SendButton(buttonInfo);
         }
         public void SendButton(ButtonTemplateInfo buttonInfo)
         {
             SendButton(buttonInfo.Entry, buttonInfo.StyleMask, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text);
+        }
+        public void SendButton(ushort buttonEntry, byte styleMask, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
+        {
+              SendButton(buttonEntry, (Button_Styles_Flag)styleMask, maxTextLength, left, top, width, height, text);
         }
         public void SendButton(ushort buttonEntry, Button_Styles_Flag buttonStyleMask, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
         {
             if (((Driver)this).IsBot())
                 return;
             
-            byte buttonId = getNewButtonId(buttonEntry);
+            byte buttonId = newButtonId(buttonEntry);
             if( buttonId == 0xFF )
             {
                 Log.error("Button System, Button Max Count Reached for Driver:"+((Driver)this).DriverName+", Licence"+((Licence)this).LicenceName+"\r\n");
@@ -133,7 +246,7 @@ namespace Drive_LFSS.Game_
             }
             return false;
         }
-        private byte getNewButtonId(ushort buttonEntry)
+        private byte newButtonId(ushort buttonEntry)
         {
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
             {
@@ -157,5 +270,10 @@ namespace Drive_LFSS.Game_
             }
             return 0xFF;
         }
+        public ushort GetButtonEntry(byte buttonId)
+        {
+            return buttonList[buttonId];
+        }
+
     }
 }

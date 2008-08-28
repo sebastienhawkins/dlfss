@@ -48,12 +48,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="external\ibutton.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="external\icar.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="external\idriver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="external\ilicence.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="external\irace.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="external\isession.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="script.cs" />
-    <Compile Include="external\icar.cs" />
-    <Compile Include="external\idriver.cs" />
-    <Compile Include="external\ilicence.cs" />
-    <Compile Include="external\irace.cs" />
-    <Compile Include="external\isession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
