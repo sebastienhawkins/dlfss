@@ -77,9 +77,11 @@ namespace Drive_LFSS.Irc_
                 return;
             }
 
-            thrdListener = new Thread(new ThreadStart(StartSocketListening));
+            thrdListener = new Thread(new ThreadStart(ReceiveServerData));
             thrdListener.Start();
         }
+
+        //Registration process is working but ugly.. need to rewrite this procedure.
         private void SendRegistration()
         {
             SendServerData("NICK " + ircServerInfo.NickName);
@@ -107,7 +109,7 @@ namespace Drive_LFSS.Irc_
 
         #endregion
 
-        private void StartSocketListening()
+        private void ReceiveServerData()
         {
             if (socket.Poll(-1, SelectMode.SelectRead))
             {
@@ -126,18 +128,19 @@ namespace Drive_LFSS.Irc_
                     {
                         byte[] buffer = new byte[socket.Available];
                         int bytesRead = socket.Receive(buffer);
-                        ProcessData(Encoding.Default.GetString(buffer, 0, bytesRead));
+                        ProcessServerData(Encoding.Default.GetString(buffer, 0, bytesRead));
                     }
                     Thread.Sleep(sleepTimer);
                 }
             }
 
         }
-        private void ProcessData(string rawLine)
+        private void ProcessServerData(string rawLine)
         {
             string[] rawLines = rawLine.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             string rawData = "";
 
+            //Seriously this Class, Suck and serve no Purpose, get rid of this shit.
             IrcMessage ircMessage;
 
             for (byte lineCount = 0; lineCount < rawLines.Length; lineCount++)
@@ -227,65 +230,6 @@ namespace Drive_LFSS.Irc_
                 //Log.debug("From: " + ircMessage.from + ", To:" + ircMessage.to + ", Command[0]:" + ircMessage.commands[0] + ", Command[1]:" + ircMessage.commands[1] + ", Command[2]:" + ircMessage.commands[2] + ", ReplyCode:" + ircMessage.replyCode + ", Data:" + ircMessage.data + "\r\n");
             }
         }
-        private void SendServerData(string data)
-        {
-            if (socket == null || !socket.Connected) return;
-
-            byte[] buffer = null;
-            buffer = Encoding.ASCII.GetBytes(data + "\r\n");
-
-            socket.Send(buffer);
-
-            //Log.debug("Send Data:"+data+"\r\n");
-        }
-        
-        
-        public void SendToChannel(string message)
-        {
-            SendServerData("PRIVMSG #"+ircServerInfo.Channel+" :"+message);
-        }
-        public void ReceiveFromChannel(string message, string from ,string forChannel)
-        {
-            Log.chat("[IRC!" + from + forChannel + "> " + message + "\r\n");
-            Drive_LFSS.CommandConsole_.CommandConsole.Exec("say all [IRC!" + from + forChannel + "> " + message.Replace("\x03","^"));
-        }
-        public void ReceiveFromNick(string message, string from)
-        {
-            Log.chat("[IRC!" + from + "> " + message + "\r\n");
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        private Irc_Command ToCommandType(string _command)
-        {
-            if (ircCommandMap.ContainsKey(_command))
-                return ircCommandMap[_command];
-            else
-                return Irc_Command.UNKNOW;
-        }
-        private static Dictionary<string,Irc_Command> ircCommandMap = new Dictionary<string,Irc_Command>()
-        {
-            {"NOTICE", Irc_Command.NOTICE},
-            {"AUTH", Irc_Command.AUTH},
-            {"PING", Irc_Command.PING},
-            {"PONG", Irc_Command.PONG},
-            {"INFO", Irc_Command.INFO},
-            {"PRIVMSG", Irc_Command.PRIVMSG},
-            {"JOIN", Irc_Command.JOIN},
-            {"MODE", Irc_Command.MODE},
-        };
         private class IrcMessage
         {
             public IrcMessage()
@@ -301,6 +245,53 @@ namespace Drive_LFSS.Irc_
             public Irc_Command[] commands = new Irc_Command[] { Irc_Command.NONE, Irc_Command.NONE, Irc_Command.NONE };
             public Irc_Reply_Code replyCode = Irc_Reply_Code.NONE;
         }
+
+        private void SendServerData(string data)
+        {
+            if (socket == null || !socket.Connected) return;
+
+            byte[] buffer = null;
+            buffer = Encoding.ASCII.GetBytes(data + "\r\n");
+
+            socket.Send(buffer);
+
+            //Log.debug("Send Data:"+data+"\r\n");
+        }
+
+
+        public void SendToChannel(string message)
+        {
+            SendServerData("PRIVMSG #"+ircServerInfo.Channel+" :"+message);
+        }
+        public void ReceiveFromChannel(string message, string from ,string forChannel)
+        {
+            Log.chat("[IRC!" + from + forChannel + "> " + message + "\r\n");
+            Drive_LFSS.CommandConsole_.CommandConsole.Exec("say all [IRC!" + from + forChannel + "> " + message.Replace("\x03","^"));
+        }
+        public void ReceiveFromNick(string message, string from)
+        {
+            Log.chat("[IRC!" + from + "> " + message + "\r\n");
+        }
+
+
+        private Irc_Command ToCommandType(string _command)
+        {
+            if (ircCommandMap.ContainsKey(_command))
+                return ircCommandMap[_command];
+            else
+                return Irc_Command.UNKNOW;
+        }
+        private static Dictionary<string,Irc_Command> ircCommandMap = new Dictionary<string,Irc_Command>()
+        {
+            {"NOTICE",  Irc_Command.NOTICE},
+            {"AUTH",    Irc_Command.AUTH},
+            {"PING",    Irc_Command.PING},
+            {"PONG",    Irc_Command.PONG},
+            {"INFO",    Irc_Command.INFO},
+            {"PRIVMSG", Irc_Command.PRIVMSG},
+            {"JOIN",    Irc_Command.JOIN},
+            {"MODE",    Irc_Command.MODE},
+        };
     }
 }
 namespace Drive_LFSS.Irc_.Data_

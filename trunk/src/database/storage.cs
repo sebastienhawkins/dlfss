@@ -32,6 +32,10 @@ namespace Drive_LFSS.Storage_
             tableName = tableFmt[0];
             tableFormat = tableFmt[1].ToCharArray(); ;
         }
+        ~Storage()
+        {
+            if (true == false) { }
+        }
         private string tableName;
         private char[] tableFormat;
         private Dictionary<uint, object[]> data = new Dictionary<uint, object[]>();
@@ -126,9 +130,15 @@ namespace Drive_LFSS.Storage_
         }
     }
 
+    //Normaly they should not have a "public sealed class ButtonTemplate : Storage"
+    //I tryed with Storage<T> and Storage<ButtonTemplate>, but Template into c# are fucking limited
     public sealed class ButtonTemplate : Storage
     {
         public ButtonTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~ButtonTemplate()
+        {
+            if (true == false) { }
+        }
         new public ButtonTemplateInfo GetEntry(uint entry)
         {
             object[] _temp = base.GetEntry(entry);
@@ -145,16 +155,22 @@ namespace Drive_LFSS.Storage_
             entry = Convert.ToUInt16(rowInfos[0]);
             description = (string)(rowInfos[1]);
             styleMask = (Button_Styles_Flag)Convert.ToUInt16(rowInfos[2]);
-            maxInputChar = (byte)Convert.ToUInt16(rowInfos[3]);
-            left = (byte)Convert.ToUInt16(rowInfos[4]);
-            top = (byte)Convert.ToUInt16(rowInfos[5]);
-            width = (byte)Convert.ToUInt16(rowInfos[6]);
-            height = (byte)Convert.ToUInt16(rowInfos[7]);
-            text = (string)rowInfos[8];
+            isAllwaysVisible = Convert.ToUInt16(rowInfos[3]) > 0 ? true : false;
+            maxInputChar = (byte)Convert.ToUInt16(rowInfos[4]);
+            left = (byte)Convert.ToUInt16(rowInfos[5]);
+            top = (byte)Convert.ToUInt16(rowInfos[6]);
+            width = (byte)Convert.ToUInt16(rowInfos[7]);
+            height = (byte)Convert.ToUInt16(rowInfos[8]);
+            text = (string)rowInfos[9];
+        }
+        ~ButtonTemplateInfo()
+        {
+            if (true == false) { }
         }
         private ushort entry;
         private string description;
         private Button_Styles_Flag styleMask;
+        private bool isAllwaysVisible;
         private byte maxInputChar;
         private byte left;
         private byte top;
@@ -173,36 +189,52 @@ namespace Drive_LFSS.Storage_
         public Button_Styles_Flag StyleMask
         {
             get { return styleMask; }
+            set { styleMask = value; }
+        }
+        public bool IsAllwaysVisible
+        {
+            get { return isAllwaysVisible; }
+            set { isAllwaysVisible = value; }
         }
         public byte MaxInputChar
         {
             get { return maxInputChar; }
+            set { maxInputChar = value; }
         }
         public byte Left
         {
             get { return left; }
+            set { left = value; }
         }
         public byte Top
         {
             get { return top; }
+            set { top = value; }
         }
         public byte Width
         {
             get { return width; }
+            set { Width = value; }
         }
         public byte Height
         {
             get { return height; }
+            set { height = value; }
         }
         public string Text
         {
             get { return text; }
+            set { text = value; }
         }
     }
 
     public sealed class TrackTemplate : Storage
     {
         public TrackTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~TrackTemplate()
+        {
+            if (true == false) { }
+        }
         new public TrackTemplateInfo GetEntry(uint entry)
         {
             object[] _temp = base.GetEntry(entry);
@@ -228,6 +260,10 @@ namespace Drive_LFSS.Storage_
             totalLength = (uint)Convert.ToUInt16(rowInfos[5]);
 
         }
+        ~TrackTemplateInfo()
+        {
+            if (true == false) { }
+        }
         private uint entry;
         private string namePrefix;
         private string name;
@@ -238,6 +274,10 @@ namespace Drive_LFSS.Storage_
     public sealed class CarTemplate : Storage
     {
         public CarTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~CarTemplate()
+        {
+            if (true == false) { }
+        }
         new public CarTemplateInfo GetEntry(uint entry)
         {
             object[] _temp = base.GetEntry(entry);
@@ -256,6 +296,10 @@ namespace Drive_LFSS.Storage_
             name = (string)rowInfos[2];
             traction = (Car_Traction)Convert.ToUInt16(rowInfos[3]);
         }
+        ~CarTemplateInfo()
+        {
+            if (true == false) { }
+        }
         private uint entry;
         private string namePrefix;
         private string name;
@@ -265,6 +309,10 @@ namespace Drive_LFSS.Storage_
     public sealed class RaceTemplate : Storage
     {
         public RaceTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~RaceTemplate()
+        {
+            if (true == false) { }
+        }
         new public RaceTemplateInfo GetEntry(uint entry)
         {
             object[] _temp = base.GetEntry(entry);
@@ -288,6 +336,10 @@ namespace Drive_LFSS.Storage_
             qualifyMinute = (byte)Convert.ToUInt16(rowInfos[7]);
             gridStartBeviator = (Grid_Start_Beviator)Convert.ToUInt16(rowInfos[8]);
         }
+        ~RaceTemplateInfo()
+        {
+            if (true == false) { }
+        }
         private uint entry;
         private string description;
         private byte trackEntry;
@@ -302,6 +354,10 @@ namespace Drive_LFSS.Storage_
     public sealed class DriverBan : Storage
     {
         public DriverBan(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~DriverBan()
+        {
+            if (true == false) { }
+        }
         new public DriverBanInfo GetEntry(uint entry)
         {
             object[] _temp = base.GetEntry(entry);
@@ -322,6 +378,10 @@ namespace Drive_LFSS.Storage_
             startTime = Convert.ToUInt32(rowInfos[4]);
             endTime = Convert.ToUInt32(rowInfos[5]);
             expired = Convert.ToUInt16(rowInfos[6]) == 1 ? true : false;
+        }
+        ~DriverBanInfo()
+        {
+            if (true == false) { }
         }
         private uint entry;
         private string licenceName;

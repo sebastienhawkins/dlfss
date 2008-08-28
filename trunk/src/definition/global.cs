@@ -20,6 +20,11 @@ using System;
 using System.Runtime.InteropServices;
 namespace Drive_LFSS.Definition_
 {
+    public enum Button_Entry : ushort
+    {
+        NONE = 0,
+        BANNER = 1,
+    }
     public enum Button_Safe_Coord_Range
     {
         BUTTON_COORD_X_MIN = 0,
@@ -198,14 +203,14 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
-        ISB_C1 = 1,
-        ISB_C2 = 2,
-        ISB_C4 = 4,
+        ISB_C1 = 1,         // you can choose a standard
+        ISB_C2 = 2,         // interface colour using
+        ISB_C4 = 4,         // these 3 lowest bits - see below
         ISB_CLICK = 8,
-        ISB_DARK = 0x20,
-        ISB_LEFT = 0x40,
-        ISB_LIGHT = 0x10,
-        ISB_RIGHT = 0x80
+        ISB_LIGHT = 16,
+        ISB_DARK = 32,
+        ISB_LEFT = 64,      // align text to left
+        ISB_RIGHT = 128,    // align text to right
     }
     [Flags]public enum Car_Racing_Flag : byte
     {

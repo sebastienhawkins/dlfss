@@ -41,7 +41,7 @@ namespace Drive_LFSS.Database_
         private IDbTransaction transaction;
         private IDbCommand command;
 
-        //Not Thread Safe
+        //Not Yet Thread Safe, They will need a Mutex.
         public void NewTransaction()
         {
             transaction = connection.BeginTransaction(IsolationLevel.Serializable);

@@ -24,6 +24,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Packet_;
     using Drive_LFSS.Script_;
     using Drive_LFSS.Log_;
+    using Drive_LFSS.Storage_;
 
     public abstract class Car : Licence, ICar
     {
@@ -37,6 +38,10 @@ namespace Drive_LFSS.Game_
         new protected void Init(PacketNCN _packet)
         {
             base.Init(_packet);
+            
+            //Send Banner
+            ButtonTemplateInfo banner = Program.buttonTemplate.GetEntry((uint)Button_Entry.BANNER);
+            SendUniqueButton(banner);
         } //When Connection
         new protected void Init(PacketNPL _packet)
         {
@@ -52,6 +57,9 @@ namespace Drive_LFSS.Game_
             tyreRearLeft = _packet.tyreRearLeft;
             tyreRearRight =_packet.tyreRearRight;
             base.Init(_packet);
+
+            //Removing This Site banner
+            RemoveButton((ushort)Button_Entry.BANNER);
         }  //When joining Race
         public void ProcessCarInformation(CarInformation _carInformation)
         {
@@ -165,6 +173,8 @@ namespace Drive_LFSS.Game_
         public void LeaveRace(PacketPLL _packet) //to be called when a car is removed from a race
         {
             carId = 0;
+            ButtonTemplateInfo banner = Program.buttonTemplate.GetEntry((uint)Button_Entry.BANNER);
+            SendUniqueButton(banner);
         }
     #endregion
 

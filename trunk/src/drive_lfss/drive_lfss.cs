@@ -53,10 +53,10 @@ namespace Drive_LFSS
         //Database
         public static IDatabase dlfssDatabase = null;
 
-        //Storage, Any Storage FMT need a 'p' value this is representing is Unique Index into the Array, the value must be a uint32
+        //Storage, All Storage FMT need a 'p' value, this is representing is Unique Index into the Array, the value must be a uint32
         public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "pssuuuu" });
         public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssu" });
-        public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "psuuuuuus" });
+        public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "psuuuuuuus" });
         public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psusuuuuu" });
         public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
         

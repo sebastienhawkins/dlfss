@@ -225,6 +225,8 @@ namespace Drive_LFSS.Config_
                 Log.error("Unable to find the config file: " + confFile + "\r\n");
                 return false;
             }
+            //This is stupid desing, is there cause of the first design i tryed.
+            //Will have to get rid of this.
             Config config = new Config();
             config.ReadToArray(confFile);
             return true;

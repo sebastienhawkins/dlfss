@@ -23,7 +23,7 @@ namespace Drive_LFSS.Game_
 
     public abstract class Licence : Button, ILicence
 	{
-        public Licence()
+        public Licence() : base()
         {
         }
         ~Licence() 
@@ -45,9 +45,10 @@ namespace Drive_LFSS.Game_
         }
 
         #region Update
-        protected virtual void update(uint diff)
+        new protected virtual void update(uint diff)
         {
             //Don't see any feature that can be implement here... but futur will tell
+            base.update(diff);
         }
         #endregion
 

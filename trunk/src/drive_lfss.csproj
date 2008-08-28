@@ -78,16 +78,18 @@
     <Compile Include="database\database.cs" />
     <Compile Include="database\database_mysql.cs" />
     <Compile Include="database\database_sqlite.cs" />
-    <Compile Include="database\IDatabase.cs" />
+    <Compile Include="database\idatabase.cs" />
     <Compile Include="database\storage.cs" />
     <Compile Include="game\button.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="irc\enum.cs" />
     <Compile Include="irc\irc_client.cs" />
-    <Compile Include="network\packet\enum.cs" />
-    <Compile Include="network\packet\handler.cs" />
-    <Compile Include="network\packet\packet_store\store.cs" />
+    <Compile Include="insim\insim.cs" />
+    <Compile Include="insim\packet\packet.cs" />
+    <Compile Include="insim\packet\enum.cs" />
+    <Compile Include="insim\packet\handler.cs" />
+    <Compile Include="insim\packet\packet_store\store.cs" />
     <Compile Include="drive_lfss\command.cs" />
     <Compile Include="definition\global.cs" />
     <Compile Include="game\command.cs" />
@@ -100,8 +102,6 @@
     <Compile Include="drive_lfss\drive_lfss.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="res\icone.res" />
-    <Compile Include="network\insim\insim.cs" />
-    <Compile Include="network\packet\packet.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\dep\lib\sqlite3.6.0.so">

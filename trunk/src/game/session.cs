@@ -50,9 +50,10 @@ namespace Drive_LFSS.Session_
         }
         new public void ConfigApply()
         {
+            base.ConfigApply();
+
             Race.ConfigApply();
             Driver.ConfigApply();
-            base.ConfigApply();
         }
         private class Ping
         {
@@ -84,9 +85,9 @@ namespace Drive_LFSS.Session_
                 return sessionLatency - diff;
             }
         }
+        private Ping ping;
         private string sessionName;
         private char commandPrefix;
-        private Ping ping;
         public bool connectionRequest;   
 
         //Object
@@ -120,10 +121,11 @@ namespace Drive_LFSS.Session_
         {
             return race.GetGuid();
         }
-        public string GetRaceTrackAbreviation()
+        public string GetRaceTrackPrefix()
         {
             return race.GetTrackPrefix();
         }
+
         #region Update/Timer
 
         private const uint TIMER_PING_PONG = 50000;
@@ -467,3 +469,21 @@ namespace Drive_LFSS.Session_
  * Gray = 9
  * Black = 0
  */
+/* IRC Text Color
+0-   White
+1-   Black
+2-   Blue
+3-   Green
+4-   Light Red
+5-   Brown
+6-   Purple
+7-   Orange
+8-   Yellow
+9-   Light Green
+10-   Cyan
+11-   Light Cyan
+12-   Light Blue
+13-   Pink
+14-   Grey
+15-   Light Grey 
+*/

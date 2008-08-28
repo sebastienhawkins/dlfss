@@ -79,7 +79,7 @@ namespace Drive_LFSS.Game_
             base.Init(_packet);
 
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackAbreviation(), driverMask);
+            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
 
             if (IsBot())
                 return;
@@ -102,7 +102,7 @@ namespace Drive_LFSS.Game_
             // Check for fastest
             // do other thing we need
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackAbreviation(), driverMask);
+            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
         }
         public void ProcessSplitInformation(PacketSPX _packet)
         {
@@ -111,12 +111,12 @@ namespace Drive_LFSS.Game_
         public void ProcessRaceStart()
         {
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackAbreviation(), driverMask);
+            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
         }
         public void ProcessRaceEnd()
         {
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackAbreviation(), driverMask);
+            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
         }
         
         //Loaded From packet
