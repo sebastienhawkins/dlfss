@@ -110,9 +110,6 @@
     <None Include="..\dep\lib\sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\sql\sqlite\Drive_LFSS.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Properties\app.config" />
     <None Include="..\dep\Drive_LFSS.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
