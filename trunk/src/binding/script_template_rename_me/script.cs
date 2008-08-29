@@ -24,7 +24,7 @@ namespace Drive_LFSS.Script_
         }
         public bool CarAcceleration_0_100(ICar car, double finalAccelerationTime)
         {
-            ((IDriver)car).SendMessage(" ^70-100Km/h In: ^2" + finalAccelerationTime + " ^0sec.");
+            ((IButton)car).AddMessageTop(" ^70-100Km/h In: ^2" + finalAccelerationTime + " ^7sec.",5000);
             
             return true;
         }
