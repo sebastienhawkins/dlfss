@@ -127,10 +127,8 @@ namespace Drive_LFSS.Session_
         }
 
         #region Update/Timer
-
         private const uint TIMER_PING_PONG = 50000;
         private uint TimerPingPong = 48000;
-
         public void update(uint diff)
         {
             // For moment will test processPacket from the network thread! gave better reaction time.
@@ -181,7 +179,7 @@ namespace Drive_LFSS.Session_
             //Since we create the driver index 0 in this.construstor()
             //will conflit with the Host NCN receive packet, so here is a overide!
             //will have to rethink this later, that is looking like a HackFix, suck CPU for nothing.
-            if (ExistLicenceId(_packet.tempLicenceId))
+            if (IsExistLicenceId(_packet.tempLicenceId))
             {
                 if (_packet.tempLicenceId == 0)
                 {
@@ -199,13 +197,13 @@ namespace Drive_LFSS.Session_
 
             //Prevent the Main thread from Doing the driverList.update()
             lock (this){driverList.Add(_driver);}
-        }  // new Connection
+        }      // new Connection
         protected sealed override void processPacket(PacketCNL _packet)
         {
             //TODO: use _packet.Total as a Debug check to be sure we have same racer count into our memory as the server do. 
             base.processPacket(_packet); //Keep the Log
 
-            if (!ExistLicenceId(_packet.tempLicenceId))
+            if (!IsExistLicenceId(_packet.tempLicenceId))
             {
                 Log.error(GetSessionNameForLog() + " Licence Disconnection, But no LicenceID associated with It, What todo???");
                 return;
@@ -217,12 +215,12 @@ namespace Drive_LFSS.Session_
             while ((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)
                 lock (this) {driverList.RemoveAt((int)itr); }
    
-        }  // delete Connection
-        protected sealed override void processPacket(PacketNPL _packet)     // New Car Join Race
+        }      // delete Connection
+        protected sealed override void processPacket(PacketNPL _packet)
         {
             base.processPacket(_packet); //Keep the Log
 
-            if (!ExistLicenceId(_packet.tempLicenceId))
+            if (!IsExistLicenceId(_packet.tempLicenceId))
             {
                 Log.error(GetSessionNameForLog() + " New Car Join Race, But Not LicenceId Associated What todo???");
                 return;
@@ -243,8 +241,8 @@ namespace Drive_LFSS.Session_
             }
             else                                                                            //Human
                 driverList[GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)].Init(_packet);
-        }
-        protected sealed override void processPacket(PacketPLL _packet)     // Delete Car leave (spectate - loses slot)
+        }      // New Car Join Race
+        protected sealed override void processPacket(PacketPLL _packet)
         {
             base.processPacket(_packet); //Keep the Log
 
@@ -258,8 +256,8 @@ namespace Drive_LFSS.Session_
             //Do a Init in case we need a Action happen into Car when leave race....
             //Do we delete the entire Driver on a Bot Leave Race???
             ((Car)driverList[itr]).LeaveRace(_packet);
-        }
-        protected sealed override void processPacket(PacketMCI _packet)     // Multiple Car Information
+        }      // Delete Car leave (spectate - loses slot)
+        protected sealed override void processPacket(PacketMCI _packet)
         {
             //base.processPacket(_packet); // Will Reprocess the Old One
 
@@ -278,14 +276,14 @@ namespace Drive_LFSS.Session_
                 ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
                 race.ProcessCarInformation(carInformation[itr]);
             }
-        }
-        protected sealed override void processPacket(PacketMSO _packet)     // message out
+        }      // Multiple Car Information
+        protected sealed override void processPacket(PacketMSO _packet)
         {
             //base.processPacket(_packet);
             //Chat_User_Type chatUserType = allo;
 
             //_packet.chatUserType;
-            if (!ExistLicenceId(_packet.tempLicenceId))
+            if (!IsExistLicenceId(_packet.tempLicenceId))
                 return;
 
             Driver _driver = driverList[GetFirstLicenceIndex(_packet.tempLicenceId)];
@@ -309,12 +307,12 @@ namespace Drive_LFSS.Session_
                 Log.chat(GetSessionNameForLog() + " " + _driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
             
             }
-        }
-        protected sealed override void processPacket(PacketREO _packet)     // Race Grid Order
+        }      // message out
+        protected sealed override void processPacket(PacketREO _packet)
         {
             base.processPacket(_packet);
             race.Init(_packet);
-        }
+        }      // Race Grid Order
         protected sealed override void processPacket(PacketRST _packet)
         {
             base.processPacket(_packet);
@@ -327,7 +325,7 @@ namespace Drive_LFSS.Session_
             }
 
             script.RaceStart();
-        }  // Race Start
+        }      // Race Start
         protected sealed override void processPacket(PacketSTA _packet)
         {
             base.processPacket(_packet);
@@ -336,7 +334,7 @@ namespace Drive_LFSS.Session_
             //else
             //    ;//driver Case
 
-        }  // State Change race/car
+        }      // State Change race/car
         protected sealed override void processPacket(PacketTiny _packet)
         {
             //base.processPacket(_packet);
@@ -348,7 +346,7 @@ namespace Drive_LFSS.Session_
                 case Tiny_Type.TINY_NONE: break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }
-        } // Multipurpose 
+        }     // Multipurpose 
         protected sealed override void processPacket(PacketSmall _packet)
         {
             //base.processPacket(_packet);
@@ -371,29 +369,29 @@ namespace Drive_LFSS.Session_
                 } break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;
             }
-        } // Multipurpose 
-        protected sealed override void processPacket(PacketLAP _packet)     // Lap Completed
+        }    // Multipurpose 
+        protected sealed override void processPacket(PacketLAP _packet)
         {
             base.processPacket(_packet);
 
             driverList[GetCarIndex(_packet.carId)].ProcessLapInformation(_packet);
-        }
-        protected sealed override void processPacket(PacketSPX _packet)     // Split Time Receive
+        }      // Lap Completed
+        protected sealed override void processPacket(PacketSPX _packet)
         {
             base.processPacket(_packet);
 
             driverList[GetCarIndex(_packet.carId)].ProcessSplitInformation(_packet);
-        }
+        }      // Split Time Receive
         protected sealed override void processPacket(PacketRES _packet)
         {
             base.processPacket(_packet);
             race.ProcessResult(_packet);
-        }  //Result, Confimation is only working for a race not qualify
+        }      // Result, "Confimation" is only working for a race not qualify
         protected sealed override void processPacket(PacketFIN _packet)
         {
             base.processPacket(_packet);
             race.ProcessResult(_packet);
-        }  //Final Result
+        }      // Final Result, Only into a Race
         protected sealed override void processPacket(PacketBTC _packet)
         {
             
@@ -404,13 +402,13 @@ namespace Drive_LFSS.Session_
                 case Button_Entry.MOTD_BUTTON_DRIVE:
                 {
                     ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
-                } break;
+                 } break;
                 default:
                 {
                     Log.error("We recevied a button ClickId, from unknow source, licenceName:" + driverList[driverIndex].LicenceName + "\r\n");
                 } break;
             }
-        }
+        }      // Button Click Receive
         #endregion
 
         #region Driver/Car/Licence Association Tool
@@ -466,7 +464,7 @@ namespace Drive_LFSS.Session_
             }
             return 0;
         }
-        private bool ExistLicenceId(byte _licenceId)
+        private bool IsExistLicenceId(byte _licenceId)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)

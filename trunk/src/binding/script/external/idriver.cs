@@ -2,10 +2,10 @@
 {
     public interface IDriver
     {
-        bool IsBot();
         bool AdminFlag { get; }
         string DriverName { get; }
-
+        uint GetGuid();
+        bool IsBot();
         void SendMessage(string message);
     }
 }

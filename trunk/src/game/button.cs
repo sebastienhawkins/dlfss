@@ -70,6 +70,33 @@ namespace Drive_LFSS.Game_
 
         }
         private List<ButtonTimed> buttonTimedList = new List<ButtonTimed>(BUTTON_MAX_COUNT);
+        private class ButtonMessage
+        {
+            public ButtonMessage(string _text,uint _time)
+            {
+                text = _text;
+                time = _time;
+            }
+            ~ButtonMessage()
+            {
+                if (true == false) { }
+            }
+            private string text;
+            private uint time;
+
+            public string Text
+            {
+                get { return text; }
+                set { text = value; }
+            }
+            public uint Time
+            {
+                get { return time; }
+                set { time = value; }
+            }
+        }
+        private Queue<ButtonMessage> buttonMessageTop = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
+        private Queue<ButtonMessage> buttonMessageMiddle = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
 
         protected virtual void update(uint diff)
         {
@@ -77,13 +104,13 @@ namespace Drive_LFSS.Game_
             {
                 for (byte itr = 0; itr < buttonTimedList.Count; itr++ )
                 {
-                    if (buttonTimedList[itr].Time <= diff)
+                    if (buttonTimedList[itr].Time > diff)
+                        buttonTimedList[itr].Time -= diff;
+                    else
                     {
                         buttonTimedList[itr].Time = 0;
                         RemoveButton(buttonTimedList[itr].ButtonEntry);
                     }
-                    else
-                        buttonTimedList[itr].Time -= diff;
                 }
                 List<ButtonTimed>.Enumerator clrItr = buttonTimedList.GetEnumerator();
                 while (clrItr.MoveNext())
@@ -94,6 +121,38 @@ namespace Drive_LFSS.Game_
                         clrItr = buttonTimedList.GetEnumerator();
                     }
                 }
+            }
+            if (buttonMessageTop.Count > 0)
+            {
+                ButtonMessage currentButton = buttonMessageTop.Peek();
+                if (currentButton.Text != "")
+                {
+                    ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_TOP);
+                    newButton.Text = currentButton.Text;
+                    AddTimedButton(currentButton.Time - 200, newButton);//Since time is not very important, use this way to be sure im sync with timedButton
+                    currentButton.Text = "";
+                }
+
+                if (currentButton.Time > diff)
+                    currentButton.Time -= diff;
+                else
+                    buttonMessageTop.Dequeue();
+            }
+            if (buttonMessageMiddle.Count > 0)
+            {
+                ButtonMessage currentButton = buttonMessageMiddle.Peek();
+                if (currentButton.Text != "")
+                {
+                    ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_MIDDLE);
+                    newButton.Text = currentButton.Text;
+                    AddTimedButton(currentButton.Time-200, newButton); //Since time is not very important, use this way to be sure im sync with timedButton
+                    currentButton.Text = "";
+                }
+
+                if (currentButton.Time > diff)
+                    currentButton.Time -= diff;
+                else
+                    buttonMessageMiddle.Dequeue();
             }
         }
 
@@ -175,15 +234,41 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
+        public void AddMessageTop(string text, uint duration)
+        {
+            if (((Driver)this).IsBot())  //Become Redondant with SendButton, but since they since timer better this way.
+                return;
+
+            lock (buttonMessageTop)
+            {
+                buttonMessageTop.Enqueue(new ButtonMessage(text, duration));
+            }
+        }
+        public void AddMessageMiddle(string text, uint duration)
+        {
+            if (((Driver)this).IsBot()) //Become Redondant with SendButton, but since they since timer better this way.
+                return;
+            lock (buttonMessageMiddle)
+            {
+                buttonMessageMiddle.Enqueue(new ButtonMessage(text, duration));
+            }
+        }
         public void AddTimedButton(ushort buttonEntry, uint time)
         {
-            ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry(buttonEntry);
-            AddTimedButton(time, buttonInfo);
+            AddTimedButton(time, Program.buttonTemplate.GetEntry(buttonEntry));
         }
         public void AddTimedButton(uint time, ButtonTemplateInfo buttonInfo)
         {
+            lock (buttonTimedList) 
+            {
+                buttonTimedList.Add(new ButtonTimed(buttonInfo.Entry, time));
+            }
             SendButton(buttonInfo);
-            lock (buttonTimedList) { buttonTimedList.Add(new ButtonTimed(buttonInfo.Entry, time)); }
+        }
+        public void SendUniqueButton(ushort buttonEntry)
+        {
+            ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
+            SendUniqueButton(buttonInfo);
         }
         public void SendUniqueButton(ButtonTemplateInfo buttonInfo)
         {

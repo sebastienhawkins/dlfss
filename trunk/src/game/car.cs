@@ -38,10 +38,6 @@ namespace Drive_LFSS.Game_
         new protected void Init(PacketNCN _packet)
         {
             base.Init(_packet);
-            
-            //Send Banner
-            ButtonTemplateInfo banner = Program.buttonTemplate.GetEntry((uint)Button_Entry.BANNER);
-            SendUniqueButton(banner);
         } //When Connection
         new protected void Init(PacketNPL _packet)
         {
@@ -58,9 +54,6 @@ namespace Drive_LFSS.Game_
             tyreRearRight =_packet.tyreRearRight;
             base.Init(_packet);
 
-            //Removing This Site banner
-            RemoveButton((ushort)Button_Entry.BANNER);
-            RemoveGui((ushort)Gui_Entry.MOTD);
         }  //When joining Race
         public void ProcessCarInformation(CarInformation _carInformation)
         {
@@ -157,7 +150,6 @@ namespace Drive_LFSS.Game_
                 Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
 
                 End();
-
 
                 if (((Driver)car).Session.script.CarAcceleration_0_100((ICar)car, finalAccelerationTime))
                     return;

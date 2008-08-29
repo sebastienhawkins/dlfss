@@ -24,6 +24,8 @@ namespace Drive_LFSS.Definition_
     {
         NONE = 0,
         BANNER = 1,
+        MESSAGE_BAR_TOP = 6,
+        MESSAGE_BAR_MIDDLE = 7,
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
     }

@@ -3,7 +3,10 @@
     public interface ISession
     {
         long GetLatency();
-        int GetNbrOfDrivers();
         long GetReactionTime();
+        int GetNbrOfDrivers();
+        uint GetRaceGuid();
+        string GetRaceTrackPrefix();
+        string GetSessionNameForLog();
     }
 }
