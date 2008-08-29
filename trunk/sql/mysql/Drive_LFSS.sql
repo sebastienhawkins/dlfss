@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/08/28 12:01:29
+Date:                  2008/08/29 08:40:10
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -28,14 +28,14 @@ CREATE TABLE `button_template` (
 # Records for table button_template
 #----------------------------
 
-lock tables button_template write ;
 
-insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (1, 'banner', 66, 0, 0, 25, 189, 50, 12, '^7A^3leajecta') ;
-insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (2, 'motd background', 98, 1, 0, 0, 0, 200, 200, '') ;
-insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta') ;
-insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (5, 'motd button', 26, 1, 0, 75, 125, 50, 12, '^2Drive') ;
-insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values (4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, '') ;
-unlock tables ;
+insert  into button_template values (1, 'banner', 66, 0, 0, 25, 189, 50, 12, '^7A^3leajecta') ;
+insert  into button_template values (2, 'motd background', 98, 1, 0, 0, 0, 200, 200, '') ;
+insert  into button_template values (3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta') ;
+insert  into button_template values (5, 'motd button', 26, 1, 0, 75, 125, 50, 12, '^2Drive') ;
+insert  into button_template values (6, 'message bar top', 2, 0, 0, 60, 10, 80, 12, '^1Message bar top') ;
+insert  into button_template values (7, 'message bar middle', 2, 0, 0, 25, 85, 150, 14, '^1Message bar Middle') ;
+insert  into button_template values (4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, '') ;
 #----------------------------
 # Table structure for car_template
 #----------------------------
@@ -129,10 +129,8 @@ CREATE TABLE `gui_template` (
 # Records for table gui_template
 #----------------------------
 
-lock tables gui_template write ;
 
-insert  into gui_template (entry,description,button_entry,text_button_entry,`text`) values (1, 'motd', '2 3 5', 4, '^7Lorem Ipsum is simply dummy text of the printing and typesetting industry.\r\n^7Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, \r\n^7when an unknown printer took a galley of type and scrambled it to make a type specimen book.\r\n ^7It has survived not only five centuries, but also the leap into electronic typesetting,\r\n ^7remaining essentially unchanged. It was popularised in the 1960s with the release of\r\n ^7Letraset sheets containing Lorem Ipsum passages, and more recently with desktop\r\n^7 publishing software like Aldus PageMaker including versions of Lorem Ipsum.') ;
-unlock tables ;
+insert  into gui_template values (1, 'motd', '2 3 5', 4, 0x5E374C6F72656D20497073756D2069732073696D706C792064756D6D792074657874206F6620746865207072696E74696E6720616E64207479706573657474696E6720696E6475737472792E0D0A5E374C6F72656D20497073756D20686173206265656E2074686520696E6475737472792773207374616E646172642064756D6D79207465787420657665722073696E6365207468652031353030732C200D0A5E377768656E20616E20756E6B6E6F776E207072696E74657220746F6F6B20612067616C6C6579206F66207479706520616E6420736372616D626C656420697420746F206D616B65206120747970652073706563696D656E20626F6F6B2E0D0A205E37497420686173207375727669766564206E6F74206F6E6C7920666976652063656E7475726965732C2062757420616C736F20746865206C65617020696E746F20656C656374726F6E6963207479706573657474696E672C0D0A205E3772656D61696E696E6720657373656E7469616C6C7920756E6368616E6765642E2049742077617320706F70756C61726973656420696E207468652031393630732077697468207468652072656C65617365206F660D0A205E374C657472617365742073686565747320636F6E7461696E696E67204C6F72656D20497073756D2070617373616765732C20616E64206D6F726520726563656E746C792077697468206465736B746F700D0A5E37207075626C697368696E6720736F667477617265206C696B6520416C64757320506167654D616B657220696E636C7564696E672076657273696F6E73206F66204C6F72656D20497073756D2E) ;
 #----------------------------
 # Table structure for race
 #----------------------------
