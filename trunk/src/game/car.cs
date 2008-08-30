@@ -97,10 +97,10 @@ namespace Drive_LFSS.Game_
         private int posX = 0;
         private int posY = 0;
         private int posZ = 0;
-        private ushort speed = 0;
+        private short speed = 0;
         private double speedKhm = 0.0d;
-        private ushort direction = 0;
-        private ushort heading = 0;
+        private short direction = 0;
+        private short heading = 0;
         private short angleVelocity = 0;
 
         //Game Feature

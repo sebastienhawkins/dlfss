@@ -357,9 +357,9 @@ namespace Drive_LFSS.Definition_
         public int posX;
         public int posY;
         public int posZ;
-        public ushort speed;
-        public ushort direction;
-        public ushort heading;
+        public short speed;
+        public short direction;
+        public short heading;
         public short angleVelocity;
     }
     [StructLayout(LayoutKind.Sequential)]

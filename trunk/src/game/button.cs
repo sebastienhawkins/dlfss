@@ -315,7 +315,7 @@ namespace Drive_LFSS.Game_
                 (
                     Packet_Size.PACKET_SIZE_BTN,
                     Packet_Type.PACKET_BTN_BUTTON_DISPLAY,
-                    new PacketBTN(((Driver)this).LicenceId, 1, buttonId, buttonStyleMask, maxTextLength, left, top, width, height, text)
+                    new PacketBTN(((Licence)this).LicenceId, 1, buttonId, buttonStyleMask, maxTextLength, left, top, width, height, text)
                 )
             );
         }
