@@ -113,13 +113,13 @@ namespace Drive_LFSS.Game_
 
             internal void Update(Car car)
             {
-                if (car.speedMs < 0x28 && (!started || startTime != 0))
+                if (car.speedMs < 0.1 && (!started || startTime != 0))
                     Start();
 
-                else if (car.speedMs > 44 && started && startTime == 0) //About 0Kmh
+                else if (car.speedMs > 0.1 && started && startTime == 0) //About 0Kmh
                     startTime = DateTime.Now.Ticks;
 
-                else if (car.speedMs > 9111 && started) //About 100Kmh
+                else if (car.speedMs > 27.777777d && started) //About 100Kmh
                     Sucess(ref car);
             }
             private void Start()
