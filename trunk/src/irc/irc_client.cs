@@ -252,7 +252,8 @@ namespace Drive_LFSS.Irc_
 
             byte[] buffer = null;
             buffer = Encoding.ASCII.GetBytes(data + "\r\n");
-
+            
+            //TODO: a try catch to be sure we are still connected.
             socket.Send(buffer);
 
             //Log.debug("Send Data:"+data+"\r\n");

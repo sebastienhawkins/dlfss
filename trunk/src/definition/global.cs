@@ -26,6 +26,7 @@ namespace Drive_LFSS.Definition_
         BANNER = 1,
         MESSAGE_BAR_TOP = 6,
         MESSAGE_BAR_MIDDLE = 7,
+        COLLISION_WARNING = 8,
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
     }
@@ -348,7 +349,7 @@ namespace Drive_LFSS.Definition_
             hStruct.Free();
             Marshal.FreeHGlobal(pStruct);
         }*/
-        public ushort trackNode;
+        public ushort nodeTrack;
         public ushort lapNumber;
         public byte carId;
         public byte position;
@@ -357,9 +358,9 @@ namespace Drive_LFSS.Definition_
         public int posX;
         public int posY;
         public int posZ;
-        public short speed;
-        public short direction;
-        public short heading;
+        public ushort speed;
+        public ushort direction;
+        public ushort heading;
         public short angleVelocity;
     }
     [StructLayout(LayoutKind.Sequential)]

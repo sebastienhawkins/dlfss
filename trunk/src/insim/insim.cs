@@ -111,6 +111,7 @@ namespace Drive_LFSS.InSim_
                 threadSocketSendReceive.Join();
             }
         }
+        //Complete ReWrite is needed here.
         public void connect()
         {
             //runThreadSocketReceive = false;
@@ -124,6 +125,7 @@ namespace Drive_LFSS.InSim_
             {
                 Log.error(((Session)this).GetSessionNameForLog()+" TCP Socket Initialization failded, Error was: " +_exception.Message);
                 //Maybe a little sleep and retry connect later, this is a isolated thread Call.. so a sleep won't hurt other thread.
+                ((Session)this).connectionRequest = true;
                 return;
             }
             tcpSocket = tcpClient.GetStream();
@@ -138,6 +140,7 @@ namespace Drive_LFSS.InSim_
             catch (SocketException _exception)
             {
                 Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message);
+                ((Session)this).connectionRequest = true;
                 return;
             }
 
@@ -160,7 +163,20 @@ namespace Drive_LFSS.InSim_
 
                 _packet = new PacketTiny(1, Tiny_Type.TINY_NPL);
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
+
+                _packet = new PacketTiny(1, Tiny_Type.TINY_REO_GRID_ORDER);
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
+
+                _packet = new PacketTiny(1, Tiny_Type.TINY_RST_RACE_START);
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
+
+                _packet = new PacketTiny(1, Tiny_Type.TINY_SST_STATE_INFO);
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
+
+
             }
+            else
+                ((Session)this).connectionRequest = true;
         }
         public bool IsConnected()
         {
@@ -198,13 +214,14 @@ namespace Drive_LFSS.InSim_
                 tcpClient.Close();
                 udpClient.Close();
                 runThreadSocketReceive = false;
+                threadSocketSendReceive.Join();
                 tcpClient = new TcpClient();
                 Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception.Message + "\r\n");
                 ((Session)this).connectionRequest = true;
                 Log.normal(((Session)this).GetSessionNameForLog() + " Trying to reconnect...\r\n");
             }
         }
-        private void UdpSend() // This is very not usefull, UDP is a receive only .... from what i know.
+        private void UdpSend()
         {
             byte[] _packet = NextUdpSendQueud();
             if (_packet == null)
@@ -226,6 +243,7 @@ namespace Drive_LFSS.InSim_
                 tcpClient.Close();
                 udpClient.Close();
                 runThreadSocketReceive = false;
+                threadSocketSendReceive.Join();
                 tcpClient = new TcpClient();
                 Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
                 ((Session)this).connectionRequest = true;

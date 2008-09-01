@@ -26,7 +26,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Log_;
     using Drive_LFSS.Storage_;
 
-    public abstract class Car : Licence, ICar
+    public abstract class Car : Licence, ICar, CarMotion
     {
         public Car() : base()
         {
@@ -57,19 +57,19 @@ namespace Drive_LFSS.Game_
         }  //When joining Race
         public void ProcessCarInformation(CarInformation _carInformation)
         {
-            trackNode = _carInformation.trackNode;
+            node = _carInformation.nodeTrack;
             lapNumber = _carInformation.lapNumber;
             position = _carInformation.position;
             carFlag = _carInformation.carFlag;
-            posX = _carInformation.posX;
-            posY = _carInformation.posY;
-            posZ = _carInformation.posZ;
+            x = _carInformation.posX / 65536.0d;
+            y = _carInformation.posY / 65536.0d;
+            z = _carInformation.posZ / 65536.0d;
 
-            speed = _carInformation.speed;
-            speedKhm = SpeedToKmh();
+            speedMs = _carInformation.speed / 327.68d;
+            speedKmh = speedMs * 3.6d;
 
-            direction = _carInformation.direction;
-            heading = _carInformation.heading;
+            directionAngle = _carInformation.direction;
+            headingAngle = _carInformation.heading;
             angleVelocity = _carInformation.angleVelocity;
 
 
@@ -90,46 +90,36 @@ namespace Drive_LFSS.Game_
         private Car_Tyres tyreFrontRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Car_Tyres tyreRearLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Car_Tyres tyreRearRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
-        private ushort trackNode = 0;
+        private ushort node = 0;
         private ushort lapNumber = 0;
         private byte position = 0;
         private Car_Racing_Flag carFlag = Car_Racing_Flag.CAR_RACING_FLAG_NONE;
-        private int posX = 0;
-        private int posY = 0;
-        private int posZ = 0;
-        private short speed = 0;
-        private double speedKhm = 0.0d;
-        private short direction = 0;
-        private short heading = 0;
-        private short angleVelocity = 0;
+        private double x = 0.0d;
+        private double y = 0.0d;
+        private double z = 0.0d;
+        private double speedMs = 0.0d;
+        private double speedKmh = 0.0d;
+        private double directionAngle = 0.0d;
+        private double headingAngle = 0.0d;
+        private double angleVelocity = 0.0d;
 
         //Game Feature
+        private uint collisionTimer = 0;
         private FeatureAcceleration_0_100 featureAcceleration_0_100 = new FeatureAcceleration_0_100();
-
-    #region Update
-        new protected virtual void update(uint diff)
-        {
-            //Script.CarFinishRace((Driver)this);
-            //session.log("");
-            base.update(diff);
-        }
-    #endregion
-
-    #region Game Feature
-        private class FeatureAcceleration_0_100
+        private sealed class FeatureAcceleration_0_100
         {
             private bool started = false;
             private long startTime = 0;
 
-            public void Update(Car car)
+            internal void Update(Car car)
             {
-                if (car.speedKhm < 0.9d && (!started || startTime != 0))
+                if (car.speedMs < 0x28 && (!started || startTime != 0))
                     Start();
 
-                else if (car.speedKhm > 1.0d && started && startTime == 0)
+                else if (car.speedMs > 44 && started && startTime == 0) //About 0Kmh
                     startTime = DateTime.Now.Ticks;
 
-                else if (car.speedKhm > 99.9d && started)
+                else if (car.speedMs > 9111 && started) //About 100Kmh
                     Sucess(ref car);
             }
             private void Start()
@@ -145,7 +135,7 @@ namespace Drive_LFSS.Game_
             private void Sucess(ref Car car)
             {
                 long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
-                double finalAccelerationTime = (((double)timeElapsed - 5.0d) / 1000.0d); //5.0d Should be MCI interval /2 
+                float finalAccelerationTime = (((float)timeElapsed - 5.0f) / 1000.0f); //5.0f Should be MCI interval /2 
 
                 Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
 
@@ -158,21 +148,42 @@ namespace Drive_LFSS.Game_
                 ((Driver)car).SendMessage("^7 0-100Km/h In: ^2" + finalAccelerationTime + " ^0 sec.");
             }
         }
-        public void FinishRace()
+
+        new protected virtual void update(uint diff)
         {
-            if(((Driver)this).Session.script.CarFinishRace((ICar)this))
+            if ( collisionTimer > 0 )
+            {
+                if (collisionTimer > diff)
+                    collisionTimer -= diff;
+                else
+                {
+                    collisionTimer = 0;
+                    ((Button)this).RemoveButton((ushort)Button_Entry.COLLISION_WARNING);
+                }
+            }
+            base.update(diff);
+        }
+        public bool HasCollisionWarning()
+        {
+            return (collisionTimer > 0);
+        }
+        public void SendCollisionWarning(string text)
+        {
+            collisionTimer = 2000;
+            ((Button)this).SendUpdateButton((ushort)Button_Entry.COLLISION_WARNING, text);
+        }
+        public void finishRace()
+        {
+            if (((Driver)this).Session.script.CarFinishRace((ICar)this))
                 return;
         }
-        public void LeaveRace(PacketPLL _packet) //to be called when a car is removed from a race
+        public void leaveRace(PacketPLL _packet) //to be called when a car is removed from a race
         {
             carId = 0;
             ButtonTemplateInfo banner = Program.buttonTemplate.GetEntry((uint)Button_Entry.BANNER);
             SendUniqueButton(banner);
         }
-    #endregion
-
-    #region Script Interface
-
+        
         public byte CarId
         {
             get { return carId; }
@@ -181,45 +192,51 @@ namespace Drive_LFSS.Game_
         {
             get { return carName; }
         }
-    #endregion
-
-    #region Tool
+        public ushort GetNode()
+        {
+            return node;
+        }
+        public byte GetPosition()
+        {
+            return position;
+        }
 
         //Speed
-        private double SpeedToKmh()
+        public double GetSpeedMs()
         {
-            return speed / 327.68 * 3.6;
+            return speedMs;
+        }
+        public double GetSpeedKmh()
+        {
+            return speedKmh;
         }
 
         //X,Y,Z Coordonate
-        private double PosXToCoord()
+        public double GetPosX()
         {
-            return posX / 65536.0d;
+            return x;
         }
-        private double PosYToCoord()
+        public double GetPosY()
         {
-            return posY / 65536.0d;
+            return y;
         }
-        private double PosZToCoord()
+        public double GetPosZ()
         {
-            return posZ / 65536.0d;
+            return z;
         }
 
         //Trajectoire / Direction / Velocity
-        private double DirectionToTrajectoryAngle()
+        public double GetTrajectoryAngle()
         {
-            return direction * 180.0d / 32768.0d;
+            return (double)directionAngle * 360.0d / 65536.0d;
         }
-        private double HeadingToOnPathOrientation()
+        public double GetHeadingAngle()
         {
-            return heading * 180.0d / 32768.0d;
+            return (double)headingAngle * 360.0d / 65536.0d;
         }
-        private double AngleVelocityToHeadindVelovity()
+        public double GetHeadindVelovity()
         {
-            return angleVelocity * 180.0d / 8192.0d;
+            return angleVelocity * 360.0f / 16384.0d;
         }
-
-    #endregion
-
     }
 }

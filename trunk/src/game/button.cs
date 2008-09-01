@@ -285,6 +285,12 @@ namespace Drive_LFSS.Game_
             else
                 SendButton(buttonInfo);
         }
+        public void SendUpdateButton(ushort buttonEntry, string text)
+        {
+            ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
+            buttonInfo.Text = text;
+            SendUpdateButton(buttonInfo);
+        }
         public void SendButton(ushort buttonEntry)
         {
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);

@@ -162,6 +162,9 @@ namespace Drive_LFSS
             }
             Log.normal("|FINISH\r\n\r\n");
 
+            if(Config.GetIntValue("CPU","Priority") > 0)
+                System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
+           
             #region MainThread update
 
             long ticks = DateTime.Now.Ticks;

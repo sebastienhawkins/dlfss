@@ -37,7 +37,7 @@ namespace Drive_LFSS.Game_
     }
     public sealed class Race : IRace
 	{
-        public Race(Session _session)
+        public Race(Session _session): base()
         {
             session = _session;
         }
@@ -88,6 +88,8 @@ namespace Drive_LFSS.Game_
             nodeSplit3Index = _packet.nodeSplit3Index;
             hasToBeSavedIntoPPSTA = true;
 
+            grid = new Grid(nodeCount);
+
             if (!SetNewGuid())
                 Log.error("Error When Creating a New GUID for Race.\r\n");
         }
@@ -127,11 +129,12 @@ namespace Drive_LFSS.Game_
                 RequestFinalResult();
             }
         }
-        public void ProcessCarInformation(CarInformation _carInformation)
+        public void ProcessCarInformation(Car car)
         {
-            if (_carInformation.position == 0 || _carInformation.position == 255) //Position is Unknow for that Car.
+            if (car.GetPosition() == 0 || car.GetPosition() == 255) //Position is Unknow for that Car.
                 return;
-            SetCarPosition(_carInformation.carId,(byte)(_carInformation.position-1));
+            SetCarPosition(car.CarId, (byte)(car.GetPosition() - 1));
+            grid.Update((CarMotion)car);
         }
         public void ProcessResult(PacketRES _packet)
         {
@@ -170,6 +173,7 @@ namespace Drive_LFSS.Game_
         private string gridOrder = "";
         private string finishOrder = "";
         //
+        private Grid grid = new Grid(0);
         private bool requestedFinalResult = false;
         private byte finalResultCount = 0;
         private bool stateHasChange = false;
@@ -198,6 +202,19 @@ namespace Drive_LFSS.Game_
             }
         }
         
+        public void AddToGrid(CarMotion car)
+        {
+            grid.Add(car);
+        }
+        public void RemoveFromGrid(CarMotion car)
+        {
+            grid.Remove(car);
+        }
+        public void UpdateGrid(CarMotion car)
+        {
+            grid.Update(car);
+        }
+
         public uint GetGuid()
         {
             return guid;
@@ -272,7 +289,11 @@ namespace Drive_LFSS.Game_
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `race` WHERE `guid`=" + guid);
             string query = "INSERT INTO `race` (`guid`,`qualify_race_guid`,`track_prefix`,`start_timestamp`,`end_timestamp`,`grid_order`,`finish_order`,`race_laps`,`race_status`,`race_feature`,`qualification_minute`,`weather_status`,`wind_status`)";
             query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / 10000000) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
-            Program.dlfssDatabase.ExecuteNonQuery(query);
+            //Since this is GUID creation, important 1 at time is created.
+            lock (Program.dlfssDatabase)
+            {
+                Program.dlfssDatabase.ExecuteNonQuery(query);
+            }
             raceSaveInterval = 0;
             stateHasChange = false;
             Log.database(session.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps:" + raceLaps + ", saved To Database.\r\n");

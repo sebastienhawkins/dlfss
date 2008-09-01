@@ -126,7 +126,7 @@ namespace Drive_LFSS.Session_
             return race.GetTrackPrefix();
         }
 
-        #region Update/Timer
+
         private const uint TIMER_PING_PONG = 50000;
         private uint TimerPingPong = 48000;
         public void update(uint diff)
@@ -151,7 +151,6 @@ namespace Drive_LFSS.Session_
             // Use Lock on the Object, since during Delete operation we can receive packet, this will pause other thread
 
         }
-        #endregion
 
         #region Process packet
         new public void AddToTcpSendingQueud(Packet _serverPacket)
@@ -226,21 +225,31 @@ namespace Drive_LFSS.Session_
                 return;
             }
 
+            Car _car;
+
+            byte index;
             //this is first version, i expect some probleme into the case, we don't know Driver as Leave the Race or Disconnected... Let See.
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
             {
-                byte itr;
-                if ((itr = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 0)
-                    driverList[itr].Init(_packet);
+                if ((index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 0)
+                {
+                    driverList[index].Init(_packet);
+                    _car = ((Car)driverList[index]);
+                }
                 else
                 {
                     Driver _driver = new Driver(this);
                     _driver.Init(_packet);
                     driverList.Add(_driver);
+                    _car = ((Car)_driver);
                 }
             }
-            else                                                                            //Human
-                driverList[GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)].Init(_packet);
+            else    //Human
+            {
+                index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName);
+                driverList[index].Init(_packet);
+            }
+            race.AddToGrid(((CarMotion)driverList[index]));
         }      // New Car Join Race
         protected sealed override void processPacket(PacketPLL _packet)
         {
@@ -253,9 +262,9 @@ namespace Drive_LFSS.Session_
                 return;
             }
 
-            //Do a Init in case we need a Action happen into Car when leave race....
             //Do we delete the entire Driver on a Bot Leave Race???
-            ((Car)driverList[itr]).LeaveRace(_packet);
+            ((Car)driverList[itr]).leaveRace(_packet);
+            race.RemoveFromGrid(((CarMotion)driverList[itr]));
         }      // Delete Car leave (spectate - loses slot)
         protected sealed override void processPacket(PacketMCI _packet)
         {
@@ -274,7 +283,7 @@ namespace Drive_LFSS.Session_
                     continue;
 
                 ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
-                race.ProcessCarInformation(carInformation[itr]);
+                race.ProcessCarInformation(((Car)driverList[carIndex]));
             }
         }      // Multiple Car Information
         protected sealed override void processPacket(PacketMSO _packet)

@@ -81,6 +81,8 @@
     <Compile Include="database\idatabase.cs" />
     <Compile Include="database\storage.cs" />
     <Compile Include="game\button.cs" />
+    <Compile Include="game\car_motion.cs" />
+    <Compile Include="game\grid.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="irc\enum.cs" />
