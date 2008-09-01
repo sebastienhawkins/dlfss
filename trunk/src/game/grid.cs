@@ -90,12 +90,14 @@ namespace Drive_LFSS.Game_
 
                 double speedDiff = ((car.GetSpeedKmh() - carAround[itr].GetSpeedKmh()));
                 double dist = GetDistance2DSq(car, carAround[itr]);
-                if (speedDiff < 0 && (dist * dist * speedColRatio) < -speedDiff
+                if (speedDiff < 0 && (dist * dist * speedColRatio) < -speedDiff //this is BAD, but need to find car brake range... :(
                     && GetDistanceZ(car, carAround[itr]) < 1.0d && HasCollisionPath(carAround[itr], car))
                 {
 
                     if (!carAround[itr].HasCollisionWarning())
-                    carAround[itr].SendCollisionWarning("^1What a Shame, Get out of the Car.");
+                        carAround[itr].SendCollisionWarning("^1What a Shame, Get out of the Car.");
+                    if (!car.HasCollisionWarning())
+                        car.SendCollisionWarning("^8Driver \"^2" + ((Driver)carAround[itr]).DriverName + "^8\" Seem to have no Brake!");
                     //Log.debug("Car Is in Back:" + ((Driver)carAround[itr]).DriverName + ", And Dangerous To:" + ((Driver)car).DriverName + "\r\n");
                 }
                     
@@ -132,8 +134,8 @@ namespace Drive_LFSS.Game_
         {
             double dx = car2.GetPosX() - car1.GetPosX();
             double dy = car2.GetPosY() - car1.GetPosY();
-            double size = 1.0d;
-            double distance = (dx * dx) + (dy * dy) - size;
+            double bothSize = 1.0d;
+            double distance = (dx * dx) + (dy * dy) - bothSize;
             return (distance > 0 ? distance : 0);
         }
         private double GetDistanceZ(CarMotion fromCar, CarMotion tocar)
@@ -165,7 +167,7 @@ namespace Drive_LFSS.Game_
             else
                 angle += 90.0d;
 
-            double angleDiff = fromCar.GetTrajectoryAngle() - angle;
+            double angleDiff = fromCar.GetTrajectory() - angle;
 
             //TODO: need to find the perfect angle, based on a static car size.
             return ( (angleDiff <= 14.0d) && (angleDiff >= -14.0d ) );

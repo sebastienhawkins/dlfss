@@ -5,9 +5,9 @@ namespace Drive_LFSS.Game_
     {
         byte CarId { get; }
         ushort GetNode();
-        double GetHeadindVelovity();
-        double GetHeadingAngle();
-        double GetTrajectoryAngle();
+        double GetOrientationSpeed();
+        double GetOrientation();
+        double GetTrajectory();
         double GetSpeedMs();
         double GetSpeedKmh();
         double GetPosX();

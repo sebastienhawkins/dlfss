@@ -131,9 +131,9 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessCarInformation(Car car)
         {
-            if (car.GetPosition() == 0 || car.GetPosition() == 255) //Position is Unknow for that Car.
+            if (car.GetRacePosition() == 0 || car.GetRacePosition() == 255) //Position is Unknow for that Car.
                 return;
-            SetCarPosition(car.CarId, (byte)(car.GetPosition() - 1));
+            SetCarPosition(car.CarId, (byte)(car.GetRacePosition() - 1));
             grid.Update((CarMotion)car);
         }
         public void ProcessResult(PacketRES _packet)

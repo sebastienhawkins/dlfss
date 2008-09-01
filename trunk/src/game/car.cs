@@ -59,7 +59,7 @@ namespace Drive_LFSS.Game_
         {
             node = _carInformation.nodeTrack;
             lapNumber = _carInformation.lapNumber;
-            position = _carInformation.position;
+            racePosition = _carInformation.position;
             carFlag = _carInformation.carFlag;
             x = _carInformation.posX / 65536.0d;
             y = _carInformation.posY / 65536.0d;
@@ -68,13 +68,21 @@ namespace Drive_LFSS.Game_
             speedMs = _carInformation.speed / 327.68d;
             speedKmh = speedMs * 3.6d;
 
-            directionAngle = _carInformation.direction;
+            tracjectory = _carInformation.direction;
             headingAngle = _carInformation.heading;
-            angleVelocity = _carInformation.angleVelocity;
+            orientationSpeed = _carInformation.angleVelocity;
 
+            double finalAccelerationTime = featureAcceleration_0_100.Update((CarMotion)this);
+            if (finalAccelerationTime > 0.0d)
+            {
+                Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
 
-            featureAcceleration_0_100.Update(this);
+                if (((Driver)this).Session.script.CarAcceleration_0_100((ICar)this, finalAccelerationTime))
+                    return;
 
+                //Normal Process
+                AddMessageTop(" ^70-100Km/h In: ^2" + finalAccelerationTime + " ^7sec.", 5000);
+            }
             //base.Init(_packet);
         }
 
@@ -92,16 +100,16 @@ namespace Drive_LFSS.Game_
         private Car_Tyres tyreRearRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private ushort node = 0;
         private ushort lapNumber = 0;
-        private byte position = 0;
+        private byte racePosition = 0;
         private Car_Racing_Flag carFlag = Car_Racing_Flag.CAR_RACING_FLAG_NONE;
         private double x = 0.0d;
         private double y = 0.0d;
         private double z = 0.0d;
         private double speedMs = 0.0d;
         private double speedKmh = 0.0d;
-        private double directionAngle = 0.0d;
+        private double tracjectory = 0.0d;
         private double headingAngle = 0.0d;
-        private double angleVelocity = 0.0d;
+        private double orientationSpeed = 0.0d;
 
         //Game Feature
         private uint collisionTimer = 0;
@@ -111,16 +119,15 @@ namespace Drive_LFSS.Game_
             private bool started = false;
             private long startTime = 0;
 
-            internal void Update(Car car)
+            internal double Update(CarMotion car)
             {
-                if (car.speedMs < 0.1 && (!started || startTime != 0))
+                if (car.GetSpeedMs() < 0.1 && (!started || startTime != 0))
                     Start();
-
-                else if (car.speedMs > 0.1 && started && startTime == 0) //About 0Kmh
+                else if (car.GetSpeedMs() > 0.1 && started && startTime == 0) //About 0Kmh
                     startTime = DateTime.Now.Ticks;
-
-                else if (car.speedMs > 27.777777d && started) //About 100Kmh
-                    Sucess(ref car);
+                else if (car.GetSpeedMs() > 27.777777d && started) //About 100Kmh
+                    return Sucess();
+                return 0.0d;
             }
             private void Start()
             {
@@ -132,20 +139,11 @@ namespace Drive_LFSS.Game_
                 startTime = 0;
                 started = false;
             }
-            private void Sucess(ref Car car)
+            private double Sucess()
             {
                 long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
-                float finalAccelerationTime = (((float)timeElapsed - 5.0f) / 1000.0f); //5.0f Should be MCI interval /2 
-
-                Log.feature(((Driver)car).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
-
                 End();
-
-                if (((Driver)car).Session.script.CarAcceleration_0_100((ICar)car, finalAccelerationTime))
-                    return;
-
-                //Normal Process
-                ((Driver)car).SendMessage("^7 0-100Km/h In: ^2" + finalAccelerationTime + " ^0 sec.");
+                return (((double)timeElapsed - 5.0d) / 1000.0d); //5.0f Should be MCI interval /2 
             }
         }
 
@@ -196,9 +194,9 @@ namespace Drive_LFSS.Game_
         {
             return node;
         }
-        public byte GetPosition()
+        public byte GetRacePosition()
         {
-            return position;
+            return racePosition;
         }
 
         //Speed
@@ -226,17 +224,17 @@ namespace Drive_LFSS.Game_
         }
 
         //Trajectoire / Direction / Velocity
-        public double GetTrajectoryAngle()
+        public double GetTrajectory()
         {
-            return (double)directionAngle * 360.0d / 65536.0d;
+            return (double)tracjectory * 360.0d / 65536.0d;
         }
-        public double GetHeadingAngle()
+        public double GetOrientation()
         {
             return (double)headingAngle * 360.0d / 65536.0d;
         }
-        public double GetHeadindVelovity()
+        public double GetOrientationSpeed()
         {
-            return angleVelocity * 360.0f / 16384.0d;
+            return orientationSpeed * 360.0f / 16384.0d;
         }
     }
 }
