@@ -191,7 +191,9 @@ namespace Drive_LFSS.Game_
                         case Vote_Track_Change.AUTO:
                         {
                             SendVoteCancel();
-                            //TODO random choses the next track and call 
+                            Random randomItr = new Random();
+                            voteInProgress = true;
+                            PrepareNextTrack(raceMap[randomItr.Next(0, (raceMap.Count - 1))]);
                         } break;
                     }
                 } break;
@@ -298,6 +300,13 @@ namespace Drive_LFSS.Game_
             iSession.SendMSTMessage("/laps " + nextRace.LapCount);
             iSession.SendMSTMessage("/weather " + (byte)nextRace.Weather);
             iSession.SendMSTMessage("/wind " + (byte)nextRace.Wind);
+            string[] carEntrys = nextRace.CarEntryAllowed.Split(new char[] { ' ' });
+            string carPrefix = "";
+            for (byte itr = 0; itr < carEntrys.Length; itr++)
+                carPrefix += Program.carTemplate.GetEntry(Convert.ToUInt32(carEntrys[itr])).NamePrefix + "+";
+            carPrefix = carPrefix.TrimEnd(new char[] { '+' });
+            iSession.SendMSTMessage("/cars " + carPrefix);
+
         }
         private void EndRace()
         {

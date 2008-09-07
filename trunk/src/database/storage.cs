@@ -391,6 +391,19 @@ namespace Drive_LFSS.Storage_
         private string namePrefix;
         private string name;
         private Car_Multiple_Flag mask;
+        
+        public string NamePrefix
+        {
+            get { return namePrefix; }
+        }
+        public string Name
+        {
+            get { return name; }
+        }
+        public Car_Multiple_Flag Mask
+        {
+            get { return mask; }
+        }
     }
 
     public sealed class RaceTemplate : Storage
@@ -416,7 +429,7 @@ namespace Drive_LFSS.Storage_
             entry = Convert.ToUInt32(rowInfos[0]);
             description = (string)(rowInfos[1]);
             trackEntry = (byte)Convert.ToUInt16(rowInfos[2]);
-            car_entry_allowed = (string)rowInfos[3];
+            carEntryAllowed = (string)rowInfos[3];
             weather = (Weather_Status)Convert.ToUInt16(rowInfos[4]);
             wind = (Wind_Status)Convert.ToUInt16(rowInfos[5]);
             lapCount = (byte)Convert.ToUInt16(rowInfos[6]);
@@ -431,7 +444,7 @@ namespace Drive_LFSS.Storage_
         private uint entry;
         private string description;
         private byte trackEntry;
-        private string car_entry_allowed;
+        private string carEntryAllowed;
         private Weather_Status weather;
         private Wind_Status wind;
         private byte lapCount;
@@ -451,9 +464,9 @@ namespace Drive_LFSS.Storage_
         {
             get { return trackEntry; }
         }
-        public string Car_entry_allowed
+        public string CarEntryAllowed
         {
-            get { return car_entry_allowed; }
+            get { return carEntryAllowed; }
         }
         public Weather_Status Weather
         {
