@@ -36,6 +36,7 @@ namespace Drive_LFSS.Session_
             sessionName = _serverName;
             commandPrefix = _inSimSetting.commandPrefix;
             race = new Race(this);
+            vote = new Vote(this);
             driverList = new List<Driver>();
             driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
             driverList.Capacity = 256;
@@ -52,6 +53,7 @@ namespace Drive_LFSS.Session_
         {
             base.ConfigApply();
 
+            vote.ConfigApply();
             Race.ConfigApply();
             Driver.ConfigApply();
         }
@@ -88,12 +90,14 @@ namespace Drive_LFSS.Session_
         private Ping ping;
         private string sessionName;
         private char commandPrefix;
-        public bool connectionRequest;   
+        public bool connectionRequest;
+        private byte clientConnectionCount = 0;
 
         //Object
         public Script script;
         private CommandInGame command;
         private Race race;
+        private Vote vote;
         private List<Driver> driverList;
 
         private void CommandExec(bool _adminStatus, string _licenceName, string _commandText)
@@ -117,6 +121,10 @@ namespace Drive_LFSS.Session_
         {
             return "["+sessionName+">";
         }
+        public string GetSessionName()
+        {
+            return sessionName;
+        }
         public uint GetRaceGuid()
         {
             return race.GetGuid();
@@ -125,8 +133,29 @@ namespace Drive_LFSS.Session_
         {
             return race.GetTrackPrefix();
         }
+        public void SendUpdateButtonToAll(ushort buttonEntry, string text)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+                driverList[itr].SendUpdateButton(buttonEntry, text);
+        }
 
-
+        public void AddMessageMiddleToAll(string text, uint duration)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+                driverList[itr].AddMessageMiddle(text,duration);
+        }
+        public void RemoveButtonToAll(ushort buttonEntry)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+                driverList[itr].RemoveButton(buttonEntry);
+        }
+        public void RemoveButton(ushort buttonEntry, byte licenceId)
+        {
+            driverList[GetLicenceIndexNoBot(licenceId)].RemoveButton(buttonEntry);
+        }
         private const uint TIMER_PING_PONG = 50000;
         private uint TimerPingPong = 48000;
         public void update(uint diff)
@@ -141,10 +170,12 @@ namespace Drive_LFSS.Session_
                 TimerPingPong = 0;
             }
 
+
+            vote.update(diff);
             for (byte itr = 1; itr < driverList.Count; ++itr)
                 driverList[itr].update(diff);
-
             race.update(diff);
+
 
             //Delete Handle
             //Since im multithreading into processPacket Delete of: Race/Driver Should take place Bellow here.
@@ -340,6 +371,8 @@ namespace Drive_LFSS.Session_
             base.processPacket(_packet);
             if (_packet.currentCarId == 0)
                 race.Init(_packet);
+
+            clientConnectionCount = _packet.connectionCount;
             //else
             //    ;//driver Case
 
@@ -351,7 +384,7 @@ namespace Drive_LFSS.Session_
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
                 case Tiny_Type.TINY_REN: Log.debug(GetSessionNameForLog() + " RACE END RACE END RACE END.\r\n"); race.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
-                case Tiny_Type.TINY_VTC: Log.debug(GetSessionNameForLog() + " A VOTE was CANCEL.\r\n"); break;
+                case Tiny_Type.TINY_VTC: vote.VoteCancel(); break;
                 case Tiny_Type.TINY_NONE: break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }
@@ -363,18 +396,7 @@ namespace Drive_LFSS.Session_
             {
                 case Small_Type.SMALL_VTA_VOTE_ACTION:
                 {
-                    switch ((Vote_Action)_packet.uintValue)
-                    {
-                        case Vote_Action.VOTE_NONE:
-                            break;
-                        case Vote_Action.VOTE_END:
-                            break;
-                        case Vote_Action.VOTE_QUALIFY:
-                            break;
-                        case Vote_Action.VOTE_RESTART:
-                            break;
-                    }
-                    Log.debug("processPacket(PacketSmall _packet), Vote Action: " + (Vote_Action)_packet.uintValue + "\r\n");
+                    vote.VoteAction((Vote_Action)_packet.uintValue);
                 } break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;
             }
@@ -412,13 +434,23 @@ namespace Drive_LFSS.Session_
                 case Button_Entry.MOTD_BUTTON_DRIVE:
                 {
                     ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
-                 } break;
+                } break;
+                case Button_Entry.VOTE_OPTION_1: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_2: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_3: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_4: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_5: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_6: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.licenceId); break;
                 default:
                 {
                     Log.error("We recevied a button ClickId, from unknow source, licenceName: " + driverList[driverIndex].LicenceName + ", LicenceIndex: "+driverIndex+"\r\n");
                 } break;
             }
         }      // Button Click Receive
+        protected sealed override void processPacket(PacketVTN _packet)
+        {
+            vote.VoteNotification(_packet.voteAction,_packet.tempLicenceId);
+        }       //Vote Notification
         #endregion
 
         #region Driver/Car/Licence Association Tool
@@ -484,9 +516,13 @@ namespace Drive_LFSS.Session_
             }
             return false;
         }
-        public int GetNbrOfDrivers()
+        public byte GetNbrOfDrivers()
         {
-            return driverList.Count - 1; // -1 remove the Host but... maybe not good idea removing it from here.
+            return (byte)(driverList.Count - 1); // -1 remove the Host but... maybe not good idea removing it from here.
+        }
+        public byte GetNbrOfConnection()
+        {
+            return (byte)(clientConnectionCount - 1); //Remove The Host
         }
         #endregion
     }

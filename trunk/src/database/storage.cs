@@ -71,13 +71,13 @@ namespace Drive_LFSS.Storage_
                             switch (tableFormat[index])
                             {
                                 case 'u':
-                                    if (reader.GetFieldType(index) == typeof(UInt32) || reader.GetFieldType(index) == typeof(byte))
+                                    if (reader.GetFieldType(index) == typeof(UInt32) || reader.GetFieldType(index) == typeof(byte) || reader.GetFieldType(index) == typeof(UInt16))
                                         value.Add(reader.IsDBNull(index) ? 0 : (uint)reader.GetInt32(index));
                                     else
                                         Log.error("  UINT Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                                 case 'p':
-                                    if (reader.GetFieldType(index) == typeof(UInt32))
+                                    if (reader.GetFieldType(index) == typeof(UInt32) || reader.GetFieldType(index) == typeof(byte) || reader.GetFieldType(index) == typeof(UInt16))
                                     {
                                         value.Add(reader.IsDBNull(index) ? 0 : (uint)reader.GetInt32(index));
                                         dataIndex = (reader.IsDBNull(index) ? 0 : (uint)reader.GetInt32(index));
@@ -128,6 +128,11 @@ namespace Drive_LFSS.Storage_
                 return data[entry];
             return null;
         }
+        public uint GetCount()
+        {
+            return (uint)data.Count;
+        }
+        //TODO: Max value... Will be helfull to add or remove thing from ingame command.
     }
 
     //Normaly they should not have a "public sealed class ButtonTemplate : Storage"
@@ -304,13 +309,15 @@ namespace Drive_LFSS.Storage_
             entry = Convert.ToUInt32(rowInfos[0]);
             namePrefix = (string)rowInfos[1];
             name = (string)rowInfos[2];
+            configuration = (string)rowInfos[3];
+            reverse = (string)rowInfos[4] == "1" ? true : false;
             nodeIndex = new byte[3]
             {
-                (byte)Convert.ToUInt16(rowInfos[3]),
-                (byte)Convert.ToUInt16(rowInfos[4]),
-                (byte)Convert.ToUInt16(rowInfos[5])
+                (byte)Convert.ToUInt16(rowInfos[5]),
+                (byte)Convert.ToUInt16(rowInfos[6]),
+                (byte)Convert.ToUInt16(rowInfos[7])
             };
-            totalLength = (uint)Convert.ToUInt16(rowInfos[5]);
+            totalLength = (uint)Convert.ToUInt16(rowInfos[8]);
 
         }
         ~TrackTemplateInfo()
@@ -320,6 +327,8 @@ namespace Drive_LFSS.Storage_
         private uint entry;
         private string namePrefix;
         private string name;
+        private string configuration;
+        private bool reverse;
         public byte[] nodeIndex;
         private uint totalLength;
     }
@@ -347,7 +356,7 @@ namespace Drive_LFSS.Storage_
             entry = Convert.ToUInt32(rowInfos[0]);
             namePrefix = (string)rowInfos[1];
             name = (string)rowInfos[2];
-            traction = (Car_Traction)Convert.ToUInt16(rowInfos[3]);
+            mask = (Car_Multiple_Flag)Convert.ToUInt32(rowInfos[3]);
         }
         ~CarTemplateInfo()
         {
@@ -356,7 +365,7 @@ namespace Drive_LFSS.Storage_
         private uint entry;
         private string namePrefix;
         private string name;
-        private Car_Traction traction;
+        private Car_Multiple_Flag mask;
     }
 
     public sealed class RaceTemplate : Storage
@@ -402,6 +411,43 @@ namespace Drive_LFSS.Storage_
         private byte lapCount;
         private byte qualifyMinute;
         private Grid_Start_Beviator gridStartBeviator;
+
+        public uint Entry
+        {
+            get { return entry; }
+        }
+        public string Description
+        {
+            get { return description; }
+        }
+        public byte TrackEntry
+        {
+            get { return trackEntry; }
+        }
+        public string Car_entry_allowed
+        {
+            get { return car_entry_allowed; }
+        }
+        public Weather_Status Weather
+        {
+            get { return weather; }
+        }
+        public Wind_Status Wind
+        {
+            get { return wind; }
+        }
+        public byte LapCount
+        {
+            get { return lapCount; }
+        }
+        public byte QualifyMinute
+        {
+            get { return qualifyMinute; }
+        }
+        public Grid_Start_Beviator GridStartBeviator
+        {
+            get { return gridStartBeviator; }
+        }
     }
 
     public sealed class DriverBan : Storage

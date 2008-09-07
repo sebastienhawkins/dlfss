@@ -53,6 +53,7 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_BTC_BUTTON_CLICK:              processPacket((PacketBTC)_packet);break;
                 case Packet_Type.PACKET_BTT_BUTTON_TYPE_IN_TEXT_OK:    processPacket((PacketBTT)_packet);break;
                 case Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE: processPacket((PacketBFN)_packet);break;
+                case Packet_Type.PACKET_VTN_VOTE_NOTIFICATION:         processPacket((PacketVTN)_packet); break;
                 default: Log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
@@ -228,7 +229,7 @@ namespace Drive_LFSS.Packet_
         // A vote got called
         protected virtual void processPacket(PacketVTN _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " VTN_VoteNotify(), VTN -> UCID=" + _packet.tempLicenceId + ", Action=" + _packet.voteAction + ", Spare2=" + _packet.Spare2 + ", Spare3=" + _packet.Spare3 + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " VTN_VoteNotify(), VTN -> UCID=" + _packet.tempLicenceId + ", Action=" + _packet.voteAction + ", Spare2=" + _packet.spare2 + ", Spare3=" + _packet.spare3 + "\r\n");
         }
         // Detailed car information packet (max 8 per packet)
         protected virtual void processPacket(PacketMCI _packet)

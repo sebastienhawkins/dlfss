@@ -27,6 +27,13 @@ namespace Drive_LFSS.Definition_
         MESSAGE_BAR_TOP = 6,
         MESSAGE_BAR_MIDDLE = 7,
         COLLISION_WARNING = 8,
+        VOTE_TITLE = 9,
+        VOTE_OPTION_1 = 10,
+        VOTE_OPTION_2 = 11,
+        VOTE_OPTION_3 = 12,
+        VOTE_OPTION_4 = 13,
+        VOTE_OPTION_5 = 14,
+        VOTE_OPTION_6 = 15,
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
     }
@@ -143,7 +150,12 @@ namespace Drive_LFSS.Definition_
         VOTE_END = 1,
         VOTE_RESTART = 2,
         VOTE_QUALIFY = 3,
-        VOTE_MAX = 4
+        VOTE_CUSTOM_1 = 4,
+        VOTE_CUSTOM_2 = 5,
+        VOTE_CUSTOM_3 = 6,
+        VOTE_CUSTOM_4 = 7,
+        VOTE_CUSTOM_5 = 8,
+        VOTE_CUSTOM_6 = 9,
     }
     public enum Leave_Reason : byte
     {
@@ -177,7 +189,7 @@ namespace Drive_LFSS.Definition_
     {
         GRID_START_BEVIATOR_NONE = 0,
     }
-    [Flags]public enum Car_Traction : byte
+    [Flags]public enum Car_Multiple_Flag : uint
     {
         CAR_TRACTION_NONE = 0,
         CAR_TRACTION_FRONT = 1,

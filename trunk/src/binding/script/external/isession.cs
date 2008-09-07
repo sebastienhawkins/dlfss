@@ -4,9 +4,15 @@
     {
         long GetLatency();
         long GetReactionTime();
-        int GetNbrOfDrivers();
+        byte GetNbrOfDrivers();
+        byte GetNbrOfConnection();
         uint GetRaceGuid();
         string GetRaceTrackPrefix();
         string GetSessionNameForLog();
+        string GetSessionName();
+        void SendUpdateButtonToAll(ushort buttonEntry, string text);
+        void RemoveButtonToAll(ushort buttonEntry);
+        void RemoveButton(ushort buttonEntry,byte licenceId);
+        void AddMessageMiddleToAll(string text, uint duration);
     }
 }

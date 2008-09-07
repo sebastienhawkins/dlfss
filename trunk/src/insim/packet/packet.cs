@@ -101,6 +101,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_SMALL_MULTI_PURPOSE, new PacketSmall());
             Add(Packet_Type.PACKET_REO_RACE_GRID_ORDER, new PacketREO());
             Add(Packet_Type.PACKET_RES_RESULT_CONFIRMED, new PacketRES());
+            Add(Packet_Type.PACKET_VTN_VOTE_NOTIFICATION, new PacketVTN());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -765,10 +766,10 @@ namespace Drive_LFSS.Packet_
         internal byte packetSize;
         internal byte packetType;
         public byte requestId;
-        internal byte Zero;
+        internal byte zero;
         public byte tempLicenceId;
         public Vote_Action voteAction;
-        public byte Spare2;
-        public byte Spare3;
+        internal byte spare2;
+        internal byte spare3;
     }
 }

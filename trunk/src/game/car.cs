@@ -20,11 +20,12 @@ using System;
 
 namespace Drive_LFSS.Game_
 {
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Script_;
-    using Drive_LFSS.Log_;
-    using Drive_LFSS.Storage_;
+    using Definition_;
+    using Packet_;
+    using Script_;
+    using Session_;
+    using Log_;
+    using Storage_;
 
     public abstract class Car : Licence, ICar, CarMotion
     {
@@ -77,7 +78,7 @@ namespace Drive_LFSS.Game_
             {
                 Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
 
-                if (((Driver)this).Session.script.CarAcceleration_0_100((ICar)this, finalAccelerationTime))
+                if (((Session)((Driver)this).ISession).script.CarAcceleration_0_100((ICar)this, finalAccelerationTime))
                     return;
 
                 //Normal Process
@@ -172,7 +173,7 @@ namespace Drive_LFSS.Game_
         }
         public void finishRace()
         {
-            if (((Driver)this).Session.script.CarFinishRace((ICar)this))
+            if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
                 return;
         }
         public void leaveRace(PacketPLL _packet) //to be called when a car is removed from a race

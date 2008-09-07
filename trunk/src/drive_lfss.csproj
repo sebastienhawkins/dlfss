@@ -85,6 +85,7 @@
     <Compile Include="game\grid.cs" />
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
+    <Compile Include="game\vote.cs" />
     <Compile Include="irc\enum.cs" />
     <Compile Include="irc\irc_client.cs" />
     <Compile Include="insim\insim.cs" />

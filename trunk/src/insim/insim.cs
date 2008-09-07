@@ -123,9 +123,10 @@ namespace Drive_LFSS.InSim_
             try{ tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
             catch (SocketException _exception)
             {
-                Log.error(((Session)this).GetSessionNameForLog()+" TCP Socket Initialization failded, Error was: " +_exception.Message);
+                Log.error(((Session)this).GetSessionNameForLog()+" TCP Socket Initialization failded, Error was: " +_exception.Message+"\r\n");
                 //Maybe a little sleep and retry connect later, this is a isolated thread Call.. so a sleep won't hurt other thread.
                 ((Session)this).connectionRequest = true;
+                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
                 return;
             }
             tcpSocket = tcpClient.GetStream();
@@ -139,8 +140,9 @@ namespace Drive_LFSS.InSim_
             try { udpClient = new UdpClient(udpIpEndPoint); /*udpClient.Connect(inSimSetting.ip, (int)inSimSetting.port);*/ }
             catch (SocketException _exception)
             {
-                Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message);
+                Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message+"\r\n");
                 ((Session)this).connectionRequest = true;
+                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
                 return;
             }
 
@@ -218,7 +220,7 @@ namespace Drive_LFSS.InSim_
                 tcpClient = new TcpClient();
                 Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception.Message + "\r\n");
                 ((Session)this).connectionRequest = true;
-                Log.normal(((Session)this).GetSessionNameForLog() + " Trying to reconnect...\r\n");
+                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
             }
         }
         private void UdpSend()
@@ -247,7 +249,7 @@ namespace Drive_LFSS.InSim_
                 tcpClient = new TcpClient();
                 Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
                 ((Session)this).connectionRequest = true;
-                Log.normal(((Session)this).GetSessionNameForLog() + " Trying to reconnect...\r\n");
+                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
                 return;
             }
 

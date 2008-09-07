@@ -30,9 +30,10 @@ namespace Drive_LFSS.Game_
 
     public sealed class Driver : Car, IDriver
     {
-        public Driver(Session _session) : base()
+        public Driver(Session _session)
+            : base()
         {
-            session = _session;
+            iSession = _session;
         }
         ~Driver()
         {
@@ -79,7 +80,7 @@ namespace Drive_LFSS.Game_
             base.Init(_packet);
 
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
+            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
 
             if (IsBot())
                 return;
@@ -102,7 +103,7 @@ namespace Drive_LFSS.Game_
             // Check for fastest
             // do other thing we need
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
+            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
         }
         public void ProcessSplitInformation(PacketSPX _packet)
         {
@@ -111,12 +112,12 @@ namespace Drive_LFSS.Game_
         public void ProcessRaceStart()
         {
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
+            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
         }
         public void ProcessRaceEnd()
         {
             currentLap.Dispose();
-            currentLap = new Lap(session.GetRaceGuid(), guid, CarName, session.GetRaceTrackPrefix(), driverMask);
+            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
         }
         
         //Loaded From packet
@@ -125,7 +126,7 @@ namespace Drive_LFSS.Game_
         private byte driverModel = 0;
         public Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
-        private Session session;
+        private Session iSession;
 
         //
         private uint guid = 0;
@@ -242,7 +243,7 @@ namespace Drive_LFSS.Game_
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
             Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_mask`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', " + configMask + ", " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
-            Log.database(session.GetSessionNameForLog() + " DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
+            Log.database(iSession.GetSessionNameForLog() + " DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
         }
         private bool SetNewGuid()
         {
@@ -268,9 +269,9 @@ namespace Drive_LFSS.Game_
 
             base.update(diff);
         }
-        public Session Session
+        public ISession ISession
         {
-            get { return session; }
+            get { return iSession; }
         }
         public void SendMessage(string message)
         {
@@ -278,7 +279,7 @@ namespace Drive_LFSS.Game_
             if (IsBot()) 
                 return;
 
-            Session.AddToTcpSendingQueud
+            ((Session)ISession).AddToTcpSendingQueud
             (
                 new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,
                     new PacketMTC(CarId, message)));

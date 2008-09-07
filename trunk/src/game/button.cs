@@ -22,6 +22,7 @@ namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
+    using Drive_LFSS.Session_;
     using Drive_LFSS.Script_;
     using Drive_LFSS.Storage_;
     using Drive_LFSS.Log_;
@@ -185,7 +186,7 @@ namespace Drive_LFSS.Game_
             byte buttonId = removeButtonEntry(buttonEntry);
             while (buttonId != 0xFF)
             {
-                ((Driver)this).Session.AddToTcpSendingQueud
+                ((Session)((Driver)this).ISession).AddToTcpSendingQueud
                 (
                     new Packet
                     (
@@ -310,12 +311,12 @@ namespace Drive_LFSS.Game_
                 return;
             
             byte buttonId = newButtonId(buttonEntry);
-            if( buttonId == 0xFF )
+            if( buttonId == 255 )
             {
                 Log.error("Button System, Button Max Count Reached for Driver:"+((Driver)this).DriverName+", Licence"+((Licence)this).LicenceName+"\r\n");
                 return;
             }
-            ((Driver)this).Session.AddToTcpSendingQueud
+            ((Session)((Driver)this).ISession).AddToTcpSendingQueud
             (
                 new Packet
                 (
