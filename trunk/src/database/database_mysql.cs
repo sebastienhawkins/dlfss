@@ -20,7 +20,7 @@ using System;
 using System.Text;
 using System.Data;
 using MySql.Data.MySqlClient;
-
+using System.Threading;
 /*
  *             string[] info = Config.GetStringValue("MySQL", "ConnectionInfo").Split(';');
             string connectionInfo = "Database=" + info[4] + ";Data Source=" + info[0] + ";Port=" + info[1] + ";User Id=" + info[2] + ";Password=" + info[3] + ";Use Compression=" + info[5];
@@ -44,25 +44,7 @@ namespace Drive_LFSS.Database_
         private MySqlConnection connection;
         private MySqlCommand command;
         private MySqlTransaction transaction;
-
-        //Not Thread Safe
-        public IAsyncResult NewExecuteNonQuery()
-        {
-            return command.BeginExecuteNonQuery();
-        }
-        public int EndExecuteNonQuery(IAsyncResult _iaSyncResult)
-        {
-            return command.EndExecuteNonQuery(_iaSyncResult);
-        }
-        public void NewTransaction()
-        {
-            transaction = connection.BeginTransaction(IsolationLevel.Serializable); 
-        }
-        public void EndTransaction()
-        {
-            transaction.Commit();
-            transaction.Dispose();
-        }
+        private static Mutex mutexDataReader = new Mutex();
         
         //Thread Safe
         public void CancelCommand()
@@ -70,15 +52,16 @@ namespace Drive_LFSS.Database_
             try { lock (command) { command.Cancel(); } }
             catch (Exception) { }
         }
-        public IDataReader ExecuteQuery(string _command)
+        public void NewTransaction()
         {
-            MySqlDataReader dataReader;
-            lock (command)
-            {
-                command.CommandText = _command;
-                dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
-            }
-            return dataReader;
+            mutexDataReader.WaitOne();
+            transaction = connection.BeginTransaction(IsolationLevel.Serializable); 
+        }
+        public void EndTransaction()
+        {
+            transaction.Commit();
+            transaction.Dispose();
+            mutexDataReader.ReleaseMutex();
         }
         public int ExecuteNonQuery(string _command)
         {
@@ -90,5 +73,27 @@ namespace Drive_LFSS.Database_
             }
             return i;
         }
+
+        //Thread Safe, If into Transaction
+        public IAsyncResult NewExecuteNonQuery()
+        {
+            return command.BeginExecuteNonQuery();
+        }
+        public int EndExecuteNonQuery(IAsyncResult _iaSyncResult)
+        {
+            return command.EndExecuteNonQuery(_iaSyncResult);
+        }
+        public IDataReader ExecuteQuery(string _command)
+        {
+            MySqlDataReader dataReader;
+            
+            lock (command)
+            {
+                command.CommandText = _command;
+                dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+            }
+            return dataReader;
+        }
+
     }
 }

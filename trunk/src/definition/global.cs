@@ -20,6 +20,15 @@ using System;
 using System.Runtime.InteropServices;
 namespace Drive_LFSS.Definition_
 {
+    [Flags]public enum Race_Template_Flag : byte
+    {
+        NONE = 0,
+        MID_RACE_JOIN = 1,
+        MUST_PIT = 2,
+        CAN_RESET = 4,
+        FORCE_COCKPIT_VIEW = 8,
+        ALLOW_WRONG_WAY = 16
+    }
     public enum Button_Entry : ushort
     {
         NONE = 0,

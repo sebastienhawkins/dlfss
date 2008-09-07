@@ -273,16 +273,20 @@ namespace Drive_LFSS.Game_
         }
         private bool SetNewGuid()
         {
+            Program.dlfssDatabase.NewTransaction();
+            bool returnValue = false;
             IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `race`");
             if (reader.Read())
             {
                 guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
-                reader.Dispose();
-                SaveToDB();
-                return true;
+                returnValue = true;
             }
             reader.Dispose();
-            return false;
+            if (returnValue)
+                SaveToDB();
+
+            Program.dlfssDatabase.EndTransaction();
+            return returnValue;
         }
         private void SaveToDB()
         {

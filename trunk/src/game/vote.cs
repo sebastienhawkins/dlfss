@@ -48,7 +48,7 @@ namespace Drive_LFSS.Game_
             {
                 case "USER": trackChangeBeviator = Vote_Track_Change.USER; break;
                 case "VOTE": trackChangeBeviator = Vote_Track_Change.VOTE; break;
-                case "NOCHANGE": trackChangeBeviator = Vote_Track_Change.NO_CHANGE; break;
+                case "STATIC": trackChangeBeviator = Vote_Track_Change.NO_CHANGE; break;
                 case "AUTO": trackChangeBeviator = Vote_Track_Change.AUTO; break;
                 default: Log.error("Vote System config Error, unknow Value for Vote." + iSession.GetSessionName()+".TrackChange = "+Config.GetStringValue("Vote", iSession.GetSessionName(), "TrackChange")+"\r\n"); break;
             }
@@ -70,12 +70,13 @@ namespace Drive_LFSS.Game_
         private List<ushort> raceMap = new List<ushort>();
         private Dictionary<ushort, byte> voteOptions = new Dictionary<ushort, byte>();
         private byte voteCount = 0;
-        private bool voteInProgress = false;
+        private bool voteInProgress = false; //used to freeze System, no Change will be made when YES
         private byte licenceCount = 0;
         private uint voteTimer = 0;
         private uint voteTimerAdvert = 5000;
         private uint nextRaceTimer = 0;
         private RaceTemplateInfo nextRace;
+        private bool doEnd = false; //Will serve for Know when RaceEnd Really happen and, if we load auto the next track.
 
         public void update(uint diff)
         {
@@ -105,14 +106,14 @@ namespace Drive_LFSS.Game_
                 {
                     nextRaceTimer = 0;
                     voteInProgress = false;
-
+                    EndRace();
                 }
                 else
                     nextRaceTimer -= diff;
             }
         }
 
-        public void VoteNotification(Vote_Action voteAction, byte licenceId)
+        public void ProcessVoteNotification(Vote_Action voteAction, byte licenceId)
         {
             Log.debug(iSession.GetSessionNameForLog() + " Vote notification was:" + voteAction + "\r\n");
             ushort[] keys = new ushort[6]{0,0,0,0,0,0};
@@ -121,7 +122,7 @@ namespace Drive_LFSS.Game_
             {
                 case Vote_Action.VOTE_RESTART:
                 case Vote_Action.VOTE_QUALIFY:
-                case Vote_Action.VOTE_END:if (voteInProgress) SendVoteCancel(); return;
+                case Vote_Action.VOTE_END:/*if (voteInProgress) SendVoteCancel();*/ return; //Not sure is good... During waiting RaceEnd 3 seconde, can happen and we will cancel our end.
                 case Vote_Action.VOTE_CUSTOM_1: voteOptions[keys[0]]++; voteCount++; break;
                 case Vote_Action.VOTE_CUSTOM_2: voteOptions[keys[1]]++; voteCount++; break;
                 case Vote_Action.VOTE_CUSTOM_3: voteOptions[keys[2]]++; voteCount++; break;
@@ -139,7 +140,7 @@ namespace Drive_LFSS.Game_
                 iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, licenceId);
             }
         }
-        public void VoteAction(Vote_Action voteAction)
+        public void ProcessVoteAction(Vote_Action voteAction)
         {
             Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
             if (voteInProgress)
@@ -171,15 +172,16 @@ namespace Drive_LFSS.Game_
                 } break;
                 case Vote_Action.VOTE_END:
                 {
+                    if (doEnd == true)
+                        return;
+
                     switch (trackChangeBeviator)
                     {
                         case Vote_Track_Change.USER: break;
                         case Vote_Track_Change.NO_CHANGE:
                         {
                             SendVoteCancel();
-                            ((Session)iSession).AddToTcpSendingQueud
-                              (new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT,
-                                new PacketMST("/pit_all")));
+                            iSession.SendMSTMessage("/pit_all");
                         } break;
                         case Vote_Track_Change.VOTE:
                         {
@@ -189,7 +191,7 @@ namespace Drive_LFSS.Game_
                         case Vote_Track_Change.AUTO:
                         {
                             SendVoteCancel();
-
+                            //TODO random choses the next track and call 
                         } break;
                     }
                 } break;
@@ -199,9 +201,17 @@ namespace Drive_LFSS.Game_
                 } break;
             }
         }
-        public void VoteCancel()
+        public void ProcessVoteCancel()
         {
             Log.debug(iSession.GetSessionNameForLog() + " A VOTE was CANCEL.\r\n");
+        }
+        public void ProcessRaceEnd()
+        {
+            if (doEnd)
+            {
+                LoadNextTrack();
+                doEnd = false;
+            }
         }
 
         private void StartNextTrackVote()
@@ -275,6 +285,24 @@ namespace Drive_LFSS.Game_
             nextRace = Program.raceTemplate.GetEntry(trackEntry);
             iSession.AddMessageMiddleToAll("^7Next Track Will Be ^3" + nextRace.Description+"^7.", 7000);
             nextRaceTimer = 7000;
+        }
+        private void LoadNextTrack()
+        {
+            iSession.SendMSTMessage("/cruise " + (nextRace.HasRaceFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
+            iSession.SendMSTMessage("/canreset " + (nextRace.HasRaceFlag(Race_Template_Flag.CAN_RESET) ? "yes" : "no"));
+            iSession.SendMSTMessage("/fcv " + (nextRace.HasRaceFlag(Race_Template_Flag.FORCE_COCKPIT_VIEW) ? "yes" : "no"));
+            iSession.SendMSTMessage("/midrace " + (nextRace.HasRaceFlag(Race_Template_Flag.MID_RACE_JOIN) ? "yes" : "no"));
+            iSession.SendMSTMessage("/mustpit " + (nextRace.HasRaceFlag(Race_Template_Flag.MUST_PIT) ? "yes" : "no"));
+            iSession.SendMSTMessage("/track " + Program.trackTemplate.GetEntry(nextRace.TrackEntry).NamePrefix);
+            iSession.SendMSTMessage("/qual " + nextRace.QualifyMinute);
+            iSession.SendMSTMessage("/laps " + nextRace.LapCount);
+            iSession.SendMSTMessage("/weather " + (byte)nextRace.Weather);
+            iSession.SendMSTMessage("/wind " + (byte)nextRace.Wind);
+        }
+        private void EndRace()
+        {
+            doEnd = true;
+            iSession.SendMSTMessage("/end");
         }
         private void SendVoteCancel()
         {

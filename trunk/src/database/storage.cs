@@ -310,7 +310,7 @@ namespace Drive_LFSS.Storage_
             namePrefix = (string)rowInfos[1];
             name = (string)rowInfos[2];
             configuration = (string)rowInfos[3];
-            reverse = (string)rowInfos[4] == "1" ? true : false;
+            reverse = (Convert.ToUInt32(rowInfos[4]) == 1 ? true : false);
             nodeIndex = new byte[3]
             {
                 (byte)Convert.ToUInt16(rowInfos[5]),
@@ -329,8 +329,33 @@ namespace Drive_LFSS.Storage_
         private string name;
         private string configuration;
         private bool reverse;
-        public byte[] nodeIndex;
+        private byte[] nodeIndex;
         private uint totalLength;
+
+        public string NamePrefix
+        {
+            get { return namePrefix; }
+        }
+        public string Name
+        {
+            get { return name; }
+        }
+        public string Configuration
+        {
+            get { return configuration; }
+        }
+        public bool Reverse
+        {
+            get { return reverse; }
+        }
+        public byte[] NodeIndex
+        {
+            get { return nodeIndex; }
+        }
+        public uint TotalLength
+        {
+            get { return totalLength; }
+        }
     }
 
     public sealed class CarTemplate : Storage
@@ -397,6 +422,7 @@ namespace Drive_LFSS.Storage_
             lapCount = (byte)Convert.ToUInt16(rowInfos[6]);
             qualifyMinute = (byte)Convert.ToUInt16(rowInfos[7]);
             gridStartBeviator = (Grid_Start_Beviator)Convert.ToUInt16(rowInfos[8]);
+            raceMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[8]);
         }
         ~RaceTemplateInfo()
         {
@@ -411,6 +437,7 @@ namespace Drive_LFSS.Storage_
         private byte lapCount;
         private byte qualifyMinute;
         private Grid_Start_Beviator gridStartBeviator;
+        private Race_Template_Flag raceMask;
 
         public uint Entry
         {
@@ -447,6 +474,10 @@ namespace Drive_LFSS.Storage_
         public Grid_Start_Beviator GridStartBeviator
         {
             get { return gridStartBeviator; }
+        }
+        public bool HasRaceFlag(Race_Template_Flag flag)
+        {
+            return (raceMask & flag) == flag;
         }
     }
 

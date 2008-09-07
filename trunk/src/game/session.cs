@@ -133,13 +133,16 @@ namespace Drive_LFSS.Session_
         {
             return race.GetTrackPrefix();
         }
+        public void SendMSTMessage(string message)
+        {
+            AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
+        }
         public void SendUpdateButtonToAll(ushort buttonEntry, string text)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
                 driverList[itr].SendUpdateButton(buttonEntry, text);
         }
-
         public void AddMessageMiddleToAll(string text, uint duration)
         {
             int count = driverList.Count;
@@ -383,8 +386,8 @@ namespace Drive_LFSS.Session_
             switch (_packet.subTinyType)
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
-                case Tiny_Type.TINY_REN: Log.debug(GetSessionNameForLog() + " RACE END RACE END RACE END.\r\n"); race.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
-                case Tiny_Type.TINY_VTC: vote.VoteCancel(); break;
+                case Tiny_Type.TINY_REN: Log.debug(GetSessionNameForLog() + " RACE END RACE END RACE END.\r\n"); race.ProcessRaceEnd(); vote.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
+                case Tiny_Type.TINY_VTC: vote.ProcessVoteCancel(); break;
                 case Tiny_Type.TINY_NONE: break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }
@@ -396,7 +399,7 @@ namespace Drive_LFSS.Session_
             {
                 case Small_Type.SMALL_VTA_VOTE_ACTION:
                 {
-                    vote.VoteAction((Vote_Action)_packet.uintValue);
+                    vote.ProcessVoteAction((Vote_Action)_packet.uintValue);
                 } break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;
             }
@@ -435,12 +438,12 @@ namespace Drive_LFSS.Session_
                 {
                     ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
                 } break;
-                case Button_Entry.VOTE_OPTION_1: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_2: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_3: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_4: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_5: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_6: vote.VoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_4: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_5: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_6: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.licenceId); break;
                 default:
                 {
                     Log.error("We recevied a button ClickId, from unknow source, licenceName: " + driverList[driverIndex].LicenceName + ", LicenceIndex: "+driverIndex+"\r\n");
@@ -449,7 +452,7 @@ namespace Drive_LFSS.Session_
         }      // Button Click Receive
         protected sealed override void processPacket(PacketVTN _packet)
         {
-            vote.VoteNotification(_packet.voteAction,_packet.tempLicenceId);
+            vote.ProcessVoteNotification(_packet.voteAction,_packet.tempLicenceId);
         }       //Vote Notification
         #endregion
 
