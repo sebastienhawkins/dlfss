@@ -38,6 +38,7 @@ namespace Drive_LFSS.Game_
 
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)Gui_Entry.MOTD);
 
+            SendTrackPrefix();
             SendBanner();
             //To make the MODT look on a very Black BG
             for (byte itr = 0; ++itr < 5; )
@@ -54,9 +55,10 @@ namespace Drive_LFSS.Game_
                 licenceName = "AI";
 
             //Removing This Site banner
+            RemoveTrackPrefix(); //TODO: readd it when Pit
             RemoveBanner();
         }
-
+        
         #region Update
         new protected virtual void update(uint diff)
         {

@@ -180,6 +180,7 @@ namespace Drive_LFSS.Game_
         {
             carId = 0;
             SendBanner();
+            SendTrackPrefix();
         }
         
         public byte CarId

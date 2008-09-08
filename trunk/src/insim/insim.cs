@@ -197,113 +197,93 @@ namespace Drive_LFSS.InSim_
         }
         private void TcpSend()
         {
-            
-            byte[] _packet = NextTcpSendQueud();
-            if (_packet == null) 
-                return;
-
-            if (!tcpClient.Connected)
+            byte[] _packet;
+            while (tcpClient.Connected && (_packet = NextTcpSendQueud()) != null)
             {
-                Log.debug(((Session)this).GetSessionNameForLog() + " TcpSend(), Disconnection Detected...\r\n");
-                return;
-            }
-
-            Log.network(((Session)this).GetSessionNameForLog() + " TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
-            try{tcpSocket.Write(_packet,0,_packet.Length);}
-            catch(Exception _exception)
-            {
-                tcpSocket.Dispose();
-                tcpClient.Close();
-                udpClient.Close();
-                runThreadSocketReceive = false;
-                threadSocketSendReceive.Join();
-                tcpClient = new TcpClient();
-                Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception.Message + "\r\n");
-                ((Session)this).connectionRequest = true;
-                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
+                Log.network(((Session)this).GetSessionNameForLog() + " TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+                try{tcpSocket.Write(_packet,0,_packet.Length);}
+                catch(Exception _exception)
+                {
+                    tcpSocket.Dispose();
+                    tcpClient.Close();
+                    udpClient.Close();
+                    runThreadSocketReceive = false;
+                    threadSocketSendReceive.Join();
+                    tcpClient = new TcpClient();
+                    Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception.Message + "\r\n");
+                    ((Session)this).connectionRequest = true;
+                    Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
+                    return;
+                }
             }
         }
         private void UdpSend()
         {
-            byte[] _packet = NextUdpSendQueud();
-            if (_packet == null)
-                return;
-
-            Log.network(((Session)this).GetSessionNameForLog() + " UdpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
-            udpClient.Send(_packet, _packet.Length);
+            byte[] _packet;
+            while( (_packet = NextUdpSendQueud()) != null)
+            {
+                Log.network(((Session)this).GetSessionNameForLog() + " UdpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+                udpClient.Send(_packet, _packet.Length);
+            }
         }
         private void TcpReceive()
         {
-            if (!tcpClient.Connected || !tcpSocket.DataAvailable)
-                return;
-
-            byte packetSize = 0;
-            try{packetSize = (byte)tcpSocket.ReadByte();}
-            catch(Exception _exception)
+            while (tcpClient.Connected && tcpSocket.DataAvailable)
             {
-                tcpSocket.Dispose();
-                tcpClient.Close();
-                udpClient.Close();
-                runThreadSocketReceive = false;
-                threadSocketSendReceive.Join();
-                tcpClient = new TcpClient();
-                Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
-                ((Session)this).connectionRequest = true;
-                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
-                return;
+                byte packetSize = 0;
+                try { packetSize = (byte)tcpSocket.ReadByte(); }
+                catch (Exception _exception)
+                {
+                    tcpSocket.Dispose();
+                    tcpClient.Close();
+                    udpClient.Close();
+                    runThreadSocketReceive = false;
+                    threadSocketSendReceive.Join();
+                    tcpClient = new TcpClient();
+                    Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
+                    ((Session)this).connectionRequest = true;
+                    Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
+                    return;
+                }
+
+                if (packetSize < 4) //maybe add a size/4 Check to be sure the Size is Conform to Scawen standart
+                {
+                    Log.network(((Session)this).GetSessionNameForLog() + " TcpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
+                    continue;
+                }
+
+                Packet_Type packetType = (Packet_Type)tcpSocket.ReadByte();
+                byte[] data = new byte[packetSize];
+                data[0] = packetSize;
+                data[1] = (byte)packetType;
+                tcpSocket.Read(data, 2, (packetSize - 2));
+                if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
+                {
+                    Log.missingDefinition(((Session)this).GetSessionNameForLog() + " TcpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                    continue;
+                }
+                ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
             }
-
-            if (packetSize  < 4) //maybe add a size/4 Check to be sure the Size is Conform to Scawen standart
-            {
-                Log.network(((Session)this).GetSessionNameForLog() + " TcpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
-                return;
-            }
-
-            Packet_Type packetType = (Packet_Type)tcpSocket.ReadByte();
-
-            //Log.network("TcpReceive, PacketSize->" + packetSize + ", PacketType->" + packetType + "\r\n");
-            
-            // Using the queud mean Main thread will processPacket.
-            //AddToTcpReceiveQueud(new Packet((Packet_Size)packetSize, packetType, data));
-
-            // This way make Each Server Process is Own .
-            byte[] data = new byte[packetSize];
-            data[0] = packetSize;
-            data[1] = (byte)packetType;
-
-            tcpSocket.Read(data, 2, (packetSize-2));
-
-            if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
-            {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " TcpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
-                return;
-            }
-
-            ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
         }
         private void UdpReceive()
         {
-            if (udpClient != null && udpClient.Available < 1)
-                return;
-
-            byte[] data = new byte[udpClient.Available];
-            data = udpClient.Receive(ref udpIpEndPoint);
-            
-            if (data[0] < 3)
+            while (udpClient != null && udpClient.Available > 1)
             {
-                Log.network(((Session)this).GetSessionNameForLog() + " UdpReceive(), Droped packet, Too Short!, PacketSize->" + data[0] + "\r\n");
-                return;
-            }
-            //Log.network("UdpReceive(), PacketSize->" + packetSize + ", PacketType->" + (Packet_Type)data[1] + "\r\n");
-            //AddToUdpReceiveQueud(new Packet(data));
+                byte[] data = new byte[udpClient.Available];
+                data = udpClient.Receive(ref udpIpEndPoint);
 
-            if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
-            {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " UdpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
-                return;
+                if (data[0] < 3)
+                {
+                    Log.network(((Session)this).GetSessionNameForLog() + " UdpReceive(), Droped packet, Too Short!, PacketSize->" + data[0] + "\r\n");
+                    continue;
+                }
+                if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
+                {
+                    Log.missingDefinition(((Session)this).GetSessionNameForLog() + " UdpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                    continue;
+                }
+                ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
             }
-
-            ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
         }
     }
 }

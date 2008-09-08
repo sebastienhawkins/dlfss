@@ -49,9 +49,11 @@ namespace Drive_LFSS.Game_
                 buttonList[itr] = 0;
             }
             if (((Car)this).CarId == 0)
+            {
                 SendBanner();
+                SendTrackPrefix();
+            }
         }
-
         private ushort[] buttonList = new ushort[BUTTON_MAX_COUNT];
 
         private class ButtonTimed
@@ -345,6 +347,14 @@ namespace Drive_LFSS.Game_
         public void RemoveBanner()
         {
             RemoveButton((ushort)Button_Entry.BANNER);
+        }
+        public void SendTrackPrefix()
+        {
+            SendUpdateButton((ushort)Button_Entry.TRACK_PREFIX, ((Driver)this).ISession.GetRaceTrackPrefix());
+        }
+        public void RemoveTrackPrefix()
+        {
+            RemoveButton((ushort)Button_Entry.TRACK_PREFIX);
         }
 
         private bool isButtonSended(ushort buttonEntry)

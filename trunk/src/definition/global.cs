@@ -45,6 +45,7 @@ namespace Drive_LFSS.Definition_
         VOTE_OPTION_6 = 15,
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
+        TRACK_PREFIX = 16,
     }
     public enum Gui_Entry : ushort
     {
