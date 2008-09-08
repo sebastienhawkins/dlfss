@@ -54,7 +54,7 @@ namespace Drive_LFSS.Database_
         }
         public void NewTransaction()
         {
-            mutexDataReader.WaitOne();
+            lock (mutexDataReader){ mutexDataReader.WaitOne(); }
             transaction = connection.BeginTransaction(IsolationLevel.Serializable); 
         }
         public void EndTransaction()

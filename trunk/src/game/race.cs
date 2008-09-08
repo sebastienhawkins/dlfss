@@ -139,9 +139,12 @@ namespace Drive_LFSS.Game_
         public void ProcessResult(PacketRES _packet)
         {
             SetCarPosition(_packet.carId, _packet.positionFinal);
-            if (_packet.requestId == 1 && ++finalResultCount == (finishedCount))
+
+            if ((_packet.requestId == 1 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY ) 
+                || _packet.confirmMask == Confirm_Flag.CONFIRM_CONFIRMED)
             {
-                lock (carPosition)
+                ++finalResultCount;
+                if(finalResultCount == (finishedCount))
                     FinishRace();
             }
         }
@@ -151,7 +154,8 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessRaceEnd()
         {
-            EndRace();
+            guid = 0;
+            qualifyRaceGuid = 0;
         }
         
         //LFS Insim Defined var
@@ -235,11 +239,7 @@ namespace Drive_LFSS.Game_
                 qualifyRaceGuid = guid;
             guid = 0;
         }            //Is The Finish Race Procudure(A Sucess CompletedRace)
-        private void EndRace()
-        {
-            guid = 0;
-            qualifyRaceGuid = 0;
-        }               //Is the RaceEND Procedure(Setup Screen)
+
         private void SetCarPosition(byte _carId, byte _position)
         {
             if (carPosition[_position] == _carId)   //Same Position

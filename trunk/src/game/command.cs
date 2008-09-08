@@ -25,19 +25,16 @@ namespace Drive_LFSS.Server_
 
     sealed class CommandInGame
     {
-        public CommandInGame(string _serverName)
+        public CommandInGame()
         {
-            serverName = _serverName;
-
             //       CommandName                CommandLevel                    CommandReference
-            command["exit"] = new CommandName(0, new CommandDelegate(Exit));
-            command["kick"] = new CommandName(0, new CommandDelegate(Kick));
+           command["exit"] = new CommandName(1, new CommandDelegate(Exit));
+           command["kick"] = new CommandName(1, new CommandDelegate(Kick));
         }
         ~CommandInGame()
         {
             if (true == false) { }
         }
-        private string serverName;
         private struct CommandName
         {
             public CommandName(byte _level, CommandDelegate _cmd)
@@ -48,46 +45,44 @@ namespace Drive_LFSS.Server_
             public byte level;
             public CommandDelegate cmd;
         }
+        private delegate void CommandDelegate(Driver driver, string[] args);
+        private Dictionary<string, CommandName> command = new Dictionary<string, CommandName>();
 
-        private delegate void CommandDelegate(bool _adminStatus, string _licenceName, string _commandText);
-        
-        private Dictionary<string,CommandName> command = new Dictionary<string,CommandName> ();
-
-        public string GetServerName()
-        {
-            return serverName;
-        }
-        public void Exec(bool _adminStatus, string _licenceName, string _commandText)
+        public void Exec(Driver driver, string _commandText)
         {
             string[] args = _commandText.Split(' ');                 //Can Be little faster... since we need only left to first white space
             args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
 
-            if (args.Length < 1 || !command.ContainsKey(args[0].ToLower()) || (command[args[0]].level > 0 && !_adminStatus))
+            if (args.Length < 1 || !command.ContainsKey(args[0].ToLowerInvariant()) ) 
             {
-                Log.debug("Command.Exec(), Bad Command Call From User: " + _licenceName + ", AccessLevel: " + (_adminStatus ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
+                driver.AddMessageMiddle("^7 Bad Command Call.", 7000);
+                Log.command("Command.Exec(), Bad Command Call From User: " + driver.LicenceName + ", AccessLevel: " + (driver.AdminFlag ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
-            command[args[0]].cmd(_adminStatus,_licenceName, _commandText);
+            if( command[args[0]].level > 0 && !driver.AdminFlag )
+            {
+                driver.AddMessageMiddle("^7 Must be Admin to excute command: ^7" + args[0]+"^1.",7000);
+                Log.command("Command.Exec(), Bad Command Call From User: " + driver.LicenceName + ", AccessLevel: " + (driver.AdminFlag ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
+                return;
+            }
+
+            command[args[0]].cmd(driver, args);
         }
         #region Commands
-        private void Exit(bool _adminStatus, string _licenceName, string _commandText)
+        private void Exit(Driver driver, string[] args)
         {
-            Log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
             Program.Exit();
         }
-        private void Kick(bool _adminStatus, string _licenceName, string _commandText)
+        private void Kick(Driver driver, string[] args)
         {
-
-            string[] args = _commandText.Split(' ');
             if (args.Length != 2)
             {
-                //Session.server[serverId].Send_MTC_MessageToConnection("bad parameters Count, Usage: !kick username", licence.GetConnectionUniqueId(), 0);
+                driver.AddMessageMiddle("^7 Bad parameters Count^7, Usage: ^2!kick ^3username",7000);
                 return;
             }
-            args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
-
-            Log.command("Command.Kick(), User: " + _licenceName + ", Kicked User: " + args[1] + "\r\n");
-            SessionList.sessionList[serverName].AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST("/kick " + args[1])));
+            driver.AddMessageMiddle("^7 You Kicked username:" + args[1]+"^7.",7000);
+            Log.command("Command.Kick(), User: " + driver.LicenceName + ", Kicked User: " + args[1] + "\r\n");
+            driver.ISession.SendMSTMessage("/kick " + args[1]);
         }
         #endregion
     }

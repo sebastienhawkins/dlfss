@@ -287,6 +287,8 @@ namespace Drive_LFSS
         }
         public static void Exit()
         {
+            Log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
+
             MainRun = false;
             
             SessionList.exit();

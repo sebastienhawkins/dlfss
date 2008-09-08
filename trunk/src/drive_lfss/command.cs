@@ -31,7 +31,11 @@ namespace Drive_LFSS.CommandConsole_
     {
         public static void Exec(string _commandText)
         {
-            string[] args = _commandText.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
+            _commandText = _commandText.TrimStart(new char[] { ' ' });
+            if (_commandText == "")
+                return;
+
+            string[] args = _commandText.Split(new char[]{' '});
 
             switch (args[0])
             {

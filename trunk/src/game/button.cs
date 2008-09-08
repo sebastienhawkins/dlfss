@@ -42,6 +42,16 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
+        public void ProcessBFNClearAll()
+        {
+            for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
+            {
+                buttonList[itr] = 0;
+            }
+            if (((Car)this).CarId == 0)
+                SendBanner();
+        }
+
         private ushort[] buttonList = new ushort[BUTTON_MAX_COUNT];
 
         private class ButtonTimed
@@ -325,6 +335,16 @@ namespace Drive_LFSS.Game_
                     new PacketBTN(((Licence)this).LicenceId, 1, buttonId, buttonStyleMask, maxTextLength, left, top, width, height, text)
                 )
             );
+        }
+
+        public void SendBanner()
+        {
+            //Send Banner
+            SendUniqueButton((ushort)Button_Entry.BANNER);
+        }
+        public void RemoveBanner()
+        {
+            RemoveButton((ushort)Button_Entry.BANNER);
         }
 
         private bool isButtonSended(ushort buttonEntry)

@@ -38,14 +38,12 @@ namespace Drive_LFSS.Game_
 
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)Gui_Entry.MOTD);
 
+            SendBanner();
             //To make the MODT look on a very Black BG
             for (byte itr = 0; ++itr < 5; )
                 SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
 
             SendGui(guiInfo);
-
-            //Send Banner
-            SendUniqueButton((ushort)Button_Entry.BANNER);
         }
         protected void Init(PacketNPL _packet)
         {
@@ -56,7 +54,7 @@ namespace Drive_LFSS.Game_
                 licenceName = "AI";
 
             //Removing This Site banner
-            RemoveButton((ushort)Button_Entry.BANNER);
+            RemoveBanner();
         }
 
         #region Update

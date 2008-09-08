@@ -179,8 +179,7 @@ namespace Drive_LFSS.Game_
         public void leaveRace(PacketPLL _packet) //to be called when a car is removed from a race
         {
             carId = 0;
-            ButtonTemplateInfo banner = Program.buttonTemplate.GetEntry((uint)Button_Entry.BANNER);
-            SendUniqueButton(banner);
+            SendBanner();
         }
         
         public byte CarId

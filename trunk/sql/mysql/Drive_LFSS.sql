@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/07 19:44:13
+Date:                  2008/09/08 15:26:20
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -202,6 +202,13 @@ insert  into race_map values (2, 1) ;
 insert  into race_map values (2, 2) ;
 insert  into race_map values (2, 3) ;
 insert  into race_map values (2, 4) ;
+insert  into race_map values (2, 5) ;
+insert  into race_map values (2, 6) ;
+insert  into race_map values (2, 7) ;
+insert  into race_map values (2, 8) ;
+insert  into race_map values (2, 9) ;
+insert  into race_map values (2, 10) ;
+insert  into race_map values (2, 11) ;
 #----------------------------
 # Table structure for race_template
 #----------------------------
@@ -224,10 +231,17 @@ CREATE TABLE `race_template` (
 #----------------------------
 
 
-insert  into race_template values (1, 'South City Classic, LowHP', 6, '2 3', 0, 0, 11, 11, 0, 5) ;
-insert  into race_template values (2, 'South City Classic Rev, LowHP', 7, '2 3', 1, 1, 12, 12, 0, 5) ;
-insert  into race_template values (3, 'South City Sprint 1, LowHP', 8, '2 3', 2, 2, 13, 13, 0, 5) ;
-insert  into race_template values (4, 'South City Sprint 1 Rev, LowHP', 9, '2 3', 3, 3, 14, 14, 0, 5) ;
+insert  into race_template values (1, 'South City Classic, LowHP', 6, '2 3', 0, 0, 11, 5, 0, 1) ;
+insert  into race_template values (2, 'South City Classic Rev, LowHP', 7, '2 3', 1, 1, 12, 5, 0, 1) ;
+insert  into race_template values (3, 'South City Sprint 1, LowHP', 8, '2 3', 2, 2, 13, 5, 0, 1) ;
+insert  into race_template values (4, 'South City Sprint 1 Rev, LowHP', 9, '2 3', 3, 3, 14, 5, 0, 1) ;
+insert  into race_template values (5, 'South City Sprint 2, LowHp', 10, '2 3', 1, 1, 16, 5, 0, 1) ;
+insert  into race_template values (6, 'South City Sprint 2 Rev, LowHp', 11, '2 3', 2, 1, 15, 5, 0, 1) ;
+insert  into race_template values (7, 'Blackwood GP Track, F08', 1, '19', 0, 0, 25, 8, 0, 1) ;
+insert  into race_template values (8, 'Westhill, Turbo GTR', 40, '13 14 15', 0, 0, 10, 8, 0, 1) ;
+insert  into race_template values (9, 'Westhill Rev, GTR Turbo', 41, '13 14 15', 0, 0, 10, 8, 0, 1) ;
+insert  into race_template values (10, 'Aston Cadet Pratice, FBM', 42, '17', 0, 0, 0, 0, 0, 5) ;
+insert  into race_template values (11, 'Aston Cadet, FBM', 42, '17', 0, 0, 0, 12, 0, 1) ;
 #----------------------------
 # Table structure for track_template
 #----------------------------
@@ -305,3 +319,4 @@ insert  into track_template values (52, 'AS6', 'Aston', 'Grand Touring', 0, 0, 0
 insert  into track_template values (53, 'AS6R', 'Aston', 'Grand Touring', 1, 0, 0, 0, 0) ;
 insert  into track_template values (54, 'AS7', 'Aston', 'North', 0, 0, 0, 0, 0) ;
 insert  into track_template values (55, 'AS7R', 'Aston', 'North', 1, 0, 0, 0, 0) ;
+

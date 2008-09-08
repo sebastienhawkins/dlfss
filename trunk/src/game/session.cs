@@ -42,7 +42,7 @@ namespace Drive_LFSS.Session_
             driverList.Capacity = 256;
             script = new Script();
             ping = new Ping();
-            command = new CommandInGame(sessionName);
+            command = new CommandInGame();
             connectionRequest = true;
         }
         ~Session()
@@ -100,9 +100,9 @@ namespace Drive_LFSS.Session_
         private Vote vote;
         private List<Driver> driverList;
 
-        private void CommandExec(bool _adminStatus, string _licenceName, string _commandText)
+        private void CommandExec(Driver driver, string _commandText)
         {
-            command.Exec(_adminStatus, _licenceName, _commandText);
+            command.Exec(driver, _commandText);
         }
         private void PingReceived()
         {
@@ -330,20 +330,18 @@ namespace Drive_LFSS.Session_
 
             Driver _driver = driverList[GetFirstLicenceIndex(_packet.tempLicenceId)];
 
-            if (_packet.message[_packet.textStart] == commandPrefix)
+            if (_packet.message[_packet.textStart] == commandPrefix) //Ingame Command
             {
                 Log.debug(GetSessionNameForLog() + " Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
-
-
-                CommandExec(_driver.AdminFlag, _driver.LicenceName, _packet.message.Substring(_packet.textStart));
+                CommandExec(_driver, _packet.message.Substring(_packet.textStart));
             }
-            else if (_packet.chatUserType == Chat_User_Type.CHAT_USER_TYPE_SYSTEM)
+            else if (_packet.chatUserType == Chat_User_Type.CHAT_USER_TYPE_SYSTEM) //Host chat
             {
                 Program.ircClient.SendToChannel(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
                 Log.chat(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
             
             }
-            else
+            else  //Player Chat
             {
                 Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + _driver.DriverName.Replace("^", "\x03") + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
                 Log.chat(GetSessionNameForLog() + " " + _driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
@@ -449,10 +447,21 @@ namespace Drive_LFSS.Session_
                 } break;
             }
         }      // Button Click Receive
+        protected sealed override void processPacket(PacketBFN _packet)
+        {
+            base.processPacket(_packet);
+
+            switch (_packet.buttonFunction)
+            {
+                case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
+                    driverList[GetLicenceIndexNoBot(_packet.licenceId)].ProcessBFNClearAll(); break;
+                case Button_Function.BUTTON_FUNCTION_REQUEST: break;
+            }
+        }      //Delete All Button or request Button.
         protected sealed override void processPacket(PacketVTN _packet)
         {
             vote.ProcessVoteNotification(_packet.voteAction,_packet.tempLicenceId);
-        }       //Vote Notification
+        }      //Vote Notification
         #endregion
 
         #region Driver/Car/Licence Association Tool
