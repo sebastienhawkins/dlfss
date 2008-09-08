@@ -260,7 +260,6 @@ namespace Drive_LFSS.Session_
             }
 
             Car _car;
-
             byte index;
             //this is first version, i expect some probleme into the case, we don't know Driver as Leave the Race or Disconnected... Let See.
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI

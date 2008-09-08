@@ -24,7 +24,7 @@ namespace Drive_LFSS.Game_
         {
             carContainer[car] = car.GetNode();
         }
-        public void Update(CarMotion car)
+        public void ProcessCarInformation(CarMotion car)
         {
             if (car.GetSpeedMs() < 0.1) //About 0.01 m seconde
                 return;
@@ -41,6 +41,9 @@ namespace Drive_LFSS.Game_
             List<CarMotion> carIds = new List<CarMotion>();
             byte itr;
             int newItr = 0;
+            //we repeat findNodeCars(), but that way we keep good position into the find!
+            //if we don't need this, Makazazo, sugestion will work greater.
+            //Maybe a synchro stack with node as key, i think this one will be faster and have both quality.
             if(nextNodeCount > 0)
             {
                 for (itr = 1; itr <= nextNodeCount; itr++)

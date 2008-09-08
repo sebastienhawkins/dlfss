@@ -134,7 +134,7 @@ namespace Drive_LFSS.Game_
             if (car.GetRacePosition() == 0 || car.GetRacePosition() == 255) //Position is Unknow for that Car.
                 return;
             SetCarPosition(car.CarId, (byte)(car.GetRacePosition() - 1));
-            grid.Update((CarMotion)car);
+            grid.ProcessCarInformation((CarMotion)car);
         }
         public void ProcessResult(PacketRES _packet)
         {
@@ -142,7 +142,7 @@ namespace Drive_LFSS.Game_
             if (_packet.requestId == 1 && ++finalResultCount == (finishedCount))
             {
                 lock (carPosition)
-                    RaceFinish();
+                    FinishRace();
             }
         }
         public void ProcessResult(PacketFIN _packet)
@@ -151,7 +151,7 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessRaceEnd()
         {
-            RaceEnd();
+            EndRace();
         }
         
         //LFS Insim Defined var
@@ -210,11 +210,6 @@ namespace Drive_LFSS.Game_
         {
             grid.Remove(car);
         }
-        public void UpdateGrid(CarMotion car)
-        {
-            grid.Update(car);
-        }
-
         public uint GetGuid()
         {
             return guid;
@@ -223,7 +218,7 @@ namespace Drive_LFSS.Game_
         {
             return trackPrefix;
         }
-        private void RaceFinish()
+        private void FinishRace()
         {
             Log.debug("Race: " + guid + ", was Finished SucessFull.\r\n");
 
@@ -240,9 +235,8 @@ namespace Drive_LFSS.Game_
                 qualifyRaceGuid = guid;
             guid = 0;
         }            //Is The Finish Race Procudure(A Sucess CompletedRace)
-        private void RaceEnd()
+        private void EndRace()
         {
-            Log.debug("Race: " + guid + ", was Fully Ended.\r\n");
             guid = 0;
             qualifyRaceGuid = 0;
         }               //Is the RaceEND Procedure(Setup Screen)

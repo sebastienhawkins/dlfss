@@ -23,20 +23,17 @@ namespace Drive_LFSS.Packet_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.InSim_;
 
-    sealed public class Packet                               ///<summary>This is a test ho what a test!</summary><returns></returns>                                  
+    sealed public class Packet
     {
+        //TODO: Packet_Size _packetSize, Packet_Type _packetType, are really not needed, rip this off.
         public Packet(Packet_Size _packetSize, Packet_Type _packetType, byte[] _data)
         {
-            //sLog.debug("Packet(), PacketType->" + _packetType + "\r\n");
-
             packetSize = (byte)_packetSize;
             packetType = _packetType;
             data = _data;
         }
         public Packet(Packet_Size _packetSize, Packet_Type _packetType, object _packet)
         {
-            //sLog.debug("Packet(), Destructor->PacketType->" + _packetType + "\r\n");
-
             packetSize = (byte)_packetSize;
             packetType = _packetType;
 
@@ -53,11 +50,8 @@ namespace Drive_LFSS.Packet_
         }
         public Packet(byte[] _data)
         {
-            //sLog.debug("Packet(), PacketType->" + (Packet_Type)_data[1] + "\r\n");
-
             packetSize = _data[0];
             packetType = (Packet_Type)_data[1];
-
             data = _data;
         }
         public byte packetSize;
@@ -108,9 +102,9 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        internal byte Zero;
-        public byte AXStart;
+        public byte requestId;
+        internal byte zero;
+        public byte axStart;
         public byte NumCP;
         public ushort NumO;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x20)]public string LName;

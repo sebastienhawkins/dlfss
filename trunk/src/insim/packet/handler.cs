@@ -214,7 +214,7 @@ namespace Drive_LFSS.Packet_
         // Request - autocross layout information
         protected virtual void processPacket(PacketAXI _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " AXI_AutocrossLayoutInformation(), AXI -> NumCP=" + _packet.NumCP + ", NumO=" + _packet.NumO + ", AXStart=" + _packet.AXStart + ", LName=" + _packet.LName + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " AXI_AutocrossLayoutInformation(), AXI -> NumCP=" + _packet.NumCP + ", NumO=" + _packet.NumO + ", AXStart=" + _packet.axStart + ", LName=" + _packet.LName + "\r\n");
         }
         // LFS reporting camera position and state
         protected virtual void processPacket(PacketCPP _packet)

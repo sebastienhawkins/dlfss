@@ -62,6 +62,118 @@ namespace Drive_LFSS.Game_
                 reader.Dispose();
             }
         }
+        public void ProcessVoteNotification(Vote_Action voteAction, byte licenceId)
+        {
+            Log.debug(iSession.GetSessionNameForLog() + " Vote notification was:" + voteAction + "\r\n");
+            ushort[] keys = new ushort[6] { 0, 0, 0, 0, 0, 0 };
+            voteOptions.Keys.CopyTo(keys, 0);
+            switch (voteAction)
+            {
+                case Vote_Action.VOTE_RESTART:
+                case Vote_Action.VOTE_QUALIFY:
+                case Vote_Action.VOTE_END:/*if (voteInProgress) SendVoteCancel();*/ return; //Not sure is good... During waiting RaceEnd 3 seconde, can happen and we will cancel our end.
+                case Vote_Action.VOTE_CUSTOM_1: voteOptions[keys[0]]++; voteCount++; break;
+                case Vote_Action.VOTE_CUSTOM_2: voteOptions[keys[1]]++; voteCount++; break;
+                case Vote_Action.VOTE_CUSTOM_3: voteOptions[keys[2]]++; voteCount++; break;
+                case Vote_Action.VOTE_CUSTOM_4: voteOptions[keys[3]]++; voteCount++; break;
+                case Vote_Action.VOTE_CUSTOM_5: voteOptions[keys[4]]++; voteCount++; break;
+                case Vote_Action.VOTE_CUSTOM_6: voteOptions[keys[5]]++; voteCount++; break;
+            }
+            if (voteInProgress)
+            {
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_1, licenceId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_2, licenceId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_3, licenceId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_4, licenceId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_5, licenceId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, licenceId);
+            }
+        }
+        public void ProcessVoteAction(Vote_Action voteAction)
+        {
+            Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
+            if (voteInProgress)
+            {
+                SendVoteCancel();
+                return;
+            }
+            switch (voteAction)
+            {
+                case Vote_Action.VOTE_RESTART:
+                    {
+                        switch (trackChangeBeviator)
+                        {
+                            case Vote_Track_Change.USER:
+                            case Vote_Track_Change.NO_CHANGE:
+                            case Vote_Track_Change.VOTE:
+                            case Vote_Track_Change.AUTO: break;
+                        }
+                    } break;
+                case Vote_Action.VOTE_QUALIFY:
+                    {
+                        switch (trackChangeBeviator)
+                        {
+                            case Vote_Track_Change.USER:
+                            case Vote_Track_Change.NO_CHANGE:
+                            case Vote_Track_Change.VOTE:
+                            case Vote_Track_Change.AUTO: break;
+                        }
+                    } break;
+                case Vote_Action.VOTE_END:
+                    {
+                        if (doEnd == true)
+                            return;
+
+                        switch (trackChangeBeviator)
+                        {
+                            case Vote_Track_Change.USER: break;
+                            case Vote_Track_Change.NO_CHANGE:
+                                {
+                                    SendVoteCancel();
+                                    iSession.SendMSTMessage("/pit_all");
+                                } break;
+                            case Vote_Track_Change.VOTE:
+                                {
+                                    SendVoteCancel();
+                                    if (raceMap.Count == 0)
+                                    {
+                                        Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can initiate a vote\r\n");
+                                        break;
+                                    }
+                                    StartNextTrackVote();
+                                } break;
+                            case Vote_Track_Change.AUTO:
+                                {
+                                    SendVoteCancel();
+                                    if (raceMap.Count == 0)
+                                    {
+                                        Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can auto select a track\r\n");
+                                        break;
+                                    }
+                                    Random randomItr = new Random();
+                                    voteInProgress = true;
+                                    PrepareNextTrack(raceMap[randomItr.Next(0, (raceMap.Count - 1))]);
+                                } break;
+                        }
+                    } break;
+                default:
+                    {
+
+                    } break;
+            }
+        }
+        public void ProcessVoteCancel()
+        {
+            Log.debug(iSession.GetSessionNameForLog() + " A VOTE was CANCEL.\r\n");
+        }
+        public void ProcessRaceEnd()
+        {
+            if (doEnd)
+            {
+                LoadNextTrack();
+                doEnd = false;
+            }
+        }
 
         private ISession iSession;
         private Vote_Track_Change trackChangeBeviator = Vote_Track_Change.USER;
@@ -110,109 +222,6 @@ namespace Drive_LFSS.Game_
                 }
                 else
                     nextRaceTimer -= diff;
-            }
-        }
-
-        public void ProcessVoteNotification(Vote_Action voteAction, byte licenceId)
-        {
-            Log.debug(iSession.GetSessionNameForLog() + " Vote notification was:" + voteAction + "\r\n");
-            ushort[] keys = new ushort[6]{0,0,0,0,0,0};
-            voteOptions.Keys.CopyTo(keys,0);
-            switch (voteAction)
-            {
-                case Vote_Action.VOTE_RESTART:
-                case Vote_Action.VOTE_QUALIFY:
-                case Vote_Action.VOTE_END:/*if (voteInProgress) SendVoteCancel();*/ return; //Not sure is good... During waiting RaceEnd 3 seconde, can happen and we will cancel our end.
-                case Vote_Action.VOTE_CUSTOM_1: voteOptions[keys[0]]++; voteCount++; break;
-                case Vote_Action.VOTE_CUSTOM_2: voteOptions[keys[1]]++; voteCount++; break;
-                case Vote_Action.VOTE_CUSTOM_3: voteOptions[keys[2]]++; voteCount++; break;
-                case Vote_Action.VOTE_CUSTOM_4: voteOptions[keys[3]]++; voteCount++; break;
-                case Vote_Action.VOTE_CUSTOM_5: voteOptions[keys[4]]++; voteCount++; break;
-                case Vote_Action.VOTE_CUSTOM_6: voteOptions[keys[5]]++; voteCount++; break;
-            }
-            if (voteInProgress)
-            {
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_1, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_2, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_3, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_4, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_5, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, licenceId);
-            }
-        }
-        public void ProcessVoteAction(Vote_Action voteAction)
-        {
-            Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
-            if (voteInProgress)
-            {
-                SendVoteCancel();
-                return;
-            }
-            switch (voteAction)
-            {
-                case Vote_Action.VOTE_RESTART:
-                {
-                    switch (trackChangeBeviator)
-                    {
-                        case Vote_Track_Change.USER:
-                        case Vote_Track_Change.NO_CHANGE:
-                        case Vote_Track_Change.VOTE:
-                        case Vote_Track_Change.AUTO: break;
-                    }
-                } break;
-                case Vote_Action.VOTE_QUALIFY:
-                {
-                    switch (trackChangeBeviator)
-                    {
-                        case Vote_Track_Change.USER:
-                        case Vote_Track_Change.NO_CHANGE:
-                        case Vote_Track_Change.VOTE:
-                        case Vote_Track_Change.AUTO: break;
-                    }
-                } break;
-                case Vote_Action.VOTE_END:
-                {
-                    if (doEnd == true)
-                        return;
-
-                    switch (trackChangeBeviator)
-                    {
-                        case Vote_Track_Change.USER: break;
-                        case Vote_Track_Change.NO_CHANGE:
-                        {
-                            SendVoteCancel();
-                            iSession.SendMSTMessage("/pit_all");
-                        } break;
-                        case Vote_Track_Change.VOTE:
-                        {
-                            SendVoteCancel();
-                            StartNextTrackVote();
-                        } break;
-                        case Vote_Track_Change.AUTO:
-                        {
-                            SendVoteCancel();
-                            Random randomItr = new Random();
-                            voteInProgress = true;
-                            PrepareNextTrack(raceMap[randomItr.Next(0, (raceMap.Count - 1))]);
-                        } break;
-                    }
-                } break;
-                default:
-                {
-
-                } break;
-            }
-        }
-        public void ProcessVoteCancel()
-        {
-            Log.debug(iSession.GetSessionNameForLog() + " A VOTE was CANCEL.\r\n");
-        }
-        public void ProcessRaceEnd()
-        {
-            if (doEnd)
-            {
-                LoadNextTrack();
-                doEnd = false;
             }
         }
 
