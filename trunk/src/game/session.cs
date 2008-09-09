@@ -165,8 +165,8 @@ namespace Drive_LFSS.Session_
         }
         
         
-        private const uint TIMER_PING_PONG = 50000;
-        private uint TimerPingPong = 48000;
+        private const uint TIMER_PING_PONG = 8000;
+        private uint TimerPingPong = 7000;
         public void update(uint diff)
         {
             // For moment will test processPacket from the network thread! gave better reaction time.
@@ -387,6 +387,7 @@ namespace Drive_LFSS.Session_
                 while (itr < itrEnd)
                 {
                     driverList[itr].SendTrackPrefix();
+                    driverList[itr].SendBanner();
                     itr++;
                 }
                 //SendMSTMessage(Msg.TRACK_PREFIX_NEW + GetRaceTrackPrefix());

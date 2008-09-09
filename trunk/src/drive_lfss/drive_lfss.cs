@@ -243,7 +243,7 @@ namespace Drive_LFSS
 
             MainRun = false;
 
-            SessionList.exit();
+            SessionList.DisconnectAll();
 
             if (ircClient != null && ircClient.IsConnected)
                 ircClient.Disconnect();

@@ -62,20 +62,18 @@ namespace Drive_LFSS.InSim_
     {
         public InSim(InSimSetting _inSimSetting)
         {
-            inSimSetting = _inSimSetting;
+            threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
+            threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
+            
+            threadConnectionProcess = new Thread(new ThreadStart(Connect));
+            //No need to name here, she named into DoConnect().
 
-            if (inSimSetting.password.Length > 16)
-                Log.error(inSimSetting.serverName + " bad Configuration For: password must be 16 characters long maximun.\r\n");
-            else if (inSimSetting.appName.Length > 16)
-                Log.error(inSimSetting.serverName + " bad Configuration For: appName must be 16 characters long maximun.\r\n");
-            else if (inSimSetting.port < 1024)
-                Log.error(inSimSetting.serverName + " bad Configuration For: Port must be greater 1024.\r\n");
-            else  //All Good
-            {
-                ConfigApply();
-                threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
-                threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
-            }
+            inSimSetting = _inSimSetting;
+            
+            ConfigApply();
+            
+            threadSocketSendReceive.Start();
+
         }
         ~InSim()
         {
@@ -84,83 +82,24 @@ namespace Drive_LFSS.InSim_
         private InSimSetting inSimSetting;
         private bool runThreadSocketReceive = false;
         private Thread threadSocketSendReceive;
-        private int networkThreadSleep;
-        private TcpClient tcpClient = new TcpClient();
+        private Thread threadConnectionProcess;
+        private int networkThreadSleep = 49;
+        private TcpClient tcpClient;
         private NetworkStream tcpSocket;
         private UdpClient udpClient;
         private IPEndPoint udpIpEndPoint;
+        private bool ISISended = false;
 
         protected void ConfigApply()
         {
             networkThreadSleep = (int)inSimSetting.networkInterval;
         }
-        public void exit()
+        
+        private void Connect()
         {
-            if (tcpClient.Connected)
+            if (InitUdpSocket() && InitTcpSocket())
             {
-                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY ,Packet_Type.PACKET_TINY_MULTI_PURPOSE,new PacketTiny(1, Tiny_Type.TINY_CLOSE)));
-            }
-            if (udpClient != null)
-            {
-                byte[] dgram = new byte[1];
-                udpClient.Send(dgram, 1, "localhost", inSimSetting.port);
-            }
-
-            if(threadSocketSendReceive.ThreadState == ThreadState.Running)
-            {
-                runThreadSocketReceive = false;
-                threadSocketSendReceive.Join();
-            }
-        }
-        //Complete ReWrite is needed here.
-        public void connect()
-        {
-            //runThreadSocketReceive = false;
-            //socketStatus = InSim_Socket_State.INSIM_SOCKET_DISCONNECTED;
-            tcpClient.NoDelay = false;
-            tcpClient.SendTimeout = 1000;
-            tcpClient.ReceiveTimeout = 1000;
-            tcpClient.ExclusiveAddressUse = false;
-            try{ tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
-            catch (SocketException _exception)
-            {
-                Log.error(((Session)this).GetSessionNameForLog()+" TCP Socket Initialization failded, Error was: " +_exception.Message+"\r\n");
-                //Maybe a little sleep and retry connect later, this is a isolated thread Call.. so a sleep won't hurt other thread.
-                ((Session)this).connectionRequest = true;
-                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
-                return;
-            }
-            tcpSocket = tcpClient.GetStream();
-            
-            PacketISI packetISI = new PacketISI(1, inSimSetting.port, (ushort)inSimSetting.insimMask, inSimSetting.commandPrefix, inSimSetting.requestInterval, inSimSetting.password, inSimSetting.appName);
-            AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_ISI, Packet_Type.PACKET_ISI_INSIM_INITIALISE, packetISI));
-
-            //System.Threading.Thread.Sleep(1000);
-
-            udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.port);
-            try { udpClient = new UdpClient(udpIpEndPoint); /*udpClient.Connect(inSimSetting.ip, (int)inSimSetting.port);*/ }
-            catch (SocketException _exception)
-            {
-                Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message+"\r\n");
-                ((Session)this).connectionRequest = true;
-                Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
-                return;
-            }
-
-            udpClient.Ttl = 10; // Try to influence a shorter route on the internet if possible, maybe a value from the MCI interval time, 10ms is pretty fast, and 50 it normal.
-
-            if (tcpClient.Connected)
-            {
-                runThreadSocketReceive = true;
-
-                if (threadSocketSendReceive.ThreadState == ThreadState.Unstarted)
-                    threadSocketSendReceive.Start();
-                else if (threadSocketSendReceive.ThreadState == ThreadState.Stopped)
-                {
-                    threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
-                    threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
-                    threadSocketSendReceive.Start();
-                }
+                SendConnectISI();
 
                 PacketTiny _packet = new PacketTiny(1, Tiny_Type.TINY_SST_STATE_INFO);
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
@@ -179,45 +118,114 @@ namespace Drive_LFSS.InSim_
 
                 _packet = new PacketTiny(1, Tiny_Type.TINY_SST_STATE_INFO);
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
-
-
             }
             else
-                ((Session)this).connectionRequest = true;
+                SetDisconnected();
+        }
+        private bool InitTcpSocket()
+        {
+            tcpClient = new TcpClient();
+            tcpClient.NoDelay = false;
+            tcpClient.SendTimeout = 1100;
+            tcpClient.ReceiveTimeout = 1100;
+            tcpClient.ExclusiveAddressUse = false;
+            try { tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
+            catch (SocketException _exception)
+            {
+                Log.error(((Session)this).GetSessionNameForLog() + " TCP Socket Initialization failded, Error was: " + _exception.Message + "\r\n");
+                return false;
+            }
+            tcpSocket = tcpClient.GetStream();
+            return true;
+        }
+        private bool InitUdpSocket()
+        {
+            udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.port);
+            try { udpClient = new UdpClient(udpIpEndPoint); }
+            catch (SocketException _exception)
+            {
+                Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message + "\r\n");
+                return false;
+            }
+            udpClient.Ttl = 10;
+            return true;
+        }
+        private void SendConnectISI()
+        {
+            PacketISI packetISI = new PacketISI(1, inSimSetting.port, (ushort)inSimSetting.insimMask, inSimSetting.commandPrefix, inSimSetting.requestInterval, inSimSetting.password, inSimSetting.appName);
+            AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_ISI, Packet_Type.PACKET_ISI_INSIM_INITIALISE, packetISI));
+            ISISended = true;
+        }
+        private void SetDisconnected()
+        {
+            ISISended = false;
+            if (tcpClient != null)
+                tcpClient.Close();
+
+            if (tcpSocket != null)
+                tcpSocket.Dispose();
+
+            if (udpClient != null)
+                udpClient.Close();
+        }
+
+        public void DoConnect()
+        {
+            if (threadConnectionProcess.ThreadState != ThreadState.Unstarted)
+                threadConnectionProcess = new Thread(new ThreadStart(Connect));
+
+            threadConnectionProcess.Name = inSimSetting.serverName + " Connection Thread";
+            threadConnectionProcess.Start();
+        }
+        public bool IsConnecting()
+        {
+            return (threadConnectionProcess.ThreadState == ThreadState.Running);
         }
         public bool IsConnected()
         {
-            return (tcpClient.Connected);
+            //Important "ISISended" stay first and "tcpClient" 
+            //is not called when false , since can mean tcpClient is destroy
+            if (ISISended && tcpClient != null && tcpClient.Connected)
+                return true;
+
+            return false;
         }
+        public void Disconnect()
+        {
+            if (IsConnected())
+            {
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_CLOSE)));
+                TcpSend();
+            }
+            SetDisconnected();
+        }
+
         private void SocketSendReceive()
         {
-            while (runThreadSocketReceive && Program.MainRun)
+            while(Program.MainRun)
             {
+                while (IsConnected())
+                {
+                    TcpReceive();
+                    UdpReceive();
+                    TcpSend();
+                    UdpSend();
+                    System.Threading.Thread.Sleep(networkThreadSleep);
+                }
                 System.Threading.Thread.Sleep(networkThreadSleep);
-                TcpReceive();
-                UdpReceive();
-                TcpSend();
-                //UdpSend();
             }
         }
         private void TcpSend()
         {
             byte[] _packet;
-            while (tcpClient.Connected && (_packet = NextTcpSendQueud()) != null)
+            while ((_packet = NextTcpSendQueud()) != null)
             {
                 Log.network(((Session)this).GetSessionNameForLog() + " TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
                 try{tcpSocket.Write(_packet,0,_packet.Length);}
                 catch(Exception _exception)
                 {
-                    tcpSocket.Dispose();
-                    tcpClient.Close();
-                    udpClient.Close();
-                    runThreadSocketReceive = false;
-                    threadSocketSendReceive.Join();
-                    tcpClient = new TcpClient();
+                    SetDisconnected();
                     Log.error(((Session)this).GetSessionNameForLog() + " TcpSend(), Exception received when writing on the TCP socket, exception:" + _exception.Message + "\r\n");
-                    ((Session)this).connectionRequest = true;
-                    Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
                     return;
                 }
             }
@@ -233,21 +241,14 @@ namespace Drive_LFSS.InSim_
         }
         private void TcpReceive()
         {
-            while (tcpClient.Connected && tcpSocket.DataAvailable)
+            while (tcpSocket.DataAvailable)
             {
                 byte packetSize = 0;
                 try { packetSize = (byte)tcpSocket.ReadByte(); }
                 catch (Exception _exception)
                 {
-                    tcpSocket.Dispose();
-                    tcpClient.Close();
-                    udpClient.Close();
-                    runThreadSocketReceive = false;
-                    threadSocketSendReceive.Join();
-                    tcpClient = new TcpClient();
+                    SetDisconnected();
                     Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
-                    ((Session)this).connectionRequest = true;
-                    Log.commandHelp(((Session)this).GetSessionNameForLog() + " retry connection\r\n");
                     return;
                 }
 
@@ -272,7 +273,7 @@ namespace Drive_LFSS.InSim_
         }
         private void UdpReceive()
         {
-            while (udpClient != null && udpClient.Available > 1)
+            while (udpClient.Available > 1)
             {
                 byte[] data = new byte[udpClient.Available];
                 data = udpClient.Receive(ref udpIpEndPoint);
