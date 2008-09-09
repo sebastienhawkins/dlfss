@@ -43,7 +43,7 @@ namespace Drive_LFSS
         public delegate bool HandlerRoutine(ushort ctrlType);
 
         //Console Command Thread
-        private static readonly Thread ThreadCaptureConsoleCommand = new Thread(new ThreadStart(CaptureConsoleCommand));
+        private static readonly Thread threadCaptureConsoleCommand = new Thread(new ThreadStart(CaptureConsoleCommand));
 
         //Used to Stop The Program and is Thread!
         public static bool MainRun = true;
@@ -106,7 +106,8 @@ namespace Drive_LFSS
            
             //Console System, Purpose for MultiThreading the Console Input
             Log.normal("Initializating Console Command.\r\n\r\n");
-            ThreadCaptureConsoleCommand.Start();
+            threadCaptureConsoleCommand.Name = "Console Capture";
+            threadCaptureConsoleCommand.Start();
 
             //Database Initialization
             Log.normal("Initializating Database...\r\n");
@@ -229,6 +230,8 @@ namespace Drive_LFSS
         private static void ConfigApply()
         {
             sleep = Config.GetIntValue("Interval", "GameThreadUpdate");
+            if (sleep < 1)
+                sleep = 1;
         }
         public static void Exit()
         {
@@ -247,8 +250,10 @@ namespace Drive_LFSS
 
             Log.flush();
 
-            if (ThreadCaptureConsoleCommand.IsAlive)
-                ThreadCaptureConsoleCommand.Abort();
+            //Abording a thread will create a UnhandleException, catching this exception , will what ever report a message.
+            //This way completely Hiden from user + gave only 1 exception at a time! better this way.
+            AppDomain.CurrentDomain.UnhandledException -= new UnhandledExceptionEventHandler(UnHandleException);
+            threadCaptureConsoleCommand.Abort();
 
             if (real)
                 System.Environment.Exit(0);
@@ -269,10 +274,8 @@ namespace Drive_LFSS
         }
         private static void UnHandleException(object sender, UnhandledExceptionEventArgs args)
         {
-            Exception error = (Exception)args.ExceptionObject;
             Log.error("Critical Error, Auto Shutdown in 20 Seconde...\r\n");
-            Log.error("The critical error Was: " + error.Message + "\r\n");
-            Log.error("Exception.StackTrace == " + error.StackTrace + "\r\n");
+            Log.error("Exception Was: " + args.ExceptionObject.ToString() + "\r\n");
             Exit(false);
             System.Threading.Thread.Sleep(15000);
             ConsoleExitTimer();

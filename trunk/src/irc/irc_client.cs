@@ -53,7 +53,7 @@ namespace Drive_LFSS.Irc_
 
         private Socket socket;
         private IrcServerInfo ircServerInfo = null;
-        private Thread thrdListener;
+        private Thread threadMircClient;
         private bool registrationSend = false;
 
         public bool IsConnected
@@ -77,8 +77,9 @@ namespace Drive_LFSS.Irc_
                 return;
             }
 
-            thrdListener = new Thread(new ThreadStart(ReceiveServerData));
-            thrdListener.Start();
+            threadMircClient = new Thread(new ThreadStart(ReceiveServerData));
+            threadMircClient.Name = "mIRC Client Thread";
+            threadMircClient.Start();
         }
 
         //Registration process is working but ugly.. need to rewrite this procedure.
@@ -104,7 +105,7 @@ namespace Drive_LFSS.Irc_
                     socket.Close();
             }
 
-            thrdListener.Join();
+            threadMircClient.Join();
         }
 
         #endregion

@@ -74,6 +74,7 @@ namespace Drive_LFSS.InSim_
             {
                 ConfigApply();
                 threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
+                threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
             }
         }
         ~InSim()
@@ -134,7 +135,7 @@ namespace Drive_LFSS.InSim_
             PacketISI packetISI = new PacketISI(1, inSimSetting.port, (ushort)inSimSetting.insimMask, inSimSetting.commandPrefix, inSimSetting.requestInterval, inSimSetting.password, inSimSetting.appName);
             AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_ISI, Packet_Type.PACKET_ISI_INSIM_INITIALISE, packetISI));
 
-            System.Threading.Thread.Sleep(1000);
+            //System.Threading.Thread.Sleep(1000);
 
             udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.port);
             try { udpClient = new UdpClient(udpIpEndPoint); /*udpClient.Connect(inSimSetting.ip, (int)inSimSetting.port);*/ }
@@ -157,6 +158,7 @@ namespace Drive_LFSS.InSim_
                 else if (threadSocketSendReceive.ThreadState == ThreadState.Stopped)
                 {
                     threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
+                    threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
                     threadSocketSendReceive.Start();
                 }
 

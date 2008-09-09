@@ -44,7 +44,7 @@ namespace Drive_LFSS.Database_
         private MySqlConnection connection;
         private MySqlCommand command;
         private MySqlTransaction transaction;
-        private static Mutex mutexDataReader = new Mutex();
+        private Mutex mutexDataReader = new Mutex();
         
         //Thread Safe
         public void CancelCommand()
@@ -54,7 +54,7 @@ namespace Drive_LFSS.Database_
         }
         public void NewTransaction()
         {
-            lock (mutexDataReader){ mutexDataReader.WaitOne(); }
+            mutexDataReader.WaitOne(-1,false);
             transaction = connection.BeginTransaction(IsolationLevel.Serializable); 
         }
         public void EndTransaction()

@@ -45,6 +45,9 @@ namespace Drive_LFSS
                     Log.error("Configuration Error for Servername: " + itr.Current + ", Bad Option Count, Must be 8.\r\n");
                     continue;
                 }
+                serverOptions[6] = Convert.ToUInt16(serverOptions[6]) < 10 ? "10" : serverOptions[6];  //Request Interval. 10 Minimun
+                serverOptions[7] = Convert.ToUInt16(serverOptions[7]) < 1 ? "1" : serverOptions[7];    //Network Thread Update Interval
+
                 Session session = new Session(itr.Current, new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], 
                                                                  Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt32(serverOptions[5]), 
                                                                   Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7])));
@@ -75,6 +78,7 @@ namespace Drive_LFSS
         public static void ConnectToServerName(string serverName)
         {
             Thread ThreadConnectionProcess = new Thread(new ThreadStart(sessionList[serverName].connect));
+            ThreadConnectionProcess.Name = serverName + " Connection Thread";
             ThreadConnectionProcess.Start();
         }
         public static void exit()
