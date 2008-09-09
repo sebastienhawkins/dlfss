@@ -270,10 +270,8 @@ namespace Drive_LFSS
         private static void UnHandleException(object sender, UnhandledExceptionEventArgs args)
         {
             Exception error = (Exception)args.ExceptionObject;
-            Log.error("Critical Error, Auto Shutdown Initiated, 20 Seconde... \"exit\".\r\n");
+            Log.error("Critical Error, Auto Shutdown in 20 Seconde...\r\n");
             Log.error("The critical error Was: " + error.Message + "\r\n");
-            Log.error("sender.ToString()== " + sender.ToString() + "\r\n");
-            Log.error("Exception.Source == " + error.Source + "\r\n");
             Log.error("Exception.StackTrace == " + error.StackTrace + "\r\n");
             Exit(false);
             System.Threading.Thread.Sleep(15000);

@@ -31,9 +31,7 @@ namespace Drive_LFSS.Game_
     public enum PositionIndex : byte
     {
         POSITION_FIRST = 0,
-        POSITION_LAST = 254,
-        POSITION_NONE = 255,
-        POSITION_MAX = 255,
+        POSITION_LAST = 255,
     }
     public sealed class Race : IRace
 	{
@@ -52,7 +50,7 @@ namespace Drive_LFSS.Game_
 
         public void Init(PacketREO _packet)
         {
-            for (byte itr = (byte)PositionIndex.POSITION_FIRST; itr < (byte)PositionIndex.POSITION_MAX; )
+            for (byte itr = (byte)PositionIndex.POSITION_FIRST; itr < (byte)PositionIndex.POSITION_LAST; )
                 carPosition[itr++] = 0;
 
             gridOrder = "";
@@ -186,7 +184,7 @@ namespace Drive_LFSS.Game_
         private uint qualifyRaceGuid = 0;
         private Session session;
         private uint timeStart = 0;
-        private byte[] carPosition = new byte[(int)PositionIndex.POSITION_MAX]; //index 0, mean nothing and index 193 mean Nothing too.
+        private byte[] carPosition = new byte[(int)PositionIndex.POSITION_LAST+1]; //index 0, mean nothing and index 193 mean Nothing too.
 
         private static uint SAVE_INTERVAL = 5000;
         private uint raceSaveInterval = 5000;
@@ -257,7 +255,7 @@ namespace Drive_LFSS.Game_
 
             byte oldCarId = carPosition[_position];
             byte oldPosition = FindCarPosition(_carId);
-            if (oldPosition != (byte)PositionIndex.POSITION_NONE)
+            if (oldPosition != (byte)PositionIndex.POSITION_LAST)
                 carPosition[oldPosition] = oldCarId;
             carPosition[_position] = _carId;
 
@@ -265,8 +263,8 @@ namespace Drive_LFSS.Game_
         }
         private byte FindCarPosition(byte _carId)
         {
-            byte itr = (byte)PositionIndex.POSITION_FIRST;
-            for(  ;carPosition[itr] != _carId && ++itr < (byte)PositionIndex.POSITION_MAX;);
+            byte itr;
+            for (itr = (byte)PositionIndex.POSITION_FIRST; carPosition[itr] != _carId && itr < (byte)PositionIndex.POSITION_LAST; itr++) ;
             return itr;
         }
         private bool SetNewGuid()
