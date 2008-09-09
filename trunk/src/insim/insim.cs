@@ -160,7 +160,10 @@ namespace Drive_LFSS.InSim_
                     threadSocketSendReceive.Start();
                 }
 
-                PacketTiny _packet = new PacketTiny(1, Tiny_Type.TINY_NCN_NEW_LICENCE_CONNECTION);
+                PacketTiny _packet = new PacketTiny(1, Tiny_Type.TINY_SST_STATE_INFO);
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
+
+                _packet = new PacketTiny(1, Tiny_Type.TINY_NCN_NEW_LICENCE_CONNECTION);
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
 
                 _packet = new PacketTiny(1, Tiny_Type.TINY_NPL);

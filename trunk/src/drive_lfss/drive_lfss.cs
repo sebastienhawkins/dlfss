@@ -35,20 +35,18 @@ namespace Drive_LFSS
 
     public sealed class Program
     {
-        #region Loop / Console / TrapSIGNTerm
         public static int sleep = 50; // Speed of Operation
 
+        //Disable under MONO, how?
         [DllImport("Kernel32")]
-        public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool AddToReceiveQueud);
-        public delegate bool HandlerRoutine(Ctrl_Types CtrlType);
+        public static extern bool SetConsoleCtrlHandler(HandlerRoutine handler, bool add);
+        public delegate bool HandlerRoutine(ushort ctrlType);
 
-        //MultiThread Console Command
+        //Console Command Thread
         private static readonly Thread ThreadCaptureConsoleCommand = new Thread(new ThreadStart(CaptureConsoleCommand));
 
         //Used to Stop The Program and is Thread!
         public static bool MainRun = true;
-        #endregion
-
 
         //Database
         public static IDatabase dlfssDatabase = null;
@@ -67,10 +65,14 @@ namespace Drive_LFSS
         [MTAThread]
         private static void Main()
 		{
+            //this one should not be done under MONO... will cause a error...
+            HandlerRoutine consoleCtrlCheck = new HandlerRoutine(DisgraceExit);
+            SetConsoleCtrlHandler(consoleCtrlCheck, true);
+
             //Console Trap CTRL-C, //Remove Unhandle Exception
             Console.CancelKeyPress += new ConsoleCancelEventHandler(DisgraceExit);
-              //this one should not be done under MONO... will cause a error...
-            SetConsoleCtrlHandler(new HandlerRoutine(DisgraceExit), true);
+            
+            //Unhandle exception
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnHandleException);
 
             //Put static working folder.
@@ -202,7 +204,7 @@ namespace Drive_LFSS
             Log.normal("          ---/----/---)__-------------__-------/------/__-------\\-----\r\n");
             Log.normal("            /    /   /   ) /   | /  /___)     /      /           \\    \r\n");
             Log.normal("          _/____/___/_____/____|/__(___ _____/____/_/________(____/___\r\n");
-            Log.normal("                                                                  v0.1\r\n");
+            Log.normal("                                                                  v0.2\r\n");
             //sLog.normal("                                                                      \r\n");       
             Log.normal("                    _______________________________________\r\n");
             Log.normal("                          __                               \r\n");
@@ -224,6 +226,35 @@ namespace Drive_LFSS
                 System.Threading.Thread.Sleep(200);
             }
         }
+        private static void ConfigApply()
+        {
+            sleep = Config.GetIntValue("Interval", "GameThreadUpdate");
+        }
+        public static void Exit()
+        {
+            Exit(true);
+        }
+        private static void Exit(bool real)
+        {
+            Log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
+
+            MainRun = false;
+
+            SessionList.exit();
+
+            if (ircClient != null && ircClient.IsConnected)
+                ircClient.Disconnect();
+
+            Log.flush();
+
+            if (ThreadCaptureConsoleCommand.IsAlive)
+                ThreadCaptureConsoleCommand.Abort();
+
+            if (real)
+                System.Environment.Exit(0);
+        }
+
+        //make ppl with disgrace exit thing 5 seconde about what they just made ;)
         private static void ConsoleExitTimer()
         {
             Log.error("Exiting into 5 seconds.\r\n");
@@ -239,68 +270,34 @@ namespace Drive_LFSS
         private static void UnHandleException(object sender, UnhandledExceptionEventArgs args)
         {
             Exception error = (Exception)args.ExceptionObject;
-            Log.error("Critical Error, Auto Shutdown Initiated, 30 Seconde... \"exit\".\r\n");
+            Log.error("Critical Error, Auto Shutdown Initiated, 20 Seconde... \"exit\".\r\n");
             Log.error("The critical error Was: " + error.Message + "\r\n");
             Log.error("sender.ToString()== " + sender.ToString() + "\r\n");
             Log.error("Exception.Source == " + error.Source + "\r\n");
             Log.error("Exception.StackTrace == " + error.StackTrace + "\r\n");
-            SessionList.exit();
-            System.Threading.Thread.Sleep(25000);
+            Exit(false);
+            System.Threading.Thread.Sleep(15000);
             ConsoleExitTimer();
-            ThreadCaptureConsoleCommand.Abort();
-            if (ircClient != null && ircClient.IsConnected)
-                ircClient.Disconnect();
-            Log.flush();
-            MainRun = false;
-            System.Threading.Thread.Sleep(1000);
             System.Environment.Exit(0);
         }
         private static void DisgraceExit(object sender, ConsoleCancelEventArgs args)
         {
             args.Cancel = true;
-            SessionList.exit();
-            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
-            System.Threading.Thread.Sleep(10000);
-            ConsoleExitTimer();
-            ThreadCaptureConsoleCommand.Abort();
-            if (ircClient != null && ircClient.IsConnected)
-                ircClient.Disconnect();
-            Log.flush();
-            MainRun = false;
-            System.Threading.Thread.Sleep(1000);
+            DisgraceExit();
             System.Environment.Exit(0);
         }
-        private static bool DisgraceExit(Ctrl_Types ctrlType)
+        private static bool DisgraceExit(ushort ctrlType)
         {
-            SessionList.exit();
-            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
-            System.Threading.Thread.Sleep(10000);
-            ConsoleExitTimer();
-            ThreadCaptureConsoleCommand.Abort();
-            if (ircClient != null && ircClient.IsConnected)
-                ircClient.Disconnect();
-            Log.flush();
-            MainRun = false;
-            System.Threading.Thread.Sleep(1000);
-            System.Environment.Exit(0);
+            DisgraceExit();
             return true;
         }
-        public static void Exit()
+        private static void DisgraceExit()
         {
-            Log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
-
-            MainRun = false;
-            
-            SessionList.exit();
-            if (ircClient != null && ircClient.IsConnected)
-                ircClient.Disconnect();
-            Log.flush();
-
+            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
+            Exit(false);
+            System.Threading.Thread.Sleep(10000);
+            ConsoleExitTimer();
             System.Environment.Exit(0);
-        }
-        private static void ConfigApply()
-        {
-            sleep = Config.GetIntValue("Interval", "GameThreadUpdate");
         }
     }
 }

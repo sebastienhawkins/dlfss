@@ -7,6 +7,7 @@
         byte GetNbrOfDrivers();
         byte GetNbrOfConnection();
         uint GetRaceGuid();
+        bool IsRaceInProgress();
         string GetRaceTrackPrefix();
         string GetSessionNameForLog();
         string GetSessionName();

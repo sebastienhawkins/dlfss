@@ -64,7 +64,7 @@ namespace Drive_LFSS.Definition_
         BUTTON_COORD_Y_MIN = 30,
         BUTTON_COORD_Y_MAX = 170,
     }
-    public enum Ctrl_Types
+    public enum Ctrl_Types : ushort
     {
         CTRL_C_EVENT = 0,
         CTRL_BREAK_EVENT,
