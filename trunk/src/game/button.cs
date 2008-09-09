@@ -48,7 +48,7 @@ namespace Drive_LFSS.Game_
             {
                 buttonList[itr] = 0;
             }
-            if (((Car)this).CarId == 0)
+            if (!((ICar)this).IsOnTrack())
             {
                 SendBanner();
                 SendTrackPrefix();
@@ -311,13 +311,13 @@ namespace Drive_LFSS.Game_
         }
         public void SendButton(ButtonTemplateInfo buttonInfo)
         {
-            SendButton(buttonInfo.Entry, buttonInfo.StyleMask, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text);
+            SendButton(buttonInfo.Entry, buttonInfo.StyleMask,buttonInfo.IsAllwaysVisible, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text);
         }
-        public void SendButton(ushort buttonEntry, byte styleMask, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
+        public void SendButton(ushort buttonEntry, byte styleMask, bool isAllwaysVisible,byte maxTextLength, byte left, byte top, byte width, byte height, string text)
         {
-              SendButton(buttonEntry, (Button_Styles_Flag)styleMask, maxTextLength, left, top, width, height, text);
+            SendButton(buttonEntry, (Button_Styles_Flag)styleMask, isAllwaysVisible, maxTextLength, left, top, width, height, text);
         }
-        public void SendButton(ushort buttonEntry, Button_Styles_Flag buttonStyleMask, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
+        public void SendButton(ushort buttonEntry, Button_Styles_Flag buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
         {
             if (((Driver)this).IsBot())
                 return;
@@ -334,7 +334,7 @@ namespace Drive_LFSS.Game_
                 (
                     Packet_Size.PACKET_SIZE_BTN,
                     Packet_Type.PACKET_BTN_BUTTON_DISPLAY,
-                    new PacketBTN(((Licence)this).LicenceId, 1, buttonId, buttonStyleMask, maxTextLength, left, top, width, height, text)
+                    new PacketBTN(((Licence)this).LicenceId, 1, buttonId, buttonStyleMask, isAllwaysVisible, maxTextLength, left, top, width, height, text)
                 )
             );
         }
@@ -350,7 +350,7 @@ namespace Drive_LFSS.Game_
         }
         public void SendTrackPrefix()
         {
-            SendUpdateButton((ushort)Button_Entry.TRACK_PREFIX, ((Driver)this).ISession.GetRaceTrackPrefix());
+            SendUpdateButton((ushort)Button_Entry.TRACK_PREFIX, "^8"+((Driver)this).ISession.GetRaceTrackPrefix());
         }
         public void RemoveTrackPrefix()
         {

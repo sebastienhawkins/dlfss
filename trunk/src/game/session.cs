@@ -38,7 +38,7 @@ namespace Drive_LFSS.Session_
             race = new Race(this);
             vote = new Vote(this);
             driverList = new List<Driver>();
-            driverList.Add(new Driver(this)); //put Default Driver 0, will save some If.
+            driverList.Add(new Driver((ISession)this)); //put Default Driver 0, will save some If.
             driverList.Capacity = 256;
             script = new Script();
             ping = new Ping();
@@ -159,6 +159,12 @@ namespace Drive_LFSS.Session_
         {
             driverList[GetLicenceIndexNoBot(licenceId)].RemoveButton(buttonEntry);
         }
+        public bool IsRaceInProgress()
+        {
+            return race.IsRaceInProgress();
+        }
+        
+        
         private const uint TIMER_PING_PONG = 50000;
         private uint TimerPingPong = 48000;
         public void update(uint diff)
@@ -296,7 +302,7 @@ namespace Drive_LFSS.Session_
             }
 
             //Do we delete the entire Driver on a Bot Leave Race???
-            ((Car)driverList[itr]).leaveRace(_packet);
+            ((Car)driverList[itr]).ProcessLeaveRace(_packet);
             race.RemoveFromGrid(((CarMotion)driverList[itr]));
         }      // Delete Car leave (spectate - loses slot)
         protected sealed override void processPacket(PacketMCI _packet)
@@ -369,8 +375,22 @@ namespace Drive_LFSS.Session_
         protected sealed override void processPacket(PacketSTA _packet)
         {
             base.processPacket(_packet);
+
+            string oldTrackPrefix =  race.GetTrackPrefix();
             if (_packet.currentCarId == 0)
                 race.Init(_packet);
+
+            if (_packet.trackPrefix != oldTrackPrefix)
+            {
+                byte itr = 0;
+                byte itrEnd = (byte)driverList.Count;
+                while (itr < itrEnd)
+                {
+                    driverList[itr].SendTrackPrefix();
+                    itr++;
+                }
+                //SendMSTMessage(Msg.TRACK_PREFIX_NEW + GetRaceTrackPrefix());
+            }
 
             clientConnectionCount = _packet.connectionCount;
             //else
@@ -462,6 +482,12 @@ namespace Drive_LFSS.Session_
         {
             vote.ProcessVoteNotification(_packet.voteAction,_packet.tempLicenceId);
         }      //Vote Notification
+        protected sealed override void processPacket(PacketPLP _packet)         //Car enter garage
+        {
+            base.processPacket(_packet);
+            driverList[GetCarIndex(_packet.carId)].ProcessEnterGarage();
+
+        }
         #endregion
 
         #region Driver/Car/Licence Association Tool

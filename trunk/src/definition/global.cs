@@ -20,6 +20,11 @@ using System;
 using System.Runtime.InteropServices;
 namespace Drive_LFSS.Definition_
 {
+    public struct Msg
+    {
+        public const string TRACK_PREFIX_NEW = "New Track Prefix Is: ^7";
+
+    }
     [Flags]public enum Race_Template_Flag : byte
     {
         NONE = 0,

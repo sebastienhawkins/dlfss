@@ -101,7 +101,7 @@ namespace Drive_LFSS.Game_
                 qualificationMinute != _packet.qualificationMinute ||
                 raceInProgressStatus != (Race_In_Progress_Status)_packet.raceInProgressStatus ||
                 raceLaps != _packet.raceLaps ||
-                trackPrefix != _packet.trackName ||
+                trackPrefix != _packet.trackPrefix ||
                 weatherStatus != (Weather_Status)_packet.weatherStatus ||
                 windStatus != (Wind_Status)_packet.windStatus)
                 stateHasChange = true;
@@ -112,7 +112,7 @@ namespace Drive_LFSS.Game_
             qualificationMinute = _packet.qualificationMinute;
             raceInProgressStatus = (Race_In_Progress_Status)_packet.raceInProgressStatus;
             raceLaps = _packet.raceLaps;
-            trackPrefix = _packet.trackName;
+            trackPrefix = _packet.trackPrefix;
             weatherStatus = (Weather_Status)_packet.weatherStatus;
             windStatus = (Wind_Status)_packet.windStatus;
 
@@ -221,6 +221,10 @@ namespace Drive_LFSS.Game_
         public string GetTrackPrefix()
         {
             return trackPrefix;
+        }
+        public bool IsRaceInProgress()
+        {
+            return (raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE);
         }
         private void FinishRace()
         {

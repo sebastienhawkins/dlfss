@@ -30,7 +30,7 @@ namespace Drive_LFSS.Game_
 
     public sealed class Driver : Car, IDriver
     {
-        public Driver(Session _session)
+        public Driver(ISession _session)
             : base()
         {
             iSession = _session;
@@ -54,6 +54,14 @@ namespace Drive_LFSS.Game_
 
             if (IsBot())
                 return;
+
+            SendBanner();
+            SendTrackPrefix();
+            //To make the MODT look on a very Black BG
+            for (byte itr = 0; ++itr < 5; )
+                SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
+
+            SendGui((ushort)Gui_Entry.MOTD);
 
             LoadFromDB();
             if (guid == 0)
@@ -85,6 +93,12 @@ namespace Drive_LFSS.Game_
             if (IsBot())
                 return;
 
+            //Removing This Site banner
+            //if (iSession.IsRaceInProgress())
+            {
+                RemoveTrackPrefix(); //TODO: readd it when Pit
+                RemoveBanner();
+            }
             if (guid == 0)
             {
                 LoadFromDB();
@@ -126,7 +140,7 @@ namespace Drive_LFSS.Game_
         private byte driverModel = 0;
         public Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
-        private Session iSession;
+        private ISession iSession;
 
         //
         private uint guid = 0;
@@ -229,6 +243,7 @@ namespace Drive_LFSS.Game_
 
         private void LoadFromDB()
         {
+            Program.dlfssDatabase.NewTransaction();
             IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_mask` FROM `driver` WHERE `licence_name`='" + licenceName + "' AND `driver_name`='" + driverName + "'");
             if (reader.Read())
             {
@@ -237,6 +252,7 @@ namespace Drive_LFSS.Game_
             }
 
             reader.Dispose();
+            Program.dlfssDatabase.EndTransaction();
         }
         private void SaveToDB()
         {
@@ -302,6 +318,18 @@ namespace Drive_LFSS.Game_
         public bool IsBot()
         {
             return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || LicenceId == 0);
+        }
+        public void SendMTCMessage(string _message)
+        {
+            if (IsBot())
+                return;
+            PacketMTC _packet;
+            if (CarId == 0)
+                _packet = new PacketMTC(LicenceId, _message, 0);
+            else
+                _packet = new PacketMTC(CarId, _message);
+
+            ((Session)iSession).AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MTC,Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,_packet));
         }
     }
 }

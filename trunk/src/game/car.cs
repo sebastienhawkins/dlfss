@@ -53,6 +53,9 @@ namespace Drive_LFSS.Game_
             tyreFrontRight = _packet.tyreFrontRight;
             tyreRearLeft = _packet.tyreRearLeft;
             tyreRearRight =_packet.tyreRearRight;
+            //
+            isOnTrack = true;
+            
             base.Init(_packet);
 
         }  //When joining Race
@@ -86,6 +89,20 @@ namespace Drive_LFSS.Game_
             }
             //base.Init(_packet);
         }
+        public void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
+        {
+            isOnTrack = false;
+            carId = 0;
+            SendBanner();
+            SendTrackPrefix();
+        }
+        public void ProcessEnterGarage()                //When a car enter garage.
+        {
+            isOnTrack = false;
+            //((Driver)this).SendMTCMessage(Msg.TRACK_PREFIX_NEW + ((Driver)this).ISession.GetRaceTrackPrefix());
+            SendBanner();
+            SendTrackPrefix();
+        }
 
         //Packet data
         private byte carId = 0;
@@ -113,6 +130,7 @@ namespace Drive_LFSS.Game_
         private double orientationSpeed = 0.0d;
 
         //Game Feature
+        private bool isOnTrack = false;
         private uint collisionTimer = 0;
         private FeatureAcceleration_0_100 featureAcceleration_0_100 = new FeatureAcceleration_0_100();
         private sealed class FeatureAcceleration_0_100
@@ -171,18 +189,20 @@ namespace Drive_LFSS.Game_
             collisionTimer = 2000;
             ((Button)this).SendUpdateButton((ushort)Button_Entry.COLLISION_WARNING, text);
         }
-        public void finishRace()
+        /*public void FinishRace() //this serve nothing, was to make a script call when car finish a race
         {
             if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
                 return;
-        }
-        public void leaveRace(PacketPLL _packet) //to be called when a car is removed from a race
+        }*/
+        public void EnterPit()
         {
-            carId = 0;
-            SendBanner();
-            SendTrackPrefix();
+
         }
-        
+
+        public bool IsOnTrack()
+        {
+            return (carId > 0 && isOnTrack);
+        }
         public byte CarId
         {
             get { return carId; }

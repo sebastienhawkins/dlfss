@@ -96,6 +96,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_REO_RACE_GRID_ORDER, new PacketREO());
             Add(Packet_Type.PACKET_RES_RESULT_CONFIRMED, new PacketRES());
             Add(Packet_Type.PACKET_VTN_VOTE_NOTIFICATION, new PacketVTN());
+            Add(Packet_Type.PACKET_PLP_ENTER_GARAGE, new PacketPLP());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -151,14 +152,14 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTN
     {
-        public PacketBTN(byte _licenceId, byte _requestId, byte _buttonId, Button_Styles_Flag _buttonStyle, byte _maxTextLength, byte _left, byte _top, byte _width, byte _height, string _text)
+        public PacketBTN(byte _licenceId, byte _requestId, byte _buttonId, Button_Styles_Flag _buttonStyle, bool _isAllwaysVisible, byte _maxTextLength, byte _left, byte _top, byte _width, byte _height, string _text)
         {
             packetSize = Packet_Size.PACKET_SIZE_BTN;
             packetType = Packet_Type.PACKET_BTN_BUTTON_DISPLAY;
             requestId = _requestId;
             licenceId = _licenceId;
             buttonId = _buttonId;
-            inst = 0;
+            inst = (byte)(_isAllwaysVisible ? 128 : 0);
             styleMask = _buttonStyle;
             maxTextLength = _maxTextLength; // if 0x80 mean DialogBox???? have to test this
             left = _left;
@@ -715,7 +716,7 @@ namespace Drive_LFSS.Packet_
         public byte raceLaps;
         public byte spare2;
         public byte spare3;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=6)]public string trackName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=6)]public string trackPrefix;
         public Weather_Status weatherStatus;
         public Wind_Status windStatus;
         //internal byte zero2;

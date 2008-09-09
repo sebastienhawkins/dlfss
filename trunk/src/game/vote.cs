@@ -130,7 +130,7 @@ namespace Drive_LFSS.Game_
                             case Vote_Track_Change.NO_CHANGE:
                                 {
                                     SendVoteCancel();
-                                    iSession.SendMSTMessage("/pit_all");
+                                    iSession.SendMSTMessage("/clear");
                                 } break;
                             case Vote_Track_Change.VOTE:
                                 {
@@ -259,6 +259,7 @@ namespace Drive_LFSS.Game_
                 optionCount++;
             }
             voteTimer = 41000; // 40 Secondes
+            iSession.SendMSTMessage("/pit_all");
             //Program.raceTemplate.GetEntry();
         }
         private void EndNextTrackVote()
@@ -299,6 +300,10 @@ namespace Drive_LFSS.Game_
         }
         private void LoadNextTrack()
         {
+            iSession.SendMSTMessage("/select no");
+            iSession.SendMSTMessage("/rstend 30");
+            iSession.SendMSTMessage("/autokick no");
+            iSession.SendMSTMessage("/clear");
             iSession.SendMSTMessage("/cruise " + (nextRace.HasRaceFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
             iSession.SendMSTMessage("/canreset " + (nextRace.HasRaceFlag(Race_Template_Flag.CAN_RESET) ? "yes" : "no"));
             iSession.SendMSTMessage("/fcv " + (nextRace.HasRaceFlag(Race_Template_Flag.FORCE_COCKPIT_VIEW) ? "yes" : "no"));

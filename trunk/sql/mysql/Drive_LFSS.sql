@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/08 15:26:20
+Date:                  2008/09/08 23:44:25
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -29,7 +29,7 @@ CREATE TABLE `button_template` (
 #----------------------------
 
 
-insert  into button_template values (1, 'banner', 66, 0, 0, 25, 189, 50, 12, '^7A^3leajecta') ;
+insert  into button_template values (1, 'banner', 66, 1, 0, 35, 194, 20, 7, '^7A^3leajecta') ;
 insert  into button_template values (2, 'motd background', 98, 1, 0, 0, 0, 200, 200, '') ;
 insert  into button_template values (10, 'vote option 1', 106, 0, 0, 2, 78, 45, 9, 'vote option 1') ;
 insert  into button_template values (11, 'vote option 2', 106, 0, 0, 2, 88, 45, 9, 'vote option 2') ;
@@ -44,6 +44,7 @@ insert  into button_template values (12, 'vote option 3', 106, 0, 0, 2, 98, 45, 
 insert  into button_template values (13, 'vote option 4', 106, 0, 0, 2, 108, 45, 9, 'vote option 4') ;
 insert  into button_template values (14, 'vote option 5', 106, 0, 0, 2, 118, 45, 9, 'vote option 5') ;
 insert  into button_template values (15, 'vote option 6', 106, 0, 0, 2, 128, 45, 9, 'vote option 6') ;
+insert  into button_template values (16, 'track prefix', 66, 1, 0, 56, 194, 10, 7, '') ;
 #----------------------------
 # Table structure for car_template
 #----------------------------
@@ -94,9 +95,22 @@ CREATE TABLE `driver` (
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
 ) ENGINE=MyISAM AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
 #----------------------------
-# No records for table driver
+# Records for table driver
 #----------------------------
 
+
+insert  into driver values (1, 'Greenseed', '^5Greenseed', 0, 63356514059) ;
+insert  into driver values (2, 'ghostbr', '^0Ghost^2B^3R', 0, 63356484985) ;
+insert  into driver values (3, 'Wenca01', '^7BUENO ^1\"', 0, 63356488761) ;
+insert  into driver values (4, 'Richardrfo', '^4Richard', 0, 63356486588) ;
+insert  into driver values (5, 'Psight', '^7=^4GGIC^7=^4D^7anne', 0, 63356489934) ;
+insert  into driver values (6, 'tim8956', 'sillet', 0, 63356493276) ;
+insert  into driver values (7, 'maxdoel', 'maxdoel', 0, 63356508737) ;
+insert  into driver values (8, 'jimmy bones', 'shark', 0, 63356504341) ;
+insert  into driver values (9, 'thomazrangel', '^3Thomaz ^2Rangel', 0, 63356507424) ;
+insert  into driver values (10, 'mekac', 'MeKac', 0, 63356508707) ;
+insert  into driver values (11, 'ketvos', 'ketvos', 0, 63356504158) ;
+insert  into driver values (12, 'Jawndus', 'Jaun', 0, 63356506433) ;
 #----------------------------
 # Table structure for driver_ban
 #----------------------------

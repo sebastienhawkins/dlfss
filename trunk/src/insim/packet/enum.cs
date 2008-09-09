@@ -52,7 +52,7 @@ namespace Drive_LFSS.Packet_
         PACKET_CNL_PART_CONNECTION,		            // 19 - info			: connection left
         PACKET_CPR_LICENCE_DRIVER_RENAME,		    // 20 - info			: connection renamed
         PACKET_NPL_DRIVER_JOIN_RACE,		        // 21 - info			: new player (joined race)
-        PACKET_PLP_DRIVER_LEAVE_PIT,		        // 22 - info			: player pit (keeps slot in race)
+        PACKET_PLP_ENTER_GARAGE,		            // 22 - info			: player pit (keeps slot in race)
         PACKET_PLL_DRIVER_LEAVE_RACE,		        // 23 - info			: player leave (spectate - loses slot)
         PACKET_LAP_DRIVER_LAP_TIME,		            // 24 - info			: lap time
         PACKET_SPX_DRIVER_SPLIT_TIME,		        // 25 - info			: split x time

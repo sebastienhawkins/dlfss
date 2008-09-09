@@ -119,7 +119,6 @@ namespace Drive_LFSS.CommandConsole_
         
         private static void Exit()
         {
-            Log.normal("Exiting Requested, Please Wait For All Thread Too Close...\n\r");
             Program.Exit();
         }
     }

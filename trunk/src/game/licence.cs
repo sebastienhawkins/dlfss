@@ -35,16 +35,6 @@ namespace Drive_LFSS.Game_
         {
             licenceName = _packet.licenceName;
             licenceId = _packet.tempLicenceId;
-
-            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)Gui_Entry.MOTD);
-
-            SendTrackPrefix();
-            SendBanner();
-            //To make the MODT look on a very Black BG
-            for (byte itr = 0; ++itr < 5; )
-                SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
-
-            SendGui(guiInfo);
         }
         protected void Init(PacketNPL _packet)
         {
@@ -53,10 +43,6 @@ namespace Drive_LFSS.Game_
 
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
                 licenceName = "AI";
-
-            //Removing This Site banner
-            RemoveTrackPrefix(); //TODO: readd it when Pit
-            RemoveBanner();
         }
         
         #region Update

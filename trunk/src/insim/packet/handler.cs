@@ -37,23 +37,25 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_MCI_MULTICAR_INFORMATION:      processPacket((PacketMCI)_packet);break;
                 case Packet_Type.PACKET_MSO_CHAT_RECEIVED:             processPacket((PacketMSO)_packet);break;
                 case Packet_Type.PACKET_TINY_MULTI_PURPOSE:            processPacket((PacketTiny)_packet);break;
+                case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet); break;
                 case Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE:  processPacket((PacketSTA)_packet);break;
-                case Packet_Type.PACKET_NCN_NEW_CONNECTION:            processPacket((PacketNCN)_packet);break;
+                case Packet_Type.PACKET_VTN_VOTE_NOTIFICATION:         processPacket((PacketVTN)_packet); break;
+                case Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME:         processPacket((PacketSPX)_packet); break;
+                case Packet_Type.PACKET_LAP_DRIVER_LAP_TIME:           processPacket((PacketLAP)_packet); break;
+                case Packet_Type.PACKET_NCN_NEW_CONNECTION:            processPacket((PacketNCN)_packet); break;
                 case Packet_Type.PACKET_CNL_PART_CONNECTION:           processPacket((PacketCNL)_packet);break;
                 case Packet_Type.PACKET_NPL_DRIVER_JOIN_RACE:          processPacket((PacketNPL)_packet);break;
                 case Packet_Type.PACKET_PLL_DRIVER_LEAVE_RACE:         processPacket((PacketPLL)_packet);break;
                 case Packet_Type.PACKET_RST_RACE_START:                processPacket((PacketRST)_packet);break;
-                case Packet_Type.PACKET_LAP_DRIVER_LAP_TIME:           processPacket((PacketLAP)_packet);break;
-                case Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME:         processPacket((PacketSPX)_packet);break;
                 case Packet_Type.PACKET_VER_VERSION_SERVER:            processPacket((PacketVER)_packet);break;
-                case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet);break;
                 case Packet_Type.PACKET_REO_RACE_GRID_ORDER:           processPacket((PacketREO)_packet);break;
                 case Packet_Type.PACKET_FIN_DRIVER_FINISH_RACE:        processPacket((PacketFIN)_packet);break;
                 case Packet_Type.PACKET_RES_RESULT_CONFIRMED:          processPacket((PacketRES)_packet);break;
                 case Packet_Type.PACKET_BTC_BUTTON_CLICK:              processPacket((PacketBTC)_packet);break;
                 case Packet_Type.PACKET_BTT_BUTTON_TYPE_IN_TEXT_OK:    processPacket((PacketBTT)_packet);break;
                 case Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE: processPacket((PacketBFN)_packet);break;
-                case Packet_Type.PACKET_VTN_VOTE_NOTIFICATION:         processPacket((PacketVTN)_packet); break;
+                case Packet_Type.PACKET_PLP_ENTER_GARAGE:              processPacket((PacketPLP)_packet); break;
+
                 default: Log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
@@ -174,7 +176,7 @@ namespace Drive_LFSS.Packet_
         // The server/race state changed
         protected virtual void processPacket(PacketSTA _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged() -> ViewOptionMask=" + _packet.viewOptionMask + ", RaceInProgStatus=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumCar=" + _packet.carCount + ", FinishCount="+_packet.finishedCount+", QualMins=" + _packet.qualificationMinute + ", raceLaps="+ _packet.raceLaps+", ReplaySpeed="+_packet.replaySpeed+", TrackName="+_packet.trackName+", WeatherStatus="+_packet.weatherStatus+"\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged() -> ViewOptionMask=" + _packet.viewOptionMask + ", RaceInProgStatus=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumCar=" + _packet.carCount + ", FinishCount="+_packet.finishedCount+", QualMins=" + _packet.qualificationMinute + ", raceLaps="+ _packet.raceLaps+", ReplaySpeed="+_packet.replaySpeed+", TrackName="+_packet.trackPrefix+", WeatherStatus="+_packet.weatherStatus+"\r\n");
         }
         // A host is started or joined
         protected virtual void processPacket(PacketISM _packet)

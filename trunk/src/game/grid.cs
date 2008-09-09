@@ -81,7 +81,7 @@ namespace Drive_LFSS.Game_
             return carIds.ToArray();
         }
 
-        private const double speedColRatio = 0.71d;
+        private const double speedColRatio = 0.715d;
         private void checkCollision(CarMotion car)
         {
             CarMotion[] carAround;
@@ -173,7 +173,7 @@ namespace Drive_LFSS.Game_
             double angleDiff = fromCar.GetTrajectory() - angle;
 
             //TODO: need to find the perfect angle, based on a static car size.
-            return ( (angleDiff <= 14.0d) && (angleDiff >= -14.0d ) );
+            return ( (angleDiff <= 13.0d) && (angleDiff >= -13.0d ) );
         }
     }
 }
