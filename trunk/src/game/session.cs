@@ -381,7 +381,7 @@ namespace Drive_LFSS.Session_
                 race.Init(_packet);
 
             if (_packet.trackPrefix != oldTrackPrefix)
-            {
+            {//THIS IS NOT NEEDED IF WE FOLLOW TINY_CLR WHO MEAN ALL PLAYE CLEARED FROM TRACK.
                 byte itr = 0;
                 byte itrEnd = (byte)driverList.Count;
                 while (itr < itrEnd)
