@@ -185,7 +185,7 @@ namespace Drive_LFSS.Game_
         private bool voteInProgress = false; //used to freeze System, no Change will be made when YES
         private byte licenceCount = 0;
         private uint voteTimer = 0;
-        private uint voteTimerAdvert = 10000;
+        private uint voteTimerAdvert = 100;
         private uint nextRaceTimer = 0;
         private RaceTemplateInfo nextRace;
         private bool doEnd = false; //Will serve for Know when RaceEnd Really happen and, if we load auto the next track.
@@ -205,8 +205,11 @@ namespace Drive_LFSS.Game_
 
                     if (voteTimerAdvert < diff)
                     {
-                        iSession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_TITLE, "^3Next Track Vote, ^2" + voteTimer / 1000 + "^3 sec.");
-                        voteTimerAdvert = 10000;
+                        string _voteTimer = (voteTimer/100).ToString();
+                        if (_voteTimer.Length > 0)
+                            _voteTimer = _voteTimer.Insert(_voteTimer.Length-1, ".");
+                        iSession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_TITLE, "^3Next Track Vote, ^2" + _voteTimer + "^3 ms.");
+                        voteTimerAdvert = 100;
                     }
                     else
                         voteTimerAdvert -= diff;

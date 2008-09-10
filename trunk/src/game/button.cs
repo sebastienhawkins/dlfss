@@ -169,6 +169,43 @@ namespace Drive_LFSS.Game_
             }
         }
 
+
+        public void SendGui(ushort guiEntry)
+        {
+            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
+            SendGui(guiInfo);
+        }
+        public void SendGui(GuiTemplateInfo guiInfo)
+        {
+            if (((Driver)this).IsBot())
+                return;
+
+            string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
+            ButtonTemplateInfo buttonInfo;
+            
+            System.Collections.IEnumerator itr =  buttonEntrys.GetEnumerator();
+            ushort buttonEntry;
+            while (itr.MoveNext())
+            {
+                buttonEntry = System.Convert.ToUInt16(itr.Current);
+                buttonInfo = Program.buttonTemplate.GetEntry(buttonEntry);
+                SendButton(newButtonId(buttonEntry), buttonInfo);
+            }
+            if (guiInfo.TextButtonEntry > 0 && guiInfo.Text.Length > 0)
+            {
+                buttonInfo = Program.buttonTemplate.GetEntry(guiInfo.TextButtonEntry);
+                ButtonTemplateInfo buttonInfoCopy;
+
+                string[] lines = guiInfo.Text.Split(new string[]{Environment.NewLine},StringSplitOptions.RemoveEmptyEntries);
+                for (byte lineItr = 0; lineItr < lines.Length; lineItr++)
+                {
+                    buttonInfoCopy = (ButtonTemplateInfo)buttonInfo.Clone();
+                    buttonInfoCopy.Top = (byte) (((lineItr) * buttonInfoCopy.Height) + buttonInfoCopy.Top + 1);
+                    buttonInfoCopy.Text = lines[lineItr];
+                    SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
+                }
+            }
+        }
         public void RemoveGui(ushort guiEntry)
         {
             if (((Driver)this).IsBot())
@@ -190,62 +227,32 @@ namespace Drive_LFSS.Game_
             }
 
         }
-        public void RemoveButton(ushort buttonEntry)
+        public byte RemoveButton(ushort buttonEntry)
         {
             if (((Driver)this).IsBot())
-                return;
+                return 0xFF;
 
-            byte buttonId = removeButtonEntry(buttonEntry);
+            byte previousId;
+            byte buttonId = previousId = removeButtonEntry(buttonEntry);
             while (buttonId != 0xFF)
             {
-                ((Session)((Driver)this).ISession).AddToTcpSendingQueud
-                (
-                    new Packet
-                    (
-                        Packet_Size.PACKET_SIZE_BFN,
-                        Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,
-                        new PacketBFN(((Driver)this).LicenceId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
-                    )
-                );
+                SendRemoveButton(buttonId);
+                previousId = buttonId;
                 buttonId = removeButtonEntry(buttonEntry);
             }
+            return previousId;
         }
-
-        public void SendGui(ushort guiEntry)
+        private void SendRemoveButton(byte buttonId)
         {
-            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
-            SendGui(guiInfo);
-        }
-        public void SendGui(GuiTemplateInfo guiInfo)
-        {
-            if (((Driver)this).IsBot())
-                return;
-
-            string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
-            ButtonTemplateInfo buttonInfo;
-            
-            System.Collections.IEnumerator itr =  buttonEntrys.GetEnumerator();
-            ushort buttonEntry;
-            while (itr.MoveNext())
-            {
-                buttonEntry = System.Convert.ToUInt16(itr.Current);
-                buttonInfo = Program.buttonTemplate.GetEntry(buttonEntry);
-                SendButton(buttonInfo);
-            }
-            if (guiInfo.TextButtonEntry > 0 && guiInfo.Text.Length > 0)
-            {
-                buttonInfo = Program.buttonTemplate.GetEntry(guiInfo.TextButtonEntry);
-                ButtonTemplateInfo buttonInfoCopy;
-
-                string[] lines = guiInfo.Text.Split(new string[]{Environment.NewLine},StringSplitOptions.RemoveEmptyEntries);
-                for (byte lineItr = 0; lineItr < lines.Length; lineItr++)
-                {
-                    buttonInfoCopy = (ButtonTemplateInfo)buttonInfo.Clone();
-                    buttonInfoCopy.Top = (byte) (((lineItr) * buttonInfoCopy.Height) + buttonInfoCopy.Top + 1);
-                    buttonInfoCopy.Text = lines[lineItr];
-                    SendButton(buttonInfoCopy);
-                }
-            }
+            ((Session)((Driver)this).ISession).AddToTcpSendingQueud
+            (
+                new Packet
+                (
+                    Packet_Size.PACKET_SIZE_BFN,
+                    Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,
+                    new PacketBFN(((Driver)this).LicenceId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
+                )
+            );
         }
         public void AddMessageTop(string text, uint duration)
         {
@@ -276,7 +283,7 @@ namespace Drive_LFSS.Game_
             {
                 buttonTimedList.Add(new ButtonTimed(buttonInfo.Entry, time));
             }
-            SendButton(buttonInfo);
+            SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
         }
         public void SendUniqueButton(ushort buttonEntry)
         {
@@ -285,18 +292,22 @@ namespace Drive_LFSS.Game_
         }
         public void SendUniqueButton(ButtonTemplateInfo buttonInfo)
         {
-            if (!isButtonSended(buttonInfo.Entry))
-                SendButton(buttonInfo);
+            if (GetButtonId(buttonInfo.Entry) == 0xFF)
+                SendButton(newButtonId(buttonInfo.Entry), buttonInfo);
         }
         public void SendUpdateButton(ButtonTemplateInfo buttonInfo)
         {
-            if (isButtonSended(buttonInfo.Entry))
+            byte buttonId = GetButtonId(buttonInfo.Entry);
+            if (buttonId != 0xFF)
             {
-                RemoveButton(buttonInfo.Entry);
-                SendButton(buttonInfo);
+                buttonInfo.Height = 0;
+                SendButton(buttonId,buttonInfo);
             }
             else
-                SendButton(buttonInfo);
+            {
+                buttonId = newButtonId(buttonInfo.Entry);
+                SendButton(buttonId,buttonInfo);
+            }
         }
         public void SendUpdateButton(ushort buttonEntry, string text)
         {
@@ -307,23 +318,18 @@ namespace Drive_LFSS.Game_
         public void SendButton(ushort buttonEntry)
         {
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
-            SendButton(buttonInfo);
+            SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
         }
-        public void SendButton(ButtonTemplateInfo buttonInfo)
+        public void SendButton(byte buttonId, ButtonTemplateInfo buttonInfo)
         {
-            SendButton(buttonInfo.Entry, buttonInfo.StyleMask,buttonInfo.IsAllwaysVisible, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text);
+            SendButton(buttonId, buttonInfo.Entry, (byte)buttonInfo.StyleMask, buttonInfo.IsAllwaysVisible, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text);
         }
-        public void SendButton(ushort buttonEntry, byte styleMask, bool isAllwaysVisible,byte maxTextLength, byte left, byte top, byte width, byte height, string text)
-        {
-            SendButton(buttonEntry, (Button_Styles_Flag)styleMask, isAllwaysVisible, maxTextLength, left, top, width, height, text);
-        }
-        public void SendButton(ushort buttonEntry, Button_Styles_Flag buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
+        public void SendButton(byte buttonId, ushort buttonEntry, byte buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
         {
             if (((Driver)this).IsBot())
                 return;
-            
-            byte buttonId = newButtonId(buttonEntry);
-            if( buttonId == 255 )
+
+            if( buttonId == 0xFF )
             {
                 Log.error("Button System, Button Max Count Reached for Driver:"+((Driver)this).DriverName+", Licence"+((Licence)this).LicenceName+"\r\n");
                 return;
@@ -334,7 +340,7 @@ namespace Drive_LFSS.Game_
                 (
                     Packet_Size.PACKET_SIZE_BTN,
                     Packet_Type.PACKET_BTN_BUTTON_DISPLAY,
-                    new PacketBTN(((Licence)this).LicenceId, 1, buttonId, buttonStyleMask, isAllwaysVisible, maxTextLength, left, top, width, height, text)
+                    new PacketBTN(((Licence)this).LicenceId, 1, buttonId, (Button_Styles_Flag)buttonStyleMask, isAllwaysVisible, maxTextLength, left, top, width, height, text)
                 )
             );
         }
@@ -357,16 +363,16 @@ namespace Drive_LFSS.Game_
             RemoveButton((ushort)Button_Entry.TRACK_PREFIX);
         }
 
-        private bool isButtonSended(ushort buttonEntry)
+        private byte GetButtonId(ushort buttonEntry)
         {
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
             {
                 if (buttonList[itr] == buttonEntry)
                 {
-                    return true;
+                    return itr;
                 }
             }
-            return false;
+            return 0xFF;
         }
         private byte newButtonId(ushort buttonEntry)
         {
