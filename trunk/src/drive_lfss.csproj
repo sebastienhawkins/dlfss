@@ -120,6 +120,12 @@
     <None Include="..\sql\mysql\Drive_LFSS.sql">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <None Include="..\sql\mysql\create_mysql.sql">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Include="..\sql\mysql\drop_mysql.sql">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="binding\script\script.csproj">

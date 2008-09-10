@@ -155,8 +155,8 @@ namespace Drive_LFSS.Game_
             {
                 raceGuid = _raceGuid;
                 driverGuid = _driverGuid;
-                carAbreviation = _carAbreviation;
-                trackAbreviation = _trackAbreaviation;
+                carPrefix = _carAbreviation;
+                trackPrefix = _trackAbreaviation;
                 driverMask = _driverMask;
             }
             ~Lap()
@@ -192,8 +192,8 @@ namespace Drive_LFSS.Game_
             private uint guid = 0;
             private uint driverGuid = 0;
             private uint raceGuid = 0;
-            private string carAbreviation = "";
-            private string trackAbreviation = "";
+            private string carPrefix = "";
+            private string trackPrefix = "";
             private uint lapTime = 0;
             private uint totalTime = 0;
             private ushort lapCompleted = 0;
@@ -218,10 +218,10 @@ namespace Drive_LFSS.Game_
             private void SaveToDB()
             {
                 Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver_lap` WHERE `guid`=" + guid);
-                string query = "INSERT INTO `driver_lap` (`guid`,`guid_race`,`guid_driver`,`car_abreviation`,`track_abreviation`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
-                query += "VALUES (" + guid + "," + raceGuid + "," + driverGuid + ",'" + carAbreviation + "','" + trackAbreviation + "'," + (byte)driverMask + "," + splitTime[1] + "," + splitTime[2] + "," + splitTime[3] + "," + lapTime + "," + totalTime + "," + lapCompleted + "," + (byte)currentPenality + "," + pitStopCount + "," + yellowFlagCount + "," + blueFlagCount + ")";
+                string query = "INSERT INTO `driver_lap` (`guid`,`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
+                query += "VALUES (" + guid + "," + raceGuid + "," + driverGuid + ",'" + carPrefix + "','" + trackPrefix + "'," + (byte)driverMask + "," + splitTime[1] + "," + splitTime[2] + "," + splitTime[3] + "," + lapTime + "," + totalTime + "," + lapCompleted + "," + (byte)currentPenality + "," + pitStopCount + "," + yellowFlagCount + "," + blueFlagCount + ")";
                 Program.dlfssDatabase.ExecuteNonQuery(query);
-                Log.database("LapGuid: " + guid + ", DriverGuid: " + driverGuid + ", carAbreviation:" + carAbreviation + ", trackAbreviation: " + trackAbreviation + ", saved To Database.\r\n");
+                Log.database("LapGuid: " + guid + ", DriverGuid: " + driverGuid + ", car_prefix:" + carPrefix + ", track_prefix: " + trackPrefix + ", saved To Database.\r\n");
             }
             private bool SetNewGuid()
             {

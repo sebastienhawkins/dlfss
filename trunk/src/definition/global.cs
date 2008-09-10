@@ -52,6 +52,18 @@ namespace Drive_LFSS.Definition_
         MOTD_BUTTON_DRIVE = 5,
         TRACK_PREFIX = 16,
     }
+    [Flags]
+    public enum Button_Styles_Flag : byte
+    {
+        ISB_C1 = 1,         // you can choose a standard
+        ISB_C2 = 2,         // interface colour using
+        ISB_C4 = 4,         // these 3 lowest bits - see below
+        ISB_CLICK = 8,
+        ISB_LIGHT = 16,
+        ISB_DARK = 32,
+        ISB_LEFT = 64,      // align text to left
+        ISB_RIGHT = 128,    // align text to right
+    }
     public enum Gui_Entry : ushort
     {
         NONE = 0,
@@ -237,17 +249,6 @@ namespace Drive_LFSS.Definition_
         ISB_LMB = 1,
         ISB_RMB = 2,
         ISB_SHIFT = 8
-    }
-    [Flags]public enum Button_Styles_Flag : byte
-    {
-        ISB_C1 = 1,         // you can choose a standard
-        ISB_C2 = 2,         // interface colour using
-        ISB_C4 = 4,         // these 3 lowest bits - see below
-        ISB_CLICK = 8,
-        ISB_LIGHT = 16,
-        ISB_DARK = 32,
-        ISB_LEFT = 64,      // align text to left
-        ISB_RIGHT = 128,    // align text to right
     }
     [Flags]public enum Car_Racing_Flag : byte
     {
