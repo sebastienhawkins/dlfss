@@ -29,7 +29,7 @@ namespace Drive_LFSS.Session_
     using Drive_LFSS.Log_;
     using Drive_LFSS.Game_;
 
-    public sealed class Session : InSim, ISession
+    public sealed class Session : InSimClient, ISession
     {
         public Session(string _serverName, InSimSetting _inSimSetting): base( _inSimSetting)
         {

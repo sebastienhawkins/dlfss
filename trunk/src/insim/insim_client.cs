@@ -58,9 +58,9 @@ namespace Drive_LFSS.InSim_
         }
     }
 
-    public abstract class InSim : PacketHandler
+    public abstract class InSimClient : PacketHandler
     {
-        public InSim(InSimSetting _inSimSetting)
+        public InSimClient(InSimSetting _inSimSetting)
         {
             threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
             threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
@@ -75,7 +75,7 @@ namespace Drive_LFSS.InSim_
             threadSocketSendReceive.Start();
 
         }
-        ~InSim()
+        ~InSimClient()
         {
             if (true == false) { }
         }

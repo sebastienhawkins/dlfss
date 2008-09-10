@@ -86,9 +86,9 @@
     <Compile Include="game\session.cs" />
     <Compile Include="game\driver.cs" />
     <Compile Include="game\vote.cs" />
+    <Compile Include="insim\insim_client.cs" />
     <Compile Include="irc\enum.cs" />
     <Compile Include="irc\irc_client.cs" />
-    <Compile Include="insim\insim.cs" />
     <Compile Include="insim\packet\packet.cs" />
     <Compile Include="insim\packet\enum.cs" />
     <Compile Include="insim\packet\handler.cs" />
