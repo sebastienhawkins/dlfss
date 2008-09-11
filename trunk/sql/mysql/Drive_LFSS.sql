@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/10 17:14:15
+Date:                  2008/09/11 02:11:41
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -180,8 +180,8 @@ CREATE TABLE `race` (
   `track_prefix` varchar(4) NOT NULL,
   `start_timestamp` bigint(12) unsigned NOT NULL,
   `end_timestamp` bigint(12) unsigned NOT NULL,
-  `grid_order` blob NOT NULL COMMENT 'Driver GUID seperated by Space.',
-  `finish_order` blob NOT NULL,
+  `grid_order` varchar(255) NOT NULL COMMENT 'Driver GUID seperated by Space.',
+  `finish_order` varchar(255) NOT NULL,
   `race_laps` tinyint(3) unsigned NOT NULL,
   `race_status` tinyint(1) unsigned NOT NULL default '0',
   `race_feature` mediumint(4) unsigned NOT NULL default '0',

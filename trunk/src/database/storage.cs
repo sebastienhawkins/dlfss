@@ -435,7 +435,7 @@ namespace Drive_LFSS.Storage_
             lapCount = (byte)Convert.ToUInt16(rowInfos[6]);
             qualifyMinute = (byte)Convert.ToUInt16(rowInfos[7]);
             gridStartBeviator = (Grid_Start_Beviator)Convert.ToUInt16(rowInfos[8]);
-            raceMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[8]);
+            raceTemplateMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[9]);
         }
         ~RaceTemplateInfo()
         {
@@ -450,7 +450,7 @@ namespace Drive_LFSS.Storage_
         private byte lapCount;
         private byte qualifyMinute;
         private Grid_Start_Beviator gridStartBeviator;
-        private Race_Template_Flag raceMask;
+        private Race_Template_Flag raceTemplateMask;
 
         public uint Entry
         {
@@ -488,9 +488,9 @@ namespace Drive_LFSS.Storage_
         {
             get { return gridStartBeviator; }
         }
-        public bool HasRaceFlag(Race_Template_Flag flag)
+        public bool HasRaceTemplateFlag(Race_Template_Flag flag)
         {
-            return (raceMask & flag) == flag;
+            return (raceTemplateMask & flag) == flag;
         }
     }
 

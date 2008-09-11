@@ -34,6 +34,24 @@ namespace Drive_LFSS.Definition_
         FORCE_COCKPIT_VIEW = 8,
         ALLOW_WRONG_WAY = 16
     }
+    public enum Racing_Flag : byte
+    {
+        RACE_BLUE_FLAG = 1,
+        RACE_YELLOW_FLAG = 2
+    }
+    [Flags]public enum Race_Feature_Flag : ushort
+    {
+        RACE_FLAG_CAN_VOTE = 1,
+        RACE_FLAG_CAN_SELECT_TRACK = 2,
+        RACE_FLAG_UNK_1 = 4,
+        RACE_FLAG_UNK_2 = 8,
+        RACE_FLAG_UNK_3 = 16,
+        RACE_FLAG_MID_RACE_JOIN = 32,
+        RACE_FLAG_MUST_PIT = 64,
+        RACE_FLAG_CAN_RESET = 128,
+        RACE_FLAG_FORCE_COKPIT_VIEW = 256
+    }
+
     public enum Button_Entry : ushort
     {
         NONE = 0,
@@ -52,8 +70,7 @@ namespace Drive_LFSS.Definition_
         MOTD_BUTTON_DRIVE = 5,
         TRACK_PREFIX = 16,
     }
-    [Flags]
-    public enum Button_Styles_Flag : byte
+    [Flags]public enum Button_Styles_Flag : byte
     {
         ISB_C1 = 1,         // you can choose a standard
         ISB_C2 = 2,         // interface colour using
@@ -76,6 +93,14 @@ namespace Drive_LFSS.Definition_
         BUTTON_COORD_Y_MIN = 30,
         BUTTON_COORD_Y_MAX = 170,
     }
+    public enum Button_Function : byte
+    {
+        BUTTON_FUNCTION_DEL = 0,
+        BUTTON_FUNCTION_CLEAR = 1,
+        BUTTON_FUNCTION_USER_CLEAR = 2,
+        BUTTON_FUNCTION_REQUEST = 3,
+    }
+
     public enum Ctrl_Types : ushort
     {
         CTRL_C_EVENT = 0,
@@ -84,11 +109,13 @@ namespace Drive_LFSS.Definition_
         CTRL_LOGOFF_EVENT = 5,
         CTRL_SHUTDOWN_EVENT
     }
+    
     public enum Protocol_Id
     {
         PROTO_UDP,
         PROTO_TCP
     }
+    
     public enum Licence_Camera_Mode : byte
     {
         CAMERA_MODE_FOLLOW = 0,
@@ -98,13 +125,7 @@ namespace Drive_LFSS.Definition_
         CAMERA_MODE_CUSTOM = 4,
         CAMERA_MODE_ANOTHER = 255
     }
-    public enum Button_Function : byte
-    {
-        BUTTON_FUNCTION_DEL = 0,
-        BUTTON_FUNCTION_CLEAR = 1,
-        BUTTON_FUNCTION_USER_CLEAR = 2,
-        BUTTON_FUNCTION_REQUEST = 3,
-    }
+
     public enum Message_Sound : byte
     {
         SOUND_CONSOLE_SILENT = 0,
@@ -166,11 +187,7 @@ namespace Drive_LFSS.Definition_
         PITLANE_STATE_PITSTOP_PENALITY = 4,
         PITLANE_STATE_NUM = 5
     }
-    public enum Racing_Flag : byte
-    {
-        RACE_BLUE_FLAG = 1,
-        RACE_YELLOW_FLAG = 2
-    }
+
     public enum Vote_Action : byte
     {
         VOTE_NONE = 0,
@@ -307,18 +324,7 @@ namespace Drive_LFSS.Definition_
         DRIVER_FLAG_KEYBOARD_STABILISED = 4096,
         DRIVER_FLAG_CUSTOM_VIEW = 8192
     }
-    [Flags]public enum Race_Feature_Flag : ushort
-    {
-        RACE_FLAG_CAN_VOTE = 1,
-        RACE_FLAG_CAN_SELECT_TRACK = 2,
-        RACE_FLAG_UNK_1 = 4,
-        RACE_FLAG_UNK_2 = 8,
-        RACE_FLAG_UNK_3 = 16,
-        RACE_FLAG_MID_RACE_JOIN = 32,
-        RACE_FLAG_MUST_PIT = 64,
-        RACE_FLAG_CAN_RESET = 128,
-        RACE_FLAG_FORCE_COKPIT_VIEW = 256
-    }
+
     [Flags]public enum Single_Char_Flag : byte
     {
         KEY_CONTROL = 2,

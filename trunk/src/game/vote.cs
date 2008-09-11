@@ -304,19 +304,19 @@ namespace Drive_LFSS.Game_
         private void LoadNextTrack()
         {
             iSession.SendMSTMessage("/select no");
-            iSession.SendMSTMessage("/rstend 30");
-            iSession.SendMSTMessage("/autokick no");
-            iSession.SendMSTMessage("/clear");
-            iSession.SendMSTMessage("/cruise " + (nextRace.HasRaceFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
-            iSession.SendMSTMessage("/canreset " + (nextRace.HasRaceFlag(Race_Template_Flag.CAN_RESET) ? "yes" : "no"));
-            iSession.SendMSTMessage("/fcv " + (nextRace.HasRaceFlag(Race_Template_Flag.FORCE_COCKPIT_VIEW) ? "yes" : "no"));
-            iSession.SendMSTMessage("/midrace " + (nextRace.HasRaceFlag(Race_Template_Flag.MID_RACE_JOIN) ? "yes" : "no"));
-            iSession.SendMSTMessage("/mustpit " + (nextRace.HasRaceFlag(Race_Template_Flag.MUST_PIT) ? "yes" : "no"));
             iSession.SendMSTMessage("/track " + Program.trackTemplate.GetEntry(nextRace.TrackEntry).NamePrefix);
             iSession.SendMSTMessage("/qual " + nextRace.QualifyMinute);
             iSession.SendMSTMessage("/laps " + nextRace.LapCount);
             iSession.SendMSTMessage("/weather " + (byte)nextRace.Weather);
             iSession.SendMSTMessage("/wind " + (byte)nextRace.Wind);
+            iSession.SendMSTMessage("/rstend 30");
+            iSession.SendMSTMessage("/autokick no");
+            iSession.SendMSTMessage("/clear");
+            iSession.SendMSTMessage("/cruise " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
+            iSession.SendMSTMessage("/canreset " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.CAN_RESET) ? "yes" : "no"));
+            iSession.SendMSTMessage("/fcv " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.FORCE_COCKPIT_VIEW) ? "yes" : "no"));
+            iSession.SendMSTMessage("/midrace " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.MID_RACE_JOIN) ? "yes" : "no"));
+            iSession.SendMSTMessage("/mustpit " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.MUST_PIT) ? "yes" : "no"));
             string[] carEntrys = nextRace.CarEntryAllowed.Split(new char[] { ' ' });
             string carPrefix = "";
             for (byte itr = 0; itr < carEntrys.Length; itr++)

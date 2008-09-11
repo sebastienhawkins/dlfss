@@ -197,12 +197,10 @@ namespace Drive_LFSS.Log_
         }
         public static void progress(string msg)
         {
-            if ((logDisable & Log_Type.LOG_PROGRESS) > 0) 
-                return;
-
             mutexConsoleColor.WaitOne();
             {
-                stringWriter.Add(System.DateTime.Now + " PROGRESS: " + msg);
+                if ((logDisable & Log_Type.LOG_PROGRESS) == 0)
+                    stringWriter.Add(System.DateTime.Now + " PROGRESS: " + msg);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
