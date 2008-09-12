@@ -31,9 +31,9 @@ namespace Drive_LFSS.PubStats_
     using Drive_LFSS.Log_;
     using Drive_LFSS.Definition_;
 
-    public struct PB
+    public class PB
     {
-        public PB(string[] args)
+        internal PB(string[] args)
         {
             trackPrefix = args[0];
             carPrefix = args[1];
@@ -50,18 +50,31 @@ namespace Drive_LFSS.PubStats_
         string trackPrefix;
         string carPrefix;
         uint[] splits;
+
+
         uint lapTime;
         uint lapCount;
         uint timeStamp;
+        public uint[] Splits
+        {
+            get { return splits; }
+            set { splits = value; }
+        }
+        public uint LapTime
+        {
+            get { return lapTime; }
+            set { lapTime = value; }
+        }
+
         public void Debug()
         {
             Log.debug(trackPrefix + " " + carPrefix + " " + splits[0] + " " + lapTime + " " + lapCount + " " + timeStamp + "\r\n");
         }
         //<track> <car> <split1> <split2> <split3> <laptime> <lapcount> <timestamp>
     }
-    public struct WR
+    public class WR
     {
-        public WR(string[] args)
+        internal WR(string[] args)
         {
             id_wr = Convert.ToUInt32(args[0]);
             trackPrefix = args[1];
@@ -83,6 +96,20 @@ namespace Drive_LFSS.PubStats_
         uint lapTime;
         Driver_Flag driverFlag;
         string licenceName;
+
+        public uint[] Splits
+        {
+            get { return splits; }
+        }
+        public uint LapTime
+        {
+            get { return lapTime; }
+        }
+        public string LicenceName
+        {
+            get { return licenceName; }
+        }
+
         public void Debug()
         {
             Log.debug(trackPrefix + " " + carPrefix + " " + splits[0] + " " + lapTime + " " + driverFlag + " " + licenceName + "\r\n");
@@ -163,7 +190,7 @@ namespace Drive_LFSS.PubStats_
         private Queue<Request> requestQueue = new Queue<Request>();
         private WebClient webClient = new WebClient();
 
-        private Dictionary<string, PB?> storagePB = new Dictionary<string, PB?>();
+        private Dictionary<string, PB> storagePB = new Dictionary<string, PB>();
         private Dictionary<string, WR> storageWR = new Dictionary<string, WR>();
 
         private bool HasPremiumService(params string[] args)
@@ -256,13 +283,13 @@ namespace Drive_LFSS.PubStats_
             return true;
         }
         
-        public PB? GetLicenceLFSW_PB(string driverName, string carTrackPrefix)
+        public PB GetPB(string licenceName, string carTrackPrefix)
         {
-            string key = driverName + carTrackPrefix;
+            string key = licenceName + carTrackPrefix;
             if (storagePB.ContainsKey(key))
                 return storagePB[key];
 
-            Request request = new Request( new FetchDelegate(FetchLicencePB), driverName);
+            Request request = new Request( new FetchDelegate(FetchLicencePB), licenceName);
             if (!requestQueue.Contains(request))
             {
                 storagePB.Add(key, null);
@@ -271,7 +298,7 @@ namespace Drive_LFSS.PubStats_
 
             return null;
         }
-        public WR? GetTrackCarLFSW_WR(string carTrackPrefix)
+        public WR GetWR(string carTrackPrefix)
         {
             if (storageWR.ContainsKey(carTrackPrefix))
                 return storageWR[carTrackPrefix];
@@ -282,7 +309,37 @@ namespace Drive_LFSS.PubStats_
 
             return null;
         }
-        
+        //Should create class "Stats" and put that function there.
+        public static string MSToString(uint msTime)
+        {
+            string stringTime = "";
+
+            uint _test = msTime / 3600000;
+            if (_test > 0)
+            {
+                stringTime += _test > 9 ? "^2" + _test.ToString() + "^7h" : "^20" + _test.ToString() + "^7h";
+            }
+            _test = msTime % 3600000 / 60000;
+            if (_test > 0)
+            {
+                stringTime += _test > 9 ? "^2" + _test.ToString() + "^7m" : "^20" + _test.ToString() + "^7m";
+            }
+
+            _test = msTime % 60000 / 1000;
+            if (_test > 0)
+            {
+                stringTime += _test > 9 ? "^2" + _test.ToString() + "^7s" : "^20" + _test.ToString() + "^7s";
+            }
+
+            _test = msTime % 1000;
+            if (_test > 0)
+            {
+                stringTime += _test > 99 ? "^2" + _test.ToString() + "^7" : "^20" + _test.ToString() + "^7";
+            }
+
+            return stringTime;
+        }
+
         public void update(uint diff)
         {
             //TODO make busy timer, and make Dispose/New webClient

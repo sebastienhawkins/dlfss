@@ -117,7 +117,7 @@ namespace Drive_LFSS.Game_
             {
                 for (byte itr = 0; itr < buttonTimedList.Count; itr++ )
                 {
-                    if (buttonTimedList[itr].Time > diff)
+                    if (buttonTimedList[itr].Time - diff > diff) //timer on button are maybe time to be rewrite, we have a dsync why this method, hack like.
                         buttonTimedList[itr].Time -= diff;
                     else
                     {
@@ -142,7 +142,7 @@ namespace Drive_LFSS.Game_
                 {
                     ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_TOP);
                     newButton.Text = currentButton.Text;
-                    AddTimedButton(currentButton.Time - 200, newButton);//Since time is not very important, use this way to be sure im sync with timedButton
+                    AddTimedButton(currentButton.Time, newButton);
                     currentButton.Text = "";
                 }
 
@@ -158,7 +158,7 @@ namespace Drive_LFSS.Game_
                 {
                     ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_MIDDLE);
                     newButton.Text = currentButton.Text;
-                    AddTimedButton(currentButton.Time-200, newButton); //Since time is not very important, use this way to be sure im sync with timedButton
+                    AddTimedButton(currentButton.Time, newButton); //Since time is not very important, use this way to be sure im sync with timedButton
                     currentButton.Text = "";
                 }
 
@@ -283,7 +283,8 @@ namespace Drive_LFSS.Game_
             {
                 buttonTimedList.Add(new ButtonTimed(buttonInfo.Entry, time));
             }
-            SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
+            //SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
+            SendUpdateButton(buttonInfo);
         }
         public void SendUniqueButton(ushort buttonEntry)
         {

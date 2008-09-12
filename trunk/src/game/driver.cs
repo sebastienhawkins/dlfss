@@ -27,6 +27,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Log_;
     using Drive_LFSS.Config_;
     using Drive_LFSS.Session_;
+    using Drive_LFSS.PubStats_;
 
     public sealed class Driver : Car, IDriver
     {
@@ -98,6 +99,18 @@ namespace Drive_LFSS.Game_
             {
                 RemoveTrackPrefix(); //TODO: readd it when Pit
                 RemoveBanner();
+                
+                WR wr = Program.pubStats.GetWR(CarName+iSession.GetRaceTrackPrefix());
+                if (wr != null)
+                {
+                     //lapTime = lapTime.Insert();
+                   AddMessageMiddle("^8World Record, " + PubStats.MSToString(wr.LapTime) + ", ^8by^ " + wr.LicenceName, 7000);
+                }
+                PB pb = Program.pubStats.GetPB(LicenceName,CarName + iSession.GetRaceTrackPrefix());
+                if (pb != null)
+                {
+                    AddMessageMiddle("^8Your Record, " + PubStats.MSToString(pb.LapTime), 7000);
+                }
             }
             if (guid == 0)
             {
@@ -108,7 +121,6 @@ namespace Drive_LFSS.Game_
                         Log.error("Error When Creating a New GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
                 }
             }
-
         }
         public void ProcessLapInformation(PacketLAP _packet)
         {
@@ -147,6 +159,7 @@ namespace Drive_LFSS.Game_
         private uint configMask = 0;
         private Lap currentLap = new Lap();
         private Lap fastestLap = new Lap(); //will be to be loaded... from RaceStart(RST)
+        private PB pb = null;
         private class Lap
         {
             public Lap()
