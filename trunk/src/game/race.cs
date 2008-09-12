@@ -187,7 +187,7 @@ namespace Drive_LFSS.Game_
         private byte[] carPosition = new byte[(int)PositionIndex.POSITION_LAST+1]; //index 0, mean nothing and index 193 mean Nothing too.
 
         private static uint SAVE_INTERVAL = 5000;
-        private uint raceSaveInterval = 5000;
+        private uint raceSaveInterval = 0;
         public void update(uint diff)
         {
 

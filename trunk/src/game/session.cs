@@ -21,13 +21,14 @@ using System.Text;
 
 namespace Drive_LFSS.Session_
 {
-    using Drive_LFSS.Server_;
-    using Drive_LFSS.InSim_;
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Script_;
-    using Drive_LFSS.Log_;
-    using Drive_LFSS.Game_;
+    using Server_;
+    using InSim_;
+    using Packet_;
+    using Definition_;
+    using Script_;
+    using Log_;
+    using Game_;
+    using PubStats_;
 
     public sealed class Session : InSimClient, ISession
     {
@@ -163,7 +164,6 @@ namespace Drive_LFSS.Session_
         {
             return race.IsRaceInProgress();
         }
-        
         
         private const uint TIMER_PING_PONG = 8000;
         private uint TimerPingPong = 7000;
@@ -382,14 +382,7 @@ namespace Drive_LFSS.Session_
 
             if (_packet.trackPrefix != oldTrackPrefix)
             {//THIS IS NOT NEEDED IF WE FOLLOW TINY_CLR WHO MEAN ALL PLAYE CLEARED FROM TRACK.
-                byte itr = 0;
-                byte itrEnd = (byte)driverList.Count;
-                while (itr < itrEnd)
-                {
-                    driverList[itr].SendTrackPrefix();
-                    driverList[itr].SendBanner();
-                    itr++;
-                }
+
                 //SendMSTMessage(Msg.TRACK_PREFIX_NEW + GetRaceTrackPrefix());
             }
 
@@ -406,6 +399,16 @@ namespace Drive_LFSS.Session_
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
                 case Tiny_Type.TINY_REN: Log.debug(GetSessionNameForLog() + " RACE END RACE END RACE END.\r\n"); race.ProcessRaceEnd(); vote.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
                 case Tiny_Type.TINY_VTC: vote.ProcessVoteCancel(); break;
+                case Tiny_Type.TINY_CLR:
+                {
+                    byte itr = 0;
+                    byte itrEnd = (byte)driverList.Count;
+                    while (itr < itrEnd)
+                    {
+                        driverList[itr].LeaveTrack();
+                        itr++;
+                    }
+                } break;
                 case Tiny_Type.TINY_NONE: break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
             }

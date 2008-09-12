@@ -312,29 +312,35 @@ namespace Drive_LFSS.PubStats_
         //Should create class "Stats" and put that function there.
         public static string MSToString(uint msTime)
         {
+            return MSToString((int)msTime);
+        }
+        public static string MSToString(int msTime)
+        {
             string stringTime = "";
+            string numberColor = "^7";
+            string separatorColor = "^5";
 
-            uint _test = msTime / 3600000;
-            if (_test > 0)
+            int _test = msTime / 3600000;
+            if (Math.Abs(_test) > 0)
             {
-                stringTime += _test > 9 ? "^2" + _test.ToString() + "^7h" : "^20" + _test.ToString() + "^7h";
+                stringTime += Math.Abs(_test) > 9 ? numberColor + _test.ToString() + separatorColor + "h" : numberColor + "0" + _test.ToString() + separatorColor + "h";
             }
             _test = msTime % 3600000 / 60000;
-            if (_test > 0)
+            if (Math.Abs(_test) > 0)
             {
-                stringTime += _test > 9 ? "^2" + _test.ToString() + "^7m" : "^20" + _test.ToString() + "^7m";
+                stringTime += Math.Abs(_test) > 9 ? numberColor + _test.ToString() + separatorColor + "m" : numberColor + "0" + _test.ToString() + separatorColor + "m";
             }
 
             _test = msTime % 60000 / 1000;
-            if (_test > 0)
+            if (Math.Abs(_test) > 0)
             {
-                stringTime += _test > 9 ? "^2" + _test.ToString() + "^7s" : "^20" + _test.ToString() + "^7s";
+                stringTime += Math.Abs(_test) > 9 ? numberColor + _test.ToString() + separatorColor + "s" : numberColor + "0" + _test.ToString() + separatorColor + "s";
             }
 
             _test = msTime % 1000;
-            if (_test > 0)
+            if (Math.Abs(_test) > 0)
             {
-                stringTime += _test > 99 ? "^2" + _test.ToString() + "^7" : "^20" + _test.ToString() + "^7";
+                stringTime += Math.Abs(_test) > 99 ? numberColor + _test.ToString() + "" : numberColor + "0" + _test.ToString() + "";
             }
 
             return stringTime;

@@ -21,13 +21,13 @@ using System;
 
 namespace Drive_LFSS.Game_
 {
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Script_;
-    using Drive_LFSS.Log_;
-    using Drive_LFSS.Config_;
-    using Drive_LFSS.Session_;
-    using Drive_LFSS.PubStats_;
+    using Definition_;
+    using Packet_;
+    using Script_;
+    using Log_;
+    using Config_;
+    using Session_;
+    using PubStats_;
 
     public sealed class Driver : Car, IDriver
     {
@@ -70,6 +70,7 @@ namespace Drive_LFSS.Game_
                 if (!SetNewGuid())
                     Log.error("Error When Creating a New GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
             }
+            pb = Program.pubStats.GetPB(LicenceName, "");
         }
         new public void Init(PacketNPL _packet)
         {
@@ -94,24 +95,6 @@ namespace Drive_LFSS.Game_
             if (IsBot())
                 return;
 
-            //Removing This Site banner
-            //if (iSession.IsRaceInProgress())
-            {
-                RemoveTrackPrefix(); //TODO: readd it when Pit
-                RemoveBanner();
-                
-                WR wr = Program.pubStats.GetWR(CarName+iSession.GetRaceTrackPrefix());
-                if (wr != null)
-                {
-                     //lapTime = lapTime.Insert();
-                   AddMessageMiddle("^8World Record, " + PubStats.MSToString(wr.LapTime) + ", ^8by^ " + wr.LicenceName, 7000);
-                }
-                PB pb = Program.pubStats.GetPB(LicenceName,CarName + iSession.GetRaceTrackPrefix());
-                if (pb != null)
-                {
-                    AddMessageMiddle("^8Your Record, " + PubStats.MSToString(pb.LapTime), 7000);
-                }
-            }
             if (guid == 0)
             {
                 LoadFromDB();
@@ -126,17 +109,39 @@ namespace Drive_LFSS.Game_
         {
             currentLap.ProcessPacketLap(_packet);
 
-            // Check for fastest
-            // do other thing we need
+            if (pb != null && wr != null)
+            {
+                if (pb.LapTime > 0 && currentLap.LapTime > 0)
+                {
+                    int lapDiff = (int)currentLap.LapTime - (int)pb.LapTime;
+                    int lapWRDiff = (int)currentLap.LapTime - (int)wr.LapTime;
+
+                    AddMessageTop("^7Lap Diff " + PubStats.MSToString(lapDiff) + ", WR Diff " + PubStats.MSToString(lapWRDiff), 7000);
+                }
+            }
+
             currentLap.Dispose();
             currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
         }
         public void ProcessSplitInformation(PacketSPX _packet)
         {
             currentLap.ProcessPacketSplit(_packet);
+            pb = Program.pubStats.GetPB(LicenceName, CarName+iSession.GetRaceTrackPrefix());
+            wr = Program.pubStats.GetWR(CarName + iSession.GetRaceTrackPrefix());
+            if (pb != null && wr != null)
+            {
+                if (pb.Splits[_packet.splitNode - 1] > 0 && currentLap.SplitTime[_packet.splitNode] > 0)
+                {
+                    int splitDiff = (int)currentLap.SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode - 1];
+                    int splitWRDiff = (int)currentLap.SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode - 1];
+
+                    AddMessageTop("^7Split Diff " + PubStats.MSToString(splitDiff) + ", WR Diff " + PubStats.MSToString(splitWRDiff), 7000);
+                }
+            }
         }
         public void ProcessRaceStart()
         {
+            wr = Program.pubStats.GetWR("");
             currentLap.Dispose();
             currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
         }
@@ -159,7 +164,8 @@ namespace Drive_LFSS.Game_
         private uint configMask = 0;
         private Lap currentLap = new Lap();
         private Lap fastestLap = new Lap(); //will be to be loaded... from RaceStart(RST)
-        private PB pb = null;
+        public PB pb = null;
+        public WR wr = null;
         private class Lap
         {
             public Lap()
@@ -218,6 +224,15 @@ namespace Drive_LFSS.Game_
             private byte pitStopTotal = 0;      //current race total pitstop.
             private byte pitStopTotalCount = 0; //To help make PitStop by lap and not by race.
             private byte pitStopCount = 0;      //this is the Current Lap Pitstop, cen be more then 2, since on a cruise server is possible i think so.
+
+            public uint LapTime
+            {
+                get { return lapTime; }
+            }
+            public uint[] SplitTime
+            {
+                get { return splitTime; }
+            }
 
             //It important this is called eachTime we change: private byte pitStopTotal, since we count pisStop that happen during this lap.
             private void SetPitStopCount()

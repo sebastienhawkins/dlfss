@@ -26,6 +26,7 @@ namespace Drive_LFSS.Game_
     using Session_;
     using Log_;
     using Storage_;
+    using PubStats_;
 
     public abstract class Car : Licence, ICar, CarMotion
     {
@@ -42,8 +43,12 @@ namespace Drive_LFSS.Game_
         } //When Connection
         new protected void Init(PacketNPL _packet)
         {
-            carId = _packet.carId;
             carName = _packet.carName;
+            if (carId != _packet.carId)
+            {
+                EntertrackFirstTime();
+            }
+            carId = _packet.carId;
             carPlate = _packet.carPlate;
             carSkin = _packet.skinName;
             addedIntakeRestriction = _packet.addedIntakeRestriction;
@@ -54,7 +59,7 @@ namespace Drive_LFSS.Game_
             tyreRearLeft = _packet.tyreRearLeft;
             tyreRearRight =_packet.tyreRearRight;
             //
-            isOnTrack = true;
+            EnterTrack();
             
             base.Init(_packet);
 
@@ -91,17 +96,12 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
         {
-            isOnTrack = false;
             carId = 0;
-            SendBanner();
-            SendTrackPrefix();
+            LeaveTrack();
         }
         public void ProcessEnterGarage()                //When a car enter garage.
         {
-            isOnTrack = false;
-            //((Driver)this).SendMTCMessage(Msg.TRACK_PREFIX_NEW + ((Driver)this).ISession.GetRaceTrackPrefix());
-            SendBanner();
-            SendTrackPrefix();
+            LeaveTrack();
         }
 
         //Packet data
@@ -197,6 +197,33 @@ namespace Drive_LFSS.Game_
         public void EnterPit()
         {
 
+        }
+        public void EnterTrack()
+        {
+            isOnTrack = true;
+
+            RemoveTrackPrefix();
+            RemoveBanner();
+        }
+        public void EntertrackFirstTime()
+        {
+            ((Driver)this).wr = Program.pubStats.GetWR(carName + ((Driver)this).ISession.GetRaceTrackPrefix());
+            if (((Driver)this).wr != null)
+            {
+                //lapTime = lapTime.Insert();
+                AddMessageMiddle("^2World Record, " + PubStats.MSToString(((Driver)this).wr.LapTime) + ", ^2by^ " + ((Driver)this).wr.LicenceName, 7000);
+            }
+            ((Driver)this).pb = Program.pubStats.GetPB(LicenceName, carName + ((Driver)this).ISession.GetRaceTrackPrefix());
+            if (((Driver)this).pb != null && ((Driver)this).wr != null)
+            {
+                AddMessageMiddle("^2Your Record, " + PubStats.MSToString(((Driver)this).pb.LapTime) + ", ^3Diff " + PubStats.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime), 7000);
+            }
+        }
+        public void LeaveTrack()
+        {
+            isOnTrack = false;
+            SendBanner();
+            SendTrackPrefix();
         }
 
         public bool IsOnTrack()
