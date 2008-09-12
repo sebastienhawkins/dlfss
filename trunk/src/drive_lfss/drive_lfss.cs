@@ -32,6 +32,7 @@ namespace Drive_LFSS
     using Drive_LFSS.Storage_;
     using Drive_LFSS.Irc_;
     using Drive_LFSS.Irc_.Data_;
+    using Drive_LFSS.PubStats_;
 
     public sealed class Program
     {
@@ -60,8 +61,11 @@ namespace Drive_LFSS
         public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
         
         //mIRC
-        public static IrcClient ircClient = new IrcClient();
+        public static readonly IrcClient ircClient = new IrcClient();
         
+        //PubStats
+        public static readonly PubStats pubStats = new PubStats();
+
         [MTAThread]
         private static void Main()
 		{
@@ -151,6 +155,10 @@ namespace Drive_LFSS
                 Log.commandHelp("  mIRC Client is Disable.\r\n");
             Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
 
+            //PubStats Initialization
+            Log.normal("Initializating PubStats...\r\n");
+            pubStats.ConfigApply();
+            Log.normal("Completed Initialize PubStats.\r\n\r\n");
 
             //Create Object for All Configured Server
             Log.normal("Initializating Servers Config...\r\n\r\n");
@@ -190,6 +198,7 @@ namespace Drive_LFSS
                 
                 //update This Thread Process
                 SessionList.update(diff);
+                pubStats.update(diff);
 
                 //Slow down Operation , so cpu usage don't become a probleme.
                System.Threading.Thread.Sleep(sleep);
