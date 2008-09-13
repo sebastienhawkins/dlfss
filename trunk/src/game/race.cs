@@ -269,32 +269,29 @@ namespace Drive_LFSS.Game_
         }
         private bool SetNewGuid()
         {
-            Program.dlfssDatabase.NewTransaction();
             bool returnValue = false;
-            IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `race`");
-            if (reader.Read())
+            lock (Program.dlfssDatabase)
             {
-                guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
-                returnValue = true;
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `race`");
+                if (reader.Read())
+                {
+                    guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
+                    returnValue = true;
+                    reader.Close();
+                    SaveToDB();
+                }
+                reader.Dispose();
             }
-            reader.Dispose();
-            if (returnValue)
-                SaveToDB();
-
-            Program.dlfssDatabase.EndTransaction();
             return returnValue;
         }
         private void SaveToDB()
         {
-            lock (Program.dlfssDatabase)
-            {
-                Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `race` WHERE `guid`=" + guid);
-                string query = "INSERT INTO `race` (`guid`,`qualify_race_guid`,`track_prefix`,`start_timestamp`,`end_timestamp`,`grid_order`,`finish_order`,`race_laps`,`race_status`,`race_feature`,`qualification_minute`,`weather_status`,`wind_status`)";
-                query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / 10000000) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
-                //Since this is GUID creation, important 1 at time is created.
+            Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `race` WHERE `guid`=" + guid);
+            string query = "INSERT INTO `race` (`guid`,`qualify_race_guid`,`track_prefix`,`start_timestamp`,`end_timestamp`,`grid_order`,`finish_order`,`race_laps`,`race_status`,`race_feature`,`qualification_minute`,`weather_status`,`wind_status`)";
+            query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / 10000000) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
+            //Since this is GUID creation, important 1 at time is created.
+            Program.dlfssDatabase.ExecuteNonQuery(query);
 
-                Program.dlfssDatabase.ExecuteNonQuery(query);
-            }
             raceSaveInterval = 0;
             stateHasChange = false;
             Log.database(session.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps:" + raceLaps + ", saved To Database.\r\n");

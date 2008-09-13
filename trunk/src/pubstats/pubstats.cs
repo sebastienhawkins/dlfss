@@ -244,7 +244,7 @@ namespace Drive_LFSS.PubStats_
             for (uint itr = 0; itr < itrMax; itr++)
             {
                 datas = lines[itr].Split(new char[] { ' ' }, 8);
-                if (datas.Length < 8)
+                if (datas.Length < 8 || datas[0]=="can't")
                     continue;
 
                 datas[0] = LFSWTrackToTrackPrefix(datas[0]);
@@ -292,7 +292,7 @@ namespace Drive_LFSS.PubStats_
             Request request = new Request( new FetchDelegate(FetchLicencePB), licenceName);
             if (!requestQueue.Contains(request))
             {
-                storagePB.Add(key, null);
+                //storagePB.Add(key, null); //this create a null index, so we don't ask for this PB anymore.
                 requestQueue.Enqueue(request);
             }
 
@@ -310,40 +310,39 @@ namespace Drive_LFSS.PubStats_
             return null;
         }
         //Should create class "Stats" and put that function there.
-        public static string MSToString(uint msTime)
+        public static string MSToString(uint msTime, string negativeColor, string positiveColor)
         {
-            return MSToString((int)msTime);
+            return MSToString((int)msTime,negativeColor, positiveColor);
         }
-        public static string MSToString(int msTime)
+        public static string MSToString(int msTime,string negativeColor, string positiveColor)
         {
             string stringTime = "";
-            string numberColor = "^7";
-            string separatorColor = "^5";
+            bool isNegative = msTime < 0 ? true : false;
+            msTime = Math.Abs(msTime);
 
+            //Hours
             int _test = msTime / 3600000;
-            if (Math.Abs(_test) > 0)
-            {
-                stringTime += Math.Abs(_test) > 9 ? numberColor + _test.ToString() + separatorColor + "h" : numberColor + "0" + _test.ToString() + separatorColor + "h";
-            }
+            if (_test > 0)
+                stringTime += (_test > 9 ?_test.ToString():"0"+_test.ToString()) + ":";
+
+            //Minute
             _test = msTime % 3600000 / 60000;
-            if (Math.Abs(_test) > 0)
-            {
-                stringTime += Math.Abs(_test) > 9 ? numberColor + _test.ToString() + separatorColor + "m" : numberColor + "0" + _test.ToString() + separatorColor + "m";
-            }
-
+            stringTime += (_test < 10 ? "0" + _test.ToString() : _test.ToString())+ ":";
+            
+            //Seconde
             _test = msTime % 60000 / 1000;
-            if (Math.Abs(_test) > 0)
-            {
-                stringTime += Math.Abs(_test) > 9 ? numberColor + _test.ToString() + separatorColor + "s" : numberColor + "0" + _test.ToString() + separatorColor + "s";
-            }
+            stringTime += (_test < 10 ? "0" + _test.ToString() : _test.ToString())+ ".";
 
+            //Milieme
             _test = msTime % 1000;
-            if (Math.Abs(_test) > 0)
-            {
-                stringTime += Math.Abs(_test) > 99 ? numberColor + _test.ToString() + "" : numberColor + "0" + _test.ToString() + "";
-            }
+            if (_test < 10)
+                stringTime += "00" + _test.ToString();
+            else if(_test < 100)
+                stringTime += "0" + _test.ToString();
+            else
+                stringTime += _test.ToString();
 
-            return stringTime;
+            return isNegative ? negativeColor+"-" + stringTime : positiveColor+ stringTime;
         }
 
         public void update(uint diff)

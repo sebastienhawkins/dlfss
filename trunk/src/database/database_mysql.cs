@@ -46,7 +46,7 @@ namespace Drive_LFSS.Database_
         private MySqlTransaction transaction;
         private Mutex mutexDataReader = new Mutex();
         
-        //Thread Safe
+        //Thread ???
         public void CancelCommand()
         {
             try { lock (this) { command.Cancel(); } }
@@ -54,7 +54,7 @@ namespace Drive_LFSS.Database_
         }
         public void NewTransaction()
         {
-            mutexDataReader.WaitOne(-1,false);
+            mutexDataReader.WaitOne(-1, true);
             transaction = connection.BeginTransaction(IsolationLevel.Serializable); 
         }
         public void EndTransaction()
@@ -65,17 +65,22 @@ namespace Drive_LFSS.Database_
         }
         public int ExecuteNonQuery(string _command)
         {
-            int i;
-            mutexDataReader.WaitOne(-1, false);
-            {
+            mutexDataReader.WaitOne(-1, true);
+                int i;
                 command.CommandText = _command;
                 i = command.ExecuteNonQuery();
-            }
             mutexDataReader.ReleaseMutex();
             return i;
         }
+        public IDataReader ExecuteQuery(string _command)
+        {
+            MySqlDataReader dataReader;
+            command.CommandText = _command;
+            dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+            return dataReader;
+        }
 
-        //Thread Safe, If into Transaction
+        //Thread ???
         public IAsyncResult NewExecuteNonQuery()
         {
             return command.BeginExecuteNonQuery();
@@ -84,17 +89,7 @@ namespace Drive_LFSS.Database_
         {
             return command.EndExecuteNonQuery(_iaSyncResult);
         }
-        public IDataReader ExecuteQuery(string _command)
-        {
-            MySqlDataReader dataReader;
-            
-            lock (command)
-            {
-                command.CommandText = _command;
-                dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
-            }
-            return dataReader;
-        }
+
 
     }
 }

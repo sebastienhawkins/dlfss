@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/12 18:53:05
+Date:                  2008/09/13 03:56:08
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -35,9 +35,9 @@ insert  into button_template values (10, 'vote option 1', 106, 0, 0, 2, 73, 45, 
 insert  into button_template values (11, 'vote option 2', 106, 0, 0, 2, 80, 45, 6, 'vote option 2') ;
 insert  into button_template values (3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta') ;
 insert  into button_template values (5, 'motd button', 26, 1, 0, 75, 125, 50, 12, '^2Drive') ;
-insert  into button_template values (6, 'message bar top', 2, 0, 0, 60, 10, 80, 12, '^1Message bar top') ;
-insert  into button_template values (7, 'message bar middle', 2, 0, 0, 25, 85, 150, 14, '^1Message bar Middle') ;
-insert  into button_template values (8, 'Collision Warning', 2, 0, 0, 25, 70, 150, 14, '^1CollisionWarning') ;
+insert  into button_template values (6, 'message bar top', 2, 0, 0, 60, 25, 80, 16, '^1Message bar top') ;
+insert  into button_template values (7, 'message bar middle', 2, 0, 0, 25, 48, 150, 16, '^1Message bar Middle') ;
+insert  into button_template values (8, 'Collision Warning', 2, 0, 0, 25, 68, 150, 8, '^1CollisionWarning') ;
 insert  into button_template values (9, 'vote title', 146, 0, 0, 2, 65, 50, 8, 'vote title') ;
 insert  into button_template values (4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, '') ;
 insert  into button_template values (12, 'vote option 3', 106, 0, 0, 2, 87, 45, 6, 'vote option 3') ;

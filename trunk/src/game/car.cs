@@ -46,7 +46,7 @@ namespace Drive_LFSS.Game_
             carName = _packet.carName;
             if (carId != _packet.carId)
             {
-                EntertrackFirstTime();
+                EnterTrackFirstTime();
             }
             carId = _packet.carId;
             carPlate = _packet.carPlate;
@@ -205,18 +205,18 @@ namespace Drive_LFSS.Game_
             RemoveTrackPrefix();
             RemoveBanner();
         }
-        public void EntertrackFirstTime()
+        public void EnterTrackFirstTime()
         {
             ((Driver)this).wr = Program.pubStats.GetWR(carName + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).wr != null)
             {
                 //lapTime = lapTime.Insert();
-                AddMessageMiddle("^2World Record, " + PubStats.MSToString(((Driver)this).wr.LapTime) + ", ^2by^ " + ((Driver)this).wr.LicenceName, 7000);
+                AddMessageMiddle("^2World Record, " + PubStats.MSToString(((Driver)this).wr.LapTime,"7^","^7") + ", ^2by^ " + ((Driver)this).wr.LicenceName, 7000);
             }
             ((Driver)this).pb = Program.pubStats.GetPB(LicenceName, carName + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).pb != null && ((Driver)this).wr != null)
             {
-                AddMessageMiddle("^2Your Record, " + PubStats.MSToString(((Driver)this).pb.LapTime) + ", ^3Diff " + PubStats.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime), 7000);
+                AddMessageMiddle("^2Your Record, " + PubStats.MSToString(((Driver)this).pb.LapTime, "7^", "^7") + ", ^3Diff " + PubStats.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime, "7^", "^8"), 7000);
             }
         }
         public void LeaveTrack()

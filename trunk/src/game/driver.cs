@@ -116,7 +116,7 @@ namespace Drive_LFSS.Game_
                     int lapDiff = (int)currentLap.LapTime - (int)pb.LapTime;
                     int lapWRDiff = (int)currentLap.LapTime - (int)wr.LapTime;
 
-                    AddMessageTop("^7Lap Diff " + PubStats.MSToString(lapDiff) + ", WR Diff " + PubStats.MSToString(lapWRDiff), 7000);
+                    AddMessageTop("^2diff " + PubStats.MSToString(lapDiff, "^7", "^8") + ", ^1wr ^2diff " + PubStats.MSToString(lapWRDiff, "^7", "^8"), 7000);
                 }
             }
 
@@ -135,20 +135,18 @@ namespace Drive_LFSS.Game_
                     int splitDiff = (int)currentLap.SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode - 1];
                     int splitWRDiff = (int)currentLap.SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode - 1];
 
-                    AddMessageTop("^7Split Diff " + PubStats.MSToString(splitDiff) + ", WR Diff " + PubStats.MSToString(splitWRDiff), 7000);
+                    AddMessageTop("^2diff " + PubStats.MSToString(splitDiff, "^7", "^8") + ", ^3wr ^2diff " + PubStats.MSToString(splitWRDiff, "^7", "^8"), 7000);
                 }
             }
         }
         public void ProcessRaceStart()
         {
             wr = Program.pubStats.GetWR("");
-            currentLap.Dispose();
+            //currentLap.Dispose();
             currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
         }
         public void ProcessRaceEnd()
         {
-            currentLap.Dispose();
-            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
         }
         
         //Loaded From packet
@@ -166,6 +164,7 @@ namespace Drive_LFSS.Game_
         private Lap fastestLap = new Lap(); //will be to be loaded... from RaceStart(RST)
         public PB pb = null;
         public WR wr = null;
+        //Have to get Rid Of this... "Lap", and should not use Network Thread to get Saved.
         private class Lap
         {
             public Lap()
@@ -249,20 +248,24 @@ namespace Drive_LFSS.Game_
                 string query = "INSERT INTO `driver_lap` (`guid`,`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
                 query += "VALUES (" + guid + "," + raceGuid + "," + driverGuid + ",'" + carPrefix + "','" + trackPrefix + "'," + (byte)driverMask + "," + splitTime[1] + "," + splitTime[2] + "," + splitTime[3] + "," + lapTime + "," + totalTime + "," + lapCompleted + "," + (byte)currentPenality + "," + pitStopCount + "," + yellowFlagCount + "," + blueFlagCount + ")";
                 Program.dlfssDatabase.ExecuteNonQuery(query);
-                Log.database("LapGuid: " + guid + ", DriverGuid: " + driverGuid + ", car_prefix:" + carPrefix + ", track_prefix: " + trackPrefix + ", saved To Database.\r\n");
+                //Log.database("LapGuid: " + guid + ", DriverGuid: " + driverGuid + ", car_prefix:" + carPrefix + ", track_prefix: " + trackPrefix + ", saved To Database.\r\n");
             }
             private bool SetNewGuid()
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver_lap`");
-                if (reader.Read())
+                bool returnValue = false;
+                lock (Program.dlfssDatabase)
                 {
-                    guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
+                    IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver_lap`");
+                    if (reader.Read())
+                    {
+                        guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
+                        reader.Close();
+                        SaveToDB();
+                        returnValue = true;
+                    }
                     reader.Dispose();
-                    SaveToDB();
-                    return true;
                 }
-                reader.Dispose();
-                return false;
+                return returnValue;
             }
         }
 
@@ -271,36 +274,40 @@ namespace Drive_LFSS.Game_
 
         private void LoadFromDB()
         {
-            Program.dlfssDatabase.NewTransaction();
-            IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_mask` FROM `driver` WHERE `licence_name`='" + licenceName + "' AND `driver_name`='" + driverName + "'");
-            if (reader.Read())
+            lock (Program.dlfssDatabase)
             {
-                guid = (uint)reader.GetInt32(0);
-                //...
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_mask` FROM `driver` WHERE `licence_name`='" + licenceName + "' AND `driver_name`='" + driverName + "'");
+                if (reader.Read())
+                {
+                    guid = (uint)reader.GetInt32(0);
+                    //...
+                }
+                reader.Dispose();
             }
-
-            reader.Dispose();
-            Program.dlfssDatabase.EndTransaction();
         }
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
             Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_mask`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', " + configMask + ", " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
-            Log.database(iSession.GetSessionNameForLog() + " DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
+            //Log.database(iSession.GetSessionNameForLog() + " DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
         }
         private bool SetNewGuid()
         {
-            IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver`");
-            if (reader.Read())
+            bool returnValue = false;
+            lock (Program.dlfssDatabase)
             {
-                guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver`");
+                if (reader.Read())
+                {
+                    guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
+                    reader.Close();
+                    SaveToDB();
+                    returnValue = true;
+                }
                 reader.Dispose();
-                SaveToDB();
-                return true;
             }
-            reader.Dispose();
-            return false;
+            return returnValue;
         }
         new public void update(uint diff) 
         {
