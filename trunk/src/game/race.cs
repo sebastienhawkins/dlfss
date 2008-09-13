@@ -119,7 +119,10 @@ namespace Drive_LFSS.Game_
 
             if (hasToBeSavedIntoPPSTA)
             {
-                SaveToDB();
+                lock (Program.dlfssDatabase)
+                {
+                    SaveToDB();
+                }
                 hasToBeSavedIntoPPSTA = false;
             }
             if (finishedCount >= carCount && !requestedFinalResult) //This is not working good in all condition during qualify
@@ -235,7 +238,12 @@ namespace Drive_LFSS.Game_
                 finishOrder = finishOrder.TrimEnd(' ');
 
             if (guid != 0)
-                SaveToDB();
+            {
+                lock (Program.dlfssDatabase)
+                {
+                    SaveToDB();
+                }
+            }
 
             if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 qualifyRaceGuid = guid;

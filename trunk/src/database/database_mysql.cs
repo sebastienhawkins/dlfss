@@ -49,7 +49,7 @@ namespace Drive_LFSS.Database_
         //Thread ???
         public void CancelCommand()
         {
-            try { lock (this) { command.Cancel(); } }
+            try { command.Cancel(); }
             catch (Exception) { }
         }
         public void NewTransaction()
@@ -65,11 +65,9 @@ namespace Drive_LFSS.Database_
         }
         public int ExecuteNonQuery(string _command)
         {
-            mutexDataReader.WaitOne(-1, true);
-                int i;
-                command.CommandText = _command;
-                i = command.ExecuteNonQuery();
-            mutexDataReader.ReleaseMutex();
+            int i;
+            command.CommandText = _command;
+            i = command.ExecuteNonQuery();
             return i;
         }
         public IDataReader ExecuteQuery(string _command)
