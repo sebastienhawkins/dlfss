@@ -104,7 +104,6 @@ namespace Drive_LFSS.Game_
             LeaveTrack();
         }
 
-        //Packet data
         private byte carId = 0;
         private string carName = "";
         private string carPlate = "";
@@ -128,8 +127,6 @@ namespace Drive_LFSS.Game_
         private double tracjectory = 0.0d;
         private double headingAngle = 0.0d;
         private double orientationSpeed = 0.0d;
-
-        //Game Feature
         private bool isOnTrack = false;
         private uint collisionTimer = 0;
         private FeatureAcceleration_0_100 featureAcceleration_0_100 = new FeatureAcceleration_0_100();
@@ -180,6 +177,7 @@ namespace Drive_LFSS.Game_
             }
             base.update(diff);
         }
+
         public bool HasCollisionWarning()
         {
             return (collisionTimer > 0);
@@ -225,7 +223,6 @@ namespace Drive_LFSS.Game_
             SendBanner();
             SendTrackPrefix();
         }
-
         public bool IsOnTrack()
         {
             return (carId > 0 && isOnTrack);
@@ -246,7 +243,6 @@ namespace Drive_LFSS.Game_
         {
             return racePosition;
         }
-
         //Speed
         public double GetSpeedMs()
         {
@@ -256,7 +252,6 @@ namespace Drive_LFSS.Game_
         {
             return speedKmh;
         }
-
         //X,Y,Z Coordonate
         public double GetPosX()
         {
@@ -270,7 +265,6 @@ namespace Drive_LFSS.Game_
         {
             return z;
         }
-
         //Trajectoire / Direction / Velocity
         public double GetTrajectory()
         {

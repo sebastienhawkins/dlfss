@@ -169,7 +169,6 @@ namespace Drive_LFSS.Game_
             }
         }
 
-
         public void SendGui(ushort guiEntry)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);

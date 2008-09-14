@@ -45,18 +45,16 @@ namespace Drive_LFSS.Game_
                 licenceName = "AI";
         }
         
-        #region Update
+        protected string licenceName = "";
+        private byte licenceId = 0;
+        private byte unkFlag = 0;
+        private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
+
         new protected virtual void update(uint diff)
         {
             //Don't see any feature that can be implement here... but futur will tell
             base.update(diff);
         }
-        #endregion
-
-        protected string licenceName = "";
-        private byte licenceId = 0;
-        private byte unkFlag = 0;
-        private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
 
         public string LicenceName 
         { 

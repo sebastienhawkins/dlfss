@@ -149,21 +149,19 @@ namespace Drive_LFSS.Game_
         {
         }
         
-        //Loaded From packet
         private bool adminFlag = false;
         private string driverName = "";
         private byte driverModel = 0;
         public Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
         private ISession iSession;
-
-        //
         private uint guid = 0;
         private uint configMask = 0;
         private Lap currentLap = new Lap();
         private Lap fastestLap = new Lap(); //will be to be loaded... from RaceStart(RST)
         public PB pb = null;
         public WR wr = null;
+
         //Have to get Rid Of this... "Lap", and should not use Network Thread to get Saved.
         private class Lap
         {
@@ -268,10 +266,8 @@ namespace Drive_LFSS.Game_
                 return returnValue;
             }
         }
-
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
-
         private void LoadFromDB()
         {
             lock (Program.dlfssDatabase)
@@ -309,6 +305,7 @@ namespace Drive_LFSS.Game_
             }
             return returnValue;
         }
+
         new public void update(uint diff) 
         {
             if (!IsBot())
@@ -320,6 +317,7 @@ namespace Drive_LFSS.Game_
 
             base.update(diff);
         }
+
         public ISession ISession
         {
             get { return iSession; }
