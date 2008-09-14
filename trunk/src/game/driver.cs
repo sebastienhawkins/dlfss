@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
+using System.Collections.Generic;
 using System.Data;
 using System;
 
@@ -89,8 +89,7 @@ namespace Drive_LFSS.Game_
 
             base.Init(_packet);
 
-            currentLap.Dispose();
-            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
+            laps.Enqueue(new Lap());
 
             if (IsBot())
                 return;
@@ -107,33 +106,34 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessLapInformation(PacketLAP _packet)
         {
-            currentLap.ProcessPacketLap(_packet);
+            laps.Peek().ProcessPacketLap(_packet,iSession.GetRaceGuid(),CarName,iSession.GetRaceTrackPrefix());
 
             if (pb != null && wr != null)
             {
-                if (pb.LapTime > 0 && currentLap.LapTime > 0)
+                if (pb.LapTime > 0 && laps.Peek().LapTime > 0)
                 {
-                    int lapDiff = (int)currentLap.LapTime - (int)pb.LapTime;
-                    int lapWRDiff = (int)currentLap.LapTime - (int)wr.LapTime;
+                    int lapDiff = (int)laps.Peek().LapTime - (int)pb.LapTime;
+                    int lapWRDiff = (int)laps.Peek().LapTime - (int)wr.LapTime;
 
                     AddMessageTop("^2diff " + PubStats.MSToString(lapDiff, "^7", "^8") + ", ^1wr ^2diff " + PubStats.MSToString(lapWRDiff, "^7", "^8"), 7000);
                 }
             }
-
-            currentLap.Dispose();
-            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
+            laps.Enqueue(new Lap());
         }
         public void ProcessSplitInformation(PacketSPX _packet)
         {
-            currentLap.ProcessPacketSplit(_packet);
+            //Internal Lap
+            laps.Peek().ProcessPacketSplit(_packet);
+            
+            //PubStats
             pb = Program.pubStats.GetPB(LicenceName, CarName+iSession.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarName + iSession.GetRaceTrackPrefix());
             if (pb != null && wr != null)
             {
-                if (pb.Splits[_packet.splitNode - 1] > 0 && currentLap.SplitTime[_packet.splitNode] > 0)
+                if (pb.Splits[_packet.splitNode - 1] > 0 && laps.Peek().SplitTime[_packet.splitNode] > 0)
                 {
-                    int splitDiff = (int)currentLap.SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode - 1];
-                    int splitWRDiff = (int)currentLap.SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode - 1];
+                    int splitDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode - 1];
+                    int splitWRDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode - 1];
 
                     AddMessageTop("^2diff " + PubStats.MSToString(splitDiff, "^7", "^8") + ", ^3wr ^2diff " + PubStats.MSToString(splitWRDiff, "^7", "^8"), 7000);
                 }
@@ -142,8 +142,7 @@ namespace Drive_LFSS.Game_
         public void ProcessRaceStart()
         {
             wr = Program.pubStats.GetWR("");
-            //currentLap.Dispose();
-            currentLap = new Lap(iSession.GetRaceGuid(), guid, CarName, iSession.GetRaceTrackPrefix(), driverMask);
+            laps.Enqueue(new Lap());
         }
         public void ProcessRaceEnd()
         {
@@ -157,8 +156,7 @@ namespace Drive_LFSS.Game_
         private ISession iSession;
         private uint guid = 0;
         private uint configMask = 0;
-        private Lap currentLap = new Lap();
-        private Lap fastestLap = new Lap(); //will be to be loaded... from RaceStart(RST)
+        private Queue<Lap> laps = new Queue<Lap>();
         public PB pb = null;
         public WR wr = null;
 
@@ -166,104 +164,102 @@ namespace Drive_LFSS.Game_
         private class Lap
         {
             public Lap()
-            { }
-            public Lap(uint _raceGuid, uint _driverGuid, string _carAbreviation, string _trackAbreaviation, Driver_Flag _driverMask)
             {
-                raceGuid = _raceGuid;
-                driverGuid = _driverGuid;
-                carPrefix = _carAbreviation;
-                trackPrefix = _trackAbreaviation;
-                driverMask = _driverMask;
             }
             ~Lap()
             {
+                if (true == false) { }
             }
-            public void Dispose()
-            {
-                if (raceGuid != 0)
-                {
-                    if (!SetNewGuid())
-                        Log.error("Database Error, unable to Create new GUID for Lap.\r\n");
-                }
-            }
-            public void ProcessPacketLap(PacketLAP _packet)
+            public void ProcessPacketLap(PacketLAP _packet,uint _raceGuid, string _carPrefix, string _trackPrefix)
             {
                 lapTime = _packet.lapTime;
                 totalTime = _packet.totalTime;
-                lapCompleted = _packet.lapCompleted;
+                SetPitStopCount(_packet.pitStopTotal);
+                carPrefix = _carPrefix;
+                trackPrefix = _trackPrefix;
+                raceGuid = _raceGuid;
                 driverMask = _packet.driverMask;
                 currentPenality = _packet.currentPenality;
-                pitStopTotal = _packet.pitStopTotal;
-                SetPitStopCount();
             }
             public void ProcessPacketSplit(PacketSPX _packet)
             {
                 splitTime[_packet.splitNode] = _packet.splitTime;
                 totalTime = _packet.totalTime;
-                pitStopTotal = _packet.pitStopTotal;
-                SetPitStopCount();
-                currentPenality = _packet.currentPenalty;
+                SetPitStopCount(_packet.pitStopTotal);
             }
 
-            private uint guid = 0;
-            private uint driverGuid = 0;
             private uint raceGuid = 0;
-            private string carPrefix = "";
             private string trackPrefix = "";
+            private string carPrefix = "";
+            private Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
             private uint lapTime = 0;
             private uint totalTime = 0;
             private ushort lapCompleted = 0;
-            private Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
-            private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
             private uint[] splitTime = new uint[4] { 0, 0, 0, 0 };
             private ushort yellowFlagCount = 0;
             private ushort blueFlagCount = 0;
+            private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
             private byte pitStopTotal = 0;      //current race total pitstop.
             private byte pitStopTotalCount = 0; //To help make PitStop by lap and not by race.
             private byte pitStopCount = 0;      //this is the Current Lap Pitstop, cen be more then 2, since on a cruise server is possible i think so.
 
+            public Penalty_Type CurrentPenality
+            {
+                get { return currentPenality; }
+            }
+            public Driver_Flag DriverMask
+            {
+                get { return driverMask; }
+            }
+            public string CarPrefix
+            {
+                get { return carPrefix; }
+            }
+            public string TrackPrefix
+            {
+                get { return trackPrefix; }
+             }
+            public uint RaceGuid
+            {
+                get { return raceGuid; }
+            }
             public uint LapTime
             {
-                get { return lapTime; }
+                get {return lapTime;}
             }
             public uint[] SplitTime
             {
                 get { return splitTime; }
             }
-
-            //It important this is called eachTime we change: private byte pitStopTotal, since we count pisStop that happen during this lap.
-            private void SetPitStopCount()
+            public ushort BlueFlagCount
             {
+                get { return blueFlagCount; }
+            }
+            public ushort YellowFlagCount
+            {
+                get { return yellowFlagCount; }
+            }
+            public uint TotalTime
+            {
+                get { return totalTime; }
+            }
+            public ushort LapCompleted
+            {
+                get { return lapCompleted; }
+            }
+            public byte PitStopCount
+            {
+                get { return pitStopCount; }
+            }
+
+            private void SetPitStopCount(byte _pitStopTotal)
+            {
+                pitStopTotal = _pitStopTotal;
                 if (pitStopTotal > pitStopTotalCount)
                 {
                     pitStopCount = (byte)(pitStopTotal - pitStopTotalCount);
                     pitStopTotalCount = pitStopTotal;
                 }
-            }
-            private void SaveToDB()
-            {
-                Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver_lap` WHERE `guid`=" + guid);
-                string query = "INSERT INTO `driver_lap` (`guid`,`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
-                query += "VALUES (" + guid + "," + raceGuid + "," + driverGuid + ",'" + carPrefix + "','" + trackPrefix + "'," + (byte)driverMask + "," + splitTime[1] + "," + splitTime[2] + "," + splitTime[3] + "," + lapTime + "," + totalTime + "," + lapCompleted + "," + (byte)currentPenality + "," + pitStopCount + "," + yellowFlagCount + "," + blueFlagCount + ")";
-                Program.dlfssDatabase.ExecuteNonQuery(query);
-                //Log.database("LapGuid: " + guid + ", DriverGuid: " + driverGuid + ", car_prefix:" + carPrefix + ", track_prefix: " + trackPrefix + ", saved To Database.\r\n");
-            }
-            private bool SetNewGuid()
-            {
-                bool returnValue = false;
-                lock (Program.dlfssDatabase)
-                {
-                    IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver_lap`");
-                    if (reader.Read())
-                    {
-                        guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
-                        reader.Close();
-                        SaveToDB();
-                        returnValue = true;
-                    }
-                    reader.Dispose();
-                }
-                return returnValue;
             }
         }
         private static uint SAVE_INTERVAL = 60000;
@@ -281,12 +277,17 @@ namespace Drive_LFSS.Game_
                 reader.Dispose();
             }
         }
+        private void SaveLapsToDB(Lap lap)
+        {
+            string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
+            query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + "," + (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount + ")";
+            Program.dlfssDatabase.ExecuteNonQuery(query);
+        }
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
             Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_mask`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', " + configMask + ", " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
-            //Log.database(iSession.GetSessionNameForLog() + " DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
         }
         private bool SetNewGuid()
         {
@@ -311,8 +312,25 @@ namespace Drive_LFSS.Game_
             if (!IsBot())
             {
                 if ((driverSaveInterval += diff) >= SAVE_INTERVAL) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
+                {
+                    Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
                     SaveToDB();
-                //...
+                    if (laps.Count > 0){lock (laps)
+                    {
+                        Lap currentLap = laps.Peek();
+                        Lap lap;
+                        while (laps.Count > 0)
+                        {
+                            lap = laps.Dequeue();
+                            if (lap.LapTime < 1)
+                                continue;
+                            SaveLapsToDB(lap);
+                            Log.database(iSession.GetSessionNameForLog() + "Lap For DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved To Database.\r\n");
+                        }
+                        if (currentLap.LapTime < 1)
+                            laps.Enqueue(currentLap);
+                    }}
+                }
             }
 
             base.update(diff);

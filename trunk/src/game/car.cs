@@ -67,7 +67,7 @@ namespace Drive_LFSS.Game_
         public void ProcessCarInformation(CarInformation _carInformation)
         {
             node = _carInformation.nodeTrack;
-            lapNumber = _carInformation.lapNumber;
+            lapCompleted = _carInformation.lapNumber;
             racePosition = _carInformation.position;
             carFlag = _carInformation.carFlag;
             x = _carInformation.posX / 65536.0d;
@@ -115,8 +115,9 @@ namespace Drive_LFSS.Game_
         private Car_Tyres tyreFrontRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Car_Tyres tyreRearLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Car_Tyres tyreRearRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
+        private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
+        private ushort lapCompleted = 0;
         private ushort node = 0;
-        private ushort lapNumber = 0;
         private byte racePosition = 0;
         private Car_Racing_Flag carFlag = Car_Racing_Flag.CAR_RACING_FLAG_NONE;
         private double x = 0.0d;
@@ -235,6 +236,15 @@ namespace Drive_LFSS.Game_
         {
             get { return carName; }
         }
+        public Penalty_Type CurrentPenality
+        {
+            get { return currentPenality; }
+        }
+        public ushort LapCompleted
+        {
+            get { return lapCompleted; }
+        }
+
         public ushort GetNode()
         {
             return node;
