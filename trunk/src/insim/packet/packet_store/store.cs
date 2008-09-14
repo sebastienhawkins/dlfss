@@ -21,10 +21,11 @@ using System.Runtime.InteropServices;
 
 namespace Drive_LFSS.PacketStore_
 {
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Session_;
-    using Drive_LFSS.Log_;
+    using Packet_;
+    using Definition_;
+    using Session_;
+    using Log_;
+    using InSim_;
 
     public abstract class Store
     {
@@ -65,6 +66,8 @@ namespace Drive_LFSS.PacketStore_
         }
         protected void AddToTcpSendingQueud(Packet _serverPacket)
         {
+            if (!((InSimClient)this).IsConnected())
+                return;
             lock (tcpSendingQueud)
             {
                 tcpSendingQueud.Enqueue(_serverPacket);

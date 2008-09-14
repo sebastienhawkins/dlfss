@@ -152,9 +152,9 @@ namespace Drive_LFSS.InSim_
         }
         private void SendConnectISI()
         {
+            ISISended = true;
             PacketISI packetISI = new PacketISI(1, inSimSetting.port, (ushort)inSimSetting.insimMask, inSimSetting.commandPrefix, inSimSetting.requestInterval, inSimSetting.password, inSimSetting.appName);
             AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_ISI, Packet_Type.PACKET_ISI_INSIM_INITIALISE, packetISI));
-            ISISended = true;
         }
         private void SetDisconnected()
         {
