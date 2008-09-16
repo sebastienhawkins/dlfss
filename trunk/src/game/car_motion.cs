@@ -8,6 +8,8 @@ namespace Drive_LFSS.Game_
         double GetOrientationSpeed();
         double GetOrientation();
         double GetTrajectory();
+        double GetAngleToReachTraj(bool clockWise);
+        double GetShorterAngleToReachTraj();
         double GetSpeedMs();
         double GetSpeedKmh();
         double GetPosX();

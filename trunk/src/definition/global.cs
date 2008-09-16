@@ -69,6 +69,11 @@ namespace Drive_LFSS.Definition_
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
         TRACK_PREFIX = 16,
+        INFO_1 = 17,
+        INFO_2 = 18,
+        INFO_3 = 19,
+        INFO_4 = 20,
+        INFO_5 = 21,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {

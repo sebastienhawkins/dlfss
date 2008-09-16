@@ -160,7 +160,6 @@ namespace Drive_LFSS.Game_
         public PB pb = null;
         public WR wr = null;
 
-        //Have to get Rid Of this... "Lap", and should not use Network Thread to get Saved.
         private class Lap
         {
             public Lap()
@@ -180,6 +179,7 @@ namespace Drive_LFSS.Game_
                 raceGuid = _raceGuid;
                 driverMask = _packet.driverMask;
                 currentPenality = _packet.currentPenality;
+                lapCompleted = _packet.lapCompleted;
             }
             public void ProcessPacketSplit(PacketSPX _packet)
             {
@@ -329,6 +329,8 @@ namespace Drive_LFSS.Game_
                         }
                         if (currentLap.LapTime < 1)
                             laps.Enqueue(currentLap);
+                        else
+                            laps.Enqueue(new Lap());
                     }}
                 }
             }

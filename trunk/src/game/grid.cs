@@ -81,7 +81,10 @@ namespace Drive_LFSS.Game_
             return carIds.ToArray();
         }
 
-        private const double speedColRatio = 0.715d;
+        //I think we have no choices but put Dynamic, Brake range Value for each Car
+        //this seem to work pretty good for most car, but with a BF1, ho no! you have much time to brake in fact!
+        //Have to remember , the real collision detection will occur if YellowFlag is trigger too...
+        private const double speedColRatio = 0.717d;
         private void checkCollision(CarMotion car)
         {
             CarMotion[] carAround;
@@ -154,7 +157,8 @@ namespace Drive_LFSS.Game_
             double dy = (toCar.GetPosY() - fromCar.GetPosY());
             double angle = Math.Atan2(dy, dx);
 
-            //return (angle >= 0) ? angle : 2 * M_PI + angle;
+            /*return for Multiturn Angle, but no need! keep to remember other possibility
+            return (angle >= 0) ? angle : 2 * M_PI + angle;*/
             return angle * 180.0f / Math.PI;
         }
         private bool HasCollisionPath(CarMotion fromCar, CarMotion toCar)
@@ -172,8 +176,8 @@ namespace Drive_LFSS.Game_
 
             double angleDiff = fromCar.GetTrajectory() - angle;
 
-            //TODO: need to find the perfect angle, based on a static car size.
-            return ( (angleDiff <= 13.0d) && (angleDiff >= -13.0d ) );
+            //TODO: need to find the perfect angle, based on a static car ~size.
+            return ( (angleDiff <= 12.0d) && (angleDiff >= -12.0d ) );
         }
     }
 }

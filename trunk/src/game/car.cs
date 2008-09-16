@@ -78,7 +78,7 @@ namespace Drive_LFSS.Game_
             speedKmh = speedMs * 3.6d;
 
             tracjectory = _carInformation.direction;
-            headingAngle = _carInformation.heading;
+            orientation = _carInformation.heading;
             orientationSpeed = _carInformation.angleVelocity;
 
             double finalAccelerationTime = featureAcceleration_0_100.Update((CarMotion)this);
@@ -92,6 +92,8 @@ namespace Drive_LFSS.Game_
                 //Normal Process
                 AddMessageTop(" ^70-100Km/h In: ^2" + finalAccelerationTime + " ^7sec.", 5000);
             }
+            featureDriftScore.Update((CarMotion)this);
+
             //base.Init(_packet);
         }
         public void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
@@ -125,12 +127,13 @@ namespace Drive_LFSS.Game_
         private double z = 0.0d;
         private double speedMs = 0.0d;
         private double speedKmh = 0.0d;
-        private double tracjectory = 0.0d;
-        private double headingAngle = 0.0d;
-        private double orientationSpeed = 0.0d;
+        private ushort tracjectory = 0;
+        private ushort orientation = 0;
+        private short orientationSpeed = 0;
         private bool isOnTrack = false;
         private uint collisionTimer = 0;
         private FeatureAcceleration_0_100 featureAcceleration_0_100 = new FeatureAcceleration_0_100();
+        private FeatureDriftScore featureDriftScore = new FeatureDriftScore();
         private sealed class FeatureAcceleration_0_100
         {
             private bool started = false;
@@ -160,7 +163,127 @@ namespace Drive_LFSS.Game_
             {
                 long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
                 End();
-                return (((double)timeElapsed - 5.0d) / 1000.0d); //5.0f Should be MCI interval /2 
+                return (((double)timeElapsed - 5.0d) / 1000.0d); //5.0f Should be MCI interval /2
+            }
+        }
+        private sealed class FeatureDriftScore
+        {
+            private const double MIN_SPEED = 25.0d;
+            private const double START_ANGLE = 13.5d;
+            private const double STOP_ANGLE = 10.5d;
+            private const double MAX_COUNTER_ANGLE_SPEED = 100.0d; //really don't know yet the good value
+            private const double MIN_COUNTER_ANGLE_SPEED = 3.0d; //Seem good, lower value make it harder to make big score
+            private const uint SCORE_TICK_TIME_MS = 350; //iF PING BECOME HIGH THEN THIS WRONG SCORE
+
+            private bool started = false;
+            private long startTime = 0;
+            private bool clockWise = false;
+            private double lastAngleDiff = 0.0d;
+            private double scoreAngle = 0.0d;
+            private double lastSpeed = 0.0d;
+            private double scoreSpeed = 0.0d;
+            private double score = 0;
+            private uint scoreTick = 0;
+            private uint counterCorrection = 0;
+            private uint packetReceive = 0;
+
+            internal void Update(CarMotion car)
+            {
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3OS ^7" + car.GetOrientationSpeed().ToString());
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3A ^7" + car.GetAngleToReachTraj(clockWise).ToString());
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3SA ^7" + car.GetShorterAngleToReachTraj().ToString());
+                
+                packetReceive++;
+                double speedKhm = car.GetSpeedKmh();
+                double angleTotraj = car.GetShorterAngleToReachTraj();
+                if (!started)
+                {
+                    if(speedKhm > MIN_SPEED && car.GetShorterAngleToReachTraj() > START_ANGLE)
+                        Start(car);
+                }
+                else
+                {
+                    //Player is Too Slow End without Score
+                    if (speedKhm < MIN_SPEED)
+                    {
+                        End(car);
+                        return;
+                    }
+                    //This will occur when orientation change is direction
+                    //Into a perfect drift this happen only at the complete end and not much.
+                    double oriSpeed = car.GetOrientationSpeed();
+                    if(clockWise != (oriSpeed>0))
+                    {
+                        if(Math.Abs(oriSpeed) > MIN_COUNTER_ANGLE_SPEED)
+                        {//he apply correction
+                            counterCorrection++;
+                            if (Math.Abs(oriSpeed) > MAX_COUNTER_ANGLE_SPEED)
+                            {//This should mean a lost control, since is doing "S"
+                                End(car);
+                                return;
+                            }
+                        }
+                    }
+                    //Find END
+                    if (angleTotraj < STOP_ANGLE)
+                    {
+                        Sucess(car);
+                        return;
+                    }
+
+                    //Normal
+                    ComputeScore(car);
+                }
+            }
+            private void Start(CarMotion car)
+            {
+                started = true;
+                startTime = DateTime.Now.Ticks;
+                clockWise = (car.GetOrientationSpeed() > 0 ? true : false);
+                packetReceive = 0;
+                counterCorrection = 0;
+                scoreTick = 0;
+                scoreSpeed = lastSpeed = car.GetSpeedKmh();
+                scoreAngle = 0.0d;
+                score = 0;
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start");
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
+            }
+            private void End(CarMotion car)
+            {
+                startTime = 0;
+                started = false;
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
+            }
+            private void Sucess(CarMotion car)
+            {
+                started = false;
+                //Official Score to be Saved... blabla...
+                ComputeScore(car);
+                if ((uint)score>0)
+                    ((Car)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score,3000);
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
+
+            }
+            private void ComputeScore(CarMotion car)
+            {
+                long timeDiff = DateTime.Now.Ticks - startTime;
+                if (timeDiff / SCORE_TICK_TIME_MS < scoreTick)
+                    return;
+
+                scoreTick++;
+                double correctionRatio = packetReceive * counterCorrection / 10000.0d;
+
+                //Gave point for Angle
+                scoreAngle += (360.0d - car.GetAngleToReachTraj(clockWise));
+                
+                //If player goes faster then start speed WOW, if not loose a little each time
+                scoreSpeed += (car.GetSpeedKmh() - lastSpeed) * 0.1;
+
+                //All vs % Correction
+                score += ((scoreAngle + scoreSpeed ) * correctionRatio);
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3"+score);
             }
         }
 
@@ -278,15 +401,45 @@ namespace Drive_LFSS.Game_
         //Trajectoire / Direction / Velocity
         public double GetTrajectory()
         {
-            return (double)tracjectory * 360.0d / 65536.0d;
+            return tracjectory * 360.0d / 65536.0d;
         }
         public double GetOrientation()
         {
-            return (double)headingAngle * 360.0d / 65536.0d;
+            return orientation * 360.0d / 65536.0d;
         }
         public double GetOrientationSpeed()
         {
-            return orientationSpeed * 360.0f / 16384.0d;
+            return orientationSpeed * 360.0d / 16384.0d;
+        }
+        //This gave the Angle have to make to reach Trajectory.
+        public double GetAngleToReachTraj(bool clockWise)
+        {
+            int temp;
+            if(clockWise)
+                temp = (65536 - orientation) - (65536 - tracjectory);
+            else
+                temp = (65536 - tracjectory) - (65536 - orientation);
+
+            if (temp < 0)
+                temp += 65536;
+
+            return temp * 360.0d / 65536.0d;
+        }
+        public double GetShorterAngleToReachTraj()
+        {
+            int temp;
+            if (orientation > tracjectory)
+                temp = (65536 - tracjectory) - (65536 - orientation);
+            else
+                temp = (65536 - orientation) - (65536 - tracjectory);
+
+            if (temp > 32768)
+                temp -= 65535;
+
+            if (temp < 0)
+                temp *= -1;
+
+            return temp * 180.0d / 32768.0d;
         }
     }
 }
