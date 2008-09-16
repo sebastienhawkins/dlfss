@@ -182,7 +182,6 @@ namespace Drive_LFSS
             uint diff = 0;
             
             uint TimerLogFlush = 0;
-            
             while (MainRun)
             {
                 //Timer Thing
@@ -195,10 +194,14 @@ namespace Drive_LFSS
                     TimerLogFlush = 0;
                     Log.flush();
                 }
-                
+
+
                 //update This Thread Process
                 SessionList.update(diff);
                 pubStats.update(diff);
+
+                //Keep Alive on Database
+                ((Database)dlfssDatabase).update(diff);
 
                 //Slow down Operation , so cpu usage don't become a probleme.
                System.Threading.Thread.Sleep(sleep);

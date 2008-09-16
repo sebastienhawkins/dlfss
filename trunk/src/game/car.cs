@@ -246,7 +246,7 @@ namespace Drive_LFSS.Game_
                 scoreSpeed = lastSpeed = car.GetSpeedKmh();
                 scoreAngle = 0.0d;
                 score = 0;
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start");
+                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
                 ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
             }
             private void End(CarMotion car)

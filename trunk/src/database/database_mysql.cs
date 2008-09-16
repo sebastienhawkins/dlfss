@@ -68,6 +68,7 @@ namespace Drive_LFSS.Database_
             int i;
             command.CommandText = _command;
             i = command.ExecuteNonQuery();
+            ResetTimerKeepAlive();
             return i;
         }
         public IDataReader ExecuteQuery(string _command)
@@ -75,6 +76,7 @@ namespace Drive_LFSS.Database_
             MySqlDataReader dataReader;
             command.CommandText = _command;
             dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+            ResetTimerKeepAlive();
             return dataReader;
         }
 
