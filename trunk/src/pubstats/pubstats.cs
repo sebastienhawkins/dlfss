@@ -231,12 +231,17 @@ namespace Drive_LFSS.PubStats_
         }
         private string FetchData(string urlAction)
         {
-            return webClient.DownloadString(LFSWUrl + urlAction);
+            string answer = "";
+            try{answer = webClient.DownloadString(LFSWUrl + urlAction);}
+            catch(Exception){}
+            return answer;
         }
 
         private bool FetchLicencePB(params string[] args)
         {
             string data = FetchData("&action=pb&racer=" + args[0]);
+            if (data == "")
+                return false;
             string[] lines = data.Split(new string[] { "\n" }, StringSplitOptions.None);
             string[] datas;
             string key;
@@ -261,6 +266,8 @@ namespace Drive_LFSS.PubStats_
         private bool FetchWR(params string[] args)
         {
             string data = FetchData("&action=wr");
+            if (data == "")
+                return false;
             string[] lines = data.Split(new string[] { "\n" },StringSplitOptions.None);
             string[] datas;
             string key;
