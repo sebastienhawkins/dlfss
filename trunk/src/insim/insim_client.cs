@@ -128,7 +128,7 @@ namespace Drive_LFSS.InSim_
             tcpClient.NoDelay = false;
             tcpClient.SendTimeout = 1100;
             tcpClient.ReceiveTimeout = 1100;
-            tcpClient.ExclusiveAddressUse = false;
+            //tcpClient.ExclusiveAddressUse = false; //Create Crash, see ticket #3
             try { tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
             catch (SocketException _exception)
             {
