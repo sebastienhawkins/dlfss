@@ -40,14 +40,14 @@ namespace Drive_LFSS
             while (itr.MoveNext())
             {
                 string[] serverOptions = Config.GetStringValue("LFSServer", itr.Current, "ConnectionInfo").Split(';');
-                if (serverOptions.Length != 8)
+                if (serverOptions.Length != 9)
                 {
                     Log.error("Configuration Error for Servername: " + itr.Current + ", Bad Option Count, Must be 8.\r\n");
                     continue;
                 }
-                InSimSetting inSimSetting = new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), serverOptions[2], 
-                                                                 Convert.ToChar(serverOptions[3]), serverOptions[4], (InSim_Flag)Convert.ToUInt32(serverOptions[5]), 
-                                                                  Convert.ToUInt16(serverOptions[6]), Convert.ToUInt16(serverOptions[7]));
+                InSimSetting inSimSetting = new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), Convert.ToUInt16(serverOptions[2]), serverOptions[3], 
+                                                                 Convert.ToChar(serverOptions[4]), serverOptions[5], (InSim_Flag)Convert.ToUInt32(serverOptions[6]), 
+                                                                  Convert.ToUInt16(serverOptions[7]), Convert.ToUInt16(serverOptions[8]));
 
                 inSimSetting.requestInterval = (ushort)(inSimSetting.requestInterval < 10 ? 10 : inSimSetting.requestInterval);
                 inSimSetting.networkInterval = (uint)(inSimSetting.networkInterval < 1 ? 1 : inSimSetting.networkInterval);
@@ -56,7 +56,7 @@ namespace Drive_LFSS
                     Log.error(inSimSetting.serverName + " bad Configuration For: password must be max 16 characters long.\r\n");
                 else if (inSimSetting.appName.Length > 16)
                     Log.error(inSimSetting.serverName + " bad Configuration For: appName must be max 16 characters long.\r\n");
-                else if (inSimSetting.port < 1024)
+                else if (inSimSetting.tcpPort < 1024)
                     Log.error(inSimSetting.serverName + " bad Configuration For: Port must be greater 1024.\r\n");
                 else
                 {

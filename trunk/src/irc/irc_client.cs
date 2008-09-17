@@ -51,7 +51,7 @@ namespace Drive_LFSS.Irc_
             ircServerInfo = new IrcServerInfo(ipAddress, Convert.ToUInt16(confvalue[1]), confvalue[2], confvalue[3], confvalue[4], confvalue[5], Convert.ToUInt16(confvalue[6]));
         }
 
-        private Socket socket;
+        private Socket socket = null;
         private IrcServerInfo ircServerInfo = null;
         private Thread threadMircClient;
         private bool registrationSend = false;
@@ -263,6 +263,8 @@ namespace Drive_LFSS.Irc_
 
         public void SendToChannel(string message)
         {
+            if (socket == null || !socket.Connected)  //redondant Check, fix this later
+                return;
             SendServerData("PRIVMSG #"+ircServerInfo.Channel+" :"+message);
         }
         public void ReceiveFromChannel(string message, string from ,string forChannel)

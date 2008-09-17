@@ -34,21 +34,23 @@ namespace Drive_LFSS.InSim_
 
     public struct InSimSetting
     {
-        public string serverName;
-        public IPAddress ip;
-        public ushort port;
-        public string password;
-        public char commandPrefix;
-        public string appName;
-        public InSim_Flag insimMask;
-        public ushort requestInterval;
-        public uint networkInterval;
+        internal string serverName;
+        internal IPAddress ip;
+        internal ushort tcpPort;
+        internal ushort udpPort;
+        internal string password;
+        internal char commandPrefix;
+        internal string appName;
+        internal InSim_Flag insimMask;
+        internal ushort requestInterval;
+        internal uint networkInterval;
 
-        public InSimSetting(string _serverName, string _ip, ushort _port, string _password, char _commandPrefix, string _appName, InSim_Flag _insimMask, ushort _requestInterval, uint _networkInterval)
+        internal InSimSetting(string _serverName, string _ip, ushort _tcpPort, ushort _udpPort, string _password, char _commandPrefix, string _appName, InSim_Flag _insimMask, ushort _requestInterval, uint _networkInterval)
         {
             serverName = _serverName;
             ip = IPAddress.Parse(_ip);
-            port = _port;
+            tcpPort = _tcpPort;
+            udpPort = _udpPort;
             password = _password;
             commandPrefix = _commandPrefix;
             appName = _appName;
@@ -69,7 +71,8 @@ namespace Drive_LFSS.InSim_
             //No need to name here, she named into DoConnect().
 
             inSimSetting = _inSimSetting;
-            
+            //inSimSetting.ip = Dns.Resolve(inSimSetting.ip.ToString()).AddressList[0];
+
             ConfigApply();
             
             threadSocketSendReceive.Start();
@@ -129,7 +132,10 @@ namespace Drive_LFSS.InSim_
             tcpClient.SendTimeout = 1100;
             tcpClient.ReceiveTimeout = 1100;
             //tcpClient.ExclusiveAddressUse = false; //Create Crash, see ticket #3
-            try { tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.port)); }
+            try 
+            { 
+                tcpClient.Connect(new IPEndPoint(inSimSetting.ip, inSimSetting.tcpPort)); 
+            }
             catch (SocketException _exception)
             {
                 Log.error(((Session)this).GetSessionNameForLog() + " TCP Socket Initialization failded, Error was: " + _exception.Message + "\r\n");
@@ -140,7 +146,7 @@ namespace Drive_LFSS.InSim_
         }
         private bool InitUdpSocket()
         {
-            udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.port);
+            udpIpEndPoint = new IPEndPoint(IPAddress.Any, inSimSetting.udpPort);
             try { udpClient = new UdpClient(udpIpEndPoint); }
             catch (SocketException _exception)
             {
@@ -153,7 +159,7 @@ namespace Drive_LFSS.InSim_
         private void SendConnectISI()
         {
             ISISended = true;
-            PacketISI packetISI = new PacketISI(1, inSimSetting.port, (ushort)inSimSetting.insimMask, inSimSetting.commandPrefix, inSimSetting.requestInterval, inSimSetting.password, inSimSetting.appName);
+            PacketISI packetISI = new PacketISI(1, inSimSetting.udpPort, (ushort)inSimSetting.insimMask, inSimSetting.commandPrefix, inSimSetting.requestInterval, inSimSetting.password, inSimSetting.appName);
             AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_ISI, Packet_Type.PACKET_ISI_INSIM_INITIALISE, packetISI));
         }
         private void SetDisconnected()
