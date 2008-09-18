@@ -16,5 +16,9 @@
         void RemoveButtonToAll(ushort buttonEntry);
         void RemoveButton(ushort buttonEntry,byte licenceId);
         void AddMessageMiddleToAll(string text, uint duration);
+        Script Script
+        {
+            get;
+        }
     }
 }

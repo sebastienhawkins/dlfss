@@ -7,6 +7,7 @@
         void AddTimedButton(ushort buttonEntry, uint time);
         void SendButton(ushort buttonEntry);
         void SendButton(byte buttonId, ushort buttonEntry, byte styleMask,  bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text);
+        void SendUpdateButton(ushort buttonEntry, string text);
         byte RemoveButton(ushort buttonEntry);
         void SendGui(ushort guiEntry);
         void RemoveGui(ushort guiEntry);

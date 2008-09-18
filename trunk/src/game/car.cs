@@ -81,17 +81,7 @@ namespace Drive_LFSS.Game_
             orientation = _carInformation.heading;
             orientationSpeed = _carInformation.angleVelocity;
 
-            double finalAccelerationTime = featureAcceleration_0_100.Update((CarMotion)this);
-            if (finalAccelerationTime > 0.0d)
-            {
-                Log.feature(((Driver)this).DriverName + ", Done  0-100Km/h In: " + finalAccelerationTime + "sec.\r\n");
-
-                if (((Session)((Driver)this).ISession).script.CarAcceleration_0_100((ICar)this, finalAccelerationTime))
-                    return;
-
-                //Normal Process
-                AddMessageTop(" ^70-100Km/h In: ^2" + finalAccelerationTime + " ^7sec.", 5000);
-            }
+            featureAcceleration.Update((CarMotion)this);
             featureDriftScore.Update((CarMotion)this);
 
             //base.Init(_packet);
@@ -132,22 +122,21 @@ namespace Drive_LFSS.Game_
         private short orientationSpeed = 0;
         private bool isOnTrack = false;
         private uint collisionTimer = 0;
-        private FeatureAcceleration_0_100 featureAcceleration_0_100 = new FeatureAcceleration_0_100();
+        private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
         private FeatureDriftScore featureDriftScore = new FeatureDriftScore();
-        private sealed class FeatureAcceleration_0_100
+        private sealed class FeatureAcceleration
         {
             private bool started = false;
             private long startTime = 0;
 
-            internal double Update(CarMotion car)
+            internal void Update(CarMotion car)
             {
                 if (car.GetSpeedMs() < 0.1 && (!started || startTime != 0))
                     Start();
                 else if (car.GetSpeedMs() > 0.1 && started && startTime == 0) //About 0Kmh
                     startTime = DateTime.Now.Ticks;
                 else if (car.GetSpeedMs() > 27.777777d && started) //About 100Kmh
-                    return Sucess();
-                return 0.0d;
+                    Sucess(car);
             }
             private void Start()
             {
@@ -159,11 +148,24 @@ namespace Drive_LFSS.Game_
                 startTime = 0;
                 started = false;
             }
-            private double Sucess()
+            private void Sucess(CarMotion car)
             {
-                long timeElapsed = (DateTime.Now.Ticks - startTime) / 10000;
+                double timeElapsed = ((DateTime.Now.Ticks - startTime) - 5.0d) / 10000000.0d;//5.0d Should be MCI interval /2
+                Log.feature(((IDriver)car).DriverName + ", Done  0-100Km/h In: " + timeElapsed + "sec.\r\n");
                 End();
-                return (((double)timeElapsed - 5.0d) / 1000.0d); //5.0f Should be MCI interval /2
+
+                //This must be removed when we find why some Accelariont become pretty fast.
+                if (timeElapsed < 1.0d)
+                {
+                    Log.error(((IDriver)car).DriverName + ", Done  0-100Km/h In: " + timeElapsed + "sec, TOO FAST TOO FAST!\r\n");
+                    return;
+                }
+
+                if (((Driver)car).ISession.Script.CarAccelerationSucess((ICar)car, timeElapsed))
+                    return;
+
+                //If no Script
+                ((IButton)car).AddMessageTop(" ^70-100Km/h In: ^2" + timeElapsed + " ^7sec.", 5000);
             }
         }
         private sealed class FeatureDriftScore
@@ -179,7 +181,8 @@ namespace Drive_LFSS.Game_
             private const uint SCORE_TICK_TIME_MS = 150; //Should Desactivate Scoring if ping goes higher, Changing this, will greatly change the scoring Value.
             private const uint MIN_DRIFT_TIME_MS = 600; //Drift Time Lower Then this are cancel.
             private const double SCORE_ANGLE_RATIO = 2.0d; //2-3 seem cool, scoreAngle By this Value
-            private const double SCORE_SPEED_RATIO = 2.0d; //scoreSpeed By this Value
+            private const double SCORE_SPEED_RATIO = 1.8d; //scoreSpeed By this Value
+            private const double SCORE_SPEED_START_RATIO = 0.75d;
 
             private bool started = false;
             private long startTime = 0;
@@ -273,9 +276,17 @@ namespace Drive_LFSS.Game_
             {
                 if (maxAngleDiff >= BONUS_ANGLE)
                     score *= BONUS_ANGLE_SCORE_RATIO;
+
+                Log.feature(((IDriver)car).DriverName + ", Done  Drift Score: " + (uint)score + ".\r\n");               
                 End(car);
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
-                ((Car)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
+                
+                //Debug think
+                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
+
+                if (((Driver)car).ISession.Script.CarDriftScoring((ICar)car, (uint)score))
+                    return;
+
+                ((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
             }
             private void ComputeScore(CarMotion car)
             {
@@ -294,16 +305,16 @@ namespace Drive_LFSS.Game_
                 scoreAngle += (360.0d - car.GetAngleToReachTraj(clockWise)) * SCORE_ANGLE_RATIO;
                 
                 //If player goes faster then start speed WOW, if not loose a little each time
-                scoreSpeed += (((car.GetSpeedKmh() * 100.0d / (startSpeed*0.80d)) - 100.0d) * SCORE_SPEED_RATIO);
+                scoreSpeed += (((car.GetSpeedKmh() * 100.0d / (startSpeed * SCORE_SPEED_START_RATIO)) - 100.0d) * SCORE_SPEED_RATIO);
 
                 //All By Correction %, Can only Lower Score
                 score = ((scoreAngle + scoreSpeed ) * correctionRatio);
 
                 //Only for debug purpose
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3"+score);
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SA ^7" + scoreAngle);
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3SS ^7" + scoreSpeed);
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3CR ^7" + correctionRatio);
+                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3"+score);
+                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SA ^7" + scoreAngle);
+                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3SS ^7" + scoreSpeed);
+                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3CR ^7" + correctionRatio);
             }
         }
 

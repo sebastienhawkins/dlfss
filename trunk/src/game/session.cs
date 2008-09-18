@@ -95,7 +95,11 @@ namespace Drive_LFSS.Session_
         private byte clientConnectionCount = 0;
 
         //Object
-        public Script script;
+        private Script script;
+        public Script Script
+        {
+            get { return script; }
+        }
         private CommandInGame command;
         private Race race;
         private Vote vote;
