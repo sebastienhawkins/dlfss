@@ -108,7 +108,7 @@ namespace Drive_LFSS.Packet_
         public byte axStart;
         public byte NumCP;
         public ushort NumO;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x20)]public string LName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)]public string LName;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXO
     {
@@ -192,7 +192,7 @@ namespace Drive_LFSS.Packet_
         public byte extendedMask;
         public byte originalTextLength;
         internal byte spare3;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x60)]public string typedText;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=96)]public string typedText;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCCH
     {
@@ -240,7 +240,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte ReqI;
         public byte UCID;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string PName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string PName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string Plate;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCRS
@@ -286,7 +286,7 @@ namespace Drive_LFSS.Packet_
         public byte carId;
         internal byte spare2;
         internal byte spare3;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string message;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=64)]public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketISI
     {
@@ -299,22 +299,23 @@ namespace Drive_LFSS.Packet_
             portUDP = _portUDP;
             mask = _mask;
             spare0 = 0;
-            commandPrefix = _commandPrefix;
+            commandPrefix = (byte)_commandPrefix;
             updateInterval = _updateInterval;
             password = _password;
             interfaceName = _interfaceName;
         }
-        internal Packet_Size packetSize;
-        internal Packet_Type packetType;
-        public byte requestId;
-        internal byte zero;
-        public ushort portUDP;
-        public ushort mask;
-        internal byte spare0;
-        public char commandPrefix;
-        public ushort updateInterval;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string password;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string interfaceName;
+        private Packet_Size packetSize;
+        private Packet_Type packetType;
+        private byte requestId;
+        private byte zero;
+        private ushort portUDP;
+        private ushort mask;
+        private byte spare0;
+        private byte commandPrefix;
+        private ushort updateInterval;
+        //Should be 16 , but not working so putted 15..
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]private string password;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]private string interfaceName;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketISM
     {
@@ -326,7 +327,7 @@ namespace Drive_LFSS.Packet_
         internal byte Sp1;
         internal byte Sp2;
         internal byte Sp3;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x20)]public string HName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)]public string HName;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketLAP
     {
@@ -383,7 +384,7 @@ namespace Drive_LFSS.Packet_
         internal Packet_Type packetType;
         public byte requestId;
         public Message_Sound sound;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=127)]public string message;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)]public string message;
         internal byte zero;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSO
@@ -396,7 +397,7 @@ namespace Drive_LFSS.Packet_
         public byte PLID;
         public Chat_User_Type chatUserType;
         public byte textStart;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x80)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)]
         public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMST
@@ -430,7 +431,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte ReqI;
         internal byte Zero;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x60)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=96)]
         public string Msg;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMTC
@@ -467,7 +468,7 @@ namespace Drive_LFSS.Packet_
         public byte carId;
         internal byte spare1;
         internal byte spare2;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x40)]public string message;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=64)]public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketNCN
     {
@@ -475,8 +476,8 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte requestId;
         public byte tempLicenceId;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string licenceName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string driverName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string licenceName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
         public byte adminStatus;
         public byte total;
         public Driver_Type_Flag driverTypeMask ;
@@ -488,7 +489,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte ReqI;
         public byte NumP;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst=0x20)]public NodeLap[] Info;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst=32)]public NodeLap[] Info;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketNPL
     {
@@ -499,10 +500,10 @@ namespace Drive_LFSS.Packet_
         public byte tempLicenceId;
         public Driver_Type_Flag driverTypeMask;
         public Driver_Flag driverMask;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string driverName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string carName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x10)]public string skinName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=16)]public string skinName;
         public Car_Tyres tyreRearLeft;
         public Car_Tyres tyreRearRight;
         public Car_Tyres tyreFrontLeft;
@@ -596,7 +597,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte requestId;
         public byte carCount;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst=0x32)]public byte[] carIds;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst=32)]public byte[] carIds;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketRES
     {
@@ -604,8 +605,8 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte requestId;
         public byte carId;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string licenceName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=0x18)]public string driverName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string licenceName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string skinPrefix;
         public uint totalTime;

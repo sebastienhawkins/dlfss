@@ -227,6 +227,14 @@ namespace Drive_LFSS.InSim_
             while ((_packet = NextTcpSendQueud()) != null)
             {
                 Log.network(((Session)this).GetSessionNameForLog() + " TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+                //This is Debug on a weird error under linux
+                if ((Packet_Type)_packet[1] == Packet_Type.PACKET_ISI_INSIM_INITIALISE)
+                {
+                    string packetView = "";
+                    foreach (byte value in _packet)
+                        packetView += ((char)value).ToString();
+                    Log.missingDefinition("ISI Packet is:" + packetView + "\r\n");
+                }
                 try{tcpSocket.Write(_packet,0,_packet.Length);}
                 catch(Exception _exception)
                 {

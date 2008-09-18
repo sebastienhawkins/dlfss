@@ -166,7 +166,7 @@ namespace Drive_LFSS.PubStats_
         private string LFSWPassword = "";
         private string LFSWUrl = "http://www.lfsworld.net/pubstat/get_stat2.php?ps=1&version=1.4";
 
-        private readonly Thread threadRequest;
+        private Thread threadRequest;
         private delegate bool FetchDelegate(params string[] args);
         private struct Request : IDisposable
         {

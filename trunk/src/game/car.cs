@@ -255,7 +255,7 @@ namespace Drive_LFSS.Game_
                 maxAngleDiff = 0.0d;
                 scoreAngle = 0.0d;
                 scoreSpeed = startSpeed = car.GetSpeedKmh();
-                scoreSpeed *= SCORE_SPEED_RATIO; //Not sure
+                //scoreSpeed *= SCORE_SPEED_RATIO; //Not sure
                 score = 0;
                 scoreTick = 0;
                 counterCorrection = 0;
@@ -294,7 +294,7 @@ namespace Drive_LFSS.Game_
                 scoreAngle += (360.0d - car.GetAngleToReachTraj(clockWise)) * SCORE_ANGLE_RATIO;
                 
                 //If player goes faster then start speed WOW, if not loose a little each time
-                scoreSpeed += (((car.GetSpeedKmh() * 100.0d / startSpeed) - 100.0d) * SCORE_SPEED_RATIO);
+                scoreSpeed += (((car.GetSpeedKmh() * 100.0d / (startSpeed*0.80d)) - 100.0d) * SCORE_SPEED_RATIO);
 
                 //All By Correction %, Can only Lower Score
                 score = ((scoreAngle + scoreSpeed ) * correctionRatio);
