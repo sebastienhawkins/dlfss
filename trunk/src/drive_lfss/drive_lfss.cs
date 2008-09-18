@@ -38,10 +38,10 @@ namespace Drive_LFSS
     {
         public static int sleep = 50; // Speed of Operation
 
-        //Disable under MONO, how?
-        [DllImport("Kernel32")]
+        /*[DllImport("Kernel32")]
         public static extern bool SetConsoleCtrlHandler(HandlerRoutine handler, bool add);
-        public delegate bool HandlerRoutine(ushort ctrlType);
+        public delegate bool HandlerRoutine(ushort ctrlType);*/
+
 
         //Console Command Thread
         private static readonly Thread threadCaptureConsoleCommand = new Thread(new ThreadStart(CaptureConsoleCommand));
@@ -69,11 +69,7 @@ namespace Drive_LFSS
         [MTAThread]
         private static void Main()
 		{
-            //this one should not be done under MONO... will cause a error...
-            HandlerRoutine consoleCtrlCheck = new HandlerRoutine(DisgraceExit);
-            SetConsoleCtrlHandler(consoleCtrlCheck, true);
-
-            //Console Trap CTRL-C, //Remove Unhandle Exception
+            //Console Trap CTRL-C,
             Console.CancelKeyPress += new ConsoleCancelEventHandler(DisgraceExit);
             
             //Unhandle exception
@@ -81,13 +77,13 @@ namespace Drive_LFSS
 
             //Put static working folder.
             string processPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            processPath = processPath.Substring(0, processPath.LastIndexOf('\\'));
+            processPath = processPath.Substring(0, processPath.LastIndexOf(System.IO.Path.DirectorySeparatorChar));
 
             //Write Startup Banner
             WriteBanner();
 
             //Configuration
-            if (!Config.Initialize(processPath + "\\Drive_LFSS.cfg"))
+            if (!Config.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Can't Initialize the Config, Will now QUIT.!\r\n\r\n");
@@ -98,7 +94,7 @@ namespace Drive_LFSS
             Program.ConfigApply();
 
             //Logging
-            if (!Log.Initialize(processPath+"\\Drive_LFSS.log"))
+            if (!Log.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.log"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n\r\n");
@@ -119,12 +115,12 @@ namespace Drive_LFSS
             List<string> databaseChoices = Config.GetIdentifierList("Database");
             if (databaseChoices.Contains("MySQL"))
             {
-                Log.commandHelp("  Using MySQL Database.\r\n");
                 string[] infos = Config.GetStringValue("Database","MySQL","ConnectionInfo").Split(';');
                 if (infos.Length != 6)
                     throw new Exception("Configuration Error, Invalide Value Count For: Database.MySQL.ConnectionInfo");
 
-                dlfssDatabase = new DatabaseMySQL("Database=" + infos[4] + ";Data Source=" + infos[0] + ";Port=" + infos[1] + ";User Id=" + infos[2] + ";Password=" + infos[3] + ";Use Compression=" + infos[5]);
+                Log.commandHelp("  Using MySQL Database.\r\n");
+                dlfssDatabase = new DatabaseMySQL("Database=" + infos[4] + ";Data Source=" + infos[0] + ";Port=" + infos[1] + ";User Id=" + infos[2] + ";Password=" + infos[3] + ";Use Compression=" + infos[5] + ";Pooling=false");
             }
             else
             {

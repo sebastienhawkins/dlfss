@@ -39,11 +39,11 @@ namespace Drive_LFSS.Database_
 
             command = connection.CreateCommand();
             transaction = null;
-            Log.commandHelp("  MySQL Using Compression: " + connection.UseCompression + "\r\n");
+            Log.commandHelp("  MySQL Using Compression: " + ((MySqlConnection)connection).UseCompression + "\r\n");
         }
-        private MySqlConnection connection;
-        private MySqlCommand command;
-        private MySqlTransaction transaction;
+        private IDbConnection connection;
+        private IDbCommand command;
+        private IDbTransaction transaction;
         private Mutex mutexDataReader = new Mutex();
         
         //Thread ???
@@ -65,30 +65,39 @@ namespace Drive_LFSS.Database_
         }
         public int ExecuteNonQuery(string _command)
         {
-            int i;
+            int _return;
+
+            command.Dispose();
+            command = connection.CreateCommand();
             command.CommandText = _command;
-            i = command.ExecuteNonQuery();
+            _return = command.ExecuteNonQuery();
+
             ResetTimerKeepAlive();
-            return i;
+
+            return _return;
         }
         public IDataReader ExecuteQuery(string _command)
         {
-            MySqlDataReader dataReader;
+            IDataReader dataReader;
+            command.Dispose();
+            command = connection.CreateCommand();
             command.CommandText = _command;
-            dataReader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+
+            dataReader = command.ExecuteReader(/*CommandBehavior.SequentialAccess*/);
             ResetTimerKeepAlive();
+            
             return dataReader;
         }
 
         //Thread ???
-        public IAsyncResult NewExecuteNonQuery()
+        /*public IAsyncResult NewExecuteNonQuery()
         {
             return command.BeginExecuteNonQuery();
         }
         public int EndExecuteNonQuery(IAsyncResult _iaSyncResult)
         {
             return command.EndExecuteNonQuery(_iaSyncResult);
-        }
+        }*/
 
 
     }

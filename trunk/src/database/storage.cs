@@ -49,7 +49,6 @@ namespace Drive_LFSS.Storage_
             {
                 if (reader.FieldCount == tableFormat.Length)
                 {
-                    
                     reader.Dispose();
                     reader = Program.dlfssDatabase.ExecuteQuery("SELECT * FROM `" + tableName + "`");
 
@@ -120,6 +119,7 @@ namespace Drive_LFSS.Storage_
                 Log.commandHelp("  Loading Storage \"" + tableName + "\"\r\n");
 
             reader.Dispose();
+            reader = null;
             return returnValue;
         }
         protected virtual object[] GetEntry(uint entry)
