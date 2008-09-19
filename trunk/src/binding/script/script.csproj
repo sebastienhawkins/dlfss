@@ -66,6 +66,7 @@
     <Compile Include="external\isession.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="external\ivote.cs" />
     <Compile Include="script.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

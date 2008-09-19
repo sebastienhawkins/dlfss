@@ -1,9 +1,29 @@
+/* 
+ * Copyright (C) 2008 DLFSS <http://www.lfsforum.net/when the post is created change ME>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Drive_LFSS.Script_
 {
+    //return true == Stop Default Core Action
+    //return false == Continue Default Core Action
     public sealed class Script
     {
         public Script()
@@ -13,15 +33,26 @@ namespace Drive_LFSS.Script_
         {
             if (true == false) { }
         }
-        public bool RaceStart()
+
+        //Session
+        public bool BeforeVoteStart(ISession iSession)
         {
-            return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
+            iSession.SendMSTMessage("/pit_all");
+
+            //There is no default action to stop from the core for this.
+            return false;
         }
-        
-        public bool CarFinishRace(ICar car)
+        public bool BeforePrepareNextTrack(IVote vote,ushort trackEntry)
         {
-            return false;               //Mean There is no Custom Script Processing, True will mean you have done a script proccesing!
+            if (trackEntry != 0)
+                return false;
+
+            //restart The vote, since no track has been Selected
+            vote.StartNextTrackVote(); 
+            return true;
         }
+
+        //Driver
         public bool CarDriftScoring(ICar car, uint score)
         {
             ((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);

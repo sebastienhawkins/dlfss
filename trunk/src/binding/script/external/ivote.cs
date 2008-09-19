@@ -18,25 +18,9 @@
 
 namespace Drive_LFSS.Script_
 {
-    public interface ISession
+    public interface IVote
     {
-        long GetLatency();
-        long GetReactionTime();
-        byte GetNbrOfDrivers();
-        byte GetNbrOfConnection();
-        uint GetRaceGuid();
-        bool IsRaceInProgress();
-        string GetRaceTrackPrefix();
-        string GetSessionNameForLog();
-        string GetSessionName();
-        void SendMSTMessage(string message);
-        void SendUpdateButtonToAll(ushort buttonEntry, string text);
-        void RemoveButtonToAll(ushort buttonEntry);
-        void RemoveButton(ushort buttonEntry,byte licenceId);
-        void AddMessageMiddleToAll(string text, uint duration);
-        Script Script
-        {
-            get;
-        }
+        void StartNextTrackVote();
+        void PrepareNextTrack(ushort trackEntry);
     }
 }

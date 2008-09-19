@@ -42,6 +42,15 @@ namespace Drive_LFSS.Script_
             //There is no default action to stop from the core for this.
             return false;
         }
+        public bool BeforePrepareNextTrack(IVote vote,ushort trackEntry)
+        {
+            if (trackEntry != 0)
+                return false;
+
+            //restart The vote, since no track has been Selected
+            vote.StartNextTrackVote(); 
+            return true;
+        }
 
         //Driver
         public bool CarDriftScoring(ICar car, uint score)

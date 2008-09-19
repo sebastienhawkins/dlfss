@@ -36,7 +36,7 @@ namespace Drive_LFSS.Game_
         NO_CHANGE = 2,
         AUTO = 4,
     }
-    sealed class Vote
+    sealed class Vote : IVote
     {
         public Vote(ISession _iSession)
         {
@@ -228,7 +228,7 @@ namespace Drive_LFSS.Game_
             }
         }
 
-        private void StartNextTrackVote()
+        public void StartNextTrackVote()
         {
             iSession.Script.BeforeVoteStart(iSession); //Script Call, Before Start.
 
@@ -289,13 +289,17 @@ namespace Drive_LFSS.Game_
             iSession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_5);
             iSession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_6);
 
+            if (iSession.Script.BeforePrepareNextTrack((IVote)this,chosedMap))
+                return;
+
             PrepareNextTrack(chosedMap);
         }
-        private void PrepareNextTrack(ushort trackEntry)
+        public void PrepareNextTrack(ushort trackEntry)
         {
             if (trackEntry == 0)
             {
-                StartNextTrackVote(); //restart The vote, since no track has been Selected
+                //Hope to never see that message, but since ppl can customize script, can happen someone let go a 0.
+                Log.error(iSession.GetSessionNameForLog() + " VOTE System, PrepareNextTrack(ushort trackEntry == 0), this should never happen");
                 return;
             }
             nextRace = Program.raceTemplate.GetEntry(trackEntry);
