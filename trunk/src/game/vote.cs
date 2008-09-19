@@ -230,6 +230,8 @@ namespace Drive_LFSS.Game_
 
         private void StartNextTrackVote()
         {
+            iSession.Script.BeforeVoteStart(iSession); //Script Call, Before Start.
+
             voteInProgress = true;
             voteCount = 0;
             voteOptions.Clear();
@@ -262,7 +264,6 @@ namespace Drive_LFSS.Game_
                 optionCount++;
             }
             voteTimer = 41000; // 40 Secondes
-            iSession.SendMSTMessage("/pit_all");
             //Program.raceTemplate.GetEntry();
         }
         private void EndNextTrackVote()
@@ -298,8 +299,8 @@ namespace Drive_LFSS.Game_
                 return;
             }
             nextRace = Program.raceTemplate.GetEntry(trackEntry);
-            iSession.AddMessageMiddleToAll("^7Next Track Will Be ^3" + nextRace.Description+"^7.", 7000);
-            nextRaceTimer = 7000;
+            iSession.AddMessageMiddleToAll("^7Next Track Will Be ^3" + nextRace.Description+"^7.", 10000);
+            nextRaceTimer = 10000;
         }
         private void LoadNextTrack()
         {

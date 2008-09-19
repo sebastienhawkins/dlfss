@@ -373,8 +373,6 @@ namespace Drive_LFSS.Session_
             {
                 driverList[itr].ProcessRaceStart();
             }
-
-            script.RaceStart();
         }      // Race Start
         protected sealed override void processPacket(PacketSTA _packet)
         {
