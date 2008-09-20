@@ -424,6 +424,10 @@ namespace Drive_LFSS.Storage_
     }
     public sealed class RaceTemplateInfo
     {
+        public RaceTemplateInfo()
+        {
+
+        }
         public RaceTemplateInfo(object[] rowInfos)
         {
             entry = Convert.ToUInt32(rowInfos[0]);
@@ -441,16 +445,16 @@ namespace Drive_LFSS.Storage_
         {
             if (true == false) { }
         }
-        private uint entry;
-        private string description;
-        private byte trackEntry;
-        private string carEntryAllowed;
-        private Weather_Status weather;
-        private Wind_Status wind;
-        private byte lapCount;
-        private byte qualifyMinute;
-        private Grid_Start_Beviator gridStartBeviator;
-        private Race_Template_Flag raceTemplateMask;
+        private uint entry = 0;
+        private string description = "";
+        private byte trackEntry = 0;
+        private string carEntryAllowed = "";
+        private Weather_Status weather = Weather_Status.WEATHER_CLEAR_DAY;
+        private Wind_Status wind = Wind_Status.WIND_NONE;
+        private byte lapCount = 0;
+        private byte qualifyMinute = 0;
+        private Grid_Start_Beviator gridStartBeviator = Grid_Start_Beviator.GRID_START_BEVIATOR_NONE;
+        private Race_Template_Flag raceTemplateMask = Race_Template_Flag.NONE;
 
         public uint Entry
         {

@@ -152,7 +152,10 @@ namespace Drive_LFSS.Game_
                                     }
                                     Random randomItr = new Random();
                                     voteInProgress = true;
-                                    PrepareNextTrack(raceMap[randomItr.Next(0, (raceMap.Count - 1))]);
+
+                                   List<ushort> _raceMap = GetSmartRaceMap();
+                                   PrepareNextTrack(_raceMap[randomItr.Next(_raceMap.Count) ]);
+
                                 } break;
                         }
                     } break;
@@ -187,7 +190,8 @@ namespace Drive_LFSS.Game_
         private uint voteTimer = 0;
         private uint voteTimerAdvert = 100;
         private uint nextRaceTimer = 0;
-        private RaceTemplateInfo nextRace;
+        private RaceTemplateInfo nextRace = new RaceTemplateInfo();
+        private ushort  previousRaceEntry = 0;
         private bool doEnd = false; //Will serve for Know when RaceEnd Really happen and, if we load auto the next track.
 
         public void update(uint diff)
@@ -228,6 +232,19 @@ namespace Drive_LFSS.Game_
             }
         }
 
+        public List<ushort> GetSmartRaceMap()
+        {
+            List<ushort> _raceMap = new List<ushort>(raceMap);
+            if (raceMap.Count > 2)
+            {
+                if (_raceMap.Contains((ushort)previousRaceEntry))
+                    _raceMap.Remove((ushort)previousRaceEntry);
+
+                if (_raceMap.Contains((ushort)nextRace.Entry))
+                    _raceMap.Remove((ushort)nextRace.Entry);
+            }
+            return _raceMap;
+        }
         public void StartNextTrackVote()
         {
             iSession.Script.BeforeVoteStart(iSession); //Script Call, Before Start.
@@ -237,13 +254,15 @@ namespace Drive_LFSS.Game_
             voteOptions.Clear();
             licenceCount = iSession.GetNbrOfConnection();
 
-            ushort raceMapMax = (ushort)raceMap.Count;
+            List<ushort> _raceMap = GetSmartRaceMap();
+            ushort raceMapMax = (ushort)_raceMap.Count;
             Random random = new Random();
+            
             while (voteOptions.Count < 6 )
             {
-                ushort next = (ushort)random.Next(0, raceMapMax);
-                if (!voteOptions.ContainsKey(raceMap[next]))
-                    voteOptions.Add(raceMap[next], 0);
+                ushort next = (ushort)random.Next(raceMapMax);
+                if (!voteOptions.ContainsKey(_raceMap[next]))
+                    voteOptions.Add(_raceMap[next], 0);
                 if (voteOptions.Count == raceMapMax)
                     break;
             }
@@ -302,6 +321,7 @@ namespace Drive_LFSS.Game_
                 Log.error(iSession.GetSessionNameForLog() + " VOTE System, PrepareNextTrack(ushort trackEntry == 0), this should never happen");
                 return;
             }
+            previousRaceEntry = (ushort)nextRace.Entry;
             nextRace = Program.raceTemplate.GetEntry(trackEntry);
             iSession.AddMessageMiddleToAll("^7Next Track Will Be ^3" + nextRace.Description+"^7.", 10000);
             nextRaceTimer = 10000;
