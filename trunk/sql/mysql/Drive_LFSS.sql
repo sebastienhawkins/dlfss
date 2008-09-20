@@ -1,9 +1,9 @@
 /*
 MySQL Backup
-Source Host:           192.168.101.200
-Source Server Version: 5.0.51a-community-nt
+Source Host:           localhost
+Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/18 06:05:54
+Date:                  2008/09/19 21:19:59
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -46,7 +46,7 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (13, 'vote option 4', 106, 0, 0, 2, 94, 45, 6, 'vote option 4'), 
 (14, 'vote option 5', 106, 0, 0, 2, 101, 45, 6, 'vote option 5'), 
 (15, 'vote option 6', 106, 0, 0, 2, 108, 45, 6, 'vote option 6'), 
-(16, 'track prefix', 66, 1, 0, 56, 194, 10, 7, ''), 
+(16, 'track prefix', 66, 1, 0, 56, 194, 10, 7, '^8'), 
 (17, 'info 1', 82, 0, 0, 180, 85, 20, 5, 'info 1'), 
 (18, 'info 2', 85, 0, 0, 180, 91, 20, 5, 'info 2'), 
 (19, 'info 3', 87, 0, 0, 180, 97, 20, 5, 'info 3'), 
@@ -149,7 +149,7 @@ CREATE TABLE `driver_lap` (
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM AUTO_INCREMENT=1153 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1278 DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver_lap
 #----------------------------

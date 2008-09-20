@@ -356,7 +356,9 @@ namespace Drive_LFSS.Game_
         }
         public void SendTrackPrefix()
         {
-            SendUpdateButton((ushort)Button_Entry.TRACK_PREFIX, "^8"+((Driver)this).ISession.GetRaceTrackPrefix());
+            ButtonTemplateInfo button = Program.buttonTemplate.GetEntry((uint)Button_Entry.TRACK_PREFIX);
+            button.Text += button.Text + ((Driver)this).ISession.GetRaceTrackPrefix();
+            SendUpdateButton(button);
         }
         public void RemoveTrackPrefix()
         {

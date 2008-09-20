@@ -41,16 +41,14 @@ namespace Drive_LFSS.Game_
             List<CarMotion> carIds = new List<CarMotion>();
             byte itr;
             int newItr = 0;
-            //we repeat findNodeCars(), but that way we keep good position into the find!
-            //if we don't need this, Makazazo, sugestion will work greater.
-            //Maybe a synchro stack with node as key, i think this one will be faster and have both quality.
+
             if(nextNodeCount > 0)
             {
-                for (itr = 1; itr <= nextNodeCount; itr++)
+                for (itr = 0; itr <= nextNodeCount; itr++)
                 {
                     newItr = carContainer[car] + itr;
                     if (newItr > nodeCount)
-                        newItr = 1; //Need to know witch is the first NODE, 0 or 1
+                        newItr = 0; 
                     carIds.AddRange(findNodeCars((ushort)newItr));
                 }
             }
@@ -59,10 +57,10 @@ namespace Drive_LFSS.Game_
             
             if (previousNodeCount > 0)
             {
-                for (itr = 1; itr <= nextNodeCount; itr++)
+                for (itr = 0; itr <= nextNodeCount; itr++)
                 {
                     newItr = carContainer[car] - itr;
-                    if (newItr < 1)
+                    if (newItr < 0)
                         newItr = nodeCount + newItr; //Need to know witch is the first NODE, 0 or 1
                     carIds.AddRange(findNodeCars((ushort)newItr));
                 }
@@ -161,6 +159,7 @@ namespace Drive_LFSS.Game_
             return (angle >= 0) ? angle : 2 * M_PI + angle;*/
             return angle * 180.0f / Math.PI;
         }
+        //Has to go into Car class.
         private bool HasCollisionPath(CarMotion fromCar, CarMotion toCar)
         {
             double angle = GetAngle(fromCar, toCar);

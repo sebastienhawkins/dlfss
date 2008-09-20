@@ -180,9 +180,8 @@ namespace Drive_LFSS.Game_
             private const double MIN_COUNTER_ANGLE_SPEED = 3.0d; //Seem good, lower value make it harder to make big score, this reverse velocity angle is see as a correction
             private const uint SCORE_TICK_TIME_MS = 150; //Should Desactivate Scoring if ping goes higher, Changing this, will greatly change the scoring Value.
             private const uint MIN_DRIFT_TIME_MS = 600; //Drift Time Lower Then this are cancel.
-            private const double SCORE_ANGLE_RATIO = 2.0d; //2-3 seem cool, scoreAngle By this Value
-            private const double SCORE_SPEED_RATIO = 1.8d; //scoreSpeed By this Value
-            private const double SCORE_SPEED_START_RATIO = 0.75d;
+            private const double SCORE_ANGLE_RATIO = 2.5d; //2-3 seem cool, scoreAngle By this Value
+            private const double SCORE_SPEED_RATIO = 1.0d; //scoreSpeed By this Value
 
             private bool started = false;
             private long startTime = 0;
@@ -257,8 +256,8 @@ namespace Drive_LFSS.Game_
                 clockWise = (car.GetOrientationSpeed() > 0 ? true : false);
                 maxAngleDiff = 0.0d;
                 scoreAngle = 0.0d;
-                scoreSpeed = startSpeed = car.GetSpeedKmh();
-                //scoreSpeed *= SCORE_SPEED_RATIO; //Not sure
+                startSpeed = car.GetSpeedKmh();
+                scoreSpeed = 0;
                 score = 0;
                 scoreTick = 0;
                 counterCorrection = 0;
@@ -302,13 +301,17 @@ namespace Drive_LFSS.Game_
                 double correctionRatio = (100.0d-(counterCorrection * 100.0d/packetReceive))/100.0d;
 
                 //Gave point for Angle
-                scoreAngle += (360.0d - car.GetAngleToReachTraj(clockWise)) * SCORE_ANGLE_RATIO;
+                double angleToReach = car.GetAngleToReachTraj(clockWise);
+                scoreAngle += (360.0d - angleToReach) * SCORE_ANGLE_RATIO;
                 
                 //If player goes faster then start speed WOW, if not loose a little each time
-                scoreSpeed += (((car.GetSpeedKmh() * 100.0d / (startSpeed * SCORE_SPEED_START_RATIO)) - 100.0d) * SCORE_SPEED_RATIO);
+                double _scoreSpeed = ((car.GetSpeedKmh() * 100.0d / startSpeed) - 100.0d) * SCORE_SPEED_RATIO;
+                if(_scoreSpeed <0.0d)
+                    _scoreSpeed += (startSpeed / 35.0d) * (double)scoreTick;
+                scoreSpeed += _scoreSpeed;
 
                 //All By Correction %, Can only Lower Score
-                score = ((scoreAngle + scoreSpeed ) * correctionRatio);
+                score = ((scoreAngle + scoreSpeed) * correctionRatio) - ((correctionRatio-1.0d)*40.0d);
 
                 //Only for debug purpose
                 ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3"+score);
