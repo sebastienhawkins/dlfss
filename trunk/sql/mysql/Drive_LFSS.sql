@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/19 21:19:59
+Date:                  2008/09/19 21:29:55
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -104,7 +104,7 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL,
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver
 #----------------------------
@@ -149,7 +149,7 @@ CREATE TABLE `driver_lap` (
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM AUTO_INCREMENT=1278 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver_lap
 #----------------------------
@@ -180,7 +180,7 @@ unlock tables ;
 #----------------------------
 drop table if exists race;
 CREATE TABLE `race` (
-  `guid` int(11) unsigned NOT NULL,
+  `guid` int(11) unsigned NOT NULL auto_increment,
   `qualify_race_guid` int(11) unsigned NOT NULL,
   `track_prefix` varchar(4) NOT NULL,
   `start_timestamp` bigint(12) unsigned NOT NULL,
