@@ -128,6 +128,26 @@ namespace Drive_LFSS.Storage_
                 return data[entry];
             return null;
         }
+        protected virtual object[] GetCustom(int fieldIndex, string equalTo)
+        {
+            Dictionary<uint,object[]>.Enumerator itr = data.GetEnumerator();
+            while(itr.MoveNext())
+            {
+                if (itr.Current.Value.Length > fieldIndex && (string)itr.Current.Value[fieldIndex] == equalTo)
+                    return itr.Current.Value;
+            }
+            return null;
+        }
+        protected virtual object[] GetCustom(int fieldIndex, uint equalTo)
+        {
+            Dictionary<uint, object[]>.Enumerator itr = data.GetEnumerator();
+            while (itr.MoveNext())
+            {
+                if (itr.Current.Value.Length > fieldIndex && (uint)itr.Current.Value[fieldIndex] == equalTo)
+                    return itr.Current.Value;
+            }
+            return null;
+        }
         public uint GetCount()
         {
             return (uint)data.Count;
@@ -370,8 +390,16 @@ namespace Drive_LFSS.Storage_
             object[] _temp = base.GetEntry(entry);
             if (_temp != null)
                 return new CarTemplateInfo(_temp);
-            else
-                return null;
+
+            return null;
+        }
+        public CarTemplateInfo GetCarPrefix(string carPrefix)
+        {
+            object[] _temp = base.GetCustom(1, carPrefix);
+            if(_temp != null)
+                return new CarTemplateInfo(_temp);
+
+            return null;
         }
     }
     public sealed class CarTemplateInfo
@@ -390,6 +418,7 @@ namespace Drive_LFSS.Storage_
         private uint entry;
         private string namePrefix;
         private string name;
+        private uint brakeDist;
         private Car_Multiple_Flag mask;
         
         public string NamePrefix

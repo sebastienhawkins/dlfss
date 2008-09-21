@@ -26,8 +26,8 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessCarInformation(CarMotion car)
         {
-            if (car.GetSpeedMs() < 0.1) //About 0.01 m seconde
-                return;
+           // if (car.GetSpeedMs() < 0.1) //About 0.01 m seconde
+               // return;
             carContainer[car] = car.GetNode();
             checkCollision(car);
         }
@@ -86,10 +86,10 @@ namespace Drive_LFSS.Game_
         private void checkCollision(CarMotion car)
         {
             CarMotion[] carAround;
-            carAround = getCarAround(car, 2, 2);
+            carAround = getCarAround(car, 3, 3);
             for (byte itr = 0; itr < carAround.Length; itr++ )
             {
-                if (carAround[itr] == car) //Remove Self
+                if (carAround[itr].CarId == car.CarId) //Remove Self
                     continue;
 
                 double speedDiff = ((car.GetSpeedKmh() - carAround[itr].GetSpeedKmh()));
@@ -98,10 +98,11 @@ namespace Drive_LFSS.Game_
                     && GetDistanceZ(car, carAround[itr]) < 1.0d && HasCollisionPath(carAround[itr], car))
                 {
 
+                    //Debug
                     if (!carAround[itr].HasCollisionWarning())
-                        carAround[itr].SendCollisionWarning("^1What a Shame, Get out of the Car.");
+                        carAround[itr].SendCollisionWarning("^1Pre Collision Into "+((Driver)car).DriverName + "!");
                     if (!car.HasCollisionWarning())
-                        car.SendCollisionWarning("^8Driver \"^2" + ((Driver)carAround[itr]).DriverName + "^8\" Seem to have no Brake!");
+                        car.SendCollisionWarning("^^1Pre Collision From" + ((Driver)carAround[itr]).DriverName + "!");
                     //Log.debug("Car Is in Back:" + ((Driver)carAround[itr]).DriverName + ", And Dangerous To:" + ((Driver)car).DriverName + "\r\n");
                 }
                     
@@ -130,7 +131,7 @@ namespace Drive_LFSS.Game_
         {
             double dx = (car2.GetPosX() - car1.GetPosX());
             double dy = (car2.GetPosY() - car1.GetPosY());
-            double bothSize = 1.0d;
+            double bothSize = 1.0d; //this is from center of the car so bothSize/2
             double distance = Math.Sqrt( ((dx * dx) + (dy * dy) - bothSize));
             return distance;
         }
@@ -176,6 +177,7 @@ namespace Drive_LFSS.Game_
             double angleDiff = fromCar.GetTrajectory() - angle;
 
             //TODO: need to find the perfect angle, based on a static car ~size.
+            //13.0d was too big at very high speed
             return ( (angleDiff <= 12.0d) && (angleDiff >= -12.0d ) );
         }
     }

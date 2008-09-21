@@ -43,7 +43,7 @@ namespace Drive_LFSS.Game_
         } //When Connection
         new protected void Init(PacketNPL _packet)
         {
-            carName = _packet.carName;
+            carPrefix = _packet.carName;
             if (carId != _packet.carId)
             {
                 EnterTrackFirstTime();
@@ -97,7 +97,7 @@ namespace Drive_LFSS.Game_
         }
 
         private byte carId = 0;
-        private string carName = "";
+        private string carPrefix = "";
         private string carPlate = "";
         private string carSkin = "";
         private byte addedMass = 0;
@@ -363,13 +363,13 @@ namespace Drive_LFSS.Game_
         }
         public void EnterTrackFirstTime()
         {
-            ((Driver)this).wr = Program.pubStats.GetWR(carName + ((Driver)this).ISession.GetRaceTrackPrefix());
+            ((Driver)this).wr = Program.pubStats.GetWR(carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).wr != null)
             {
                 //lapTime = lapTime.Insert();
                 AddMessageMiddle("^2World Record, " + PubStats.MSToString(((Driver)this).wr.LapTime,"7^","^7") + ", ^2by^ " + ((Driver)this).wr.LicenceName, 7000);
             }
-            ((Driver)this).pb = Program.pubStats.GetPB(LicenceName, carName + ((Driver)this).ISession.GetRaceTrackPrefix());
+            ((Driver)this).pb = Program.pubStats.GetPB(LicenceName, carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).pb != null && ((Driver)this).wr != null)
             {
                 AddMessageMiddle("^2Your Record, " + PubStats.MSToString(((Driver)this).pb.LapTime, "7^", "^7") + ", ^3Diff " + PubStats.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime, "7^", "^8"), 7000);
@@ -389,9 +389,9 @@ namespace Drive_LFSS.Game_
         {
             get { return carId; }
         }
-        public string CarName
+        public string CarPrefix
         {
-            get { return carName; }
+            get { return carPrefix; }
         }
         public Penalty_Type CurrentPenality
         {

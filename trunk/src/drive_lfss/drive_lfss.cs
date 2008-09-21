@@ -56,7 +56,7 @@ namespace Drive_LFSS
         public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "pxuuuuuuus" });
         public static readonly GuiTemplate guiTemplate = new GuiTemplate(new string[2] { "gui_template", "pxsus" });
         public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "psssuuuuu" });
-        public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssu" });
+        public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssuu" });
         public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psusuuuuuu" });
         public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
         

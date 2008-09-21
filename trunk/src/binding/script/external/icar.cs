@@ -22,6 +22,6 @@ namespace Drive_LFSS.Script_
     {
         byte CarId { get; }
         bool IsOnTrack();
-        string CarName { get; }
+        string CarPrefix { get; }
     }
 }

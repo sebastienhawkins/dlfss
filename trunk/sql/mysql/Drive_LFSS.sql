@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/19 21:29:55
+Date:                  2008/09/20 19:56:59
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -61,6 +61,7 @@ CREATE TABLE `car_template` (
   `entry` smallint(2) unsigned NOT NULL,
   `name_prefix` varchar(3) NOT NULL,
   `name` varchar(16) NOT NULL,
+  `brake_distance` smallint(3) unsigned NOT NULL default '0',
   `mask` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -70,27 +71,27 @@ CREATE TABLE `car_template` (
 
 lock tables car_template write ;
 
-insert  into car_template (entry,name_prefix,name,mask) values 
-(1, 'UF1', 'UF 1000', 0), 
-(2, 'XFG', 'XF GTI', 0), 
-(3, 'XRG', 'XR GT', 0), 
-(4, 'LX4', 'LX4', 0), 
-(5, 'LX6', 'LX6', 0), 
-(6, 'RB4', 'RB4 GT', 0), 
-(7, 'FXO', 'FXO TURBO', 0), 
-(8, 'XRT', 'XR GT TURBO', 0), 
-(9, 'RAC', 'RACEABOUT', 0), 
-(10, 'FZ5', 'FZ5', 0), 
-(11, 'UFR', 'UF GTR', 0), 
-(12, 'XFR', 'XF GTR', 0), 
-(13, 'FXR', 'FXO GTR', 0), 
-(14, 'XRR', 'XR GTR', 0), 
-(15, 'FZR', 'FZ50 GTR', 0), 
-(16, 'MRT', 'MRT5', 0), 
-(17, 'FBM', 'FORMULA BMW FB02', 0), 
-(18, 'FOX', 'FORMULA XR', 0), 
-(19, 'FO8', 'FORMULA V8', 0), 
-(20, 'BF1', 'BMW SAUBER F1.06', 0);
+insert  into car_template (entry,name_prefix,name,brake_distance,mask) values 
+(1, 'UF1', 'UF 1000', 40, 0), 
+(2, 'XFG', 'XF GTI', 35, 0), 
+(3, 'XRG', 'XR GT', 35, 0), 
+(4, 'LX4', 'LX4', 30, 0), 
+(5, 'LX6', 'LX6', 25, 0), 
+(6, 'RB4', 'RB4 GT', 35, 0), 
+(7, 'FXO', 'FXO TURBO', 35, 0), 
+(8, 'XRT', 'XR GT TURBO', 35, 0), 
+(9, 'RAC', 'RACEABOUT', 35, 0), 
+(10, 'FZ5', 'FZ5', 30, 0), 
+(11, 'UFR', 'UF GTR', 20, 0), 
+(12, 'XFR', 'XF GTR', 20, 0), 
+(13, 'FXR', 'FXO GTR', 20, 0), 
+(14, 'XRR', 'XR GTR', 20, 0), 
+(15, 'FZR', 'FZ50 GTR', 20, 0), 
+(16, 'MRT', 'MRT5', 10, 0), 
+(17, 'FBM', 'FORMULA BMW FB02', 15, 0), 
+(18, 'FOX', 'FORMULA XR', 15, 0), 
+(19, 'FO8', 'FORMULA V8', 20, 0), 
+(20, 'BF1', 'BMW SAUBER F1.06', 15, 0);
 unlock tables ;
 #----------------------------
 # Table structure for driver

@@ -106,7 +106,7 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessLapInformation(PacketLAP _packet)
         {
-            laps.Peek().ProcessPacketLap(_packet,iSession.GetRaceGuid(),CarName,iSession.GetRaceTrackPrefix());
+            laps.Peek().ProcessPacketLap(_packet,iSession.GetRaceGuid(),CarPrefix,iSession.GetRaceTrackPrefix());
 
             if (pb != null && wr != null)
             {
@@ -126,8 +126,8 @@ namespace Drive_LFSS.Game_
             laps.Peek().ProcessPacketSplit(_packet);
             
             //PubStats
-            pb = Program.pubStats.GetPB(LicenceName, CarName+iSession.GetRaceTrackPrefix());
-            wr = Program.pubStats.GetWR(CarName + iSession.GetRaceTrackPrefix());
+            pb = Program.pubStats.GetPB(LicenceName, CarPrefix+iSession.GetRaceTrackPrefix());
+            wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
             if (pb != null && wr != null)
             {
                 if (pb.Splits[_packet.splitNode - 1] > 0 && laps.Peek().SplitTime[_packet.splitNode] > 0)

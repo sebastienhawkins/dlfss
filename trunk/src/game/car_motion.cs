@@ -15,7 +15,7 @@ namespace Drive_LFSS.Game_
         double GetPosX();
         double GetPosY();
         double GetPosZ();
-        bool HasCollisionWarning();
-        void SendCollisionWarning(string text);
+        bool HasCollisionWarning();//Debug purpose
+        void SendCollisionWarning(string text);//debug purpose
     }
 }
