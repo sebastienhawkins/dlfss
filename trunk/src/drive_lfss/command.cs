@@ -21,11 +21,12 @@ using System.Collections.Generic;
 
 namespace Drive_LFSS.CommandConsole_
 {
-    using Drive_LFSS.Log_;
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Game_;
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Session_;
+    using Log_;
+    using Packet_;
+    using Game_;
+    using Definition_;
+    using Session_;
+    using Config_;
 
     static class CommandConsole
     {
@@ -142,7 +143,9 @@ namespace Drive_LFSS.CommandConsole_
                     Program.driverBan.Load(false);
                     Log.commandHelp("  driver_ban reloaded.\r\n");
 
+
                     Log.normal("Initializating DLFSS Client...\r\n");
+                    Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                     Program.ConfigApply();
                     Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
 
@@ -197,6 +200,7 @@ namespace Drive_LFSS.CommandConsole_
                 case "config":
                 {
                     Log.normal("Initializating DLFSS Client...\r\n");
+                    Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                     Program.ConfigApply();
                     Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
 

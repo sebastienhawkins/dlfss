@@ -66,6 +66,9 @@ namespace Drive_LFSS
         //PubStats
         public static readonly PubStats pubStats = new PubStats();
 
+        //Local Path
+        public static string processPath = "";
+
         [MTAThread]
         private static void Main()
 		{
@@ -76,7 +79,7 @@ namespace Drive_LFSS
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnHandleException);
 
             //Put static working folder.
-            string processPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            processPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             processPath = processPath.Substring(0, processPath.LastIndexOf(System.IO.Path.DirectorySeparatorChar));
 
             //Write Startup Banner
