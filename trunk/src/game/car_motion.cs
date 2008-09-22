@@ -4,6 +4,7 @@ namespace Drive_LFSS.Game_
     public interface CarMotion
     {
         byte CarId { get; }
+        string CarPrefix { get; }
         ushort GetNode();
         double GetOrientationSpeed();
         double GetOrientation();

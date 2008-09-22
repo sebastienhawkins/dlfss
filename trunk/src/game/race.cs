@@ -43,9 +43,10 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        public static void ConfigApply()
+        public void ConfigApply()
         {
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "RaceSave");
+            grid.ConfigApply();
         }
 
         public void Init(PacketREO _packet)
@@ -86,7 +87,7 @@ namespace Drive_LFSS.Game_
             nodeSplit3Index = _packet.nodeSplit3Index;
             hasToBeSavedIntoPPSTA = true;
 
-            grid = new Grid(nodeCount);
+            grid.Init(nodeCount);
 
             if (!SetNewGuid())
                 Log.error("Error When Creating a New GUID for Race.\r\n");
@@ -178,7 +179,7 @@ namespace Drive_LFSS.Game_
         private string gridOrder = "";
         private string finishOrder = "";
         //
-        private Grid grid = new Grid(0);
+        private Grid grid = new Grid();
         private bool requestedFinalResult = false;
         private byte finalResultCount = 0;
         private bool stateHasChange = false;

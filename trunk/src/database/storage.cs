@@ -30,7 +30,7 @@ namespace Drive_LFSS.Storage_
         protected Storage(string[] tableFmt)
         {
             tableName = tableFmt[0];
-            tableFormat = tableFmt[1].ToCharArray(); ;
+            tableFormat = tableFmt[1].ToCharArray();
         }
         ~Storage()
         {
@@ -38,6 +38,7 @@ namespace Drive_LFSS.Storage_
         }
         private string tableName;
         private char[] tableFormat;
+        private uint maxEntry = 0;
         private Dictionary<uint, object[]> data = new Dictionary<uint, object[]>();
 
         public bool Load(bool errorOnEmpty)
@@ -120,6 +121,8 @@ namespace Drive_LFSS.Storage_
 
             reader.Dispose();
             reader = null;
+
+            SetMaxEntry();
             return returnValue;
         }
         protected virtual object[] GetEntry(uint entry)
@@ -148,11 +151,23 @@ namespace Drive_LFSS.Storage_
             }
             return null;
         }
+        private void SetMaxEntry()
+        {
+            Dictionary<uint, object[]>.KeyCollection keys = data.Keys;
+            foreach(uint entry in keys)
+            {
+                if (maxEntry < entry)
+                    maxEntry = entry;
+            }
+        }
         public uint GetCount()
         {
             return (uint)data.Count;
         }
-        //TODO: Max value... Will be helfull to add or remove thing from ingame command.
+        public uint GetMaxEntry()
+        {
+            return maxEntry;
+        }
     }
 
     //Normaly they should not have a "public sealed class ButtonTemplate : Storage"
@@ -409,7 +424,8 @@ namespace Drive_LFSS.Storage_
             entry = Convert.ToUInt32(rowInfos[0]);
             namePrefix = (string)rowInfos[1];
             name = (string)rowInfos[2];
-            mask = (Car_Multiple_Flag)Convert.ToUInt32(rowInfos[3]);
+            brakeDist = Convert.ToUInt16(rowInfos[3]);
+            mask = (Car_Multiple_Flag)Convert.ToUInt32(rowInfos[4]);
         }
         ~CarTemplateInfo()
         {
@@ -418,7 +434,7 @@ namespace Drive_LFSS.Storage_
         private uint entry;
         private string namePrefix;
         private string name;
-        private uint brakeDist;
+        private ushort brakeDist;
         private Car_Multiple_Flag mask;
         
         public string NamePrefix
@@ -428,6 +444,10 @@ namespace Drive_LFSS.Storage_
         public string Name
         {
             get { return name; }
+        }
+        public ushort BrakeDist
+        {
+            get { return brakeDist; }
         }
         public Car_Multiple_Flag Mask
         {

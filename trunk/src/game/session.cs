@@ -55,7 +55,7 @@ namespace Drive_LFSS.Session_
             base.ConfigApply();
 
             vote.ConfigApply();
-            Race.ConfigApply();
+            race.ConfigApply();
             Driver.ConfigApply();
         }
         private class Ping

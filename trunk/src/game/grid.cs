@@ -4,21 +4,39 @@ using System.Text;
 
 namespace Drive_LFSS.Game_
 {
-    using Drive_LFSS.Log_;
+    using Log_;
+    using Config_;
+    using Storage_;
+    using Script_;
+    using Definition_;
 
     sealed class Grid
     {
-        public Grid(ushort _nodeCount)
+        public Grid()
         {
-            carContainer = new Dictionary<CarMotion, ushort>();
-            nodeCount = _nodeCount;
         }
         ~Grid()
         {
             if (true == false) { }
         }
-        private ushort nodeCount;
-        private Dictionary<CarMotion, ushort> carContainer;
+        public void Init(ushort _nodeCount)
+        {
+            nodeCount = _nodeCount;
+        }
+        public void ConfigApply()
+        {
+           uint endItr = Program.carTemplate.GetMaxEntry()+1;
+           for(uint itr = 1; itr < endItr;itr++)
+           {
+                CarTemplateInfo carInfo = Program.carTemplate.GetEntry(itr);
+               if(carInfo != null)
+                   carBrakeValue.Add(carInfo.NamePrefix,carInfo.BrakeDist);
+           }
+        }
+
+        private ushort nodeCount = 0;
+        private Dictionary<CarMotion, ushort> carContainer  = new Dictionary<CarMotion, ushort>();
+        private Dictionary<string, ushort> carBrakeValue = new Dictionary<string,ushort>();
 
         public void Add(CarMotion car)
         {
@@ -94,9 +112,17 @@ namespace Drive_LFSS.Game_
 
                 double speedDiff = ((car.GetSpeedKmh() - carAround[itr].GetSpeedKmh()));
                 double dist = GetDistance2DSq(car, carAround[itr]);
-                if (speedDiff < 0 && (dist * dist * speedColRatio) < -speedDiff //this is BAD, but need to find car brake range... :(
-                    && GetDistanceZ(car, carAround[itr]) < 1.0d && HasCollisionPath(carAround[itr], car))
+
+                if ( speedDiff < 0 && GetDistanceZ(car, carAround[itr]) < 1.0d
+                     && (-speedDiff / 100.0d * carBrakeValue[carAround[itr].CarPrefix]) > dist 
+                     && HasCollisionPath(carAround[itr], car) )
                 {
+                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_1, "^3CD " + (-speedDiff / 100.0d * carBrakeValue[carAround[itr].CarPrefix]));
+                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3D ^7" + dist);
+                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3Z ^7" + GetDistanceZ(car, carAround[itr]));
+                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SD ^7" + -speedDiff);
+                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3B ^7" + carBrakeValue[carAround[itr].CarPrefix]);
+
 
                     //Debug
                     if (!carAround[itr].HasCollisionWarning())
@@ -109,6 +135,9 @@ namespace Drive_LFSS.Game_
             }
 
         }
+
+
+
         private double GetDistance3DSq(CarMotion car1, CarMotion car2)
         {
             double dx = car2.GetPosX() - car1.GetPosX();
@@ -131,7 +160,7 @@ namespace Drive_LFSS.Game_
         {
             double dx = (car2.GetPosX() - car1.GetPosX());
             double dy = (car2.GetPosY() - car1.GetPosY());
-            double bothSize = 1.0d; //this is from center of the car so bothSize/2
+            double bothSize = 1.5d; //this is from center of the car so bothSize/2
             double distance = Math.Sqrt( ((dx * dx) + (dy * dy) - bothSize));
             return distance;
         }
