@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/20 19:56:59
+Date:                  2008/09/22 17:39:54
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -73,25 +73,25 @@ lock tables car_template write ;
 
 insert  into car_template (entry,name_prefix,name,brake_distance,mask) values 
 (1, 'UF1', 'UF 1000', 40, 0), 
-(2, 'XFG', 'XF GTI', 35, 0), 
-(3, 'XRG', 'XR GT', 35, 0), 
-(4, 'LX4', 'LX4', 30, 0), 
-(5, 'LX6', 'LX6', 25, 0), 
-(6, 'RB4', 'RB4 GT', 35, 0), 
-(7, 'FXO', 'FXO TURBO', 35, 0), 
-(8, 'XRT', 'XR GT TURBO', 35, 0), 
-(9, 'RAC', 'RACEABOUT', 35, 0), 
-(10, 'FZ5', 'FZ5', 30, 0), 
-(11, 'UFR', 'UF GTR', 20, 0), 
-(12, 'XFR', 'XF GTR', 20, 0), 
-(13, 'FXR', 'FXO GTR', 20, 0), 
-(14, 'XRR', 'XR GTR', 20, 0), 
-(15, 'FZR', 'FZ50 GTR', 20, 0), 
-(16, 'MRT', 'MRT5', 10, 0), 
-(17, 'FBM', 'FORMULA BMW FB02', 15, 0), 
-(18, 'FOX', 'FORMULA XR', 15, 0), 
-(19, 'FO8', 'FORMULA V8', 20, 0), 
-(20, 'BF1', 'BMW SAUBER F1.06', 15, 0);
+(2, 'XFG', 'XF GTI', 31, 0), 
+(3, 'XRG', 'XR GT', 31, 0), 
+(4, 'LX4', 'LX4', 28, 0), 
+(5, 'LX6', 'LX6', 22, 0), 
+(6, 'RB4', 'RB4 GT', 26, 0), 
+(7, 'FXO', 'FXO TURBO', 30, 0), 
+(8, 'XRT', 'XR GT TURBO', 30, 0), 
+(9, 'RAC', 'RACEABOUT', 32, 0), 
+(10, 'FZ5', 'FZ5', 28, 0), 
+(11, 'UFR', 'UF GTR', 24, 0), 
+(12, 'XFR', 'XF GTR', 21, 0), 
+(13, 'FXR', 'FXO GTR', 17, 0), 
+(14, 'XRR', 'XR GTR', 18, 0), 
+(15, 'FZR', 'FZ50 GTR', 17, 0), 
+(16, 'MRT', 'MRT5', 17, 0), 
+(17, 'FBM', 'FORMULA BMW FB02', 22, 0), 
+(18, 'FOX', 'FORMULA XR', 16, 0), 
+(19, 'FO8', 'FORMULA V8', 18, 0), 
+(20, 'BF1', 'BMW SAUBER F1.06', 16, 0);
 unlock tables ;
 #----------------------------
 # Table structure for driver
@@ -105,7 +105,7 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL,
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver
 #----------------------------
@@ -150,7 +150,7 @@ CREATE TABLE `driver_lap` (
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver_lap
 #----------------------------
@@ -195,7 +195,7 @@ CREATE TABLE `race` (
   `weather_status` tinyint(2) unsigned NOT NULL,
   `wind_status` tinyint(2) unsigned NOT NULL,
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=210 DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table race
 #----------------------------
