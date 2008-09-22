@@ -50,6 +50,11 @@ namespace Drive_LFSS.Session_
         {
             if (true == false) { }
         }
+        public void ConfigApply(InSimSetting _inSimSetting)
+        {
+            base.SetInSimSetting(_inSimSetting);
+            ConfigApply();
+        }
         new public void ConfigApply()
         {
             base.ConfigApply();

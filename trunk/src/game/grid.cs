@@ -25,6 +25,7 @@ namespace Drive_LFSS.Game_
         }
         public void ConfigApply()
         {
+            carBrakeValue.Clear();
            uint endItr = Program.carTemplate.GetMaxEntry()+1;
            for(uint itr = 1; itr < endItr;itr++)
            {
@@ -97,10 +98,7 @@ namespace Drive_LFSS.Game_
             return carIds.ToArray();
         }
 
-        //I think we have no choices but put Dynamic, Brake range Value for each Car
-        //this seem to work pretty good for most car, but with a BF1, ho no! you have much time to brake in fact!
-        //Have to remember , the real collision detection will occur if YellowFlag is trigger too...
-        private const double speedColRatio = 0.717d;
+        //Feature
         private void checkCollision(CarMotion car)
         {
             CarMotion[] carAround;
@@ -136,14 +134,13 @@ namespace Drive_LFSS.Game_
 
         }
 
-
-
+        //Badly need Car.GetSize()
         private double GetDistance3DSq(CarMotion car1, CarMotion car2)
         {
             double dx = car2.GetPosX() - car1.GetPosX();
             double dy = car2.GetPosY() - car1.GetPosY();
             double dz = car2.GetPosZ() - car1.GetPosZ();
-            double bothSize = 1.0d;
+            double bothSize = 3.0d;
             double distance = Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz) - bothSize);
             return (distance > 0 ? distance : 0);
         }
@@ -152,7 +149,7 @@ namespace Drive_LFSS.Game_
             double dx = car2.GetPosX() - car1.GetPosX();
             double dy = car2.GetPosY() - car1.GetPosY();
             double dz = car2.GetPosZ() - car1.GetPosZ();
-            double bothSize = 1.0d;
+            double bothSize = 3.0d;
             double distance = (dx * dx) + (dy * dy) + (dz * dz) - bothSize;
             return (distance > 0 ? distance : 0);
         }
@@ -160,7 +157,7 @@ namespace Drive_LFSS.Game_
         {
             double dx = (car2.GetPosX() - car1.GetPosX());
             double dy = (car2.GetPosY() - car1.GetPosY());
-            double bothSize = 1.5d; //this is from center of the car so bothSize/2
+            double bothSize = 3.0d; //this is from center of the car so bothSize/2
             double distance = Math.Sqrt( ((dx * dx) + (dy * dy) - bothSize));
             return distance;
         }
@@ -168,14 +165,14 @@ namespace Drive_LFSS.Game_
         {
             double dx = car2.GetPosX() - car1.GetPosX();
             double dy = car2.GetPosY() - car1.GetPosY();
-            double bothSize = 1.0d;
+            double bothSize = 3.0d;
             double distance = (dx * dx) + (dy * dy) - bothSize;
             return (distance > 0 ? distance : 0);
         }
         private double GetDistanceZ(CarMotion fromCar, CarMotion tocar)
         {
             double dz = Math.Abs(tocar.GetPosZ() - fromCar.GetPosZ());
-            double bothHeight = 0.5d;
+            double bothHeight = 1.5d; //bothHeight/2 in fact
             double distance = dz - bothHeight;
             return ( distance > 0 ? distance : 0);
 }
@@ -185,11 +182,10 @@ namespace Drive_LFSS.Game_
             double dy = (toCar.GetPosY() - fromCar.GetPosY());
             double angle = Math.Atan2(dy, dx);
 
-            /*return for Multiturn Angle, but no need! keep to remember other possibility
+            /*return for Multiturn Angle, no need! keep to remember other possibility
             return (angle >= 0) ? angle : 2 * M_PI + angle;*/
             return angle * 180.0f / Math.PI;
         }
-        //Has to go into Car class.
         private bool HasCollisionPath(CarMotion fromCar, CarMotion toCar)
         {
             double angle = GetAngle(fromCar, toCar);
@@ -206,8 +202,8 @@ namespace Drive_LFSS.Game_
             double angleDiff = fromCar.GetTrajectory() - angle;
 
             //TODO: need to find the perfect angle, based on a static car ~size.
-            //13.0d was too big at very high speed
-            return ( (angleDiff <= 12.0d) && (angleDiff >= -12.0d ) );
+            //12.0d was too big at very high speed
+            return ( (angleDiff <= 6.0d) && (angleDiff >= -6.0d ) );
         }
     }
 }

@@ -39,6 +39,7 @@ namespace Drive_LFSS.CommandConsole_
 
             switch (args[0])
             {
+                case "reload": Reload(args); break;
                 case "status": Status(args); break;
                 case "say": Say(args); break;
                 case "exit": Exit(); break;
@@ -90,7 +91,7 @@ namespace Drive_LFSS.CommandConsole_
         {
             if (args.Length < 3)
             {
-                Log.normal("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverName $Message\r\n      #serverName can be \"all\".\r\n");
+                Log.commandHelp("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverName $Message\r\n      #serverName can be \"all\".\r\n");
                 return;
             }
 
@@ -116,7 +117,109 @@ namespace Drive_LFSS.CommandConsole_
                     Log.command("Command Announce, serverName Not Found, Server Requested was: " + args[1] + "\r\n");
             }
         }
-        
+        private static void Reload(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                Log.commandHelp("Command Reload, Syntax Error.\r\n  Usage:\r\n    reload #table_name\r\n      #table_name can be \"all\" or \"config\".\r\n");
+                return;
+            }
+            Log.command("Start Reloading of "+args[1]+".\r\n");
+            switch (args[1])
+            {
+                case "all": 
+                {
+                    Program.trackTemplate.Load(true);
+                    Log.commandHelp("  track_template reloaded.\r\n");
+                    Program.carTemplate.Load(true);
+                    Log.commandHelp("  car_template reloaded.\r\n");
+                    Program.buttonTemplate.Load(true);
+                    Log.commandHelp("  button_template reloaded.\r\n");
+                    Program.guiTemplate.Load(true);
+                    Log.commandHelp("  gui_template reloaded.\r\n");
+                    Program.raceTemplate.Load(false);
+                    Log.commandHelp("  race_template reloaded.\r\n");
+                    Program.driverBan.Load(false);
+                    Log.commandHelp("  driver_ban reloaded.\r\n");
+
+                    Log.normal("Initializating DLFSS Client...\r\n");
+                    Program.ConfigApply();
+                    Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
+
+                    Log.normal("Initializating mIRC Client...\r\n");
+                    Program.ircClient.ConfigApply();
+                    Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
+
+                    Log.normal("Initializating PubStats...\r\n");
+                    Program.pubStats.ConfigApply();
+                    Log.normal("Completed Initialize PubStats.\r\n\r\n");
+
+                    Log.normal("Initializating Servers Config...\r\n\r\n");
+                    SessionList.ConfigApply();
+                    Log.normal("Complete Servers Config.\r\n\r\n");
+                } break;
+                case "track":
+                case "track_template":
+                {
+                    Program.trackTemplate.Load(true);
+                    Log.commandHelp("track_template reloaded.\r\n");
+                } break;
+                case "car":
+                case "car_template":
+                {
+                    Program.carTemplate.Load(true);
+                    Log.commandHelp("car_template reloaded.\r\n");
+                } break;
+                case "button":
+                case "button_template":
+                {
+                    Program.buttonTemplate.Load(true);
+                    Log.commandHelp("button_template reloaded.\r\n");
+                } break;
+                case "race":
+                case "race_template":
+                {
+                    Program.raceTemplate.Load(false);
+                    Log.commandHelp("race_template reloaded.\r\n");
+                } break;
+                case "ban":
+                case "driver_ban":
+                {
+                    Program.driverBan.Load(false);
+                    Log.commandHelp("driver_ban reloaded.\r\n");
+                } break;
+                case "gui":
+                case "gui_template":
+                {
+                    Program.guiTemplate.Load(true);
+                    Log.commandHelp("gui_template reloaded.\r\n");
+                } break;
+                case "config":
+                {
+                    Log.normal("Initializating DLFSS Client...\r\n");
+                    Program.ConfigApply();
+                    Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
+
+                    Log.normal("Initializating mIRC Client...\r\n");
+                    Program.ircClient.ConfigApply();
+                    Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
+
+                    Log.normal("Initializating PubStats...\r\n");
+                    Program.pubStats.ConfigApply();
+                    Log.normal("Completed Initialize PubStats.\r\n\r\n");
+                   
+                    Log.normal("Initializating Servers Config...\r\n\r\n");
+                    SessionList.ConfigApply();
+                    Log.normal("Complete Servers Config.\r\n\r\n");
+                } break;
+                default:
+                {
+                    Log.commandHelp("Command Reload, Unknow tableName: "+args[1]+".\r\n");
+                    Log.commandHelp("Command Reload, Syntax Error.\r\n  Usage:\r\n    reload #table_name\r\n      #table_name can be \"all\" or \"config\".\r\n");
+                } break;
+            }
+            Log.command("End Reloading of " + args[1] + ".\r\n");
+        }
         private static void Exit()
         {
             Program.Exit();

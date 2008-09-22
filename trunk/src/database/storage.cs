@@ -44,6 +44,7 @@ namespace Drive_LFSS.Storage_
         public bool Load(bool errorOnEmpty)
         {
             bool returnValue = false;
+            data.Clear();
 
             IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT * FROM `" + tableName + "` LIMIT 1");
             if (reader.Read())

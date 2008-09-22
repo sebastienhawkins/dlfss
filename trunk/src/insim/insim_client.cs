@@ -97,7 +97,11 @@ namespace Drive_LFSS.InSim_
         {
             networkThreadSleep = (int)inSimSetting.networkInterval;
         }
-        
+        protected void SetInSimSetting(InSimSetting _inSimSetting)
+        {
+            inSimSetting = _inSimSetting;
+        }
+
         private void Connect()
         {
             if (InitUdpSocket() && InitTcpSocket())

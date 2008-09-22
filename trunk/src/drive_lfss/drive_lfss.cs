@@ -191,7 +191,6 @@ namespace Drive_LFSS
                     Log.flush();
                 }
 
-
                 //update This Thread Process
                 SessionList.update(diff);
                 pubStats.update(diff);
@@ -235,7 +234,7 @@ namespace Drive_LFSS
                 System.Threading.Thread.Sleep(200);
             }
         }
-        private static void ConfigApply()
+        public static void ConfigApply()
         {
             sleep = Config.GetIntValue("Interval", "GameThreadUpdate");
             if (sleep < 1)

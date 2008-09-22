@@ -60,9 +60,17 @@ namespace Drive_LFSS
                     Log.error(inSimSetting.serverName + " bad Configuration For: Port must be greater 1024.\r\n");
                 else
                 {
-                    Session session = new Session(itr.Current, inSimSetting);
-                    session.ConfigApply();
-                    sessionList.Add(itr.Current,session);
+                    if (sessionList.ContainsKey(itr.Current)) //reloading config
+                    {
+
+                        sessionList[itr.Current].ConfigApply(inSimSetting);
+                    }
+                    else //New Session
+                    {
+                        Session session = new Session(itr.Current, inSimSetting);
+                        session.ConfigApply();
+                        sessionList.Add(itr.Current, session);
+                    }
                 }
             }
         }
