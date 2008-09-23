@@ -243,6 +243,96 @@ namespace Drive_LFSS
             if (sleep < 1)
                 sleep = 1;
         }
+        public static void Reload(string what)
+        {
+            Log.command("Start Reloading of " + what + ".\r\n");
+            switch (what)
+            {
+                case "all":
+                    {
+                        Program.trackTemplate.Load(true);
+                        Log.commandHelp("  track_template reloaded.\r\n");
+                        Program.carTemplate.Load(true);
+                        Log.commandHelp("  car_template reloaded.\r\n");
+                        Program.buttonTemplate.Load(true);
+                        Log.commandHelp("  button_template reloaded.\r\n");
+                        Program.guiTemplate.Load(true);
+                        Log.commandHelp("  gui_template reloaded.\r\n");
+                        Program.raceTemplate.Load(false);
+                        Log.commandHelp("  race_template reloaded.\r\n");
+                        Program.driverBan.Load(false);
+                        Log.commandHelp("  driver_ban reloaded.\r\n");
+
+
+                        Log.normal("Initializating DLFSS Client...\r\n");
+                        Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
+                        Program.ConfigApply();
+                        Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
+
+                        Log.normal("Initializating mIRC Client...\r\n");
+                        Program.ircClient.ConfigApply();
+                        Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
+
+                        Log.normal("Initializating PubStats...\r\n");
+                        Program.pubStats.ConfigApply();
+                        Log.normal("Completed Initialize PubStats.\r\n\r\n");
+
+                        Log.normal("Initializating Servers Config...\r\n\r\n");
+                        SessionList.ConfigApply();
+                        Log.normal("Complete Servers Config.\r\n\r\n");
+                    } break;
+                case "track_template":
+                    {
+                        Program.trackTemplate.Load(true);
+                        Log.commandHelp("track_template reloaded.\r\n");
+                    } break;
+                case "car_template":
+                    {
+                        Program.carTemplate.Load(true);
+                        Log.commandHelp("car_template reloaded.\r\n");
+                    } break;
+                case "button_template":
+                    {
+                        Program.buttonTemplate.Load(true);
+                        Log.commandHelp("button_template reloaded.\r\n");
+                    } break;
+                case "race_template":
+                    {
+                        Program.raceTemplate.Load(false);
+                        Log.commandHelp("race_template reloaded.\r\n");
+                    } break;
+                case "driver_ban":
+                    {
+                        Program.driverBan.Load(false);
+                        Log.commandHelp("driver_ban reloaded.\r\n");
+                    } break;
+                case "gui_template":
+                    {
+                        Program.guiTemplate.Load(true);
+                        Log.commandHelp("gui_template reloaded.\r\n");
+                    } break;
+                case "config":
+                    {
+                        Log.normal("Initializating DLFSS Client...\r\n");
+                        Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
+                        Program.ConfigApply();
+                        Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
+
+                        Log.normal("Initializating mIRC Client...\r\n");
+                        Program.ircClient.ConfigApply();
+                        Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
+
+                        Log.normal("Initializating PubStats...\r\n");
+                        Program.pubStats.ConfigApply();
+                        Log.normal("Completed Initialize PubStats.\r\n\r\n");
+
+                        Log.normal("Initializating Servers Config...\r\n\r\n");
+                        SessionList.ConfigApply();
+                        Log.normal("Complete Servers Config.\r\n\r\n");
+                    } break;
+            }
+            Log.command("End Reloading of " + what + ".\r\n");
+        }
         public static void Exit()
         {
             Exit(true);
