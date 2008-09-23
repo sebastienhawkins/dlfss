@@ -108,15 +108,36 @@ namespace Drive_LFSS.Game_
         {
             laps.Peek().ProcessPacketLap(_packet,iSession.GetRaceGuid(),CarPrefix,iSession.GetRaceTrackPrefix());
 
+            pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
+            wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
             if (pb != null && wr != null)
             {
                 if (pb.LapTime > 0 && laps.Peek().LapTime > 0)
                 {
                     int lapDiff = (int)laps.Peek().LapTime - (int)pb.LapTime;
+                    if (lapDiff < 0) //New PB
+                    {
+                        pb.Splits[1] = laps.Peek().SplitTime[1];
+                        pb.Splits[2] = laps.Peek().SplitTime[2];
+                        pb.Splits[3] = laps.Peek().SplitTime[3];
+                        pb.LapTime = laps.Peek().LapTime;
+                    }
                     int lapWRDiff = (int)laps.Peek().LapTime - (int)wr.LapTime;
-
-                    AddMessageTop("^2diff " + PubStats.MSToString(lapDiff, "^7", "^8") + ", ^1wr ^2diff " + PubStats.MSToString(lapWRDiff, "^7", "^8"), 7000);
+                    if (lapWRDiff < 0)//A New World Record
+                    {
+                        wr.Splits[1] = laps.Peek().SplitTime[1];
+                        wr.Splits[2] = laps.Peek().SplitTime[2];
+                        wr.Splits[3] = laps.Peek().SplitTime[3];
+                        wr.LapTime = laps.Peek().LapTime;
+                        wr.LicenceName = LicenceName;
+                        ISession.AddMessageMiddleToAll("^2 New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 7000);
+                    }
+                    AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
                 }
+            }
+            else
+            {
+                
             }
             laps.Enqueue(new Lap());
         }
@@ -130,12 +151,12 @@ namespace Drive_LFSS.Game_
             wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
             if (pb != null && wr != null)
             {
-                if (pb.Splits[_packet.splitNode - 1] > 0 && laps.Peek().SplitTime[_packet.splitNode] > 0)
+                if (pb.Splits[_packet.splitNode] > 0 && laps.Peek().SplitTime[_packet.splitNode] > 0)
                 {
-                    int splitDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode - 1];
-                    int splitWRDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode - 1];
+                    int splitDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode];
+                    int splitWRDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode];
 
-                    AddMessageTop("^2diff " + PubStats.MSToString(splitDiff, "^7", "^8") + ", ^3wr ^2diff " + PubStats.MSToString(splitWRDiff, "^7", "^8"), 7000);
+                    AddMessageTop("^2PB " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
                 }
             }
         }

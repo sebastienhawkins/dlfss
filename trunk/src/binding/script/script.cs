@@ -55,13 +55,13 @@ namespace Drive_LFSS.Script_
         //Driver
         public bool CarDriftScoring(ICar car, uint score)
         {
-            ((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
+            //((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
 
-            return true;
+            return false;
         }
         public bool CarAccelerationSucess(ICar car, double finalAccelerationTime)
         {
-            ((IButton)car).AddMessageTop(" ^70-100Km/h In: ^2" + Math.Round(finalAccelerationTime,3) + " ^7sec.",5000);
+           ((IButton)car).AddMessageTop(" ^70-100Km/h In: ^2" + Math.Round(finalAccelerationTime,3) + " ^7sec.",5000);
             
             return true;
         }

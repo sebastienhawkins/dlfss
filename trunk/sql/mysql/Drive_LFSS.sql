@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/23 02:54:38
+Date:                  2008/09/23 05:17:06
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -37,8 +37,8 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (11, 'vote option 2', 106, 0, 0, 2, 80, 45, 6, 'vote option 2'), 
 (3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta'), 
 (5, 'motd button', 26, 1, 0, 75, 125, 50, 12, '^2Drive'), 
-(6, 'message bar top', 2, 0, 0, 60, 25, 80, 16, '^1Message bar top'), 
-(7, 'message bar middle', 2, 0, 0, 25, 48, 150, 16, '^1Message bar Middle'), 
+(6, 'message bar top', 32, 0, 0, 60, 27, 80, 13, '^1Message bar top'), 
+(7, 'message bar middle', 32, 0, 0, 60, 50, 80, 13, '^1Message bar Middle'), 
 (8, 'Collision Warning', 2, 0, 0, 25, 68, 150, 8, '^1CollisionWarning'), 
 (9, 'vote title', 146, 0, 0, 2, 65, 50, 8, 'vote title'), 
 (4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, ''), 

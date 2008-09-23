@@ -37,8 +37,9 @@ namespace Drive_LFSS.PubStats_
         {
             trackPrefix = args[0];
             carPrefix = args[1];
-            splits = new uint[3]
+            splits = new uint[4]
             {
+               0,
                Convert.ToUInt32(args[2]),
                Convert.ToUInt32(args[3]),
                Convert.ToUInt32(args[4])
@@ -68,7 +69,7 @@ namespace Drive_LFSS.PubStats_
 
         public void Debug()
         {
-            Log.debug(trackPrefix + " " + carPrefix + " " + splits[0] + " " + lapTime + " " + lapCount + " " + timeStamp + "\r\n");
+            Log.debug(trackPrefix + " " + carPrefix + " " + splits[1] + " " + lapTime + " " + lapCount + " " + timeStamp + "\r\n");
         }
         //<track> <car> <split1> <split2> <split3> <laptime> <lapcount> <timestamp>
     }
@@ -79,8 +80,9 @@ namespace Drive_LFSS.PubStats_
             id_wr = Convert.ToUInt32(args[0]);
             trackPrefix = args[1];
             carPrefix = args[2];
-            splits = new uint[3]
+            splits = new uint[4]
             {
+               0,
                Convert.ToUInt32(args[3]),
                Convert.ToUInt32(args[4]),
                Convert.ToUInt32(args[5])
@@ -100,19 +102,22 @@ namespace Drive_LFSS.PubStats_
         public uint[] Splits
         {
             get { return splits; }
+            set { splits = value; }
         }
         public uint LapTime
         {
             get { return lapTime; }
+            set { lapTime = value; }
         }
         public string LicenceName
         {
             get { return licenceName; }
+            set { licenceName = value; }
         }
 
         public void Debug()
         {
-            Log.debug(trackPrefix + " " + carPrefix + " " + splits[0] + " " + lapTime + " " + driverFlag + " " + licenceName + "\r\n");
+            Log.debug(trackPrefix + " " + carPrefix + " " + splits[1] + " " + lapTime + " " + driverFlag + " " + licenceName + "\r\n");
         }
         //<id_wr> <track> <car> <split1> <split2> <split3> <laptime> <flags_hlaps> <racername>
     }

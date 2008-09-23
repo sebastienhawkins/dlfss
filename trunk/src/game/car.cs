@@ -284,8 +284,8 @@ namespace Drive_LFSS.Game_
 
                 if (((Driver)car).ISession.Script.CarDriftScoring((ICar)car, (uint)score))
                     return;
-
-                ((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
+                //Too Much annoying ;)
+                //((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
             }
             private void ComputeScore(CarMotion car)
             {
@@ -367,12 +367,12 @@ namespace Drive_LFSS.Game_
             if (((Driver)this).wr != null)
             {
                 //lapTime = lapTime.Insert();
-                AddMessageMiddle("^2World Record, " + PubStats.MSToString(((Driver)this).wr.LapTime,"7^","^7") + ", ^2by^ " + ((Driver)this).wr.LicenceName, 7000);
+                AddMessageMiddle("^2WR " + PubStats.MSToString(((Driver)this).wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + ((Driver)this).wr.LicenceName, 6000);
             }
             ((Driver)this).pb = Program.pubStats.GetPB(LicenceName, carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).pb != null && ((Driver)this).wr != null)
             {
-                AddMessageMiddle("^2Your Record, " + PubStats.MSToString(((Driver)this).pb.LapTime, "7^", "^7") + ", ^3Diff " + PubStats.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime, "7^", "^8"), 7000);
+                AddMessageMiddle("^2PB " + PubStats.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + PubStats.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime,Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
             }
         }
         public void LeaveTrack()

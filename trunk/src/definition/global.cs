@@ -22,8 +22,10 @@ namespace Drive_LFSS.Definition_
 {
      public struct Msg
     {
-        public const string TRACK_PREFIX_NEW = "New Track Prefix Is: ^7";
-
+         public const string COLOR_DIFF_LOWER = "^3";
+         public const string COLOR_DIFF_EVENT = "^8";
+         public const string COLOR_DIFF_HIGHER = "^4";
+         public const string COLOR_DIFF_TOP = "^7";
     }
     [Flags]public enum Race_Template_Flag : byte
     {
