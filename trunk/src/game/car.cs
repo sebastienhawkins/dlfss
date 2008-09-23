@@ -43,12 +43,20 @@ namespace Drive_LFSS.Game_
         } //When Connection
         new protected void Init(PacketNPL _packet)
         {
-            carPrefix = _packet.carName;
-            if (carId != _packet.carId)
+            carPrefix = _packet.carPrefix;
+
+            if (carId != _packet.carId || carPrefix != _packet.carPrefix)
             {
+                carPrefix = _packet.carPrefix;
+                carId = _packet.carId;
                 EnterTrackFirstTime();
             }
-            carId = _packet.carId;
+            else
+            {
+                carPrefix = _packet.carPrefix;
+                carId = _packet.carId;
+            }
+
             carPlate = _packet.carPlate;
             carSkin = _packet.skinName;
             addedIntakeRestriction = _packet.addedIntakeRestriction;
@@ -76,6 +84,8 @@ namespace Drive_LFSS.Game_
 
             speedMs = _carInformation.speed / 327.68d;
             speedKmh = speedMs * 3.6d;
+            if (maxSpeedKmh < speedKmh)
+                maxSpeedKmh = speedKmh;
 
             tracjectory = _carInformation.direction;
             orientation = _carInformation.heading;
@@ -108,6 +118,7 @@ namespace Drive_LFSS.Game_
         private Car_Tyres tyreRearLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Car_Tyres tyreRearRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
+        protected double maxSpeedKmh = 0.0d;
         private ushort lapCompleted = 0;
         private ushort node = 0;
         private byte racePosition = 0;

@@ -297,6 +297,9 @@ namespace Drive_LFSS.PubStats_
         
         public PB GetPB(string licenceName, string carTrackPrefix)
         {
+            if (licenceName == "AI")
+                return null;
+
             string key = licenceName + carTrackPrefix;
             if (storagePB.ContainsKey(key))
                 return storagePB[key];

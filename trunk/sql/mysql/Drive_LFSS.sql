@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/23 05:17:06
+Date:                  2008/09/23 17:50:33
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -13,15 +13,15 @@ SET FOREIGN_KEY_CHECKS=0;
 drop table if exists button_template;
 CREATE TABLE `button_template` (
   `entry` mediumint(8) unsigned NOT NULL,
-  `description` varchar(255) default NULL,
+  `description` varchar(255) NOT NULL default '',
   `style_mask` tinyint(3) unsigned NOT NULL default '0',
   `is_allways_visible` tinyint(1) unsigned NOT NULL default '0',
-  `max_input_char` tinyint(3) unsigned NOT NULL,
-  `left` tinyint(3) unsigned NOT NULL,
-  `top` tinyint(3) unsigned NOT NULL,
-  `width` tinyint(3) unsigned NOT NULL,
-  `height` tinyint(3) unsigned NOT NULL,
-  `text` varchar(240) NOT NULL,
+  `max_input_char` tinyint(3) unsigned NOT NULL default '0',
+  `left` tinyint(3) unsigned NOT NULL default '0',
+  `top` tinyint(3) unsigned NOT NULL default '0',
+  `width` tinyint(3) unsigned NOT NULL default '0',
+  `height` tinyint(3) unsigned NOT NULL default '0',
+  `text` varchar(240) NOT NULL default '',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
@@ -59,8 +59,8 @@ unlock tables ;
 drop table if exists car_template;
 CREATE TABLE `car_template` (
   `entry` smallint(2) unsigned NOT NULL,
-  `name_prefix` varchar(3) NOT NULL,
-  `name` varchar(16) NOT NULL,
+  `name_prefix` varchar(3) NOT NULL default '',
+  `name` varchar(16) NOT NULL default '',
   `brake_distance` smallint(3) unsigned NOT NULL default '0',
   `mask` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
@@ -102,7 +102,7 @@ CREATE TABLE `driver` (
   `licence_name` varchar(24) NOT NULL,
   `driver_name` varchar(24) NOT NULL,
   `config_mask` smallint(5) unsigned NOT NULL default '0',
-  `last_connection_time` bigint(12) unsigned NOT NULL,
+  `last_connection_time` bigint(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -116,10 +116,10 @@ CREATE TABLE `driver` (
 drop table if exists driver_ban;
 CREATE TABLE `driver_ban` (
   `entry` int(10) unsigned NOT NULL,
-  `licence_name` varchar(16) NOT NULL,
-  `from_licence_name` varchar(16) NOT NULL,
-  `reason` varchar(255) NOT NULL,
-  `start_timestamp` int(12) unsigned NOT NULL,
+  `licence_name` varchar(16) NOT NULL default '',
+  `from_licence_name` varchar(16) NOT NULL default '',
+  `reason` varchar(255) NOT NULL default '',
+  `start_timestamp` int(12) unsigned NOT NULL default '0',
   `duration_timestamp` int(12) unsigned NOT NULL default '0',
   `expired` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
@@ -145,6 +145,7 @@ CREATE TABLE `driver_lap` (
   `lap_time` int(12) unsigned NOT NULL,
   `total_time` int(12) unsigned NOT NULL,
   `lap_completed` mediumint(5) unsigned NOT NULL default '0',
+  `max_speed_kmh` float NOT NULL default '0',
   `current_penalty` tinyint(2) unsigned NOT NULL default '0',
   `pit_stop_count` tinyint(3) unsigned NOT NULL,
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
@@ -161,8 +162,8 @@ CREATE TABLE `driver_lap` (
 drop table if exists gui_template;
 CREATE TABLE `gui_template` (
   `entry` int(11) unsigned NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `button_entry` varchar(255) NOT NULL COMMENT 'space separated value',
+  `description` varchar(255) NOT NULL default '',
+  `button_entry` varchar(255) NOT NULL default '' COMMENT 'space separated value',
   `text_button_entry` mediumint(5) unsigned NOT NULL default '0',
   `text` blob NOT NULL,
   PRIMARY KEY  (`entry`)
@@ -182,18 +183,18 @@ unlock tables ;
 drop table if exists race;
 CREATE TABLE `race` (
   `guid` int(11) unsigned NOT NULL auto_increment,
-  `qualify_race_guid` int(11) unsigned NOT NULL,
+  `qualify_race_guid` int(11) unsigned NOT NULL default '0',
   `track_prefix` varchar(4) NOT NULL,
   `start_timestamp` bigint(12) unsigned NOT NULL,
-  `end_timestamp` bigint(12) unsigned NOT NULL,
+  `end_timestamp` bigint(12) unsigned NOT NULL default '0',
   `grid_order` varchar(255) NOT NULL COMMENT 'Driver GUID seperated by Space.',
-  `finish_order` varchar(255) NOT NULL,
-  `race_laps` tinyint(3) unsigned NOT NULL,
+  `finish_order` varchar(255) NOT NULL default '',
+  `race_laps` tinyint(3) unsigned NOT NULL default '0',
   `race_status` tinyint(1) unsigned NOT NULL default '0',
   `race_feature` mediumint(4) unsigned NOT NULL default '0',
-  `qualification_minute` tinyint(3) unsigned NOT NULL,
-  `weather_status` tinyint(2) unsigned NOT NULL,
-  `wind_status` tinyint(2) unsigned NOT NULL,
+  `qualification_minute` tinyint(3) unsigned NOT NULL default '0',
+  `weather_status` tinyint(2) unsigned NOT NULL default '0',
+  `wind_status` tinyint(2) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
@@ -206,7 +207,7 @@ CREATE TABLE `race` (
 drop table if exists race_map;
 CREATE TABLE `race_map` (
   `entry` mediumint(5) unsigned NOT NULL default '0',
-  `race_template_entry` mediumint(5) unsigned NOT NULL,
+  `race_template_entry` mediumint(5) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`,`race_template_entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
@@ -243,7 +244,7 @@ unlock tables ;
 drop table if exists race_template;
 CREATE TABLE `race_template` (
   `entry` mediumint(5) unsigned NOT NULL,
-  `description` varchar(34) NOT NULL,
+  `description` varchar(34) NOT NULL default '',
   `track_entry` tinyint(2) unsigned NOT NULL default '0',
   `car_entry_allowed` varchar(64) NOT NULL default '0',
   `weather` tinyint(2) unsigned NOT NULL default '0',
@@ -288,9 +289,9 @@ unlock tables ;
 drop table if exists track_template;
 CREATE TABLE `track_template` (
   `entry` tinyint(2) unsigned NOT NULL,
-  `name_prefix` varchar(4) NOT NULL,
-  `name` varchar(16) NOT NULL,
-  `configuration` varchar(16) NOT NULL,
+  `name_prefix` varchar(4) NOT NULL default '',
+  `name` varchar(16) NOT NULL default '',
+  `configuration` varchar(16) NOT NULL default '',
   `reverse` tinyint(1) unsigned NOT NULL default '0',
   `split_node_index_1` tinyint(3) unsigned NOT NULL default '0',
   `split_node_index_2` tinyint(3) unsigned NOT NULL default '0',

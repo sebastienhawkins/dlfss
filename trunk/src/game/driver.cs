@@ -106,7 +106,7 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessLapInformation(PacketLAP _packet)
         {
-            laps.Peek().ProcessPacketLap(_packet,iSession.GetRaceGuid(),CarPrefix,iSession.GetRaceTrackPrefix());
+            laps.Peek().ProcessPacketLap(_packet,iSession.GetRaceGuid(),CarPrefix,iSession.GetRaceTrackPrefix(),maxSpeedKmh);
 
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
@@ -130,9 +130,12 @@ namespace Drive_LFSS.Game_
                         wr.Splits[3] = laps.Peek().SplitTime[3];
                         wr.LapTime = laps.Peek().LapTime;
                         wr.LicenceName = LicenceName;
-                        ISession.AddMessageMiddleToAll("^2 New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 7000);
+                        ISession.AddMessageMiddleToAll("^2 New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
                     }
-                    AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
+                    AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                    AddMessageMiddle("^2MS ^7" + Math.Round(maxSpeedKmh, 2)+" ^7Kmh", 6000);
+                    
+                    maxSpeedKmh = 0.0d; 
                 }
             }
             else
@@ -190,7 +193,7 @@ namespace Drive_LFSS.Game_
             {
                 if (true == false) { }
             }
-            public void ProcessPacketLap(PacketLAP _packet,uint _raceGuid, string _carPrefix, string _trackPrefix)
+            public void ProcessPacketLap(PacketLAP _packet,uint _raceGuid, string _carPrefix, string _trackPrefix,double _maxSpeedKmh)
             {
                 lapTime = _packet.lapTime;
                 totalTime = _packet.totalTime;
@@ -201,6 +204,7 @@ namespace Drive_LFSS.Game_
                 driverMask = _packet.driverMask;
                 currentPenality = _packet.currentPenality;
                 lapCompleted = _packet.lapCompleted;
+                maxSpeedKhm = _maxSpeedKmh;
             }
             public void ProcessPacketSplit(PacketSPX _packet)
             {
@@ -216,6 +220,7 @@ namespace Drive_LFSS.Game_
             private uint lapTime = 0;
             private uint totalTime = 0;
             private ushort lapCompleted = 0;
+            private double maxSpeedKhm = 0.0d;
             private uint[] splitTime = new uint[4] { 0, 0, 0, 0 };
             private ushort yellowFlagCount = 0;
             private ushort blueFlagCount = 0;
@@ -268,6 +273,10 @@ namespace Drive_LFSS.Game_
             {
                 get { return lapCompleted; }
             }
+            public double MaxSpeedKmh
+            {
+                get { return maxSpeedKhm; }
+            }
             public byte PitStopCount
             {
                 get { return pitStopCount; }
@@ -300,8 +309,8 @@ namespace Drive_LFSS.Game_
         }
         private void SaveLapsToDB(Lap lap)
         {
-            string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
-            query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + "," + (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount + ")";
+            string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`max_speed_kmh`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
+            query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + ","+ lap.MaxSpeedKmh +","+ (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount + ")";
             Program.dlfssDatabase.ExecuteNonQuery(query);
         }
         private void SaveToDB()

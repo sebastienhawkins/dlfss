@@ -502,7 +502,7 @@ namespace Drive_LFSS.Packet_
         public Driver_Flag driverMask;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string carName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]public string carPrefix;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=16)]public string skinName;
         public Car_Tyres tyreRearLeft;
         public Car_Tyres tyreRearRight;

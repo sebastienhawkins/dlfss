@@ -110,7 +110,7 @@ namespace Drive_LFSS.Packet_
         // A player joins the race. If PLID already exists, then player leaves pit.
         protected virtual void processPacket(PacketNPL _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " NPL_PlayerJoinsRace(), NPL -> CName=" + _packet.carName + ", PName=" + _packet.driverName + ", PLID=" + _packet.carId + ", UCID=" + _packet.tempLicenceId + ", PType=" + _packet.driverTypeMask + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " NPL_PlayerJoinsRace(), NPL -> CName=" + _packet.carPrefix + ", PName=" + _packet.driverName + ", PLID=" + _packet.carId + ", UCID=" + _packet.tempLicenceId + ", PType=" + _packet.driverTypeMask + "\r\n");
         }
         protected virtual void processPacket(PacketLAP _packet)
         {
