@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/22 17:39:54
+Date:                  2008/09/23 02:54:38
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -47,7 +47,7 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (14, 'vote option 5', 106, 0, 0, 2, 101, 45, 6, 'vote option 5'), 
 (15, 'vote option 6', 106, 0, 0, 2, 108, 45, 6, 'vote option 6'), 
 (16, 'track prefix', 66, 1, 0, 56, 194, 10, 7, '^8'), 
-(17, 'info 1', 82, 0, 0, 180, 85, 20, 5, 'info 1'), 
+(17, 'info 1', 106, 0, 0, 180, 85, 20, 5, 'info 1'), 
 (18, 'info 2', 85, 0, 0, 180, 91, 20, 5, 'info 2'), 
 (19, 'info 3', 87, 0, 0, 180, 97, 20, 5, 'info 3'), 
 (20, 'info 4', 86, 0, 0, 180, 103, 20, 5, 'info 4'), 
@@ -105,7 +105,7 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL,
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver
 #----------------------------
@@ -150,7 +150,7 @@ CREATE TABLE `driver_lap` (
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver_lap
 #----------------------------
@@ -195,7 +195,7 @@ CREATE TABLE `race` (
   `weather_status` tinyint(2) unsigned NOT NULL,
   `wind_status` tinyint(2) unsigned NOT NULL,
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM AUTO_INCREMENT=210 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table race
 #----------------------------
