@@ -58,13 +58,13 @@ namespace Drive_LFSS.Server_
 
             if (args.Length < 1 || !command.ContainsKey(args[0].ToLowerInvariant()) ) 
             {
-                driver.AddMessageMiddle("^7 Unknow command: ^3" + _commandText + ".", 4500);
+                driver.AddMessageMiddle("^7 Unknown command: ^3" + _commandText + ".", 4500);
                 Log.command("Command.Exec(), Bad Command Call From User: " + driver.LicenceName + ", AccessLevel: " + (driver.AdminFlag ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
             if( command[args[0]].level > 0 && !driver.AdminFlag )
             {
-                driver.AddMessageMiddle("^7 Must be Admin to excute command: ^3" + args[0]+".",4500);
+                driver.AddMessageMiddle("^7 Must be Admin to execute command: ^3" + args[0]+".",4500);
                 Log.command("Command.Exec(), Bad Command Call From User: " + driver.LicenceName + ", AccessLevel: " + (driver.AdminFlag ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
@@ -144,7 +144,7 @@ namespace Drive_LFSS.Server_
                     } break;
                 default:
                     {
-                        driver.AddMessageMiddle("^7 Unknow tableName, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7 Unknown tableName, ^3 " + args[1], 4500);
                     } break;
 
                     Log.command("Command.Reload(), User: " + driver.LicenceName + ", reloaded: " + args[1] + "\r\n");

@@ -236,7 +236,7 @@ namespace Drive_LFSS.Session_
                 }
                 else
                 {
-                    Log.error(GetSessionNameForLog() + " New Licence Connection, But Override a Allready LicenceId, what to do if that Happen???");
+                    Log.error(GetSessionNameForLog() + " New Licence Connection, But Overrides an Already existing LicenceId, what to do if that Happens?");
                     return;
                 }
             }
@@ -253,7 +253,7 @@ namespace Drive_LFSS.Session_
 
             if (!IsExistLicenceId(_packet.tempLicenceId))
             {
-                Log.error(GetSessionNameForLog() + " Licence Disconnection, But no LicenceID associated with It, What todo???");
+                Log.error(GetSessionNameForLog() + " Licence Disconnection, But no LicenceID associated with It, What to do?");
                 return;
             }
 
@@ -270,7 +270,7 @@ namespace Drive_LFSS.Session_
 
             if (!IsExistLicenceId(_packet.tempLicenceId))
             {
-                Log.error(GetSessionNameForLog() + " New Car Join Race, But Not LicenceId Associated What todo???");
+                Log.error(GetSessionNameForLog() + " New Car Join Race, But No LicenceId Associated, What to do?");
                 return;
             }
 
@@ -306,7 +306,7 @@ namespace Drive_LFSS.Session_
             byte itr;
             if ((itr = GetCarIndex(_packet.carId)) == 0)
             {
-                Log.error(GetSessionNameForLog() + " Car Leave race, But no Car Association Found , what todo???");
+                Log.error(GetSessionNameForLog() + " Car Left race, But no Car Association Found , what to do?");
                 return;
             }
 
@@ -483,7 +483,7 @@ namespace Drive_LFSS.Session_
                 case Button_Entry.VOTE_OPTION_6: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.licenceId); break;
                 default:
                 {
-                    Log.error("We recevied a button ClickId, from unknow source, licenceName: " + driverList[driverIndex].LicenceName + ", LicenceIndex: "+driverIndex+"\r\n");
+                    Log.error("We received a button ClickId, from unknown source, licenceName: " + driverList[driverIndex].LicenceName + ", LicenceIndex: "+driverIndex+"\r\n");
                 } break;
             }
         }      // Button Click Receive

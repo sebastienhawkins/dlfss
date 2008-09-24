@@ -50,7 +50,7 @@ namespace Drive_LFSS.Game_
                 case "VOTE": trackChangeBeviator = Vote_Track_Change.VOTE; break;
                 case "STATIC": trackChangeBeviator = Vote_Track_Change.NO_CHANGE; break;
                 case "AUTO": trackChangeBeviator = Vote_Track_Change.AUTO; break;
-                default: Log.error("Vote System config Error, unknow Value for Vote." + iSession.GetSessionName()+".TrackChange = "+Config.GetStringValue("Vote", iSession.GetSessionName(), "TrackChange")+"\r\n"); break;
+                default: Log.error("Vote System config Error, unknown Value for Vote." + iSession.GetSessionName()+".TrackChange = "+Config.GetStringValue("Vote", iSession.GetSessionName(), "TrackChange")+"\r\n"); break;
             }
             raceMapEntry = (ushort)Config.GetIntValue("Vote", iSession.GetSessionName(), "RaceMap");
             raceMap.Clear();

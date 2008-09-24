@@ -230,7 +230,7 @@ namespace Drive_LFSS.Game_
         }
         private void FinishRace()
         {
-            Log.debug("Race: " + guid + ", was Finished SucessFull.\r\n");
+            Log.debug("Race: " + guid + ", was Finished Sucessfully.\r\n");
 
             for (byte itr = (byte)PositionIndex.POSITION_FIRST; itr < finishedCount; itr++)
                 finishOrder += carPosition[itr]+" ";
@@ -261,7 +261,7 @@ namespace Drive_LFSS.Game_
             else if (carPosition[_position] == 0)   //Not same position, but don't take positon of anyone... a weird case
             {
                 carPosition[_position] = _carId;
-                Log.error("Race.SetCarPosition(), Weird Case happen. CarId: " + _carId + ", PositionAsked:" + _position + ", the old Position carId was 0.\r\n");
+                Log.error("Race.SetCarPosition(), Weird Case happened. CarId: " + _carId + ", PositionAsked:" + _position + ", the old Position carId was 0.\r\n");
                 return;
             }
 
