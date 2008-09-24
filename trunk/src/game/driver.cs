@@ -31,8 +31,7 @@ namespace Drive_LFSS.Game_
 
     public sealed class Driver : Car, IDriver
     {
-        public Driver(ISession _session)
-            : base()
+        public Driver(ISession _session): base()
         {
             iSession = _session;
         }
@@ -59,10 +58,10 @@ namespace Drive_LFSS.Game_
             SendBanner();
             SendTrackPrefix();
             //To make the MODT look on a very Black BG
-            for (byte itr = 0; ++itr < 5; )
-                SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
+           // for (byte itr = 0; ++itr < 5; )
+           //     SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
 
-            SendGui((ushort)Gui_Entry.MOTD);
+           // SendGui((ushort)Gui_Entry.MOTD);
 
             LoadFromDB();
             if (guid == 0)
@@ -89,7 +88,7 @@ namespace Drive_LFSS.Game_
 
             base.Init(_packet);
 
-            laps.Enqueue(new Lap());
+            laps.Add(new Lap());
 
             if (IsBot())
                 return;
@@ -106,67 +105,84 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessLapInformation(PacketLAP _packet)
         {
-            laps.Peek().ProcessPacketLap(_packet,iSession.GetRaceGuid(),CarPrefix,iSession.GetRaceTrackPrefix(),maxSpeedKmh);
+            Lap lap = laps[laps.Count - 1];
+            lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedKmh);
 
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
-            if (pb != null && wr != null)
+            int lapDiff, lapWRDiff;
+            lapDiff = lapWRDiff = 0;
+            if (pb != null)
             {
-                if (pb.LapTime > 0 && laps.Peek().LapTime > 0)
+                if (pb.LapTime > 0 && lap.LapTime > 0)
                 {
-                    int lapDiff = (int)laps.Peek().LapTime - (int)pb.LapTime;
+                    lapDiff = (int)lap.LapTime - (int)pb.LapTime;
                     if (lapDiff < 0) //New PB
                     {
-                        pb.Splits[1] = laps.Peek().SplitTime[1];
-                        pb.Splits[2] = laps.Peek().SplitTime[2];
-                        pb.Splits[3] = laps.Peek().SplitTime[3];
-                        pb.LapTime = laps.Peek().LapTime;
+                        pb.Splits[1] = lap.SplitTime[1];
+                        pb.Splits[2] = lap.SplitTime[2];
+                        pb.Splits[3] = lap.SplitTime[3];
+                        pb.LapTime = lap.LapTime;
                     }
-                    int lapWRDiff = (int)laps.Peek().LapTime - (int)wr.LapTime;
-                    if (lapWRDiff < 0)//A New World Record
-                    {
-                        wr.Splits[1] = laps.Peek().SplitTime[1];
-                        wr.Splits[2] = laps.Peek().SplitTime[2];
-                        wr.Splits[3] = laps.Peek().SplitTime[3];
-                        wr.LapTime = laps.Peek().LapTime;
-                        wr.LicenceName = LicenceName;
-                        ISession.AddMessageMiddleToAll("^2 New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
-                    }
-                    AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
-                    AddMessageMiddle("^2MS ^7" + Math.Round(maxSpeedKmh, 2)+" ^7Kmh", 6000);
-                    
-                    maxSpeedKmh = 0.0d; 
                 }
             }
-            else
+            if (wr != null)
             {
-                
+                lapWRDiff = (int)lap.LapTime - (int)wr.LapTime;
+                if (lapWRDiff < 0)//A New World Record
+                {
+                    wr.Splits[1] = lap.SplitTime[1];
+                    wr.Splits[2] = lap.SplitTime[2];
+                    wr.Splits[3] = lap.SplitTime[3];
+                    wr.LapTime = lap.LapTime;
+                    wr.LicenceName = LicenceName;
+                    ISession.AddMessageMiddleToAll("^2 New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
+                }
             }
-            laps.Enqueue(new Lap());
+
+            if (pb != null && wr != null)
+            {
+                AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+            }
+            else if (pb != null)
+            {
+                AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+            }
+            AddMessageMiddle("^2MS ^7" + Math.Round(maxSpeedKmh, 2) + " ^7Kmh", 6000);
+            maxSpeedKmh = 0.0d; 
+
+            laps.Add(new Lap());
         }
         public void ProcessSplitInformation(PacketSPX _packet)
         {
             //Internal Lap
-            laps.Peek().ProcessPacketSplit(_packet);
+            Lap lap = laps[laps.Count -1];
+            lap.ProcessPacketSplit(_packet);
             
             //PubStats
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix+iSession.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
-            if (pb != null && wr != null)
+            int splitDiff, splitWRDiff;
+            splitDiff = splitWRDiff = 0;
+            if (pb != null)
             {
-                if (pb.Splits[_packet.splitNode] > 0 && laps.Peek().SplitTime[_packet.splitNode] > 0)
-                {
-                    int splitDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode];
-                    int splitWRDiff = (int)laps.Peek().SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode];
-
-                    AddMessageTop("^2PB " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
-                }
+                if (pb.Splits[_packet.splitNode] > 0 && lap.SplitTime[_packet.splitNode] > 0)
+                    splitDiff = (int)lap.SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode];
             }
+
+            if (wr != null && pb != null)
+            {
+                splitWRDiff = (int)lap.SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode];
+                AddMessageMiddle("^2Split " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+            }
+            else if(pb != null)
+                AddMessageMiddle("^2Split " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) , 4500);
         }
         public void ProcessRaceStart()
         {
             wr = Program.pubStats.GetWR("");
-            laps.Enqueue(new Lap());
+            laps.Add(new Lap());
+            maxSpeedKmh = 0.0d;
         }
         public void ProcessRaceEnd()
         {
@@ -180,7 +196,7 @@ namespace Drive_LFSS.Game_
         private ISession iSession;
         private uint guid = 0;
         private uint configMask = 0;
-        private Queue<Lap> laps = new Queue<Lap>();
+        private List<Lap> laps = new List<Lap>();
         public PB pb = null;
         public WR wr = null;
 
@@ -339,32 +355,42 @@ namespace Drive_LFSS.Game_
 
         new public void update(uint diff) 
         {
-            if (!IsBot())
+            driverSaveInterval += diff;
+            if (SAVE_INTERVAL < driverSaveInterval  ) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
             {
-                if ((driverSaveInterval += diff) >= SAVE_INTERVAL) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
+                if (!IsBot())
                 {
                     Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
                     SaveToDB();
-                    if (laps.Count > 0){lock (laps)
+
+                    if (laps.Count > 0)
                     {
-                        Lap currentLap = laps.Peek();
-                        Lap lap;
-                        while (laps.Count > 0)
+                        lock (laps)
                         {
-                            lap = laps.Dequeue();
-                            if (lap.LapTime < 1)
-                                continue;
-                            SaveLapsToDB(lap);
-                            Log.database(iSession.GetSessionNameForLog() + "Lap For DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved To Database.\r\n");
+                            Lap currentLap = laps[laps.Count - 1];
+                            List<Lap>.Enumerator itr = laps.GetEnumerator();
+                            while (itr.MoveNext())
+                            {
+                                Lap lap = itr.Current;
+                                if (lap.LapTime < 1)
+                                    continue;
+                                SaveLapsToDB(lap);
+                                Log.database(iSession.GetSessionNameForLog() + "Lap For DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved To Database.\r\n");
+                            }
+                            laps.Clear();
+                            if (currentLap.LapTime < 1)
+                                laps.Add(currentLap);
+                            else
+                                laps.Add(new Lap());
                         }
-                        if (currentLap.LapTime < 1)
-                            laps.Enqueue(currentLap);
-                        else
-                            laps.Enqueue(new Lap());
-                    }}
+                    }
+                }
+                else //this is Bot Only
+                {
+                    laps.Clear();
+                    laps.Add(new Lap());
                 }
             }
-
             base.update(diff);
         }
 
