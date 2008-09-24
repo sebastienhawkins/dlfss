@@ -78,6 +78,7 @@ namespace Drive_LFSS.Definition_
         VOTE_OPTION_6 = 15,
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
+        MOTD_BUTTON_HELP = 36,
         MOTD_BUTTON_CONFIG = 30,
         TRACK_PREFIX = 16,
         INFO_1 = 17,
@@ -91,6 +92,9 @@ namespace Drive_LFSS.Definition_
         CONFIG_USER_ACC_START = 27,
         CONFIG_USER_ACC_END = 28,
         CONFIG_USER_ACC_CURRENT = 29,
+        HELP_BG = 31,
+        HELP_BUTTON_DRIVE = 34,
+        HELP_BUTTON_CONFIG = 35,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
@@ -108,6 +112,7 @@ namespace Drive_LFSS.Definition_
         NONE = 0,
         MOTD = 1,
         CONFIG_USER = 2,
+        HELP = 3,
     }
     public enum Button_Safe_Coord_Range
     {

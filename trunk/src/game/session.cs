@@ -469,9 +469,10 @@ namespace Drive_LFSS.Session_
                 {
                     driver.RemoveGui((ushort)Gui_Entry.MOTD);
                 } break;
-                case Button_Entry.CONFIG_USER_CLOSE:
+                case Button_Entry.MOTD_BUTTON_HELP:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.CONFIG_USER);
+                    driver.RemoveGui((ushort)Gui_Entry.MOTD);
+                    driver.SendHelpGui();
                 } break;
                 case Button_Entry.MOTD_BUTTON_CONFIG:
                 {
@@ -487,6 +488,19 @@ namespace Drive_LFSS.Session_
 
                     driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_ON, (driver.IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
                 }break;
+                case Button_Entry.CONFIG_USER_CLOSE:
+                {
+                    driver.RemoveGui((ushort)Gui_Entry.CONFIG_USER);
+                } break;
+                case Button_Entry.HELP_BUTTON_CONFIG:
+                {
+                    driver.RemoveGui((ushort)Gui_Entry.HELP);
+                    driver.SendConfigGui();
+                } break;
+                case Button_Entry.HELP_BUTTON_DRIVE:
+                {
+                    driver.RemoveGui((ushort)Gui_Entry.HELP);
+                } break;
                 case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
                 case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;
                 case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.licenceId); break;

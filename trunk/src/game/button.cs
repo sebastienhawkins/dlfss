@@ -384,7 +384,15 @@ namespace Drive_LFSS.Game_
         {
             RemoveGui((ushort)Gui_Entry.CONFIG_USER);
         }
-
+        public void SendHelpGui()
+        {
+            SendGui((ushort)Gui_Entry.HELP);
+        }
+        public void RemoveHelpGui()
+        {
+            RemoveGui((ushort)Gui_Entry.HELP);
+        }
+        
         private byte GetButtonId(ushort buttonEntry)
         {
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)

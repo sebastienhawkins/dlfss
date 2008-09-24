@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/24 17:04:50
+Date:                  2008/09/24 18:35:06
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -36,8 +36,7 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (2, 'motd background', 98, 1, 0, 0, 0, 200, 200, '', ''), 
 (10, 'vote option 1', 106, 0, 0, 2, 73, 45, 6, 'vote option 1', ''), 
 (11, 'vote option 2', 106, 0, 0, 2, 80, 45, 6, 'vote option 2', ''), 
-(3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta', ''), 
-(5, 'motd button', 26, 1, 0, 51, 125, 48, 12, '^2Drive', ''), 
+(3, 'motd upper', 144, 1, 0, 45, 60, 110, 7, '^8Motd ^7A^3leajecta', ''), 
 (6, 'message bar top', 32, 0, 0, 60, 27, 80, 13, '^1Message bar top', ''), 
 (7, 'message bar middle', 32, 0, 0, 60, 50, 80, 13, '^1Message bar Middle', ''), 
 (8, 'Collision Warning', 2, 0, 0, 25, 68, 150, 8, '^1CollisionWarning', ''), 
@@ -61,7 +60,14 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (27, 'config acceleration start', 40, 0, 131, 2, 39, 9, 6, '^2start', '^3Start Kmh Speed ex: 0'), 
 (28, 'config acceleration end', 40, 0, 131, 13, 39, 9, 6, '^2 end ', '^3End Kmh Speed ex: 100'), 
 (29, 'config acceleration current', 32, 0, 0, 2, 46, 20, 6, '^7', ''), 
-(30, 'motd button config', 26, 0, 0, 102, 125, 48, 13, '^3Config', '');
+(30, 'motd button config', 24, 1, 0, 120, 125, 35, 12, '^2Config', ''), 
+(36, 'motd button help', 24, 1, 0, 83, 125, 35, 12, '^2Help', ''), 
+(5, 'motd button drive', 24, 1, 0, 46, 125, 35, 12, '^2Drive', ''), 
+(35, 'help button config', 24, 1, 0, 102, 125, 48, 12, '^2Config', ''), 
+(34, 'help button drive', 24, 1, 0, 51, 125, 48, 12, '^2Drive', ''), 
+(33, 'help text', 96, 1, 0, 50, 67, 100, 6, '^7', ''), 
+(32, 'help upper', 144, 1, 0, 45, 60, 110, 7, '^8Help ^7A^3leajecta', ''), 
+(31, 'help bg', 96, 1, 0, 0, 0, 200, 200, '', '');
 unlock tables ;
 #----------------------------
 # Table structure for car_template
@@ -115,7 +121,7 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver
 #----------------------------
@@ -161,7 +167,7 @@ CREATE TABLE `driver_lap` (
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table driver_lap
 #----------------------------
@@ -185,8 +191,9 @@ CREATE TABLE `gui_template` (
 lock tables gui_template write ;
 
 insert  into gui_template (entry,description,button_entry,text_button_entry,`text`) values 
-(1, 'motd', '2 3 5 30', 4, '^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.'), 
-(2, 'user config', '22 23 24 25 26 27 28 29', 0, '');
+(1, 'motd', '2 3 5 30 36', 4, '^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.'), 
+(2, 'user config', '22 23 24 25 26 27 28 29', 0, ''), 
+(3, 'help', '31 32 33 34 35', 33, '^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7Your ^2Admin.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^5!kick^7, ^5!exit^7, ^5!reload');
 unlock tables ;
 #----------------------------
 # Table structure for race
@@ -207,7 +214,7 @@ CREATE TABLE `race` (
   `weather_status` tinyint(2) unsigned NOT NULL default '0',
   `wind_status` tinyint(2) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 #----------------------------
 # No records for table race
 #----------------------------

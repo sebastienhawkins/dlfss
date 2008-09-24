@@ -152,7 +152,8 @@ namespace Drive_LFSS.Server_
         }
         private void Help(Driver driver, string[] args)
         {
-            driver.AddMessageMiddle("^3Sorry, the help system is still TODO!, try !config",8000);
+            driver.SendHelpGui();
+            //driver.AddMessageMiddle("^3Sorry, the help system is still TODO!, try !config",8000);
         }
         private void Config(Driver driver, string[] args)
         {
