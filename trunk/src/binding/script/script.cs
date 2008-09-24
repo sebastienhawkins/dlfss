@@ -77,7 +77,7 @@ namespace Drive_LFSS.Script_
         public bool CarAccelerationSucess(ICar car, ushort startKmh, ushort endKmh, double finalAccelerationTime)
         {
             ((IButton)car).AddMessageTop(" ^7 " + startKmh + "^2 - ^7" + endKmh + " ^2Km/h In: ^7" + Math.Round(finalAccelerationTime, 3) + " ^2sec.", 4500);
-
+            
            return false;                             //true or false change nothing.
         }
     }

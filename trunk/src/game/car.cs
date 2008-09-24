@@ -141,9 +141,12 @@ namespace Drive_LFSS.Game_
             private long startTime = 0;
             private double startSpeed = 0.9;
             private double endSpeed = 100.0;
+            private bool isOn = true;
 
             internal void Update(CarMotion car)
             {
+                if(!isOn)
+                    return;
                 if (car.GetSpeedKmh() < startSpeed && (!started || startTime != 0))
                     Start();
                 else if (car.GetSpeedKmh() > startSpeed && started && startTime == 0) //About 0Kmh
@@ -180,14 +183,59 @@ namespace Drive_LFSS.Game_
             public double StartSpeed
             {
                 get { return startSpeed; }
-                set { startSpeed = value; }
+                set 
+                { 
+                    startSpeed = value;
+                    End();
+                }
             }
             public double EndSpeed
             {
                 get { return endSpeed; }
-                set { endSpeed = value; }
+                set 
+                { 
+                    endSpeed = value;
+                    End();
+                }
+            }
+            public void SetOnOff(bool on)
+            {
+                isOn = on;
+                End();
+            }
+            public bool IsOn()
+            {
+                return isOn;
             }
         }
+        public bool IsAccelerationOn()
+        {
+            return featureAcceleration.IsOn();
+        }
+        public ushort GetAccelerationStartSpeed()
+        {
+            return (featureAcceleration.StartSpeed < 1.0d ? (ushort)0 : (ushort)featureAcceleration.StartSpeed);
+        }
+        public ushort GetAccelerationEndSpeed()
+        {
+            return (ushort)featureAcceleration.EndSpeed;
+        }
+        public void SetAccelerationStartSpeed(ushort startKmh)
+        {
+            featureAcceleration.StartSpeed = (startKmh > 0 ? (double)startKmh : 0.9d);
+            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_START, startKmh.ToString());
+        }
+        public void SetAccelerationEndSpeed(ushort endKmh)
+        {
+            featureAcceleration.EndSpeed = (double)endKmh;
+            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_STOP, endKmh.ToString());
+        }
+        public void SetAccelerationOn(bool on)
+        {
+            featureAcceleration.SetOnOff(on);
+            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_ON, (on ? "1" : "0"));
+        }
+        
         private sealed class FeatureDriftScore
         {
             private const double MIN_SPEED = 30.0d; //CONFIG, speed lower then this will cancel a drift score and will never trigger a drift start.
@@ -282,14 +330,20 @@ namespace Drive_LFSS.Game_
                 scoreTick = 0;
                 counterCorrection = 0;
                 packetReceive = 0;
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
+                if(((Driver)car).IsAdmin)
+                {
+                    ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
+                    ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
+                }
             }
             private void End(CarMotion car)
             {
                 startTime = 0;
                 started = false;
-                ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
+                if(((Driver)car).IsAdmin)
+                {
+                    ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
+                }
             }
             private void Sucess(CarMotion car)
             {
@@ -300,7 +354,10 @@ namespace Drive_LFSS.Game_
                 End(car);
                 
                 //Debug think
-                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
+                if(((Driver)car).IsAdmin)
+                {
+                    ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
+                }
 
                 if (((Driver)car).ISession.Script.CarDriftScoring((ICar)car, (uint)score))
                     return;
@@ -332,10 +389,13 @@ namespace Drive_LFSS.Game_
                 score = ((scoreAngle + scoreSpeed) * correctionRatio) - ((correctionRatio-1.0d)*40.0d);
 
                 //Only for debug purpose
-                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3"+score);
-                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SA ^7" + scoreAngle);
-                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3SS ^7" + scoreSpeed);
-                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3CR ^7" + correctionRatio);
+                if(((Driver)car).IsAdmin)
+                {
+                    ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3"+score);
+                    ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SA ^7" + scoreAngle);
+                    ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3SS ^7" + scoreSpeed);
+                    ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3CR ^7" + correctionRatio);
+                }
             }
         }
 
@@ -424,22 +484,6 @@ namespace Drive_LFSS.Game_
         public ushort LapCompleted
         {
             get { return lapCompleted; }
-        }
-        public ushort GetAccelerationStartSpeed()
-        {
-            return (ushort)featureAcceleration.StartSpeed;
-        }
-        public ushort GetAccelerationEndSpeed()
-        {
-            return (ushort)featureAcceleration.EndSpeed;
-        }
-        public void SetAccelerationStartSpeed(ushort startKmh)
-        {
-            featureAcceleration.StartSpeed = (startKmh > 0 ? (double)startKmh : 0.9d);
-        }
-        public void SetAccelerationEndSpeed(ushort endKmh)
-        {
-            featureAcceleration.EndSpeed = (double)endKmh;
         }
 
         public ushort GetNode()

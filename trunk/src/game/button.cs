@@ -378,6 +378,7 @@ namespace Drive_LFSS.Game_
         {
             SendGui((ushort)Gui_Entry.CONFIG_USER);
             SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + ((Car)this).GetAccelerationStartSpeed() + "^2-^7" + ((Car)this).GetAccelerationEndSpeed() + " ^2Kmh");
+            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_ON, (((Car)this).IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
         }
         public void RemoveConfigGui()
         {

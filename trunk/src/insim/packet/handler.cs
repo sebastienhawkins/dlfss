@@ -83,7 +83,7 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketCNL _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " CNL_ClientLeavesHost, CNL -> UCID= " + _packet.tempLicenceId + ", Reason=" + _packet.Reason + ", Total=" + _packet.Total + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " CNL_ClientLeavesHost, CNL -> UCID= " + _packet.tempLicenceId + ", Reason=" + _packet.quitReason + ", Total=" + _packet.total + "\r\n");
         }
         protected virtual void processPacket(PacketCPR _packet)
         {
@@ -171,7 +171,7 @@ namespace Drive_LFSS.Packet_
         // A player changed his camera
         protected virtual void processPacket(PacketCCH _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " CCH_CameraChanged(), CCH -> PLID=" + _packet.PLID + ", Camera=" + _packet.Camera + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " CCH_CameraChanged(), CCH -> PLID=" + _packet.carId + ", Camera=" + _packet.camera + "\r\n");
         }
         // The server/race state changed
         protected virtual void processPacket(PacketSTA _packet)

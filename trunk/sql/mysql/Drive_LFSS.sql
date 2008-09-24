@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/23 17:50:33
+Date:                  2008/09/24 17:04:50
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -22,6 +22,7 @@ CREATE TABLE `button_template` (
   `width` tinyint(3) unsigned NOT NULL default '0',
   `height` tinyint(3) unsigned NOT NULL default '0',
   `text` varchar(240) NOT NULL default '',
+  `caption_text` varchar(240) NOT NULL default '',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #----------------------------
@@ -30,28 +31,37 @@ CREATE TABLE `button_template` (
 
 lock tables button_template write ;
 
-insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`) values 
-(1, 'banner', 66, 1, 0, 35, 194, 20, 7, '^7A^3leajecta'), 
-(2, 'motd background', 98, 1, 0, 0, 0, 200, 200, ''), 
-(10, 'vote option 1', 106, 0, 0, 2, 73, 45, 6, 'vote option 1'), 
-(11, 'vote option 2', 106, 0, 0, 2, 80, 45, 6, 'vote option 2'), 
-(3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta'), 
-(5, 'motd button', 26, 1, 0, 75, 125, 50, 12, '^2Drive'), 
-(6, 'message bar top', 32, 0, 0, 60, 27, 80, 13, '^1Message bar top'), 
-(7, 'message bar middle', 32, 0, 0, 60, 50, 80, 13, '^1Message bar Middle'), 
-(8, 'Collision Warning', 2, 0, 0, 25, 68, 150, 8, '^1CollisionWarning'), 
-(9, 'vote title', 146, 0, 0, 2, 65, 50, 8, 'vote title'), 
-(4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, ''), 
-(12, 'vote option 3', 106, 0, 0, 2, 87, 45, 6, 'vote option 3'), 
-(13, 'vote option 4', 106, 0, 0, 2, 94, 45, 6, 'vote option 4'), 
-(14, 'vote option 5', 106, 0, 0, 2, 101, 45, 6, 'vote option 5'), 
-(15, 'vote option 6', 106, 0, 0, 2, 108, 45, 6, 'vote option 6'), 
-(16, 'track prefix', 66, 1, 0, 56, 194, 10, 7, '^8'), 
-(17, 'info 1', 106, 0, 0, 180, 85, 20, 5, 'info 1'), 
-(18, 'info 2', 85, 0, 0, 180, 91, 20, 5, 'info 2'), 
-(19, 'info 3', 87, 0, 0, 180, 97, 20, 5, 'info 3'), 
-(20, 'info 4', 86, 0, 0, 180, 103, 20, 5, 'info 4'), 
-(21, 'info 5', 84, 0, 0, 180, 109, 20, 5, 'info 5');
+insert  into button_template (entry,description,style_mask,is_allways_visible,max_input_char,`left`,top,width,height,`text`,caption_text) values 
+(1, 'banner', 66, 1, 0, 35, 194, 20, 7, '^7A^3leajecta', ''), 
+(2, 'motd background', 98, 1, 0, 0, 0, 200, 200, '', ''), 
+(10, 'vote option 1', 106, 0, 0, 2, 73, 45, 6, 'vote option 1', ''), 
+(11, 'vote option 2', 106, 0, 0, 2, 80, 45, 6, 'vote option 2', ''), 
+(3, 'motd upper', 146, 1, 0, 45, 60, 110, 7, '^7A^3leajecta', ''), 
+(5, 'motd button', 26, 1, 0, 51, 125, 48, 12, '^2Drive', ''), 
+(6, 'message bar top', 32, 0, 0, 60, 27, 80, 13, '^1Message bar top', ''), 
+(7, 'message bar middle', 32, 0, 0, 60, 50, 80, 13, '^1Message bar Middle', ''), 
+(8, 'Collision Warning', 2, 0, 0, 25, 68, 150, 8, '^1CollisionWarning', ''), 
+(9, 'vote title', 146, 0, 0, 2, 65, 50, 8, 'vote title', ''), 
+(4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, '', ''), 
+(12, 'vote option 3', 106, 0, 0, 2, 87, 45, 6, 'vote option 3', ''), 
+(13, 'vote option 4', 106, 0, 0, 2, 94, 45, 6, 'vote option 4', ''), 
+(14, 'vote option 5', 106, 0, 0, 2, 101, 45, 6, 'vote option 5', ''), 
+(15, 'vote option 6', 106, 0, 0, 2, 108, 45, 6, 'vote option 6', ''), 
+(16, 'track prefix', 66, 1, 0, 56, 194, 10, 7, '^8', ''), 
+(17, 'info 1', 106, 0, 0, 180, 85, 20, 5, 'info 1', ''), 
+(18, 'info 2', 85, 0, 0, 180, 91, 20, 5, 'info 2', ''), 
+(19, 'info 3', 87, 0, 0, 180, 97, 20, 5, 'info 3', ''), 
+(20, 'info 4', 86, 0, 0, 180, 103, 20, 5, 'info 4', ''), 
+(21, 'info 5', 84, 0, 0, 180, 109, 20, 5, 'info 5', ''), 
+(22, 'config bg', 32, 0, 0, 0, 0, 200, 200, '', ''), 
+(23, 'config title', 40, 0, 0, 75, 1, 50, 13, '^3User Config', ''), 
+(24, 'config button close', 0, 0, 0, 115, 8, 8, 5, '^2 Close', ''), 
+(25, 'config acceleration bg', 32, 0, 0, 1, 30, 22, 24, '', ''), 
+(26, 'config acceleration title', 8, 0, 0, 2, 31, 20, 7, '^7Acceleration', ''), 
+(27, 'config acceleration start', 40, 0, 131, 2, 39, 9, 6, '^2start', '^3Start Kmh Speed ex: 0'), 
+(28, 'config acceleration end', 40, 0, 131, 13, 39, 9, 6, '^2 end ', '^3End Kmh Speed ex: 100'), 
+(29, 'config acceleration current', 32, 0, 0, 2, 46, 20, 6, '^7', ''), 
+(30, 'motd button config', 26, 0, 0, 102, 125, 48, 13, '^3Config', '');
 unlock tables ;
 #----------------------------
 # Table structure for car_template
@@ -101,7 +111,7 @@ CREATE TABLE `driver` (
   `guid` int(11) unsigned NOT NULL auto_increment,
   `licence_name` varchar(24) NOT NULL,
   `driver_name` varchar(24) NOT NULL,
-  `config_mask` smallint(5) unsigned NOT NULL default '0',
+  `config_data` blob,
   `last_connection_time` bigint(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
@@ -175,7 +185,8 @@ CREATE TABLE `gui_template` (
 lock tables gui_template write ;
 
 insert  into gui_template (entry,description,button_entry,text_button_entry,`text`) values 
-(1, 'motd', '2 3 5', 4, '^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.');
+(1, 'motd', '2 3 5 30', 4, '^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.'), 
+(2, 'user config', '22 23 24 25 26 27 28 29', 0, '');
 unlock tables ;
 #----------------------------
 # Table structure for race

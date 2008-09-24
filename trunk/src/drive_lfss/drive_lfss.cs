@@ -247,8 +247,8 @@ namespace Drive_LFSS
         public static void Reload(string what)
         {
             Log.command("Start Reloading of " + what + ".\r\n");
-            switch (what)
-            {
+            lock(dlfssDatabase)
+            {switch (what){
                 case "all":
                     {
                         Program.trackTemplate.Load(true);
@@ -331,7 +331,7 @@ namespace Drive_LFSS
                         SessionList.ConfigApply();
                         Log.normal("Complete Servers Config.\r\n\r\n");
                     } break;
-            }
+            } }
             Log.command("End Reloading of " + what + ".\r\n");
         }
         public static void Exit()

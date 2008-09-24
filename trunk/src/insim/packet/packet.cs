@@ -198,23 +198,23 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public byte PLID;
-        public Licence_Camera_Mode Camera;
-        internal byte Sp1;
-        internal byte Sp2;
-        internal byte Sp3;
+        public byte requestId;
+        public byte carId;
+        public Licence_Camera_Mode camera;
+        internal byte spare1;
+        internal byte spare2;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCNL
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
+        public byte requestId;
         public byte tempLicenceId;
-        public Leave_Reason Reason;
-        public byte Total;
-        internal byte Sp2;
-        internal byte Sp3;
+        public Leave_Reason quitReason;
+        public byte total;
+        internal byte spare2;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCPP
     {

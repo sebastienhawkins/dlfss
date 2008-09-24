@@ -261,7 +261,10 @@ namespace Drive_LFSS.Session_
             //Im not sure i love this design, since Mutex refresh time.
             byte itr;
             while ((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)
+            {
+                driverList[itr].ProcessCNLPacket(_packet);
                 lock (this) {driverList.RemoveAt((int)itr); }
+            }
    
         }      // delete Connection
         protected sealed override void processPacket(PacketNPL _packet)
@@ -458,23 +461,32 @@ namespace Drive_LFSS.Session_
         {
             base.processPacket(_packet);
 
-            byte driverIndex = GetLicenceIndexNoBot(_packet.licenceId);
-            
-            switch((Button_Entry)((Button)driverList[driverIndex]).GetButtonEntry(_packet.buttonId))
+            Driver driver = driverList[GetLicenceIndexNoBot(_packet.licenceId)];
+
+            switch ((Button_Entry)driver.GetButtonEntry(_packet.buttonId))
             {
                 case Button_Entry.MOTD_BUTTON_DRIVE:
                 {
-                    ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
+                    driver.RemoveGui((ushort)Gui_Entry.MOTD);
                 } break;
                 case Button_Entry.CONFIG_USER_CLOSE:
                 {
-                    ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.CONFIG_USER);
+                    driver.RemoveGui((ushort)Gui_Entry.CONFIG_USER);
                 } break;
                 case Button_Entry.MOTD_BUTTON_CONFIG:
                 {
-                    ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
-                    ((Button)driverList[driverIndex]).SendConfigGui();
+                    driver.RemoveGui((ushort)Gui_Entry.MOTD);
+                    driver.SendConfigGui();
                 } break;
+                case Button_Entry.CONFIG_USER_ACC_ON:
+                {
+                    if (driver.IsAccelerationOn())
+                        driver.SetAccelerationOn(false);
+                    else
+                        driver.SetAccelerationOn(true);
+
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_ON, (driver.IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
+                }break;
                 case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
                 case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;
                 case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.licenceId); break;
@@ -483,7 +495,7 @@ namespace Drive_LFSS.Session_
                 case Button_Entry.VOTE_OPTION_6: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.licenceId); break;
                 default:
                 {
-                    Log.error("We received a button ClickId, from unknown source, licenceName: " + driverList[driverIndex].LicenceName + ", LicenceIndex: "+driverIndex+"\r\n");
+                    Log.error("We received a button ClickId, from unknown source, licenceName: " + driver.LicenceName + "\r\n");
                 } break;
             }
         }      // Button Click Receive

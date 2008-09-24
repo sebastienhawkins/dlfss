@@ -20,7 +20,7 @@ namespace Drive_LFSS.Script_
 {
     public interface IDriver
     {
-        bool AdminFlag { get; }
+        bool IsAdmin { get; }
         string DriverName { get; }
         uint GetGuid();
         bool IsBot();

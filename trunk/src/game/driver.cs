@@ -45,7 +45,7 @@ namespace Drive_LFSS.Game_
         }
         new public void Init(PacketNCN _packet)
         {
-            adminFlag = _packet.adminStatus > 0 ? true : false;
+            isAdmin = _packet.adminStatus > 0 ? true : false;
             driverName = _packet.driverName;
             driverTypeMask = _packet.driverTypeMask;
             //_packet.total;// What is Total????
@@ -62,6 +62,10 @@ namespace Drive_LFSS.Game_
                 SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
 
             SendGui((ushort)Gui_Entry.MOTD);
+
+            configData = new string[(int)Config_User.END];
+            for (byte itr = 0; itr < (byte)Config_User.END; itr++)
+                configData[itr] = "0";
 
             LoadFromDB();
             if (guid == 0)
@@ -187,15 +191,23 @@ namespace Drive_LFSS.Game_
         public void ProcessRaceEnd()
         {
         }
+        public void ProcessCNLPacket(PacketCNL _packet) //Disconnect
+        {
+            QuitReason = _packet.quitReason;
+            lock( Program.dlfssDatabase)
+            {
+                SaveToDB();
+            }
+        }
         
-        private bool adminFlag = false;
+        private bool isAdmin = false;
         private string driverName = "";
         private byte driverModel = 0;
         public Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
         private ISession iSession;
         private uint guid = 0;
-        private uint configMask = 0;
+        private string[] configData;
         private List<Lap> laps = new List<Lap>();
         public PB pb = null;
         public WR wr = null;
@@ -314,11 +326,11 @@ namespace Drive_LFSS.Game_
         {
             lock (Program.dlfssDatabase)
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_mask` FROM `driver` WHERE `licence_name`='" + licenceName + "' AND `driver_name`='" + driverName + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`='" + licenceName + "' AND `driver_name`='" + driverName + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
-                    //...
+                    SetConfigData(reader.GetString(1));
                 }
                 reader.Dispose();
             }
@@ -332,7 +344,7 @@ namespace Drive_LFSS.Game_
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_mask`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', " + configMask + ", " + (System.DateTime.Now.Ticks / 10000000) + ")");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', '" + String.Join(" ",configData)+ "', " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
         }
         private bool SetNewGuid()
@@ -352,7 +364,50 @@ namespace Drive_LFSS.Game_
             }
             return returnValue;
         }
+        private void ApplyConfigData()
+        {
+           ushort accStart = GetConfigUint16(Config_User.ACCELERATION_START);
+           ushort accEnd = GetConfigUint16(Config_User.ACCELERATION_STOP);
+           if(accEnd > 10 && accEnd > accStart)
+           {
+                SetAccelerationStartSpeed(accStart);
+                SetAccelerationEndSpeed(accEnd);
+           }
+           if(GetConfigUint16(Config_User.ACCELERATION_ON)>0)
+                SetAccelerationOn(true);
+           else
+                SetAccelerationOn(false);
+        }
+        private void SetConfigData(string configString)
+        {
+            string[] configStrings = configString.Split(new char[]{' '},StringSplitOptions.RemoveEmptyEntries);
+            if(configStrings.Length != (int)Config_User.END)
+            {
+                for(byte itr = 0 ; itr < (byte)Config_User.END;itr++)
+                    configData[itr] = "0";
+                    
+                return;
+            }
+            configStrings.CopyTo(configData,0);
+            ApplyConfigData();
+        }
 
+        public ushort GetConfigUint16(Config_User index)
+        {
+            return  Convert.ToUInt16(configData[(int)index]);
+        }
+        public uint GetConfigUint32(Config_User index)
+        {
+            return Convert.ToUInt32(configData[(int)index]);
+        }
+        public string GetConfigString(Config_User index)
+        {
+            return configData[(int)index];
+        }
+        public void SetConfigValue(Config_User index, string value)
+        {
+            configData[(int)index] = value;
+        }
         new public void update(uint diff) 
         {
             driverSaveInterval += diff;
@@ -410,9 +465,9 @@ namespace Drive_LFSS.Game_
                     new PacketMTC(CarId, message)));
             Log.progress("Sending MTC packet to:"+CarId + ", with Licence: "+LicenceId+"\r\n");
         }
-        public bool AdminFlag
+        public bool IsAdmin
         {
-            get { return adminFlag; }
+            get { return isAdmin; }
             //set { adminFlag = value; }
         }
         public string DriverName

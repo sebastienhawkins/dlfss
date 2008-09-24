@@ -115,12 +115,14 @@ namespace Drive_LFSS.Game_
                      && (-speedDiff / 100.0d * carBrakeValue[carAround[itr].CarPrefix]) > dist 
                      && HasCollisionPath(carAround[itr], car) )
                 {
-                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_1, "^3CD " + (-speedDiff / 100.0d * carBrakeValue[carAround[itr].CarPrefix]));
-                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3D ^7" + dist);
-                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3Z ^7" + GetDistanceZ(car, carAround[itr]));
-                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SD ^7" + -speedDiff);
-                    ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3B ^7" + carBrakeValue[carAround[itr].CarPrefix]);
-
+                    if(((Driver)car).IsAdmin)
+                    {
+                        ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_1, "^3CD " + (-speedDiff / 100.0d * carBrakeValue[carAround[itr].CarPrefix]));
+                        ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3D ^7" + dist);
+                        ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3Z ^7" + GetDistanceZ(car, carAround[itr]));
+                        ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SD ^7" + -speedDiff);
+                        ((IButton)carAround[itr]).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3B ^7" + carBrakeValue[carAround[itr].CarPrefix]);
+                    }
 
                     //Debug
                     if (!carAround[itr].HasCollisionWarning())

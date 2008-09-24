@@ -19,13 +19,20 @@
 using System;
 using System.Runtime.InteropServices;
 namespace Drive_LFSS.Definition_
-{
-     public struct Msg
+{ 
+    public struct Msg
     {
          public const string COLOR_DIFF_LOWER = "^3";
          public const string COLOR_DIFF_EVENT = "^8";
          public const string COLOR_DIFF_HIGHER = "^4";
          public const string COLOR_DIFF_TOP = "^7";
+    }
+    public enum Config_User : byte
+    {
+        ACCELERATION_START=0,
+        ACCELERATION_STOP=1,
+        ACCELERATION_ON=2,
+        END=3,
     }
     [Flags]public enum Race_Template_Flag : byte
     {
@@ -80,6 +87,7 @@ namespace Drive_LFSS.Definition_
         INFO_5 = 21,
         CONFIG_USER_BG = 22,
         CONFIG_USER_CLOSE = 23,
+        CONFIG_USER_ACC_ON = 26,
         CONFIG_USER_ACC_START = 27,
         CONFIG_USER_ACC_END = 28,
         CONFIG_USER_ACC_CURRENT = 29,

@@ -43,7 +43,10 @@ namespace Drive_LFSS.Game_
         protected void Init(PacketNPL _packet)
         {
             if (licenceId != _packet.tempLicenceId)
+            {
+                //Should log this.
                 licenceId = _packet.tempLicenceId;
+            }
 
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
                 licenceName = "AI";
