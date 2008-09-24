@@ -194,6 +194,8 @@ namespace Drive_LFSS.Game_
         public void ProcessCNLPacket(PacketCNL _packet) //Disconnect
         {
             QuitReason = _packet.quitReason;
+            if(IsBot())
+                return;
             lock( Program.dlfssDatabase)
             {
                 SaveToDB();
