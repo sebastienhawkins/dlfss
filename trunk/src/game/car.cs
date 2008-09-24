@@ -139,14 +139,16 @@ namespace Drive_LFSS.Game_
         {
             private bool started = false;
             private long startTime = 0;
+            private double startSpeed = 0.9;
+            private double endSpeed = 100.0;
 
             internal void Update(CarMotion car)
             {
-                if (car.GetSpeedMs() < 0.1 && (!started || startTime != 0))
+                if (car.GetSpeedKmh() < startSpeed && (!started || startTime != 0))
                     Start();
-                else if (car.GetSpeedMs() > 0.1 && started && startTime == 0) //About 0Kmh
+                else if (car.GetSpeedKmh() > startSpeed && started && startTime == 0) //About 0Kmh
                     startTime = DateTime.Now.Ticks;
-                else if (car.GetSpeedMs() > 27.777777d && started) //About 100Kmh
+                else if (car.GetSpeedKmh() > endSpeed && started) //About 100Kmh
                     Sucess(car);
             }
             private void Start()
@@ -161,22 +163,29 @@ namespace Drive_LFSS.Game_
             }
             private void Sucess(CarMotion car)
             {
-                double timeElapsed = ((DateTime.Now.Ticks - startTime) - 5.0d) / 10000000.0d;//5.0d Should be MCI interval /2
-                Log.feature(((IDriver)car).DriverName + ", Done  0-100Km/h In: " + timeElapsed + "sec.\r\n");
+                double timeElapsed = ((DateTime.Now.Ticks - startTime) - 5.0d) / (Program.tickPerMs * 1000.0d);//5.0d Should be MCI interval /2
+                Log.feature(((IDriver)car).DriverName + ", Done  "+(ushort)startSpeed+"-"+(ushort)endSpeed+" Km/h In: " + timeElapsed + "sec.\r\n");
                 End();
 
                 //This must be removed when we find why some Accelariont become pretty fast.
-                if (timeElapsed < 1.0d)
+                if (timeElapsed < 0.3d)
                 {
-                    Log.error(((IDriver)car).DriverName + ", Done  0-100Km/h In: " + timeElapsed + "sec, TOO FAST TOO FAST!\r\n");
+                    Log.error(((IDriver)car).DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + timeElapsed + "sec, TOO FAST TOO FAST!\r\n");
                     return;
                 }
 
-                if (((Driver)car).ISession.Script.CarAccelerationSucess((ICar)car, timeElapsed))
+                if (((Driver)car).ISession.Script.CarAccelerationSucess((ICar)car, (ushort)startSpeed, (ushort)endSpeed, timeElapsed))
                     return;
-
-                //If no Script
-                ((IButton)car).AddMessageTop(" ^70-100Km/h In: ^2" + timeElapsed + " ^7sec.", 5000);
+            }
+            public double StartSpeed
+            {
+                get { return startSpeed; }
+                set { startSpeed = value; }
+            }
+            public double EndSpeed
+            {
+                get { return endSpeed; }
+                set { endSpeed = value; }
             }
         }
         private sealed class FeatureDriftScore
@@ -295,13 +304,11 @@ namespace Drive_LFSS.Game_
 
                 if (((Driver)car).ISession.Script.CarDriftScoring((ICar)car, (uint)score))
                     return;
-                //Too Much annoying ;)
-                //((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
             }
             private void ComputeScore(CarMotion car)
             {
                 //Scoring calculation occur only at all SCORE_TICK_TIME_MS diff.
-                long timeDiff = (DateTime.Now.Ticks - startTime)/10000;
+                long timeDiff = (DateTime.Now.Ticks - startTime)/Program.tickPerMs;
                 if (timeDiff / SCORE_TICK_TIME_MS < scoreTick)
                     return;
 
@@ -417,6 +424,22 @@ namespace Drive_LFSS.Game_
         public ushort LapCompleted
         {
             get { return lapCompleted; }
+        }
+        public ushort GetAccelerationStartSpeed()
+        {
+            return (ushort)featureAcceleration.StartSpeed;
+        }
+        public ushort GetAccelerationEndSpeed()
+        {
+            return (ushort)featureAcceleration.EndSpeed;
+        }
+        public void SetAccelerationStartSpeed(ushort startKmh)
+        {
+            featureAcceleration.StartSpeed = (startKmh > 0 ? (double)startKmh : 0.9d);
+        }
+        public void SetAccelerationEndSpeed(ushort endKmh)
+        {
+            featureAcceleration.EndSpeed = (double)endKmh;
         }
 
         public ushort GetNode()

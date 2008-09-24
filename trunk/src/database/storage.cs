@@ -202,6 +202,7 @@ namespace Drive_LFSS.Storage_
             width = (byte)Convert.ToUInt16(rowInfos[6]);
             height = (byte)Convert.ToUInt16(rowInfos[7]);
             text = (string)rowInfos[8];
+            textCaption = (string)rowInfos[9];
         }
         ~ButtonTemplateInfo()
         {
@@ -220,6 +221,7 @@ namespace Drive_LFSS.Storage_
         private byte width;
         private byte height;
         private string text;
+        private string textCaption;
 
         public ushort Entry
         {
@@ -265,6 +267,11 @@ namespace Drive_LFSS.Storage_
             get { return text; }
             set { text = value; }
         }
+        public string TextCaption
+        {
+            get { return textCaption; }
+        }
+
     }
 
     public sealed class GuiTemplate : Storage

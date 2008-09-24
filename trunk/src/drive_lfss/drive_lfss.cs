@@ -37,6 +37,7 @@ namespace Drive_LFSS
     public sealed class Program
     {
         public static int sleep = 50; // Speed of Operation
+        public static long tickPerMs = TimeSpan.TicksPerMillisecond;
 
         /*[DllImport("Kernel32")]
         public static extern bool SetConsoleCtrlHandler(HandlerRoutine handler, bool add);
@@ -53,7 +54,7 @@ namespace Drive_LFSS
         public static IDatabase dlfssDatabase = null;
 
         //Storage, All Storage FMT need a 'p' value, this is representing is Unique Index into the Array, the value must be a uint32
-        public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "pxuuuuuuus" });
+        public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "pxuuuuuuuss" });
         public static readonly GuiTemplate guiTemplate = new GuiTemplate(new string[2] { "gui_template", "pxsus" });
         public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "psssuuuuu" });
         public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssuu" });
@@ -183,8 +184,8 @@ namespace Drive_LFSS
             uint TimerLogFlush = 0;
             while (MainRun)
             {
-                //Timer Thing
-                diff = (uint)(DateTime.Now.Ticks - ticks) / 10000; //Diff in MS
+                //Timer Thing, Really have to test .net fastest solution.
+                diff = (uint)((DateTime.Now.Ticks - ticks) / tickPerMs); //Diff in MS
                 ticks = DateTime.Now.Ticks;
 
                 TimerLogFlush += diff;

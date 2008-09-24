@@ -24,7 +24,7 @@ namespace Drive_LFSS.Script_
         void AddMessageMiddle(string text, uint duration);
         void AddTimedButton(ushort buttonEntry, uint time);
         void SendButton(ushort buttonEntry);
-        void SendButton(byte buttonId, ushort buttonEntry, byte styleMask,  bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text);
+        void SendButton(byte buttonId, ushort buttonEntry, byte styleMask,  bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text, string textCaption);
         void SendUpdateButton(ushort buttonEntry, string text);
         byte RemoveButton(ushort buttonEntry);
         void SendGui(ushort guiEntry);

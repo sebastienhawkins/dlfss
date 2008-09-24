@@ -82,7 +82,7 @@ namespace Drive_LFSS.Session_
             }
             public long Received()
             {
-                return (sessionLatency = (DateTime.Now.Ticks - pingTime) / 10000);
+                return (sessionLatency = (DateTime.Now.Ticks - pingTime) / Program.tickPerMs);
             }
             public long SessionLatency
             {
@@ -193,7 +193,7 @@ namespace Drive_LFSS.Session_
             for (byte itr = 1; itr < driverList.Count; ++itr)
                 driverList[itr].update(diff);
             race.update(diff);
-
+            script.update(diff);
 
             //Delete Handle
             //Since im multithreading into processPacket Delete of: Race/Driver Should take place Bellow here.
@@ -331,7 +331,7 @@ namespace Drive_LFSS.Session_
                     continue;
 
                 ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
-                race.ProcessCarInformation(((Car)driverList[carIndex]));
+                race.ProcessCarInformation(((CarMotion)driverList[carIndex]));
             }
         }      // Multiple Car Information
         protected sealed override void processPacket(PacketMSO _packet)
@@ -466,6 +466,15 @@ namespace Drive_LFSS.Session_
                 {
                     ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
                 } break;
+                case Button_Entry.CONFIG_USER_CLOSE:
+                {
+                    ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.CONFIG_USER);
+                } break;
+                case Button_Entry.MOTD_BUTTON_CONFIG:
+                {
+                    ((Button)driverList[driverIndex]).RemoveGui((ushort)Gui_Entry.MOTD);
+                    ((Button)driverList[driverIndex]).SendConfigGui();
+                } break;
                 case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
                 case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;
                 case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.licenceId); break;
@@ -478,6 +487,55 @@ namespace Drive_LFSS.Session_
                 } break;
             }
         }      // Button Click Receive
+        protected sealed override void processPacket(PacketBTT _packet)           // Button Text Receive
+        {
+            base.processPacket(_packet);
+
+            byte driverIndex = GetLicenceIndexNoBot(_packet.licenceId);
+            Car car = driverList[driverIndex];
+            switch((Button_Entry)car.GetButtonEntry(_packet.buttonId))
+            {
+                case Button_Entry.CONFIG_USER_ACC_START:
+                {
+                    ushort startKmh;
+                    try { startKmh = Convert.ToUInt16(_packet.typedText); }
+                    catch (Exception)
+                    {
+                        car.AddMessageMiddle("^1Bad value(^7" + _packet.typedText + "^1) entered for 'Acceleration Start Speed Kmh'.", 7000);
+                        return;
+                    }
+                    if (startKmh > car.GetAccelerationEndSpeed())
+                    {
+                        car.AddMessageMiddle("^1Start Speed(^7" + startKmh + "^1) can NOT be higher then End Speed(^7" + car.GetAccelerationEndSpeed() + "^1)", 7000);
+                        return;
+                    }
+                    car.SetAccelerationStartSpeed(startKmh);
+                    car.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + car.GetAccelerationStartSpeed() + "^2-^7" + car.GetAccelerationEndSpeed() + " ^2Kmh");
+                } break;
+                case Button_Entry.CONFIG_USER_ACC_END:
+                {
+                    ushort endKmh;
+                    try { endKmh = Convert.ToUInt16(_packet.typedText); }
+                    catch (Exception)
+                    {
+                        car.AddMessageMiddle("^1Bad value(^7" + _packet.typedText + "^1) entered for 'Acceleration End Speed Kmh'.", 7000);
+                        return;
+                    }
+                    if (endKmh < car.GetAccelerationStartSpeed())
+                    {
+                        car.AddMessageMiddle("^1End Speed(^7" + endKmh + "^1) can NOT be lower then Start Speed(^7"+car.GetAccelerationStartSpeed()+"^1)", 7000);
+                        return;
+                    }
+                    if (endKmh < 10)
+                    {
+                        car.AddMessageMiddle("^1End Speed(^7" + endKmh + "^1) can NOT be lower then ^710", 7000);
+                        return;
+                    }
+                    car.SetAccelerationEndSpeed(endKmh);
+                    car.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + car.GetAccelerationStartSpeed() + "^2-^7" + car.GetAccelerationEndSpeed() + " ^2Kmh");
+                } break;
+            }
+        }
         protected sealed override void processPacket(PacketBFN _packet)
         {
             base.processPacket(_packet);
@@ -486,7 +544,8 @@ namespace Drive_LFSS.Session_
             {
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
                     driverList[GetLicenceIndexNoBot(_packet.licenceId)].ProcessBFNClearAll(); break;
-                case Button_Function.BUTTON_FUNCTION_REQUEST: break;
+                case Button_Function.BUTTON_FUNCTION_REQUEST:
+                    driverList[GetLicenceIndexNoBot(_packet.licenceId)].ProcessBFNRequest(); break;
             }
         }      //Delete All Button or request Button.
         protected sealed override void processPacket(PacketVTN _packet)

@@ -6,6 +6,7 @@ namespace Drive_LFSS.Game_
         byte CarId { get; }
         string CarPrefix { get; }
         ushort GetNode();
+        byte GetRacePosition();
         double GetOrientationSpeed();
         double GetOrientation();
         double GetTrajectory();

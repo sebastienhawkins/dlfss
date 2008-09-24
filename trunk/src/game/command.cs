@@ -31,6 +31,8 @@ namespace Drive_LFSS.Server_
            command["exit"] = new CommandName(1, new CommandDelegate(Exit));
            command["kick"] = new CommandName(1, new CommandDelegate(Kick));
            command["reload"] = new CommandName(1, new CommandDelegate(Reload));
+           command["help"] = new CommandName(0, new CommandDelegate(Help));
+           command["config"] = new CommandName(0, new CommandDelegate(Config));
         }
         ~CommandInGame()
         {
@@ -147,6 +149,14 @@ namespace Drive_LFSS.Server_
 
                     Log.command("Command.Reload(), User: " + driver.LicenceName + ", reloaded: " + args[1] + "\r\n");
             }
+        }
+        private void Help(Driver driver, string[] args)
+        {
+            driver.AddMessageMiddle("^3Sorry, the help system is still TODO!, try !config",8000);
+        }
+        private void Config(Driver driver, string[] args)
+        {
+            driver.SendConfigGui();
         }
         #endregion
     }

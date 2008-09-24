@@ -376,7 +376,7 @@ namespace Drive_LFSS.PubStats_
             long ticks = DateTime.Now.Ticks;
             while (Program.MainRun)
             {
-                diff = (uint)(DateTime.Now.Ticks - ticks) / 10000;
+                diff = (uint)((DateTime.Now.Ticks - ticks) / Program.tickPerMs);
                 ticks = DateTime.Now.Ticks;
 
                 if (!webClient.IsBusy)

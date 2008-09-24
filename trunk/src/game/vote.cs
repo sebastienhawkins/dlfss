@@ -247,7 +247,9 @@ namespace Drive_LFSS.Game_
         }
         public void StartNextTrackVote()
         {
-            iSession.Script.BeforeVoteStart(iSession); //Script Call, Before Start.
+            //Script Call, Before Start.
+            if (iSession.Script.NextTrackVoteStarted(iSession))
+                return;
 
             voteInProgress = true;
             voteCount = 0;
@@ -308,7 +310,7 @@ namespace Drive_LFSS.Game_
             iSession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_5);
             iSession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_6);
 
-            if (iSession.Script.BeforePrepareNextTrack((IVote)this,chosedMap))
+            if (iSession.Script.NextTrackVoteEnded((IVote)this,ref chosedMap))
                 return;
 
             PrepareNextTrack(chosedMap);

@@ -43,6 +43,7 @@ namespace Drive_LFSS.Definition_
     }
     [Flags]public enum Race_Feature_Flag : ushort
     {
+        RACE_FLAG_NONE = 0,
         RACE_FLAG_CAN_VOTE = 1,
         RACE_FLAG_CAN_SELECT_TRACK = 2,
         RACE_FLAG_UNK_1 = 4,
@@ -70,12 +71,18 @@ namespace Drive_LFSS.Definition_
         VOTE_OPTION_6 = 15,
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
+        MOTD_BUTTON_CONFIG = 30,
         TRACK_PREFIX = 16,
         INFO_1 = 17,
         INFO_2 = 18,
         INFO_3 = 19,
         INFO_4 = 20,
         INFO_5 = 21,
+        CONFIG_USER_BG = 22,
+        CONFIG_USER_CLOSE = 23,
+        CONFIG_USER_ACC_START = 27,
+        CONFIG_USER_ACC_END = 28,
+        CONFIG_USER_ACC_CURRENT = 29,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
@@ -92,6 +99,7 @@ namespace Drive_LFSS.Definition_
     {
         NONE = 0,
         MOTD = 1,
+        CONFIG_USER = 2,
     }
     public enum Button_Safe_Coord_Range
     {

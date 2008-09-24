@@ -22,6 +22,7 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Script_;
     using Drive_LFSS.Storage_;
 
+    //Maybe flush this object and pout everything inside Driver, let see after making TOC
     public abstract class Licence : Button, ILicence
 	{
         public Licence() : base()

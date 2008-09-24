@@ -37,7 +37,7 @@ namespace Drive_LFSS.Game_
 	{
         public Race(Session _session): base()
         {
-            session = _session;
+            iSession = _session;
         }
         ~Race()
         {
@@ -68,7 +68,7 @@ namespace Drive_LFSS.Game_
         } //Is the Main RaceSTART Procedure
         public void Init(PacketRST _packet)
         {
-            timeStart = (uint)(System.DateTime.Now.Ticks / 10000);
+            timeStart = (uint)(System.DateTime.Now.Ticks / Program.tickPerMs);
             requestedFinalResult = false;
             finalResultCount = 0;
             finishOrder = "";
@@ -131,12 +131,12 @@ namespace Drive_LFSS.Game_
                 RequestFinalResult();
             }
         }
-        public void ProcessCarInformation(Car car)
+        public void ProcessCarInformation(CarMotion car)
         {
             if (car.GetRacePosition() == 0 || car.GetRacePosition() == 255) //Position is Unknow for that Car.
                 return;
             SetCarPosition(car.CarId, (byte)(car.GetRacePosition() - 1));
-            grid.ProcessCarInformation((CarMotion)car);
+            grid.ProcessCarInformation(car);
         }
         public void ProcessResult(PacketRES _packet)
         {
@@ -161,7 +161,7 @@ namespace Drive_LFSS.Game_
         }
         
         //LFS Insim Defined var
-        private Race_Feature_Flag raceFeatureMask = (Race_Feature_Flag)0;
+        private Race_Feature_Flag raceFeatureMask = Race_Feature_Flag.RACE_FLAG_NONE;
         private ushort nodeFinishIndex = 0;
         private byte connectionCount = 0;
         private byte finishedCount = 0;
@@ -186,7 +186,7 @@ namespace Drive_LFSS.Game_
         private bool hasToBeSavedIntoPPSTA = false;
         private uint guid = 0;
         private uint qualifyRaceGuid = 0;
-        private Session session;
+        private ISession iSession;
         private uint timeStart = 0;
         private byte[] carPosition = new byte[(int)PositionIndex.POSITION_LAST+1]; //index 0, mean nothing and index 193 mean Nothing too.
 
@@ -249,6 +249,9 @@ namespace Drive_LFSS.Game_
             if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 qualifyRaceGuid = guid;
             guid = 0;
+
+            if (iSession.Script.RaceCompleted(gridOrder,finishOrder))
+                return;
         }            //Is The Finish Race Procudure(A Sucess CompletedRace)
 
         private void SetCarPosition(byte _carId, byte _position)
@@ -297,18 +300,18 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `race` WHERE `guid`=" + guid);
             string query = "INSERT INTO `race` (`guid`,`qualify_race_guid`,`track_prefix`,`start_timestamp`,`end_timestamp`,`grid_order`,`finish_order`,`race_laps`,`race_status`,`race_feature`,`qualification_minute`,`weather_status`,`wind_status`)";
-            query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / 10000000) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
+            query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / (Program.tickPerMs*1000)) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
             //Since this is GUID creation, important 1 at time is created.
             Program.dlfssDatabase.ExecuteNonQuery(query);
 
             raceSaveInterval = 0;
             stateHasChange = false;
-            Log.database(session.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps:" + raceLaps + ", saved To Database.\r\n");
+            Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps:" + raceLaps + ", saved To Database.\r\n");
         }
         private void RequestFinalResult()
         {
             requestedFinalResult = true;
-            session.AddToTcpSendingQueud
+            ((Session)iSession).AddToTcpSendingQueud
             (
                 new Packet
                 (

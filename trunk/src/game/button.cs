@@ -53,6 +53,11 @@ namespace Drive_LFSS.Game_
                 SendBanner();
                 SendTrackPrefix();
             }
+            SendConfigGui();
+        }
+        public void ProcessBFNRequest()
+        {
+            SendConfigGui();
         }
         private ushort[] buttonList = new ushort[BUTTON_MAX_COUNT];
 
@@ -322,9 +327,9 @@ namespace Drive_LFSS.Game_
         }
         public void SendButton(byte buttonId, ButtonTemplateInfo buttonInfo)
         {
-            SendButton(buttonId, buttonInfo.Entry, (byte)buttonInfo.StyleMask, buttonInfo.IsAllwaysVisible, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text);
+            SendButton(buttonId, buttonInfo.Entry, (byte)buttonInfo.StyleMask, buttonInfo.IsAllwaysVisible, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text, buttonInfo.TextCaption);
         }
-        public void SendButton(byte buttonId, ushort buttonEntry, byte buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text)
+        public void SendButton(byte buttonId, ushort buttonEntry, byte buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text, string textCaption)
         {
             if (((Driver)this).IsBot())
                 return;
@@ -333,6 +338,11 @@ namespace Drive_LFSS.Game_
             {
                 Log.error("Button System, Button Max Count Reached for Driver:"+((Driver)this).DriverName+", Licence"+((Licence)this).LicenceName+"\r\n");
                 return;
+            }
+
+            if (maxTextLength > 0 && textCaption != "")
+            {
+                text = Char.ConvertFromUtf32(0) + textCaption + Char.ConvertFromUtf32(0) + text;
             }
             ((Session)((Driver)this).ISession).AddToTcpSendingQueud
             (
@@ -363,6 +373,15 @@ namespace Drive_LFSS.Game_
         public void RemoveTrackPrefix()
         {
             RemoveButton((ushort)Button_Entry.TRACK_PREFIX);
+        }
+        public void SendConfigGui()
+        {
+            SendGui((ushort)Gui_Entry.CONFIG_USER);
+            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + ((Car)this).GetAccelerationStartSpeed() + "^2-^7" + ((Car)this).GetAccelerationEndSpeed() + " ^2Kmh");
+        }
+        public void RemoveConfigGui()
+        {
+            RemoveGui((ushort)Gui_Entry.CONFIG_USER);
         }
 
         private byte GetButtonId(ushort buttonEntry)

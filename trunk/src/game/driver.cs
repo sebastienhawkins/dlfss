@@ -58,10 +58,10 @@ namespace Drive_LFSS.Game_
             SendBanner();
             SendTrackPrefix();
             //To make the MODT look on a very Black BG
-           // for (byte itr = 0; ++itr < 5; )
-           //     SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
+            for (byte itr = 0; ++itr < 5; )
+                SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
 
-           // SendGui((ushort)Gui_Entry.MOTD);
+            SendGui((ushort)Gui_Entry.MOTD);
 
             LoadFromDB();
             if (guid == 0)
