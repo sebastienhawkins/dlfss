@@ -350,7 +350,7 @@ namespace Drive_LFSS.Game_
 
             if (maxTextLength > 0 && textCaption != "")
             {
-                text = Char.ConvertFromUtf32(0) + textCaption + Char.ConvertFromUtf32(0) + text;
+                text = ((char)0).ToString() + textCaption + ((char)0).ToString() + text;
             }
             ((Session)((Driver)this).ISession).AddToTcpSendingQueud
             (
