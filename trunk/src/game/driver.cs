@@ -143,15 +143,18 @@ namespace Drive_LFSS.Game_
                     ISession.AddMessageMiddleToAll("^2 New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
                 }
             }
-
-            if (pb != null && wr != null)
+            if(isTimeDiffLap)
             {
-                AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                if (pb != null && wr != null)
+                {
+                    AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                }
+                else if (pb != null)
+                {
+                    AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                }
             }
-            else if (pb != null)
-            {
-                AddMessageTop("^2PB " + PubStats.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
-            }
+            
             AddMessageMiddle("^2MS ^7" + Math.Round(maxSpeedKmh, 2) + " ^7Kmh", 6000);
             maxSpeedKmh = 0.0d; 
 
@@ -174,13 +177,16 @@ namespace Drive_LFSS.Game_
                     splitDiff = (int)lap.SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode];
             }
 
-            if (wr != null && pb != null)
+            if(isTimeDiffSplit)
             {
-                splitWRDiff = (int)lap.SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode];
-                AddMessageMiddle("^2Split " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                if (wr != null && pb != null)
+                {
+                    splitWRDiff = (int)lap.SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode];
+                    AddMessageMiddle("^2Split " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + PubStats.MSToString(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                }
+                else if(pb != null)
+                    AddMessageMiddle("^2Split " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) , 4500);
             }
-            else if(pb != null)
-                AddMessageMiddle("^2Split " + PubStats.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) , 4500);
         }
         public void ProcessRaceStart()
         {
@@ -201,7 +207,9 @@ namespace Drive_LFSS.Game_
                 SaveToDB();
             }
         }
-        
+
+        private bool isTimeDiffLap = true;
+        private bool isTimeDiffSplit = true;
         private bool isAdmin = false;
         private string driverName = "";
         private byte driverModel = 0;
@@ -384,7 +392,16 @@ namespace Drive_LFSS.Game_
                 SetDriftScoreOn(true);
            else
                 SetDriftScoreOn(false);
-           
+
+           if (GetConfigUint16(Config_User.TIMEDIFF_LAP) > 0)
+               IsTimeDiffLap = true;
+           else
+               IsTimeDiffLap = false;
+
+           if (GetConfigUint16(Config_User.TIMEDIFF_SPLIT) > 0)
+               IsTimeDiffSplit = true;
+           else
+               IsTimeDiffSplit = false;
         }
         private void SetConfigData(string configString)
         {
@@ -393,7 +410,13 @@ namespace Drive_LFSS.Game_
             {
                 for(byte itr = 0 ; itr < (byte)Config_User.END;itr++)
                     configData[itr] = "0";
-                    
+
+                configData[(int)Config_User.ACCELERATION_ON] = "1";
+                configData[(int)Config_User.ACCELERATION_START] = "0";
+                configData[(int)Config_User.ACCELERATION_STOP] = "100";
+                configData[(int)Config_User.DRIFT_SCORE_ON] = "1";
+                configData[(int)Config_User.TIMEDIFF_LAP] = "1";
+                configData[(int)Config_User.TIMEDIFF_SPLIT] = "1";
                 return;
             }
             configStrings.CopyTo(configData,0);
@@ -482,6 +505,24 @@ namespace Drive_LFSS.Game_
         {
             get { return driverName; }
            // set { driverName = value; }
+        }
+        public bool IsTimeDiffLap
+        {
+            get { return isTimeDiffLap; }
+            set 
+            { 
+                isTimeDiffLap = value;
+                SetConfigValue(Config_User.TIMEDIFF_LAP, (isTimeDiffLap ? "1" : "0"));
+            }
+        }
+        public bool IsTimeDiffSplit
+        {
+            get { return isTimeDiffSplit; }
+            set 
+            { 
+                isTimeDiffSplit = value;
+                SetConfigValue(Config_User.TIMEDIFF_SPLIT, (isTimeDiffSplit ? "1" : "0"));
+            }
         }
         public uint GetGuid()
         {

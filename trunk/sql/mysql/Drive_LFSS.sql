@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/24 20:50:37
+Date:                  2008/09/25 00:26:25
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -47,11 +47,11 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (14, 'vote option 5', 106, 0, 0, 2, 101, 45, 6, 'vote option 5', ''), 
 (15, 'vote option 6', 106, 0, 0, 2, 108, 45, 6, 'vote option 6', ''), 
 (16, 'track prefix', 66, 1, 0, 56, 194, 10, 7, '^8', ''), 
-(17, 'info 1', 106, 0, 0, 180, 85, 20, 5, 'info 1', ''), 
-(18, 'info 2', 85, 0, 0, 180, 91, 20, 5, 'info 2', ''), 
-(19, 'info 3', 87, 0, 0, 180, 97, 20, 5, 'info 3', ''), 
-(20, 'info 4', 86, 0, 0, 180, 103, 20, 5, 'info 4', ''), 
-(21, 'info 5', 84, 0, 0, 180, 109, 20, 5, 'info 5', ''), 
+(17, 'info 1', 96, 0, 0, 180, 85, 20, 5, 'info 1', ''), 
+(18, 'info 2', 80, 0, 0, 180, 91, 20, 5, 'info 2', ''), 
+(19, 'info 3', 80, 0, 0, 180, 97, 20, 5, 'info 3', ''), 
+(20, 'info 4', 80, 0, 0, 180, 103, 20, 5, 'info 4', ''), 
+(21, 'info 5', 80, 0, 0, 180, 109, 20, 5, 'info 5', ''), 
 (22, 'config bg', 32, 0, 0, 0, 0, 200, 200, '', ''), 
 (23, 'config title and close', 40, 0, 0, 75, 0, 50, 13, '^3User Config', ''), 
 (24, 'config text close', 0, 0, 0, 115, 8, 8, 5, '^2 Close', ''), 
@@ -60,17 +60,21 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (27, 'config acceleration start', 40, 0, 131, 2, 39, 9, 6, '^2start', '^3Start Kmh Speed ex: 0'), 
 (28, 'config acceleration end', 40, 0, 131, 13, 39, 9, 6, '^2 end ', '^3End Kmh Speed ex: 100'), 
 (29, 'config acceleration current', 32, 0, 0, 2, 46, 20, 6, '^7', ''), 
-(30, 'motd button config', 24, 1, 0, 120, 125, 35, 12, '^2Config', ''), 
-(36, 'motd button help', 24, 1, 0, 83, 125, 35, 12, '^2Help', ''), 
-(5, 'motd button drive', 24, 1, 0, 46, 125, 35, 12, '^2Drive', ''), 
-(35, 'help button config', 24, 1, 0, 102, 125, 48, 12, '^2Config', ''), 
-(34, 'help button drive', 24, 1, 0, 51, 125, 48, 12, '^2Drive', ''), 
+(30, 'motd button config', 24, 1, 0, 120, 146, 35, 12, '^2Config', ''), 
+(36, 'motd button help', 24, 1, 0, 83, 146, 35, 12, '^2Help', ''), 
+(5, 'motd button drive', 24, 1, 0, 46, 146, 35, 12, '^2Drive', ''), 
+(35, 'help button config', 24, 1, 0, 102, 146, 48, 12, '^2Config', ''), 
+(34, 'help button drive', 24, 1, 0, 51, 146, 48, 12, '^2Drive', ''), 
 (33, 'help text', 96, 1, 0, 50, 67, 100, 6, '^7', ''), 
 (32, 'help upper', 144, 1, 0, 45, 60, 110, 7, '^8Help ^7A^3leajecta', ''), 
 (31, 'help bg', 96, 1, 0, 0, 0, 200, 200, '', ''), 
-(39, 'config help text', 32, 0, 0, 100, 150, 75, 7, '', ''), 
+(39, 'config help text', 32, 0, 0, 70, 120, 75, 7, '', ''), 
 (38, 'config drift title', 8, 0, 0, 26, 31, 20, 7, '^7Drift Score', ''), 
-(37, 'config drift bg', 32, 0, 0, 25, 30, 22, 24, '', '');
+(37, 'config drift bg', 32, 0, 0, 25, 30, 22, 24, '', ''), 
+(43, 'config timediff pb->split', 8, 0, 0, 50, 46, 20, 6, '^7PB vs Split', ''), 
+(42, 'config timediff pb->lap', 8, 0, 0, 50, 39, 20, 6, '^7PB vs Lap', ''), 
+(40, 'config timediff bg', 32, 0, 0, 49, 30, 22, 24, '', ''), 
+(41, 'config timediff title', 8, 0, 0, 50, 31, 20, 7, '^7Time Diff', '');
 unlock tables ;
 #----------------------------
 # Table structure for car_template
@@ -195,8 +199,8 @@ lock tables gui_template write ;
 
 insert  into gui_template (entry,description,button_entry,text_button_entry,`text`) values 
 (1, 'motd', '2 3 5 30 36', 4, '^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.'), 
-(2, 'user config', '22 23 24 25 26 27 28 29 37 38', 39, '^8Config Help\r\n^7Title ^3 will enable or disable the feature\r\n^3Green ^2button ^3will trigger a action for this feature.'), 
-(3, 'help', '31 32 33 34 35', 33, '^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7Your ^2Admin.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^5!kick^7, ^5!exit^7, ^5!reload');
+(2, 'user config', '22 23 24 25 26 27 28 29 37 38 40 41 42 43', 39, '^8Config Help\r\n^7Title ^3 will enable or disable the feature\r\n^3Green ^2button ^3will trigger a action for this feature.'), 
+(3, 'help', '31 32 33 34 35', 33, '^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^5!kick^7, ^5!exit^7, ^5!reload\r\n^7\r\n^7Did you know \"SHIFT-i\" will reset button and make Config screen appear.\r\n^7\r\n^5Greenseed^7.');
 unlock tables ;
 #----------------------------
 # Table structure for race

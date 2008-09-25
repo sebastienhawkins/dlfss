@@ -128,6 +128,7 @@ namespace Drive_LFSS.PubStats_
         {
             threadRequest = new Thread(new ThreadStart(ExecRequest));
             threadRequest.Name = "PubStats Request";
+            webClient.CachePolicy.Level = System.Net.Cache.RequestCacheLevel.NoCacheNoStore;
         }
         ~PubStats()
         {

@@ -29,11 +29,13 @@ namespace Drive_LFSS.Definition_
     }
     public enum Config_User : byte
     {
-        ACCELERATION_START=0,
-        ACCELERATION_STOP=1,
-        ACCELERATION_ON=2,
-        DRIFT_SCORE_ON=3,
-        END=4,
+        ACCELERATION_START = 0,
+        ACCELERATION_STOP = 1,
+        ACCELERATION_ON = 2,
+        DRIFT_SCORE_ON = 3,
+        TIMEDIFF_LAP = 4,
+        TIMEDIFF_SPLIT = 5,
+        END = 6,
     }
     [Flags]public enum Race_Template_Flag : byte
     {
@@ -94,6 +96,9 @@ namespace Drive_LFSS.Definition_
         CONFIG_USER_ACC_END = 28,
         CONFIG_USER_ACC_CURRENT = 29,
         CONFIG_USER_DRIFT_ON = 38,
+        CONFIG_USER_TIMEDIFF_ALL= 41,
+        CONFIG_USER_TIMEDIFF_LAP = 42,
+        CONFIG_USER_TIMEDIFF_SPLIT = 43,
         HELP_BG = 31,
         HELP_BUTTON_DRIVE = 34,
         HELP_BUTTON_CONFIG = 35,

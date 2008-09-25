@@ -53,6 +53,7 @@ namespace Drive_LFSS.Game_
                 SendBanner();
                 SendTrackPrefix();
             }
+            currentGui = 0;
             SendConfigGui();
         }
         public void ProcessBFNRequest()
@@ -115,7 +116,8 @@ namespace Drive_LFSS.Game_
         }
         private Queue<ButtonMessage> buttonMessageTop = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
         private Queue<ButtonMessage> buttonMessageMiddle = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
-
+        private ushort currentGui = (ushort)0;
+        
         protected virtual void update(uint diff)
         {
             if (buttonTimedList.Count > 0)
@@ -183,7 +185,12 @@ namespace Drive_LFSS.Game_
         {
             if (((Driver)this).IsBot())
                 return;
+            if (guiInfo.Entry == currentGui)
+                return;
 
+            if(currentGui > 0)
+                RemoveGui(currentGui);
+            
             string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
             ButtonTemplateInfo buttonInfo;
             
@@ -209,6 +216,7 @@ namespace Drive_LFSS.Game_
                     SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
                 }
             }
+            currentGui = guiInfo.Entry;
         }
         public void RemoveGui(ushort guiEntry)
         {
@@ -229,7 +237,7 @@ namespace Drive_LFSS.Game_
             {
                 RemoveButton(guiInfo.TextButtonEntry);
             }
-
+            currentGui = (ushort)0;
         }
         public byte RemoveButton(ushort buttonEntry)
         {
@@ -377,9 +385,14 @@ namespace Drive_LFSS.Game_
         public void SendConfigGui()
         {
             SendGui((ushort)Gui_Entry.CONFIG_USER);
+            
             SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + ((Car)this).GetAccelerationStartSpeed() + "^2-^7" + ((Car)this).GetAccelerationEndSpeed() + " ^2Kmh");
             SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_ON, (((Car)this).IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
             SendUpdateButton((ushort)Button_Entry.CONFIG_USER_DRIFT_ON, (((Car)this).IsDriftScoreOn() ? "^7" : "^8") + " Drift Score");
+
+            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((((Driver)this).IsTimeDiffSplit && ((Driver)this).IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
+            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (((Driver)this).IsTimeDiffLap ? "^7" : "^8") + " PB vs lap");
+            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (((Driver)this).IsTimeDiffSplit ? "^7" : "^8") + " PB vs Split");
         }
         public void RemoveConfigGui()
         {

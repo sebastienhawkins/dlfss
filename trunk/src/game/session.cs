@@ -497,6 +497,42 @@ namespace Drive_LFSS.Session_
 
                     driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_DRIFT_ON, (driver.IsDriftScoreOn() ? "^7" : "^8") + " Drift Score");
                 } break;
+                case Button_Entry.CONFIG_USER_TIMEDIFF_ALL:
+                {
+                    if (driver.IsTimeDiffLap)
+                    {
+                        driver.IsTimeDiffLap = false;
+                        driver.IsTimeDiffSplit = false;
+                    }
+                    else
+                    {
+                        driver.IsTimeDiffLap = true;
+                        driver.IsTimeDiffSplit = true;
+                    }
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplit && driver.IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (driver.IsTimeDiffLap ? "^7" : "^8") + " PB vs lap");
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (driver.IsTimeDiffSplit ? "^7" : "^8") + " PB vs Split");
+                } break;
+                case Button_Entry.CONFIG_USER_TIMEDIFF_LAP:
+                {
+                    if (driver.IsTimeDiffLap)
+                        driver.IsTimeDiffLap = false;
+                    else
+                        driver.IsTimeDiffLap = true;
+
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplit && driver.IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (driver.IsTimeDiffLap ? "^7" : "^8") + " PB vs lap");
+                } break;
+                case Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT:
+                {
+                    if (driver.IsTimeDiffSplit)
+                        driver.IsTimeDiffSplit = false;
+                    else
+                        driver.IsTimeDiffSplit = true;
+
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplit && driver.IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (driver.IsTimeDiffSplit ? "^7" : "^8") + " PB vs Split");
+                } break;
                 case Button_Entry.CONFIG_USER_CLOSE:
                 {
                     driver.RemoveGui((ushort)Gui_Entry.CONFIG_USER);
