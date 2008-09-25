@@ -488,10 +488,20 @@ namespace Drive_LFSS.Session_
 
                     driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_ON, (driver.IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
                 }break;
+                case Button_Entry.CONFIG_USER_DRIFT_ON:
+                {
+                    if (driver.IsDriftScoreOn())
+                        driver.SetDriftScoreOn(false);
+                    else
+                        driver.SetDriftScoreOn(true);
+
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_DRIFT_ON, (driver.IsDriftScoreOn() ? "^7" : "^8") + " Drift Score");
+                } break;
                 case Button_Entry.CONFIG_USER_CLOSE:
                 {
                     driver.RemoveGui((ushort)Gui_Entry.CONFIG_USER);
                 } break;
+                
                 case Button_Entry.HELP_BUTTON_CONFIG:
                 {
                     driver.RemoveGui((ushort)Gui_Entry.HELP);

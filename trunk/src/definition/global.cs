@@ -32,7 +32,8 @@ namespace Drive_LFSS.Definition_
         ACCELERATION_START=0,
         ACCELERATION_STOP=1,
         ACCELERATION_ON=2,
-        END=3,
+        DRIFT_SCORE_ON=3,
+        END=4,
     }
     [Flags]public enum Race_Template_Flag : byte
     {
@@ -92,6 +93,7 @@ namespace Drive_LFSS.Definition_
         CONFIG_USER_ACC_START = 27,
         CONFIG_USER_ACC_END = 28,
         CONFIG_USER_ACC_CURRENT = 29,
+        CONFIG_USER_DRIFT_ON = 38,
         HELP_BG = 31,
         HELP_BUTTON_DRIVE = 34,
         HELP_BUTTON_CONFIG = 35,

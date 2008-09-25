@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/24 18:35:06
+Date:                  2008/09/24 20:50:37
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -53,8 +53,8 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (20, 'info 4', 86, 0, 0, 180, 103, 20, 5, 'info 4', ''), 
 (21, 'info 5', 84, 0, 0, 180, 109, 20, 5, 'info 5', ''), 
 (22, 'config bg', 32, 0, 0, 0, 0, 200, 200, '', ''), 
-(23, 'config title', 40, 0, 0, 75, 1, 50, 13, '^3User Config', ''), 
-(24, 'config button close', 0, 0, 0, 115, 8, 8, 5, '^2 Close', ''), 
+(23, 'config title and close', 40, 0, 0, 75, 0, 50, 13, '^3User Config', ''), 
+(24, 'config text close', 0, 0, 0, 115, 8, 8, 5, '^2 Close', ''), 
 (25, 'config acceleration bg', 32, 0, 0, 1, 30, 22, 24, '', ''), 
 (26, 'config acceleration title', 8, 0, 0, 2, 31, 20, 7, '^7Acceleration', ''), 
 (27, 'config acceleration start', 40, 0, 131, 2, 39, 9, 6, '^2start', '^3Start Kmh Speed ex: 0'), 
@@ -67,7 +67,10 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (34, 'help button drive', 24, 1, 0, 51, 125, 48, 12, '^2Drive', ''), 
 (33, 'help text', 96, 1, 0, 50, 67, 100, 6, '^7', ''), 
 (32, 'help upper', 144, 1, 0, 45, 60, 110, 7, '^8Help ^7A^3leajecta', ''), 
-(31, 'help bg', 96, 1, 0, 0, 0, 200, 200, '', '');
+(31, 'help bg', 96, 1, 0, 0, 0, 200, 200, '', ''), 
+(39, 'config help text', 32, 0, 0, 100, 150, 75, 7, '', ''), 
+(38, 'config drift title', 8, 0, 0, 26, 31, 20, 7, '^7Drift Score', ''), 
+(37, 'config drift bg', 32, 0, 0, 25, 30, 22, 24, '', '');
 unlock tables ;
 #----------------------------
 # Table structure for car_template
@@ -192,7 +195,7 @@ lock tables gui_template write ;
 
 insert  into gui_template (entry,description,button_entry,text_button_entry,`text`) values 
 (1, 'motd', '2 3 5 30 36', 4, '^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.'), 
-(2, 'user config', '22 23 24 25 26 27 28 29', 0, ''), 
+(2, 'user config', '22 23 24 25 26 27 28 29 37 38', 39, '^8Config Help\r\n^7Title ^3 will enable or disable the feature\r\n^3Green ^2button ^3will trigger a action for this feature.'), 
 (3, 'help', '31 32 33 34 35', 33, '^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7Your ^2Admin.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^5!kick^7, ^5!exit^7, ^5!reload');
 unlock tables ;
 #----------------------------

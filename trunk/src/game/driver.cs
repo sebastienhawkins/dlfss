@@ -379,6 +379,12 @@ namespace Drive_LFSS.Game_
                 SetAccelerationOn(true);
            else
                 SetAccelerationOn(false);
+          
+           if (GetConfigUint16(Config_User.DRIFT_SCORE_ON) > 0)
+                SetDriftScoreOn(true);
+           else
+                SetDriftScoreOn(false);
+           
         }
         private void SetConfigData(string configString)
         {

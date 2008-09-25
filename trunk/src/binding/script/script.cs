@@ -68,7 +68,7 @@ namespace Drive_LFSS.Script_
         //this happen when a player got a drift score
         public bool CarDriftScoring(ICar car, uint score)
         {
-            //((IButton)car).AddMessageMiddle("^3Drift Score ^2" + (uint)score, 2200);
+            ((IButton)car).AddMessageMiddle("^2Drift Score ^7" + (uint)score, 2200);
 
             return false;                            //true or false change nothing.
         }

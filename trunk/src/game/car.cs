@@ -135,6 +135,7 @@ namespace Drive_LFSS.Game_
         private uint collisionTimer = 0;
         private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
         private FeatureDriftScore featureDriftScore = new FeatureDriftScore();
+
         private sealed class FeatureAcceleration
         {
             private bool started = false;
@@ -230,12 +231,12 @@ namespace Drive_LFSS.Game_
             featureAcceleration.EndSpeed = (double)endKmh;
             ((Driver)this).SetConfigValue(Config_User.ACCELERATION_STOP, endKmh.ToString());
         }
-        public void SetAccelerationOn(bool on)
+        public void SetAccelerationOn(bool isOn)
         {
-            featureAcceleration.SetOnOff(on);
-            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_ON, (on ? "1" : "0"));
+            featureAcceleration.SetOnOff(isOn);
+            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_ON, (isOn ? "1" : "0"));
         }
-        
+
         private sealed class FeatureDriftScore
         {
             private const double MIN_SPEED = 30.0d; //CONFIG, speed lower then this will cancel a drift score and will never trigger a drift start.
@@ -251,6 +252,7 @@ namespace Drive_LFSS.Game_
             private const double SCORE_ANGLE_RATIO = 2.5d; //2-3 seem cool, scoreAngle By this Value
             private const double SCORE_SPEED_RATIO = 1.0d; //scoreSpeed By this Value
 
+            private bool isOn = true;
             private bool started = false;
             private long startTime = 0;
             private bool clockWise = false; //To be sure we catch a 360 and know witch side is a correction.
@@ -265,6 +267,9 @@ namespace Drive_LFSS.Game_
 
             internal void Update(CarMotion car)
             {
+                if(!isOn)
+                    return;
+
                 packetReceive++;
                 double speedKhm = car.GetSpeedKmh();
                 double angleTotraj = car.GetShorterAngleToReachTraj();
@@ -397,6 +402,25 @@ namespace Drive_LFSS.Game_
                     ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3CR ^7" + correctionRatio);
                 }
             }
+            public bool IsOn
+            {
+                get { return isOn; }
+                set 
+                { 
+                    isOn = value;
+                    startTime = 0;
+                    started = false;
+                }
+            }
+        }
+        public bool IsDriftScoreOn()
+        {
+            return featureDriftScore.IsOn;
+        }
+        public void SetDriftScoreOn(bool isOn)
+        {
+            featureDriftScore.IsOn = isOn;
+            ((Driver)this).SetConfigValue(Config_User.DRIFT_SCORE_ON, (isOn ? "1" : "0"));
         }
 
         new protected virtual void update(uint diff)
