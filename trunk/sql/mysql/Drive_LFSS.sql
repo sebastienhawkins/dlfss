@@ -41,6 +41,52 @@ CREATE TABLE `button_template` (
 
 LOCK TABLES `button_template` WRITE;
 /*!40000 ALTER TABLE `button_template` DISABLE KEYS */;
+INSERT INTO `button_template` VALUES (1,'banner',66,1,0,35,194,20,7,'^7A^3leajecta','');
+INSERT INTO `button_template` VALUES (2,'motd background',98,1,0,0,0,200,200,'','');
+INSERT INTO `button_template` VALUES (10,'vote option 1',106,0,0,2,73,45,6,'vote option 1','');
+INSERT INTO `button_template` VALUES (11,'vote option 2',106,0,0,2,80,45,6,'vote option 2','');
+INSERT INTO `button_template` VALUES (3,'motd upper',144,1,0,45,60,110,7,'^8Motd ^7A^3leajecta','');
+INSERT INTO `button_template` VALUES (6,'message bar top',0,0,0,25,27,150,12,'^1Message bar top','');
+INSERT INTO `button_template` VALUES (7,'message bar middle',0,0,0,25,52,150,12,'^1Message bar Middle','');
+INSERT INTO `button_template` VALUES (8,'Collision Warning',2,0,0,25,68,150,8,'^1CollisionWarning','');
+INSERT INTO `button_template` VALUES (9,'vote title',146,0,0,2,65,50,8,'vote title','');
+INSERT INTO `button_template` VALUES (4,'motd text line',98,1,0,50,67,100,8,'','');
+INSERT INTO `button_template` VALUES (12,'vote option 3',106,0,0,2,87,45,6,'vote option 3','');
+INSERT INTO `button_template` VALUES (13,'vote option 4',106,0,0,2,94,45,6,'vote option 4','');
+INSERT INTO `button_template` VALUES (14,'vote option 5',106,0,0,2,101,45,6,'vote option 5','');
+INSERT INTO `button_template` VALUES (15,'vote option 6',106,0,0,2,108,45,6,'vote option 6','');
+INSERT INTO `button_template` VALUES (16,'track prefix',66,1,0,56,194,10,7,'^8','');
+INSERT INTO `button_template` VALUES (17,'info 1',96,0,0,180,85,20,5,'info 1','');
+INSERT INTO `button_template` VALUES (18,'info 2',80,0,0,180,91,20,5,'info 2','');
+INSERT INTO `button_template` VALUES (19,'info 3',80,0,0,180,97,20,5,'info 3','');
+INSERT INTO `button_template` VALUES (20,'info 4',80,0,0,180,103,20,5,'info 4','');
+INSERT INTO `button_template` VALUES (21,'info 5',80,0,0,180,109,20,5,'info 5','');
+INSERT INTO `button_template` VALUES (22,'config bg',32,0,0,0,0,200,200,'','');
+INSERT INTO `button_template` VALUES (23,'config title and close',40,0,0,75,0,50,13,'^3User Config','');
+INSERT INTO `button_template` VALUES (24,'config text close',0,0,0,115,8,8,5,'^2 Close','');
+INSERT INTO `button_template` VALUES (25,'config acceleration bg',32,0,0,1,30,22,24,'','');
+INSERT INTO `button_template` VALUES (26,'config acceleration title',8,0,0,2,31,20,7,'^7Acceleration','');
+INSERT INTO `button_template` VALUES (27,'config acceleration start',40,0,131,2,39,9,6,'^2start','^3Start Kmh Speed ex: 0');
+INSERT INTO `button_template` VALUES (28,'config acceleration end',40,0,131,13,39,9,6,'^2 end ','^3End Kmh Speed ex: 100');
+INSERT INTO `button_template` VALUES (29,'config acceleration current',32,0,0,2,46,20,6,'^7','');
+INSERT INTO `button_template` VALUES (30,'motd button config',24,1,0,120,146,35,12,'^2Config','');
+INSERT INTO `button_template` VALUES (36,'motd button help',24,1,0,83,146,35,12,'^2Help','');
+INSERT INTO `button_template` VALUES (5,'motd button drive',24,1,0,46,146,35,12,'^2Drive','');
+INSERT INTO `button_template` VALUES (35,'help button config',24,1,0,102,146,48,12,'^2Config','');
+INSERT INTO `button_template` VALUES (34,'help button drive',24,1,0,51,146,48,12,'^2Drive','');
+INSERT INTO `button_template` VALUES (33,'help text',96,1,0,50,67,100,6,'^7','');
+INSERT INTO `button_template` VALUES (32,'help upper',144,1,0,45,60,110,7,'^8Help ^7A^3leajecta','');
+INSERT INTO `button_template` VALUES (31,'help bg',96,1,0,0,0,200,200,'','');
+INSERT INTO `button_template` VALUES (39,'config help text',32,0,0,70,120,75,7,'','');
+INSERT INTO `button_template` VALUES (38,'config drift title',8,0,0,26,31,20,7,'^7Drift Score','');
+INSERT INTO `button_template` VALUES (37,'config drift bg',32,0,0,25,30,22,24,'','');
+INSERT INTO `button_template` VALUES (43,'config timediff pb->split',8,0,0,50,46,20,6,'^7PB vs Split','');
+INSERT INTO `button_template` VALUES (42,'config timediff pb->lap',8,0,0,50,39,20,6,'^7PB vs Lap','');
+INSERT INTO `button_template` VALUES (40,'config timediff bg',32,0,0,49,30,22,24,'','');
+INSERT INTO `button_template` VALUES (41,'config timediff title',8,0,0,50,31,20,7,'^7Time Diff','');
+INSERT INTO `button_template` VALUES (44,'text line',32,0,0,1,45,110,6,'','');
+INSERT INTO `button_template` VALUES (45,'text title and close',40,0,0,30,32,50,12,'^3Text Display','');
+INSERT INTO `button_template` VALUES (46,'text close button',0,0,0,71,39,8,4,'^2close','');
 /*!40000 ALTER TABLE `button_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -100,7 +146,7 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `driver`
@@ -118,14 +164,14 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `driver_ban`;
 CREATE TABLE `driver_ban` (
   `entry` int(10) unsigned NOT NULL,
-  `licence_name` varchar(16) character set utf8 NOT NULL default '',
-  `from_licence_name` varchar(16) character set utf8 NOT NULL default '',
-  `reason` varchar(255) character set utf8 NOT NULL default '',
+  `licence_name` varchar(16) NOT NULL default '',
+  `from_licence_name` varchar(16) NOT NULL default '',
+  `reason` varchar(255) NOT NULL default '',
   `start_timestamp` int(12) unsigned NOT NULL default '0',
   `duration_timestamp` int(12) unsigned NOT NULL default '0',
   `expired` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `driver_ban`
@@ -409,4 +455,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-09-26  9:47:14
+-- Dump completed on 2008-09-26 10:46:08
