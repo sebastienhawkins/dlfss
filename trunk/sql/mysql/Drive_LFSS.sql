@@ -146,7 +146,7 @@ CREATE TABLE `driver` (
   `last_connection_time` bigint(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `driver`
@@ -171,7 +171,7 @@ CREATE TABLE `driver_ban` (
   `duration_timestamp` int(12) unsigned NOT NULL default '0',
   `expired` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `driver_ban`
@@ -455,4 +455,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-09-26 10:46:08
+-- Dump completed on 2008-09-26 11:01:00
