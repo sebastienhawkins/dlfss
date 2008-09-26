@@ -3,7 +3,7 @@ MySQL Backup
 Source Host:           localhost
 Source Server Version: 5.0.27-community-nt
 Source Database:       drive_lfss
-Date:                  2008/09/25 00:26:25
+Date:                  2008/09/26 03:30:06
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -37,8 +37,8 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (10, 'vote option 1', 106, 0, 0, 2, 73, 45, 6, 'vote option 1', ''), 
 (11, 'vote option 2', 106, 0, 0, 2, 80, 45, 6, 'vote option 2', ''), 
 (3, 'motd upper', 144, 1, 0, 45, 60, 110, 7, '^8Motd ^7A^3leajecta', ''), 
-(6, 'message bar top', 32, 0, 0, 60, 27, 80, 13, '^1Message bar top', ''), 
-(7, 'message bar middle', 32, 0, 0, 60, 50, 80, 13, '^1Message bar Middle', ''), 
+(6, 'message bar top', 0, 0, 0, 25, 27, 150, 12, '^1Message bar top', ''), 
+(7, 'message bar middle', 0, 0, 0, 25, 52, 150, 12, '^1Message bar Middle', ''), 
 (8, 'Collision Warning', 2, 0, 0, 25, 68, 150, 8, '^1CollisionWarning', ''), 
 (9, 'vote title', 146, 0, 0, 2, 65, 50, 8, 'vote title', ''), 
 (4, 'motd text line', 98, 1, 0, 50, 67, 100, 8, '', ''), 
@@ -74,7 +74,10 @@ insert  into button_template (entry,description,style_mask,is_allways_visible,ma
 (43, 'config timediff pb->split', 8, 0, 0, 50, 46, 20, 6, '^7PB vs Split', ''), 
 (42, 'config timediff pb->lap', 8, 0, 0, 50, 39, 20, 6, '^7PB vs Lap', ''), 
 (40, 'config timediff bg', 32, 0, 0, 49, 30, 22, 24, '', ''), 
-(41, 'config timediff title', 8, 0, 0, 50, 31, 20, 7, '^7Time Diff', '');
+(41, 'config timediff title', 8, 0, 0, 50, 31, 20, 7, '^7Time Diff', ''), 
+(46, 'text close button', 0, 0, 0, 71, 39, 8, 4, '^2close', ''), 
+(45, 'text title and close', 40, 0, 0, 30, 32, 50, 12, '^3Text Display', ''), 
+(44, 'text line', 32, 0, 0, 1, 45, 110, 6, '', '');
 unlock tables ;
 #----------------------------
 # Table structure for car_template
@@ -200,7 +203,8 @@ lock tables gui_template write ;
 insert  into gui_template (entry,description,button_entry,text_button_entry,`text`) values 
 (1, 'motd', '2 3 5 30 36', 4, '^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.'), 
 (2, 'user config', '22 23 24 25 26 27 28 29 37 38 40 41 42 43', 39, '^8Config Help\r\n^7Title ^3 will enable or disable the feature\r\n^3Green ^2button ^3will trigger a action for this feature.'), 
-(3, 'help', '31 32 33 34 35', 33, '^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^5!kick^7, ^5!exit^7, ^5!reload\r\n^7\r\n^7Did you know \"SHIFT-i\" will reset button and make Config screen appear.\r\n^7\r\n^5Greenseed^7.');
+(3, 'help', '31 32 33 34 35', 33, '^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7,^2!status^7, ^5!kick^7, ^5!exit^7, ^5!reload\r\n^7\r\n^7Did you know \"SHIFT-i\" will reset button and make Config screen appear.\r\n^7\r\n^5Greenseed^7.'), 
+(4, 'text', '45 46', 44, '');
 unlock tables ;
 #----------------------------
 # Table structure for race
