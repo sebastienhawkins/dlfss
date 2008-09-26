@@ -24,6 +24,6 @@ namespace Drive_LFSS.Script_
         string DriverName { get; }
         uint GetGuid();
         bool IsBot();
-        void SendMessage(string message);
+        void SendMTCMessage(string message);
     }
 }

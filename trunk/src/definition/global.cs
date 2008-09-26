@@ -102,6 +102,7 @@ namespace Drive_LFSS.Definition_
         HELP_BG = 31,
         HELP_BUTTON_DRIVE = 34,
         HELP_BUTTON_CONFIG = 35,
+        TEXT_BUTTON_DRIVE = 45,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
@@ -120,6 +121,7 @@ namespace Drive_LFSS.Definition_
         MOTD = 1,
         CONFIG_USER = 2,
         HELP = 3,
+        TEXT = 4,
     }
     public enum Button_Safe_Coord_Range
     {

@@ -18,7 +18,7 @@
 namespace Drive_LFSS.Packet_
 {
     using Drive_LFSS.PacketStore_;
-    using Drive_LFSS.Session_;
+    using Drive_LFSS.Game_;
     using Drive_LFSS.Log_;
 
     public abstract class PacketHandler : Store

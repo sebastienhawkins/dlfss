@@ -26,7 +26,7 @@ namespace Drive_LFSS.Game_
     using Script_;
     using Log_;
     using Config_;
-    using Session_;
+    using Game_;
     using PubStats_;
 
     public sealed class Driver : Car, IDriver
@@ -484,18 +484,7 @@ namespace Drive_LFSS.Game_
         {
             get { return iSession; }
         }
-        public void SendMessage(string message)
-        {
-            //Serve no Purpose sending a Message to a Bot.
-            if (IsBot()) 
-                return;
-
-            ((Session)ISession).AddToTcpSendingQueud
-            (
-                new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,
-                    new PacketMTC(CarId, message)));
-            Log.progress("Sending MTC packet to: " + CarId + ", with Licence: "+LicenceId+"\r\n");
-        }
+        
         public bool IsAdmin
         {
             get { return isAdmin; }
@@ -532,17 +521,20 @@ namespace Drive_LFSS.Game_
         {
             return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || LicenceId == 0);
         }
-        public void SendMTCMessage(string _message)
+        public void SendMTCMessage(string message)
         {
+            //Serve no Purpose sending a Message to a Bot.
             if (IsBot())
                 return;
             PacketMTC _packet;
             if (CarId == 0)
-                _packet = new PacketMTC(LicenceId, _message, 0);
+                _packet = new PacketMTC(LicenceId, message, 0);
             else
-                _packet = new PacketMTC(CarId, _message);
+                _packet = new PacketMTC(CarId, message);
 
-            ((Session)iSession).AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MTC,Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,_packet));
+            ((Session)iSession).AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, _packet));
+       
+            Log.progress("Sending MTC packet to: " + CarId + ", with Licence: " + LicenceId + "\r\n");
         }
     }
 }

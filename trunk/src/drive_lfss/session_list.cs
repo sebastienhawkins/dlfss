@@ -26,7 +26,7 @@ namespace Drive_LFSS
     using Drive_LFSS.InSim_;
     using Drive_LFSS.Config_;
     using Drive_LFSS.Log_;
-    using Drive_LFSS.Session_;
+    using Drive_LFSS.Game_;
 
     public class SessionList //Must become compatible with all Session type: ServerInSim, ClientOutGauge, ... Im not aware of all....
     {

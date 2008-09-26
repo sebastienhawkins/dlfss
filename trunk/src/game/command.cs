@@ -19,20 +19,23 @@ using System;
 using System.Collections.Generic;
 namespace Drive_LFSS.Server_
 {
-    using Drive_LFSS.Log_;
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Game_;
+    using Log_;
+    using Packet_;
+    using Game_;
+    using Definition_;
 
     sealed class CommandInGame
     {
-        public CommandInGame()
+        public CommandInGame(Session _session)
         {
+            session = _session;
             //       CommandName                CommandLevel                    CommandReference
            command["exit"] = new CommandName(1, new CommandDelegate(Exit));
            command["kick"] = new CommandName(1, new CommandDelegate(Kick));
            command["reload"] = new CommandName(1, new CommandDelegate(Reload));
            command["help"] = new CommandName(0, new CommandDelegate(Help));
            command["config"] = new CommandName(0, new CommandDelegate(Config));
+           command["status"] = new CommandName(0, new CommandDelegate(Status));
         }
         ~CommandInGame()
         {
@@ -50,6 +53,7 @@ namespace Drive_LFSS.Server_
         }
         private delegate void CommandDelegate(Driver driver, string[] args);
         private Dictionary<string, CommandName> command = new Dictionary<string, CommandName>();
+        private readonly Session session;
 
         public void Exec(Driver driver, string _commandText)
         {
@@ -158,6 +162,70 @@ namespace Drive_LFSS.Server_
         private void Config(Driver driver, string[] args)
         {
             driver.SendConfigGui();
+        }
+        private void Status(Driver driver, string[] args)
+        {
+            if (args.Length != 2)
+            {
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!status ^3serverName^7/^3all^7/^3current", 7000);
+                return;
+            }
+
+            if (args[1] == "all")
+            {
+                //Maybe you Real Iterator<Session>
+                Dictionary<string, Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
+                string textToSend = "Status for all Server\r\n";
+                while (itr.MoveNext())
+                {
+                    if (itr.Current.Value.IsConnected())
+                    {
+                        string reactionTime;
+                        long _rt = itr.Current.Value.GetReactionTime() ;
+                        if (_rt == 0)
+                            reactionTime = "^7" + _rt.ToString();
+                        else if (_rt > 0)
+                            reactionTime = "^4" + _rt.ToString();
+                        else
+                            reactionTime = "^3" + _rt.ToString();
+
+                        textToSend+="^8ServerName ^7" + itr.Current.Key + ", ^8Status ^2online^8, ReactionTime ^7" + reactionTime + "^8ms" + ", DriversCount ^7" + itr.Current.Value.GetNbrOfDrivers()+"\r\n";
+                    }
+                    else
+                        textToSend+="^8ServerName ^7" + itr.Current.Key + ", ^8Status ^1offline^8, ReactionTime ^7na^8ms, DriversCount ^7na\r\n";
+                }
+
+                driver.SendGui((ushort)Gui_Entry.TEXT, textToSend);
+            }
+            else
+            {
+                string serverName = args[1];
+                if(serverName == "current")
+                    serverName = session.GetSessionName();
+                
+                if (SessionList.sessionList.ContainsKey(serverName))
+                {
+                    Session _session = SessionList.sessionList[serverName];
+
+                    if (_session.IsConnected())
+                    {
+                        string reactionTime;
+                        long _rt = _session.GetReactionTime();
+                        if (_rt == 0)
+                            reactionTime = "^7" + _rt.ToString();
+                        else if (_rt > 0)
+                            reactionTime = "^4" + _rt.ToString();
+                        else
+                            reactionTime = "^3" + _rt.ToString();
+
+                        driver.AddMessageMiddle("^8ServerName ^7" + serverName + ", ^8Status ^2online^8, ReactionTime ^7" + reactionTime + "^8ms" + ", DriversCount ^7" + _session.GetNbrOfDrivers(),4500);
+                    }
+                    else
+                        driver.AddMessageMiddle("^8ServerName ^7" + serverName + ", ^8Status ^1offline^8, ReactionTime ^7na^8ms, DriversCount ^7na",4500);
+                }
+                else
+                    driver.AddMessageMiddle("^8Status - serverName(^7"+serverName+")^8 not found.",4500);
+            }
         }
         #endregion
     }

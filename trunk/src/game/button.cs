@@ -22,7 +22,7 @@ namespace Drive_LFSS.Game_
 {
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Packet_;
-    using Drive_LFSS.Session_;
+    using Drive_LFSS.Game_;
     using Drive_LFSS.Script_;
     using Drive_LFSS.Storage_;
     using Drive_LFSS.Log_;
@@ -175,7 +175,12 @@ namespace Drive_LFSS.Game_
                     buttonMessageMiddle.Dequeue();
             }
         }
-
+        public void SendGui(ushort guiEntry,string text)
+        {
+            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
+            guiInfo.Text = text;
+            SendGui(guiInfo);
+        }
         public void SendGui(ushort guiEntry)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
@@ -233,7 +238,7 @@ namespace Drive_LFSS.Game_
                 buttonEntry = System.Convert.ToUInt16(itr.Current);
                 RemoveButton(buttonEntry);
             }
-            if (guiInfo.TextButtonEntry > 0 && guiInfo.Text.Length > 0)
+            if (guiInfo.TextButtonEntry > 0 /*&& guiInfo.Text.Length > 0*/)
             {
                 RemoveButton(guiInfo.TextButtonEntry);
             }
@@ -350,7 +355,7 @@ namespace Drive_LFSS.Game_
 
             if (maxTextLength > 0 && textCaption != "")
             {
-                text = ((char)0).ToString() + textCaption + ((char)0).ToString() + text;
+                text = ((char)0).ToString() + textCaption + ((char)0).ToString() + text + ((char)0).ToString();
             }
             ((Session)((Driver)this).ISession).AddToTcpSendingQueud
             (

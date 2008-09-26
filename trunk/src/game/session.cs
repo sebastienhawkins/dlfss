@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Drive_LFSS.Session_
+namespace Drive_LFSS.Game_
 {
     using Server_;
     using InSim_;
@@ -27,7 +27,6 @@ namespace Drive_LFSS.Session_
     using Definition_;
     using Script_;
     using Log_;
-    using Game_;
     using PubStats_;
 
     public sealed class Session : InSimClient, ISession
@@ -43,7 +42,7 @@ namespace Drive_LFSS.Session_
             driverList.Capacity = 256;
             script = new Script();
             ping = new Ping();
-            command = new CommandInGame();
+            command = new CommandInGame(this);
             connectionRequest = true;
         }
         ~Session()
@@ -546,6 +545,10 @@ namespace Drive_LFSS.Session_
                 case Button_Entry.HELP_BUTTON_DRIVE:
                 {
                     driver.RemoveGui((ushort)Gui_Entry.HELP);
+                } break;
+                case Button_Entry.TEXT_BUTTON_DRIVE:
+                {
+                    driver.RemoveGui((ushort)Gui_Entry.TEXT);
                 } break;
                 case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
                 case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;

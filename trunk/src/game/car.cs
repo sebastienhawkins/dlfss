@@ -23,7 +23,7 @@ namespace Drive_LFSS.Game_
     using Definition_;
     using Packet_;
     using Script_;
-    using Session_;
+    using Game_;
     using Log_;
     using Storage_;
     using PubStats_;
@@ -83,7 +83,7 @@ namespace Drive_LFSS.Game_
             z = _carInformation.posZ / 65536.0d;
 
             speedMs = _carInformation.speed / 327.68d;
-            speedKmh = speedMs * 3.6d;
+            speedKmh = speedMs * 3.624d;
             if (maxSpeedKmh < speedKmh)
                 maxSpeedKmh = speedKmh;
 
