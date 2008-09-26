@@ -142,7 +142,7 @@ namespace Drive_LFSS.InSim_
             }
             catch (SocketException _exception)
             {
-                Log.error(((Session)this).GetSessionNameForLog() + " TCP Socket Initialization failded, Error was: " + _exception.Message + "\r\n");
+                Log.error(((Session)this).GetSessionNameForLog() + " TCP socket initialization failed, error was: " + _exception.Message + "\r\n");
                 return false;
             }
             tcpSocket = tcpClient.GetStream();
@@ -154,7 +154,7 @@ namespace Drive_LFSS.InSim_
             try { udpClient = new UdpClient(udpIpEndPoint); }
             catch (SocketException _exception)
             {
-                Log.error(((Session)this).GetSessionNameForLog() + " UDP Socket Initialization failded, Error was: " + _exception.Message + "\r\n");
+                Log.error(((Session)this).GetSessionNameForLog() + " UDP socket initialization failed, error was: " + _exception.Message + "\r\n");
                 return false;
             }
             udpClient.Ttl = 10;
@@ -259,13 +259,13 @@ namespace Drive_LFSS.InSim_
                 catch (Exception _exception)
                 {
                     SetDisconnected();
-                    Log.error(((Session)this).GetSessionNameForLog() + " Tcpreceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
+                    Log.error(((Session)this).GetSessionNameForLog() + " TcpReceive(), Exception received when reading on the TCP socket, exception:" + _exception.Message + "\r\n");
                     return;
                 }
 
                 if (packetSize < 4) //maybe add a size/4 Check to be sure the Size is Conform to Scawen standart
                 {
-                    Log.network(((Session)this).GetSessionNameForLog() + " TcpReceive(), Droped packet, Too Short!, PacketSize->" + packetSize + "\r\n");
+                    Log.network(((Session)this).GetSessionNameForLog() + " TcpReceive(), Dropped packet, too Small!, PacketSize->" + packetSize + "\r\n");
                     continue;
                 }
 
@@ -276,7 +276,7 @@ namespace Drive_LFSS.InSim_
                 tcpSocket.Read(data, 2, (packetSize - 2));
                 if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
                 {
-                    Log.missingDefinition(((Session)this).GetSessionNameForLog() + " TcpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                    Log.missingDefinition(((Session)this).GetSessionNameForLog() + " TcpReceive(), No structure defined for this PacketType->" + (Packet_Type)data[1] + "\r\n");
                     continue;
                 }
                 ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));
@@ -291,12 +291,12 @@ namespace Drive_LFSS.InSim_
 
                 if (data[0] < 3)
                 {
-                    Log.network(((Session)this).GetSessionNameForLog() + " UdpReceive(), Droped packet, Too Short!, PacketSize->" + data[0] + "\r\n");
+                    Log.network(((Session)this).GetSessionNameForLog() + " UdpReceive(), Dropped packet, too small!, PacketSize->" + data[0] + "\r\n");
                     continue;
                 }
                 if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
                 {
-                    Log.missingDefinition(((Session)this).GetSessionNameForLog() + " UdpReceive(), No Structure Define for this PacketType->" + (Packet_Type)data[1] + "\r\n");
+                    Log.missingDefinition(((Session)this).GetSessionNameForLog() + " UdpReceive(), No structure defined for this PacketType->" + (Packet_Type)data[1] + "\r\n");
                     continue;
                 }
                 ProcessPacket((Packet_Type)data[1], toStruct((Packet_Type)data[1], data));

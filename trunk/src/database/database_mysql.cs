@@ -39,7 +39,7 @@ namespace Drive_LFSS.Database_
 
             command = connection.CreateCommand();
             transaction = null;
-            Log.commandHelp("  MySQL Using Compression: " + ((MySqlConnection)connection).UseCompression + "\r\n");
+            Log.commandHelp("  MySQL using compression: " + ((MySqlConnection)connection).UseCompression + "\r\n");
         }
         private IDbConnection connection;
         private IDbCommand command;

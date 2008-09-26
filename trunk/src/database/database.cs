@@ -28,7 +28,7 @@ namespace Drive_LFSS.Database_
             if (TimerKeepAlive > 840000) //25 Minute
             {
                 TimerKeepAlive = 0;
-                Log.progress("Ping Database\r\n");
+                Log.progress("Ping database\r\n");
                 ((IDatabase)this).ExecuteNonQuery("SELECT 1");
 
             }

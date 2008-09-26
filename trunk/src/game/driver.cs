@@ -57,7 +57,7 @@ namespace Drive_LFSS.Game_
 
             SendBanner();
             SendTrackPrefix();
-            //To make the MODT look on a very Black BG
+            //To make the MOTD look on a very Black BG
             for (byte itr = 0; ++itr < 5; )
                 SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
 
@@ -71,7 +71,7 @@ namespace Drive_LFSS.Game_
             if (guid == 0)
             {
                 if (!SetNewGuid())
-                    Log.error("Error When Creating a New GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
+                    Log.error("Error when creating a new GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
             }
             pb = Program.pubStats.GetPB(LicenceName, "");
         }
@@ -103,7 +103,7 @@ namespace Drive_LFSS.Game_
                 if (guid == 0)
                 {
                     if (!SetNewGuid())
-                        Log.error("Error When Creating a New GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
+                        Log.error("Error when creating a new GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace Drive_LFSS.Game_
                     wr.Splits[3] = lap.SplitTime[3];
                     wr.LapTime = lap.LapTime;
                     wr.LicenceName = LicenceName;
-                    ISession.AddMessageMiddleToAll("^2 New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
+                    ISession.AddMessageMiddleToAll("^2New WR " + PubStats.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
                 }
             }
             if(isTimeDiffLap)
@@ -446,7 +446,7 @@ namespace Drive_LFSS.Game_
             {
                 if (!IsBot())
                 {
-                    Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved To Database.\r\n");
+                    Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved to database.\r\n");
                     SaveToDB();
 
                     if (laps.Count > 0)
@@ -461,7 +461,7 @@ namespace Drive_LFSS.Game_
                                 if (lap.LapTime < 1)
                                     continue;
                                 SaveLapsToDB(lap);
-                                Log.database(iSession.GetSessionNameForLog() + "Lap For DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved To Database.\r\n");
+                                Log.database(iSession.GetSessionNameForLog() + "Lap for DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved to database.\r\n");
                             }
                             laps.Clear();
                             if (currentLap.LapTime < 1)
@@ -494,7 +494,7 @@ namespace Drive_LFSS.Game_
             (
                 new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE,
                     new PacketMTC(CarId, message)));
-            Log.progress("Sending MTC packet to:"+CarId + ", with Licence: "+LicenceId+"\r\n");
+            Log.progress("Sending MTC packet to: " + CarId + ", with Licence: "+LicenceId+"\r\n");
         }
         public bool IsAdmin
         {

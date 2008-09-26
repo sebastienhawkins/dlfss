@@ -236,7 +236,7 @@ namespace Drive_LFSS.Session_
                 }
                 else
                 {
-                    Log.error(GetSessionNameForLog() + " New Licence Connection, But Overrides an Already existing LicenceId, what to do if that Happens?");
+                    Log.error(GetSessionNameForLog() + " New licence connection, but overrides an already existing LicenceId, what to do if that happens?");
                     return;
                 }
             }
@@ -253,7 +253,7 @@ namespace Drive_LFSS.Session_
 
             if (!IsExistLicenceId(_packet.tempLicenceId))
             {
-                Log.error(GetSessionNameForLog() + " Licence Disconnection, But no LicenceID associated with It, What to do?");
+                Log.error(GetSessionNameForLog() + " Licence disconnection, but no LicenceID associated with it, what to do?");
                 return;
             }
 
@@ -273,7 +273,7 @@ namespace Drive_LFSS.Session_
 
             if (!IsExistLicenceId(_packet.tempLicenceId))
             {
-                Log.error(GetSessionNameForLog() + " New Car Join Race, But No LicenceId Associated, What to do?");
+                Log.error(GetSessionNameForLog() + " New car joined race, but no LicenceId associated with it, what to do?");
                 return;
             }
 
@@ -309,7 +309,7 @@ namespace Drive_LFSS.Session_
             byte itr;
             if ((itr = GetCarIndex(_packet.carId)) == 0)
             {
-                Log.error(GetSessionNameForLog() + " Car Left race, But no Car Association Found , what to do?");
+                Log.error(GetSessionNameForLog() + " Car left race, but no car association found, what to do?");
                 return;
             }
 
@@ -555,7 +555,7 @@ namespace Drive_LFSS.Session_
                 case Button_Entry.VOTE_OPTION_6: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.licenceId); break;
                 default:
                 {
-                    Log.error("We received a button ClickId, from unknown source, licenceName: " + driver.LicenceName + "\r\n");
+                    Log.error("We received a button ClickId from an unknown source, licenceName: " + driver.LicenceName + "\r\n");
                 } break;
             }
         }      // Button Click Receive
@@ -573,12 +573,12 @@ namespace Drive_LFSS.Session_
                     try { startKmh = Convert.ToUInt16(_packet.typedText); }
                     catch (Exception)
                     {
-                        car.AddMessageMiddle("^1Bad value(^7" + _packet.typedText + "^1) entered for 'Acceleration Start Speed Kmh'.", 7000);
+                        car.AddMessageMiddle("^1Bad value (^7" + _packet.typedText + "^1) entered for 'Acceleration Start speed (in Kmh)'.", 7000);
                         return;
                     }
                     if (startKmh > car.GetAccelerationEndSpeed())
                     {
-                        car.AddMessageMiddle("^1Start Speed(^7" + startKmh + "^1) can NOT be higher then End Speed(^7" + car.GetAccelerationEndSpeed() + "^1)", 7000);
+                        car.AddMessageMiddle("^1Start speed (^7" + startKmh + "^1) cannot be higher then End speed (^7" + car.GetAccelerationEndSpeed() + "^1)", 7000);
                         return;
                     }
                     car.SetAccelerationStartSpeed(startKmh);
@@ -590,17 +590,17 @@ namespace Drive_LFSS.Session_
                     try { endKmh = Convert.ToUInt16(_packet.typedText); }
                     catch (Exception)
                     {
-                        car.AddMessageMiddle("^1Bad value(^7" + _packet.typedText + "^1) entered for 'Acceleration End Speed Kmh'.", 7000);
+                        car.AddMessageMiddle("^1Bad value (^7" + _packet.typedText + "^1) entered for 'Acceleration End speed (in Kmh)'.", 7000);
                         return;
                     }
                     if (endKmh < car.GetAccelerationStartSpeed())
                     {
-                        car.AddMessageMiddle("^1End Speed(^7" + endKmh + "^1) can NOT be lower then Start Speed(^7"+car.GetAccelerationStartSpeed()+"^1)", 7000);
+                        car.AddMessageMiddle("^1End speed (^7" + endKmh + "^1) cannot be lower than the Start speed (^7"+car.GetAccelerationStartSpeed()+"^1)", 7000);
                         return;
                     }
                     if (endKmh < 10)
                     {
-                        car.AddMessageMiddle("^1End Speed(^7" + endKmh + "^1) can NOT be lower then ^710", 7000);
+                        car.AddMessageMiddle("^1End speed (^7" + endKmh + "^1) cannot be lower than ^710.", 7000);
                         return;
                     }
                     car.SetAccelerationEndSpeed(endKmh);

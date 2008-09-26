@@ -56,13 +56,13 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE: processPacket((PacketBFN)_packet);break;
                 case Packet_Type.PACKET_PLP_ENTER_GARAGE:              processPacket((PacketPLP)_packet); break;
 
-                default: Log.missingDefinition("ProcessPacket(), No Existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
+                default: Log.missingDefinition("ProcessPacket(), No existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
 
         protected virtual void processPacket(PacketVER _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " Process packet ->" + _packet + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " Process packet -> " + _packet + "\r\n");
             Log.normal(((Session)this).GetSessionNameForLog() + " InSim v" + _packet.inSimVersion + ", Licence: " + _packet.productVersion + "." + _packet.serverVersion + "\r\n");
         }
         protected virtual void processPacket(PacketTiny _packet)
@@ -188,7 +188,7 @@ namespace Drive_LFSS.Packet_
         // Race got cleared with /clear
         protected virtual void processPacket()
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " CLR_RaceCleared(), Got a Ping Request, What ToDo With That???\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " CLR_RaceCleared(), Got a ping request, but what to do with that?\r\n");
         }
         // Sent at the start of every race or qualifying session, listing the start order
         protected virtual void processPacket(PacketREO _packet)

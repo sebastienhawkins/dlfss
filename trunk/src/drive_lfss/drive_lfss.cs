@@ -90,61 +90,61 @@ namespace Drive_LFSS
             if (!Config.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Can't Initialize the Config, Will now QUIT.!\r\n\r\n");
+                Console.Write("Can't initialize the config, will now QUIT!\r\n\r\n");
                 System.Threading.Thread.Sleep(10000);
                 CommandConsole.Exec("exit");
                 return;
-            } Log.normal("Config Initialized...\r\n\r\n");
+            } Log.normal("Config initialized...\r\n\r\n");
             Program.ConfigApply();
 
             //Logging
             if (!Log.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.log"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Can't Initialize the Log System, Will now QUIT.!\r\n\r\n");
+                Console.Write("Can't initialize the log system, will now QUIT!\r\n\r\n");
                 System.Threading.Thread.Sleep(10000);
                 CommandConsole.Exec("exit");
                 return;
-            } Log.normal("Log System Initialized...\r\n\r\n");
+            } Log.normal("Log system initialized...\r\n\r\n");
 
            
             //Console System, Purpose for MultiThreading the Console Input
-            Log.normal("Initializating Console Command.\r\n\r\n");
+            Log.normal("Initializing console command...\r\n\r\n");
             threadCaptureConsoleCommand.Name = "Console Capture";
             threadCaptureConsoleCommand.Start();
 
             //Database Initialization
-            Log.normal("Initializating Database...\r\n");
+            Log.normal("Initializing database...\r\n");
 
             List<string> databaseChoices = Config.GetIdentifierList("Database");
             if (databaseChoices.Contains("MySQL"))
             {
                 string[] infos = Config.GetStringValue("Database","MySQL","ConnectionInfo").Split(';');
                 if (infos.Length != 6)
-                    throw new Exception("Configuration Error, Invalide Value Count For: Database.MySQL.ConnectionInfo");
+                    throw new Exception("Configuration error, invalid value count for: Database.MySQL.ConnectionInfo");
 
-                Log.commandHelp("  Using MySQL Database.\r\n");
+                Log.commandHelp("  Using MySQL database.\r\n");
                 dlfssDatabase = new DatabaseMySQL("Database=" + infos[4] + ";Data Source=" + infos[0] + ";Port=" + infos[1] + ";User Id=" + infos[2] + ";Password=" + infos[3] + ";Use Compression=" + infos[5] + ";Pooling=false");
             }
             else
             {
-                Log.commandHelp("  Using SQLite Database.\r\n");
+                Log.commandHelp("  Using SQLite database.\r\n");
                 dlfssDatabase = new DatabaseSQLite(Config.GetStringValue("Database", "SQLite", "ConnectionInfo"));
             }
-            Log.normal("Completed Initialize Database...\r\n\r\n");
+            Log.normal("Completed initializing database...\r\n\r\n");
 
             //Initialize Storage
-            Log.normal("Initializating Storage...\r\n");
+            Log.normal("Initializing storage...\r\n");
             trackTemplate.Load(true);
             carTemplate.Load(true);
             buttonTemplate.Load(true);
             guiTemplate.Load(true);
             raceTemplate.Load(false);
             driverBan.Load(false);
-            Log.normal("Completed Initialize Storage.\r\n\r\n");
+            Log.normal("Completed initializing storage.\r\n\r\n");
 
             //Irc Client
-            Log.normal("Initializating mIRC Client...\r\n");
+            Log.normal("Initializing mIRC client...\r\n");
             string isActivated = Config.GetStringValue("mIRC", "Activate").ToLowerInvariant();
             if (isActivated == "yes" || isActivated == "1" || isActivated == "true" || isActivated == "on" || isActivated == "activate")
             {
@@ -152,20 +152,20 @@ namespace Drive_LFSS
                 ircClient.Connect();
             }
             else
-                Log.commandHelp("  mIRC Client is Disable.\r\n");
-            Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
+                Log.commandHelp("  mIRC client is disabled.\r\n");
+            Log.normal("Completed initializing mIRC client.\r\n\r\n");
 
             //PubStats Initialization
-            Log.normal("Initializating PubStats...\r\n");
+            Log.normal("Initializing PubStats...\r\n");
             pubStats.ConfigApply();
-            Log.normal("Completed Initialize PubStats.\r\n\r\n");
+            Log.normal("Completed initializing PubStats.\r\n\r\n");
 
             //Create Object for All Configured Server
-            Log.normal("Initializating Servers Config...\r\n\r\n");
+            Log.normal("Initializing server(s) config(s)...\r\n\r\n");
             SessionList.ConfigApply( );
             
             //Session.InitializeServerList();
-            Log.normal("DEPART|");
+            Log.normal("START|");
             for (float itr = 200; (itr /= 1.1f) > 1;)
             {
                 Log.progress(".");
@@ -246,7 +246,7 @@ namespace Drive_LFSS
         }
         public static void Reload(string what)
         {
-            Log.command("Start Reloading of " + what + ".\r\n");
+            Log.command("Start reloading of " + what + ".\r\n");
             lock(dlfssDatabase)
             {switch (what){
                 case "all":
@@ -265,22 +265,22 @@ namespace Drive_LFSS
                         Log.commandHelp("  driver_ban reloaded.\r\n");
 
 
-                        Log.normal("Initializating DLFSS Client...\r\n");
+                        Log.normal("Initializing DLFSS client...\r\n");
                         Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                         Program.ConfigApply();
-                        Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
+                        Log.normal("Completed initializing DLFSS client.\r\n\r\n");
 
-                        Log.normal("Initializating mIRC Client...\r\n");
+                        Log.normal("Initializing mIRC Client...\r\n");
                         Program.ircClient.ConfigApply();
-                        Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
+                        Log.normal("Completed initializing mIRC client.\r\n\r\n");
 
-                        Log.normal("Initializating PubStats...\r\n");
+                        Log.normal("Initializing PubStats...\r\n");
                         Program.pubStats.ConfigApply();
-                        Log.normal("Completed Initialize PubStats.\r\n\r\n");
+                        Log.normal("Completed initializing PubStats.\r\n\r\n");
 
-                        Log.normal("Initializating Servers Config...\r\n\r\n");
+                        Log.normal("Initializing server(s) config(s)...\r\n\r\n");
                         SessionList.ConfigApply();
-                        Log.normal("Complete Servers Config.\r\n\r\n");
+                        Log.normal("Completed initializing server(s) config(s).\r\n\r\n");
                     } break;
                 case "track_template":
                     {
@@ -314,25 +314,25 @@ namespace Drive_LFSS
                     } break;
                 case "config":
                     {
-                        Log.normal("Initializating DLFSS Client...\r\n");
+                        Log.normal("Initializing DLFSS Client...\r\n");
                         Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                         Program.ConfigApply();
-                        Log.normal("Completed Initialize DLFSS Client.\r\n\r\n");
+                        Log.normal("Completed initializing DLFSS client.\r\n\r\n");
 
-                        Log.normal("Initializating mIRC Client...\r\n");
+                        Log.normal("Initializing mIRC client...\r\n");
                         Program.ircClient.ConfigApply();
-                        Log.normal("Completed Initialize mIRC Client.\r\n\r\n");
+                        Log.normal("Completed initializing mIRC client.\r\n\r\n");
 
-                        Log.normal("Initializating PubStats...\r\n");
+                        Log.normal("Initializing PubStats...\r\n");
                         Program.pubStats.ConfigApply();
-                        Log.normal("Completed Initialize PubStats.\r\n\r\n");
+                        Log.normal("Completed initializing PubStats.\r\n\r\n");
 
-                        Log.normal("Initializating Servers Config...\r\n\r\n");
+                        Log.normal("Initializing server(s) config(s)...\r\n\r\n");
                         SessionList.ConfigApply();
-                        Log.normal("Complete Servers Config.\r\n\r\n");
+                        Log.normal("Completed initializing server(s) config(s).\r\n\r\n");
                     } break;
             } }
-            Log.command("End Reloading of " + what + ".\r\n");
+            Log.command("Completed reloading of " + what + ".\r\n");
         }
         public static void Exit()
         {
@@ -340,7 +340,7 @@ namespace Drive_LFSS
         }
         private static void Exit(bool real)
         {
-            Log.normal("Exiting Requested, Please Wait For All Thread Too Exit...\n\r");
+            Log.normal("Exit requested, please wait for all threads to exit...\r\n");
 
             MainRun = false;
 
@@ -363,20 +363,20 @@ namespace Drive_LFSS
         //make ppl with disgrace exit thing 5 seconde about what they just made ;)
         private static void ConsoleExitTimer()
         {
-            Log.error("Exiting into 5 seconds.\r\n");
+            Log.error("Exiting in 5 seconds.\r\n");
 
             byte secondeBeforeExit = 5;
             while(secondeBeforeExit > 0)
             {
                 Console.Clear();
-                Log.error("Exiting into " + --secondeBeforeExit + " seconds.\r\n");
+                Log.error("Exiting in " + --secondeBeforeExit + " seconds.\r\n");
                 System.Threading.Thread.Sleep(1000);
             }
         }
         private static void UnHandleException(object sender, UnhandledExceptionEventArgs args)
         {
-            Log.error("Critical Error, Auto Shutdown in 20 Seconde...\r\n");
-            Log.error("Exception Was: " + args.ExceptionObject.ToString() + "\r\n");
+            Log.error("Critical error, auto-shutdown in 20 Seconds...\r\n");
+            Log.error("Exception was: " + args.ExceptionObject.ToString() + "\r\n");
             Exit(false);
             System.Threading.Thread.Sleep(15000);
             ConsoleExitTimer();
@@ -395,7 +395,7 @@ namespace Drive_LFSS
         }
         private static void DisgraceExit()
         {
-            Log.error("Application has been closed Disgracefully, please next time, type \"exit\", Going Shutdown into 15 secondes.\r\n");
+            Log.error("Application has been closed disgracefully, next time please type \"exit\". Exiting in 15 seconds.\r\n");
             Exit(false);
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();

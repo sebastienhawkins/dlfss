@@ -58,14 +58,14 @@ namespace Drive_LFSS.Server_
 
             if (args.Length < 1 || !command.ContainsKey(args[0].ToLowerInvariant()) ) 
             {
-                driver.AddMessageMiddle("^7 Unknown command: ^3" + _commandText + ".", 4500);
-                Log.command("Command.Exec(), Bad Command Call From User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
+                driver.AddMessageMiddle("^7Unknown command: ^3" + _commandText + ".", 4500);
+                Log.command("Command.Exec(), Invalid command from User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
             if( command[args[0]].level > 0 && !driver.IsAdmin )
             {
-                driver.AddMessageMiddle("^7 Must be Admin to execute command: ^3" + args[0]+".",4500);
-                Log.command("Command.Exec(), Bad Command Call From User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
+                driver.AddMessageMiddle("^7Must be admin to execute command: ^3" + args[0]+".",4500);
+                Log.command("Command.Exec(), Illegal command from User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
 
@@ -80,10 +80,10 @@ namespace Drive_LFSS.Server_
         {
             if (args.Length != 2)
             {
-                driver.AddMessageMiddle("^7 Bad parameters Count^7, Usage: ^2!kick ^3username",4500);
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!kick ^3username",4500);
                 return;
             }
-            driver.AddMessageMiddle("^7 You Kicked username: ^3" + args[1]+".",4500);
+            driver.AddMessageMiddle("^7You kicked username: ^3" + args[1]+".",4500);
             Log.command("Command.Kick(), User: " + driver.LicenceName + ", Kicked User: " + args[1] + "\r\n");
             driver.ISession.SendMSTMessage("/kick " + args[1]);
         }
@@ -91,7 +91,7 @@ namespace Drive_LFSS.Server_
         {
             if (args.Length != 2)
             {
-                driver.AddMessageMiddle("^7 Bad parameters Count^7, Usage: ^2!reload ^3tableName", 4500);
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!reload ^3tableName", 4500);
                 return;
             }
             switch (args[1])
@@ -99,52 +99,52 @@ namespace Drive_LFSS.Server_
                 case "all":
                     {
                         lock (Program.dlfssDatabase) { Program.Reload("all"); }
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 everything", 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3everything", 4500);
                     } break;
                 case "track":
                 case "track_template":
                     {
                         lock (Program.dlfssDatabase) { Program.Reload("track_template"); }
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "car":
                 case "car_template":
                     {
                         lock (Program.dlfssDatabase) { Program.Reload("car_template"); }
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "button":
                 case "button_template":
                     {
                         lock (Program.dlfssDatabase) { Program.Reload("button_template"); }
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "race":
                 case "race_template":
                     {
                         lock (Program.dlfssDatabase) { Program.Reload("race_template"); }
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "ban":
                 case "driver_ban":
                     {
                         lock (Program.dlfssDatabase) { Program.Reload("driver_ban"); }
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "gui":
                 case "gui_template":
                     {
                         lock (Program.dlfssDatabase) { Program.Reload("gui_template"); }
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "config":
                     {
                         Program.Reload("config");
-                        driver.AddMessageMiddle("^7 Completed Reloading, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 default:
                     {
-                        driver.AddMessageMiddle("^7 Unknown tableName, ^3 " + args[1], 4500);
+                        driver.AddMessageMiddle("^7Unknown tableName, ^3" + args[1], 4500);
                     } break;
 
                     Log.command("Command.Reload(), User: " + driver.LicenceName + ", reloaded: " + args[1] + "\r\n");

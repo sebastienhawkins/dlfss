@@ -42,7 +42,7 @@ namespace Drive_LFSS
                 string[] serverOptions = Config.GetStringValue("LFSServer", itr.Current, "ConnectionInfo").Split(';');
                 if (serverOptions.Length != 9)
                 {
-                    Log.error("Configuration Error for Servername: " + itr.Current + ", Bad Option Count, Must be 8.\r\n");
+                    Log.error("Configuration error for Servername: " + itr.Current + ", Bad option count, must be 8.\r\n");
                     continue;
                 }
                 InSimSetting inSimSetting = new InSimSetting(itr.Current, serverOptions[0], Convert.ToUInt16(serverOptions[1]), Convert.ToUInt16(serverOptions[2]), serverOptions[3], 
@@ -53,11 +53,11 @@ namespace Drive_LFSS
                 inSimSetting.networkInterval = (uint)(inSimSetting.networkInterval < 1 ? 1 : inSimSetting.networkInterval);
 
                 if (inSimSetting.password.Length > 16)
-                    Log.error(inSimSetting.serverName + " bad Configuration For: password must be max 16 characters long.\r\n");
+                    Log.error(inSimSetting.serverName + " invalid configuration for: password must be max 16 characters long.\r\n");
                 else if (inSimSetting.appName.Length > 16)
-                    Log.error(inSimSetting.serverName + " bad Configuration For: appName must be max 16 characters long.\r\n");
+                    Log.error(inSimSetting.serverName + " invalid configuration for: appName must be max 16 characters long.\r\n");
                 else if (inSimSetting.tcpPort < 1024)
-                    Log.error(inSimSetting.serverName + " bad Configuration For: Port must be greater 1024.\r\n");
+                    Log.error(inSimSetting.serverName + " invalid configuration for: Port must be greater than 1024.\r\n");
                 else
                 {
                     if (sessionList.ContainsKey(itr.Current)) //reloading config

@@ -90,7 +90,7 @@ namespace Drive_LFSS.Game_
             grid.Init(nodeCount);
 
             if (!SetNewGuid())
-                Log.error("Error When Creating a New GUID for Race.\r\n");
+                Log.error("Error when creating a new GUID for race.\r\n");
         }
         public void Init(PacketSTA _packet)
         {
@@ -230,7 +230,7 @@ namespace Drive_LFSS.Game_
         }
         private void FinishRace()
         {
-            Log.debug("Race: " + guid + ", was Finished Sucessfully.\r\n");
+            Log.debug("Race: " + guid + ", was finished successfully.\r\n");
 
             for (byte itr = (byte)PositionIndex.POSITION_FIRST; itr < finishedCount; itr++)
                 finishOrder += carPosition[itr]+" ";
@@ -261,7 +261,7 @@ namespace Drive_LFSS.Game_
             else if (carPosition[_position] == 0)   //Not same position, but don't take positon of anyone... a weird case
             {
                 carPosition[_position] = _carId;
-                Log.error("Race.SetCarPosition(), Weird Case happened. CarId: " + _carId + ", PositionAsked:" + _position + ", the old Position carId was 0.\r\n");
+                Log.error("Race.SetCarPosition(), Weird case happened: CarId: " + _carId + ", PositionAsked:" + _position + ", the old position carId was 0.\r\n");
                 return;
             }
 
@@ -306,7 +306,7 @@ namespace Drive_LFSS.Game_
 
             raceSaveInterval = 0;
             stateHasChange = false;
-            Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps:" + raceLaps + ", saved To Database.\r\n");
+            Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + raceLaps + ", saved to database.\r\n");
         }
         private void RequestFinalResult()
         {

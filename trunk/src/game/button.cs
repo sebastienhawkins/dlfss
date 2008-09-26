@@ -344,7 +344,7 @@ namespace Drive_LFSS.Game_
 
             if( buttonId == 0xFF )
             {
-                Log.error("Button System, Button Max Count Reached for Driver:"+((Driver)this).DriverName+", Licence"+((Licence)this).LicenceName+"\r\n");
+                Log.error("Button system> Max button count reached for Driver: " + ((Driver)this).DriverName + ", Licence: " + ((Licence)this).LicenceName + "\r\n");
                 return;
             }
 

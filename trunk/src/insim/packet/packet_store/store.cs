@@ -82,7 +82,7 @@ namespace Drive_LFSS.PacketStore_
             Packet packet = udpSendingQueud.Dequeue();
             if (!struturedPacket.ContainsKey(packet.packetType))
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpSendQueud(), No Structure Define for this PacketType->" + packet.packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpSendQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
                 return null;
             }
             return packet.data;
@@ -95,7 +95,7 @@ namespace Drive_LFSS.PacketStore_
             Packet packet = tcpSendingQueud.Dequeue();
             if (!struturedPacket.ContainsKey(packet.packetType))
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpSendQueud(), No Structure Define for this PacketType->" + packet.packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpSendQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
                 return null;
             }
             return packet.data;
@@ -109,7 +109,7 @@ namespace Drive_LFSS.PacketStore_
             Packet packet = udpReceivedQueud.Dequeue();
             if (!struturedPacket.ContainsKey(packet.packetType))
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpReceiveQueud(bool _returnStruct), No Structure Define for this PacketType->" + packet.packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpReceiveQueud(bool _returnStruct), No structure defined for this PacketType->" + packet.packetType + "\r\n");
                 return null;
             }
             object[] _return = new object[2];
@@ -125,7 +125,7 @@ namespace Drive_LFSS.PacketStore_
             Packet packet = udpReceivedQueud.Dequeue();
             if (!struturedPacket.ContainsKey(packet.packetType))
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpReceiveQueud(), No Structure Define for this PacketType->" + packet.packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpReceiveQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
                 return null;
             }
             return packet.data;
@@ -138,7 +138,7 @@ namespace Drive_LFSS.PacketStore_
             Packet packet = tcpReceivedQueud.Dequeue();
             if (!struturedPacket.ContainsKey(tcpReceivedQueud.Peek().packetType))
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpReceiveQueud(bool _returnStruct), No Structure Define for this PacketType->" + packet.packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpReceiveQueud(bool _returnStruct), No structure defined for this PacketType->" + packet.packetType + "\r\n");
                 return null;
             }
             object[] _return = new object[2];
@@ -154,7 +154,7 @@ namespace Drive_LFSS.PacketStore_
             Packet packet = tcpReceivedQueud.Dequeue();
             if (!struturedPacket.ContainsKey(packet.packetType))
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpReceiveQueud(), No Structure Define for this PacketType->" + packet.packetType + "\r\n");
+                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpReceiveQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
                 return null;
             }
            return packet.data;

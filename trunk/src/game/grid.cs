@@ -126,9 +126,9 @@ namespace Drive_LFSS.Game_
 
                     //Debug
                     if (!carAround[itr].HasCollisionWarning())
-                        carAround[itr].SendCollisionWarning("^1Pre Collision Into "+((Driver)car).DriverName + "!");
+                        carAround[itr].SendCollisionWarning("^1Pre-collision into: " + ((Driver)car).DriverName + "!");
                     if (!car.HasCollisionWarning())
-                        car.SendCollisionWarning("^1Pre Collision From" + ((Driver)carAround[itr]).DriverName + "!");
+                        car.SendCollisionWarning("^1Pre-collision from: " + ((Driver)carAround[itr]).DriverName + "!");
                     //Log.debug("Car Is in Back:" + ((Driver)carAround[itr]).DriverName + ", And Dangerous To:" + ((Driver)car).DriverName + "\r\n");
                 }
                     

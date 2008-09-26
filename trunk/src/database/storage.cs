@@ -54,7 +54,7 @@ namespace Drive_LFSS.Storage_
                     reader.Dispose();
                     reader = Program.dlfssDatabase.ExecuteQuery("SELECT * FROM `" + tableName + "`");
 
-                    Log.commandHelp("  Loading Storage \"" + tableName + "\"\r\n");
+                    Log.commandHelp("  Loading storage \"" + tableName + "\"\r\n");
 
                     List<object> value = new List<object>();
                     int valueIndex = 0;
@@ -75,7 +75,7 @@ namespace Drive_LFSS.Storage_
                                     if (reader.GetFieldType(index) == typeof(UInt32) || reader.GetFieldType(index) == typeof(byte) || reader.GetFieldType(index) == typeof(UInt16))
                                         value.Add(reader.IsDBNull(index) ? 0 : (uint)reader.GetInt32(index));
                                     else
-                                        Log.error("  UINT Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  UINT unsupported field type for: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                                 case 'p':
                                     if (reader.GetFieldType(index) == typeof(UInt32) || reader.GetFieldType(index) == typeof(byte) || reader.GetFieldType(index) == typeof(UInt16))
@@ -84,13 +84,13 @@ namespace Drive_LFSS.Storage_
                                         dataIndex = (reader.IsDBNull(index) ? 0 : (uint)reader.GetInt32(index));
                                     }
                                     else
-                                        Log.error("  Primary Key Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  Primary key unsupported field type for: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                                 case 'i':
                                     if (reader.GetFieldType(index) == typeof(Int32) || reader.GetFieldType(index) == typeof(byte))
                                         value.Add(reader.IsDBNull(index) ? 0 : reader.GetInt32(index));
                                     else
-                                        Log.error("  INT Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  INT unsupported field type for: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                                 case 's':
                                     value.Add((reader.IsDBNull(index) ? "NULL" : "" + reader.GetString(index)));
@@ -101,7 +101,7 @@ namespace Drive_LFSS.Storage_
                                     else if (reader.GetFieldType(index) == typeof(Decimal))
                                         value.Add((float)(reader.IsDBNull(index) ? 0 : reader.GetDecimal(index)));
                                     else
-                                        Log.error("  Unsuported Field Type For: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
+                                        Log.error("  Unsupported field type for: " + index + " FieldType is: " + reader.GetFieldType(index) + "\r\n");
                                     break;
                             }
                             valueIndex++;
@@ -113,12 +113,12 @@ namespace Drive_LFSS.Storage_
                     returnValue = true;
                 }
                 else
-                    Log.error("  Storage System, Database Table:'" + tableName + "', has a invalide field count, she has: " + reader.FieldCount + ", it should be at: " + tableFormat.Length + "\r\n");
+                    Log.error("  Storage system - Database table:'" + tableName + "', has an invalid field count, has: " + reader.FieldCount + ", should be: " + tableFormat.Length + "\r\n");
             }
             else if (errorOnEmpty)
-                Log.error("  Storage System, Database Table:'" + tableName + "', Is Empty.\r\n");
+                Log.error("  Storage system - Database table:'" + tableName + "', is empty.\r\n");
             else
-                Log.commandHelp("  Loading Storage \"" + tableName + "\"\r\n");
+                Log.commandHelp("  Loading storage \"" + tableName + "\"\r\n");
 
             reader.Dispose();
             reader = null;

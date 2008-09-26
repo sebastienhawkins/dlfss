@@ -44,7 +44,7 @@ namespace Drive_LFSS.CommandConsole_
                 case "exit": Exit(); break;
                 default:
                 {
-                    Log.error("Unknow Command: " + _commandText + "\r\n");
+                    Log.error("Unknown command: " + _commandText + "\r\n");
                     break;
                 }
             }
@@ -53,7 +53,7 @@ namespace Drive_LFSS.CommandConsole_
         {
             if (args.Length != 2)
             {
-                Log.normal("Command Status, Syntax Error.\r\n  Usage:\r\n    status #serverName\r\n      #serverName can be \"all\".\r\n");
+                Log.normal("Command - status, Syntax error.\r\n  Usage:\r\n    status #serverName\r\n      #serverName can be \"all\".\r\n");
                 return;
             }
 
@@ -78,19 +78,19 @@ namespace Drive_LFSS.CommandConsole_
                     Session session = SessionList.sessionList[serverName];
 
                     if (session.IsConnected())
-                        Log.normal("serverName: " + serverName + ", Status: online, ReactionTime: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
+                        Log.normal("ServerName: " + serverName + ", Status: online, ReactionTime: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
                     else
-                        Log.error("serverName: " + serverName + ", Status: offline, ReactionTime: -ms, DriversCount: -\r\n");
+                        Log.error("ServerName: " + serverName + ", Status: offline, ReactionTime: -ms, DriversCount: -\r\n");
                 }
                 else
-                    Log.command("Command Status, ServerName Not Found, Server Requested was: " + serverName + "\r\n");
+                    Log.command("Command - status, ServerName not found.\r\n  Server requested was: " + serverName + "\r\n");
             }
         }
         private static void Say(string[] args)
         {
             if (args.Length < 3)
             {
-                Log.commandHelp("Command Say, Syntax Error.\r\n  Usage:\r\n    say #serverName $Message\r\n      #serverName can be \"all\".\r\n");
+                Log.commandHelp("Command - say, Syntax error.\r\n  Usage:\r\n    say #serverName $Message\r\n      #serverName can be \"all\".\r\n");
                 return;
             }
 
@@ -113,14 +113,14 @@ namespace Drive_LFSS.CommandConsole_
                 if (SessionList.sessionList.ContainsKey(serverName))
                     SessionList.sessionList[serverName].AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
                 else
-                    Log.command("Command Announce, serverName Not Found, Server Requested was: " + args[1] + "\r\n");
+                    Log.command("Command - announce, serverName Not Found: " + args[1] + "\r\n");
             }
         }
         private static void Reload(string[] args)
         {
             if (args.Length < 2)
             {
-                Log.commandHelp("Command Reload, Syntax Error.\r\n  Usage:\r\n    reload #table_name\r\n      #table_name can be \"all\" or \"config\".\r\n");
+                Log.commandHelp("Command - reload, Syntax error.\r\n  Usage:\r\n    reload #table_name\r\n      #table_name can be \"all\" or \"config\".\r\n");
                 return;
             }
             switch (args[1])
@@ -165,8 +165,8 @@ namespace Drive_LFSS.CommandConsole_
                 } break;
                 default:
                 {
-                    Log.commandHelp("Command Reload, unknow tableName: "+args[1]+".\r\n");
-                    Log.commandHelp("Command Reload, Syntax Error.\r\n  Usage:\r\n    reload #table_name\r\n      #table_name can be \"all\" or \"config\".\r\n");
+                    Log.commandHelp("Command - reload, unknown tableName: "+args[1]+".\r\n");
+                    Log.commandHelp("Command - reload, Syntax Error.\r\n  Usage:\r\n    reload #table_name\r\n      #table_name can be \"all\" or \"config\".\r\n");
                 } break;
             }
         }
