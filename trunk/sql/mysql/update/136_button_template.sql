@@ -1,5 +1,5 @@
 -- add button for user config gui
-DELETE FROM `button_template` WHERE `entry` IN(40,41,42,43,44);
+DELETE FROM `button_template` WHERE `entry` IN(40,41,42,43);
 INSERT INTO `button_template` 
 (`entry`,`description`,`style_mask`,`is_allways_visible`,`max_input_char`,`left`,`top`,`width`,`height`,`text`,`caption_text`) values 
 (40, 'config timediff bg', 32, 0, 0, 49, 30, 22, 24, '', ''), 
