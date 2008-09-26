@@ -336,7 +336,7 @@ namespace Drive_LFSS.Game_
         {
             lock (Program.dlfssDatabase)
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`='" + licenceName + "' AND `driver_name`='" + driverName + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`='" + licenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "' AND `driver_name`='" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
@@ -354,7 +354,7 @@ namespace Drive_LFSS.Game_
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName + "','" + driverName + "', '" + String.Join(" ",configData)+ "', " + (System.DateTime.Now.Ticks / 10000000) + ")");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "','" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "', '" + String.Join(" ", configData) + "', " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
         }
         private bool SetNewGuid()
