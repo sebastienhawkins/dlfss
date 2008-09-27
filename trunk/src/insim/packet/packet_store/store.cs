@@ -93,6 +93,21 @@ namespace Drive_LFSS.PacketStore_
                 return null;
 
             Packet packet = tcpSendingQueud.Dequeue();
+
+            //This is a patented fix for a Flooding probleme occuring...
+            if(packet == null)
+            {
+                Log.error("NextTcpSendQueud(), Strange Flooding of Null Packet Occur, Cleanup Engaged.\r\n");
+                while(tcpSendingQueud.Count > 0)
+                {
+                    packet = tcpSendingQueud.Dequeue();
+                    if(packet != null)
+                        break;
+                }
+            }
+            if(packet == null)
+                return null;
+            
             if (!struturedPacket.ContainsKey(packet.packetType))
             {
                 Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpSendQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");

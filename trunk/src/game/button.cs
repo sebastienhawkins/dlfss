@@ -267,7 +267,7 @@ namespace Drive_LFSS.Game_
                 (
                     Packet_Size.PACKET_SIZE_BFN,
                     Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,
-                    new PacketBFN(((Driver)this).LicenceId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
+                    new PacketBFN(((Licence)this).LicenceId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
                 )
             );
         }

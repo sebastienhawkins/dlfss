@@ -213,7 +213,7 @@ namespace Drive_LFSS.Game_
                         if (_voteTimer.Length > 0)
                             _voteTimer = _voteTimer.Insert(_voteTimer.Length-1, ".");
                         iSession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_TITLE, "^3Next Track Vote, ^2" + _voteTimer + "^3 ms.");
-                        voteTimerAdvert = 100;
+                        voteTimerAdvert = 300;
                     }
                     else
                         voteTimerAdvert -= diff;
@@ -248,7 +248,7 @@ namespace Drive_LFSS.Game_
         public void StartNextTrackVote()
         {
             //Script Call, Before Start.
-            if (iSession.Script.NextTrackVoteStarted(iSession))
+            if (iSession.Script.NextTrackVoteStarted())
                 return;
 
             voteInProgress = true;

@@ -46,11 +46,13 @@ namespace Drive_LFSS.Game_
         public void ConfigApply()
         {
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "RaceSave");
+            RACE_RESTART_INTERVAL = (uint)Config.GetIntValue("Race",iSession.GetSessionName() ,"AutoRestart");
             grid.ConfigApply();
         }
 
         public void Init(PacketREO _packet)
         {
+            EndRestart();
             for (byte itr = (byte)PositionIndex.POSITION_FIRST; itr < (byte)PositionIndex.POSITION_LAST; )
                 carPosition[itr++] = 0;
 
@@ -65,11 +67,12 @@ namespace Drive_LFSS.Game_
                 gridOrder = gridOrder.TrimEnd(' ');
 
             stateHasChange = true;
-        } //Is the Main RaceSTART Procedure
+        } //Is the first RaceSTART Procedure
         public void Init(PacketRST _packet)
         {
+            EndRestart();
             timeStart = (uint)(System.DateTime.Now.Ticks / Program.tickPerMs);
-            requestedFinalResult = false;
+            requestedFinalResultDone = false;
             finalResultCount = 0;
             finishOrder = "";
 
@@ -126,7 +129,7 @@ namespace Drive_LFSS.Game_
                 }
                 hasToBeSavedIntoPPSTA = false;
             }
-            if (finishedCount >= carCount && !requestedFinalResult) //This is not working good in all condition during qualify
+            if (finishedCount >= carCount && !requestedFinalResultDone) //This is not working good in all condition during qualify
             {
                 RequestFinalResult();
             }
@@ -140,24 +143,28 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessResult(PacketRES _packet)
         {
+            if(guid == 0)
+                return;
+
             SetCarPosition(_packet.carId, _packet.positionFinal);
 
-            if ((_packet.requestId == 1 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY ) 
+            if ( (_packet.requestId == 2 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 || _packet.confirmMask == Confirm_Flag.CONFIRM_CONFIRMED)
             {
                 ++finalResultCount;
-                if(finalResultCount == (finishedCount))
+                if (finalResultCount >= carCount) //This is bad
                     FinishRace();
             }
         }
         public void ProcessResult(PacketFIN _packet)
         {
             //In fact this packet is more needed into Lap/Driver
-        }
+        } //This confirm a race Finished
         public void ProcessRaceEnd()
         {
             guid = 0;
             qualifyRaceGuid = 0;
+            EndRestart();
         }
         
         //LFS Insim Defined var
@@ -180,7 +187,7 @@ namespace Drive_LFSS.Game_
         private string finishOrder = "";
         //
         private Grid grid = new Grid();
-        private bool requestedFinalResult = false;
+        private bool requestedFinalResultDone = false;
         private byte finalResultCount = 0;
         private bool stateHasChange = false;
         private bool hasToBeSavedIntoPPSTA = false;
@@ -189,9 +196,13 @@ namespace Drive_LFSS.Game_
         private ISession iSession;
         private uint timeStart = 0;
         private byte[] carPosition = new byte[(int)PositionIndex.POSITION_LAST+1]; //index 0, mean nothing and index 193 mean Nothing too.
+        private bool triggerRaceRestart = false; 
+        private uint RACE_RESTART_INTERVAL = 0;
+        private uint timerRaceRestart = 0;
 
         private static uint SAVE_INTERVAL = 5000;
         private uint raceSaveInterval = 0;
+        uint advertRaceRestart = 0;
         public void update(uint diff)
         {
 
@@ -204,6 +215,25 @@ namespace Drive_LFSS.Game_
                         if ((raceSaveInterval += diff) >= SAVE_INTERVAL)
                             SaveToDB();
                     }
+                }
+            }
+            if(timerRaceRestart > 0)
+            {
+                if(diff >= timerRaceRestart)
+                {
+                    EndRestart();
+                    ExecRestart();
+                }
+                else
+                {
+                    timerRaceRestart -= diff;
+                    if (diff > advertRaceRestart)
+                    {
+                        advertRaceRestart = 300;
+                        iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1, "^2Restart in ^7" + Math.Round((decimal)(timerRaceRestart / 1000.00d), 1).ToString());
+                    }
+                    else
+                        advertRaceRestart -=diff;
                 }
             }
         }
@@ -252,6 +282,13 @@ namespace Drive_LFSS.Game_
 
             if (iSession.Script.RaceCompleted(gridOrder,finishOrder))
                 return;
+            
+            //Qualify need better support on finish before i can add this.
+            //timerRaceRestart , should not be added into the if, since this should not be called twice... let see after qual fix.
+            if (RACE_RESTART_INTERVAL > 0 && timerRaceRestart == 0 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING)
+            {
+                StartRestart();
+            }
         }            //Is The Finish Race Procudure(A Sucess CompletedRace)
 
         private void SetCarPosition(byte _carId, byte _position)
@@ -310,16 +347,37 @@ namespace Drive_LFSS.Game_
         }
         private void RequestFinalResult()
         {
-            requestedFinalResult = true;
+            requestedFinalResultDone = true;
             ((Session)iSession).AddToTcpSendingQueud
             (
                 new Packet
                 (
                     Packet_Size.PACKET_SIZE_TINY,
                     Packet_Type.PACKET_TINY_MULTI_PURPOSE,
-                    new PacketTiny(1, Tiny_Type.TINY_RES)
+                    new PacketTiny(2, Tiny_Type.TINY_RES)
                 )
             );
+        }
+        
+        private void StartRestart()
+        {
+            Log.debug(iSession.GetSessionNameForLog() + " StartRestart(), has been launched with  '" + RACE_RESTART_INTERVAL + "' to go.\r\n");
+            timerRaceRestart = RACE_RESTART_INTERVAL;
+            iSession.AddMessageMiddleToAll("^2Race will restart in ^7" + RACE_RESTART_INTERVAL / 1000 + " ^2sec , if no other action.", (4500 > RACE_RESTART_INTERVAL ? RACE_RESTART_INTERVAL : 4500));
+        }
+        private void ExecRestart()
+        {
+            Log.debug(iSession.GetSessionNameForLog() + " ExecRestart(), Exec /restart.\r\n");
+            iSession.SendMSTMessage("/restart");
+        }
+        private void EndRestart()
+        {
+            if (timerRaceRestart > 0)
+            {
+                Log.debug(iSession.GetSessionNameForLog()+" EndRestart(), was ended sucess.\r\n");
+                iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
+                timerRaceRestart = 0;
+            }
         }
     }
 }

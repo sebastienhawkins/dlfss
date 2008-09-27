@@ -155,7 +155,7 @@ namespace Drive_LFSS.Game_
                 }
             }
             
-            AddMessageMiddle("^2MS ^7" + Math.Round(maxSpeedKmh, 2) + " ^7Kmh", 6000);
+            AddMessageMiddle("^2MS ^7" + Math.Round((decimal)maxSpeedKmh, 2) + " ^7Kmh", 6000);
             maxSpeedKmh = 0.0d; 
 
             laps.Add(new Lap());

@@ -230,6 +230,7 @@ namespace Drive_LFSS.InSim_
             byte[] _packet;
             while ((_packet = NextTcpSendQueud()) != null)
             {
+                
                 Log.network(((Session)this).GetSessionNameForLog() + " TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
 
                 try{tcpSocket.Write(_packet,0,_packet.Length);}

@@ -26,14 +26,16 @@ namespace Drive_LFSS.Script_
     //return false == Continue Default Core Action
     public sealed class Script
     {
-        public Script()
+        public Script(ISession _iSession)
         {
+            iSession = _iSession;
         }
         ~Script()
         {
             if (true == false) { }
         }
-
+        
+        private readonly ISession iSession;
         //diff == the time passed from the last call here.
         //anything you need to timer.
         public void update(uint diff)
@@ -47,7 +49,7 @@ namespace Drive_LFSS.Script_
         }
         
         //Any action you wich to do when a track vote start.
-        public bool NextTrackVoteStarted(ISession iSession)
+        public bool NextTrackVoteStarted()
         {
             iSession.SendMSTMessage("/pit_all");
 
@@ -59,10 +61,11 @@ namespace Drive_LFSS.Script_
         public bool NextTrackVoteEnded(IVote vote,ref ushort trackEntry)
         {
             if (trackEntry != 0)
-                return false;                                    //return false, will prepare the trackEntry
-
-            vote.StartNextTrackVote();              //restart The vote, since no track has been Selected(trackEntry == 0)
-            return true;                                          //return true, will not try to prepare the next track.
+                return false;                                       //return false, will prepare the trackEntry
+            
+            iSession.AddMessageMiddleToAll("^2Next Track Vote Cancel!",4500);
+            //vote.StartNextTrackVote();                            //restart The vote, since no track has been Selected(trackEntry == 0)
+            return true;                                            //return true, will not try to prepare the next track.
         }
 
         //this happen when a player got a drift score
@@ -76,7 +79,7 @@ namespace Drive_LFSS.Script_
         //this happen when a player do a 0-100Kmh acceleration.
         public bool CarAccelerationSucess(ICar car, ushort startKmh, ushort endKmh, double finalAccelerationTime)
         {
-            ((IButton)car).AddMessageTop(" ^7 " + startKmh + "^2 - ^7" + endKmh + " ^2Km/h In: ^7" + Math.Round(finalAccelerationTime, 3) + " ^2sec.", 4500);
+            ((IButton)car).AddMessageTop(" ^7 " + startKmh + "^2 - ^7" + endKmh + " ^2Km/h In: ^7" + Math.Round((decimal)finalAccelerationTime, 3) + " ^2sec.", 4500);
             
            return false;                             //true or false change nothing.
         }
