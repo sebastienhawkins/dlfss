@@ -200,7 +200,6 @@ namespace Drive_LFSS.Game_
 
         }
 
-        #region Process packet
         new public void AddToTcpSendingQueud(Packet _serverPacket)
         {
             base.AddToTcpSendingQueud(_serverPacket);
@@ -276,7 +275,6 @@ namespace Drive_LFSS.Game_
                 return;
             }
 
-            Car _car;
             byte index;
             //this is first version, i expect some probleme into the case, we don't know Driver as Leave the Race or Disconnected... Let See.
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
@@ -284,14 +282,12 @@ namespace Drive_LFSS.Game_
                 if ((index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 0)
                 {
                     driverList[index].Init(_packet);
-                    _car = ((Car)driverList[index]);
                 }
                 else
                 {
                     Driver _driver = new Driver(this);
                     _driver.Init(_packet);
                     driverList.Add(_driver);
-                    _car = ((Car)_driver);
                 }
             }
             else    //Human
@@ -299,7 +295,7 @@ namespace Drive_LFSS.Game_
                 index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName);
                 driverList[index].Init(_packet);
             }
-            race.AddToGrid(((CarMotion)driverList[index]));
+            race.ProcessCarJoinRace(((CarMotion)driverList[index]));
         }      // New Car Join Race
         protected sealed override void processPacket(PacketPLL _packet)
         {
@@ -314,7 +310,7 @@ namespace Drive_LFSS.Game_
 
             //Do we delete the entire Driver on a Bot Leave Race???
             ((Car)driverList[itr]).ProcessLeaveRace(_packet);
-            race.RemoveFromGrid(((CarMotion)driverList[itr]));
+            race.ProcessCarLeaveRace(((CarMotion)driverList[itr]));
         }      // Delete Car leave (spectate - loses slot)
         protected sealed override void processPacket(PacketMCI _packet)
         {
@@ -431,6 +427,10 @@ namespace Drive_LFSS.Game_
                 {
                     vote.ProcessVoteAction((Vote_Action)_packet.uintValue);
                 } break;
+                case Small_Type.SMALL_RTP_RACE_TIME:
+                {
+                    race.ProcessGTH(_packet.uintValue);
+                }break;
                 default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;
             }
         }    // Multipurpose 
@@ -454,7 +454,6 @@ namespace Drive_LFSS.Game_
         protected sealed override void processPacket(PacketFIN _packet)
         {
             base.processPacket(_packet);
-            race.ProcessResult(_packet);
         }      // Final Result, Only into a Race
         protected sealed override void processPacket(PacketBTC _packet)
         {
@@ -562,7 +561,7 @@ namespace Drive_LFSS.Game_
                 } break;
             }
         }      // Button Click Receive
-        protected sealed override void processPacket(PacketBTT _packet)           // Button Text Receive
+        protected sealed override void processPacket(PacketBTT _packet)         // Button Text Receive
         {
             base.processPacket(_packet);
 
@@ -633,13 +632,11 @@ namespace Drive_LFSS.Game_
             driverList[GetCarIndex(_packet.carId)].ProcessEnterGarage();
 
         }
-        #endregion
 
-        #region Driver/Car/Licence Association Tool
         private byte GetCarIndex(byte _carId)
         {
             int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 1; itr < count; itr++)
             {
                 if (((ICar)driverList[itr]).CarId == _carId)
                     return itr;
@@ -661,7 +658,7 @@ namespace Drive_LFSS.Game_
         private byte GetLicenceIndexWithName(byte _licenceId, string _driverName)
         {
             int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 1; itr < count; itr++)
             {
                 if (((ILicence)driverList[itr]).LicenceId == _licenceId && ((IDriver)driverList[itr]).DriverName == _driverName)
                     return itr;
@@ -671,7 +668,7 @@ namespace Drive_LFSS.Game_
         private byte GetLicenceIndexNoBot(byte _licenceId)
         {
             int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 1; itr < count; itr++)
             {
                 if (driverList[itr].LicenceId == _licenceId && !driverList[itr].IsBot())
                     return itr;
@@ -681,7 +678,7 @@ namespace Drive_LFSS.Game_
         private byte GetFirstLicenceIndex(byte _licenceId)
         {
             int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 1; itr < count; itr++)
             {
                 if (((ILicence)driverList[itr]).LicenceId == _licenceId)
                     return itr;
@@ -691,7 +688,7 @@ namespace Drive_LFSS.Game_
         private bool IsExistLicenceId(byte _licenceId)
         {
             int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 1; itr < count; itr++)
             {
                 if (((ILicence)driverList[itr]).LicenceId == _licenceId)
                     return true;
@@ -706,7 +703,13 @@ namespace Drive_LFSS.Game_
         {
             return (byte)(clientConnectionCount - 1); //Remove The Host
         }
-        #endregion
+        public IDriver GetDriverWith(byte carId)
+        {
+            byte carIndex = GetCarIndex(carId);
+            if(carIndex != 0)
+                return driverList[carIndex];
+            return null;
+        }
     }
 }
 

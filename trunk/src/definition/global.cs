@@ -146,7 +146,11 @@ namespace Drive_LFSS.Definition_
         CTRL_LOGOFF_EVENT = 5,
         CTRL_SHUTDOWN_EVENT
     }
-    
+    public enum Bot_GUI : uint
+    {
+        FIRST = 4294967167,
+        LAST = 0xFFFFFFFF
+    }
     public enum Protocol_Id
     {
         PROTO_UDP,

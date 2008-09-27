@@ -125,6 +125,9 @@ namespace Drive_LFSS.InSim_
 
                 _packet = new PacketTiny(1, Tiny_Type.TINY_SST_STATE_INFO);
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
+                
+                _packet = new PacketTiny(1, Tiny_Type.TINY_RES);
+                AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, _packet));
             }
             else
                 SetDisconnected();

@@ -311,7 +311,10 @@ namespace Drive_LFSS.Game_
             iSession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_6);
 
             if (iSession.Script.NextTrackVoteEnded((IVote)this,ref chosedMap))
+            {
+                voteInProgress = false;
                 return;
+            }
 
             PrepareNextTrack(chosedMap);
         }
@@ -336,7 +339,7 @@ namespace Drive_LFSS.Game_
             iSession.SendMSTMessage("/laps " + nextRace.LapCount);
             iSession.SendMSTMessage("/weather " + (byte)nextRace.Weather);
             iSession.SendMSTMessage("/wind " + (byte)nextRace.Wind);
-            iSession.SendMSTMessage("/rstend 30");
+            iSession.SendMSTMessage("/rstend 0");
             iSession.SendMSTMessage("/autokick no");
             iSession.SendMSTMessage("/clear");
             iSession.SendMSTMessage("/cruise " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
@@ -350,7 +353,6 @@ namespace Drive_LFSS.Game_
                 carPrefix += Program.carTemplate.GetEntry(Convert.ToUInt32(carEntrys[itr])).NamePrefix + "+";
             carPrefix = carPrefix.TrimEnd(new char[] { '+' });
             iSession.SendMSTMessage("/cars " + carPrefix);
-
         }
         private void EndRace()
         {

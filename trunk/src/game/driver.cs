@@ -31,6 +31,7 @@ namespace Drive_LFSS.Game_
 
     public sealed class Driver : Car, IDriver
     {
+        private static bool[] botGuid = new bool[128];
         public Driver(ISession _session): base()
         {
             iSession = _session;
@@ -52,7 +53,8 @@ namespace Drive_LFSS.Game_
 
             base.Init(_packet);
 
-            if (IsBot())
+            //Only a Host will trigger a NCN as a Bot, real AI Bot trigger only a NPL
+            if (IsBot()) 
                 return;
 
             SendBanner();
@@ -93,10 +95,19 @@ namespace Drive_LFSS.Game_
             base.Init(_packet);
 
             laps.Add(new Lap());
-
+            
             if (IsBot())
-                return;
-
+            {
+                for (byte botAddGuid = 0; botAddGuid < 129; botAddGuid++)
+                {
+                    if (!botGuid[botAddGuid])
+                    {
+                        botGuid[botAddGuid] = true;
+                        guid = (uint)Bot_GUI.FIRST + botAddGuid;
+                        break;
+                    }
+                }
+            }
             if (guid == 0)
             {
                 LoadFromDB();
@@ -197,11 +208,24 @@ namespace Drive_LFSS.Game_
         public void ProcessRaceEnd()
         {
         }
+        new public void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
+        {
+            base.ProcessLeaveRace(_packet);
+            
+            if(IsBot())
+            {
+                botGuid[guid-(uint)Bot_GUI.FIRST] = false;
+                guid = 0;
+            }
+        }
         public void ProcessCNLPacket(PacketCNL _packet) //Disconnect
         {
             QuitReason = _packet.quitReason;
+            
+            //Only a host will trigger this a real bot trigger only a Leave race.
             if(IsBot())
                 return;
+
             lock( Program.dlfssDatabase)
             {
                 SaveToDB();
