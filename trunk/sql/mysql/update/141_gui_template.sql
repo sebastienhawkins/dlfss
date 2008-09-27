@@ -1,8 +1,9 @@
--- 
+-- Add the new Gui Text
 DELETE FROM `gui_template` WHERE `entry` IN(4);
 INSERT INTO `gui_template` (`entry`,`description`,`button_entry`,`text_button_entry`,`text`) VALUES 
 (4, 'text', '45 46', 44, '');
 
+-- Update the text for the Help gui
 UPDATE `gui_template` SET`text`= 
 '^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha
 ^7
