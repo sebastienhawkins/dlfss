@@ -1,4 +1,4 @@
-DLFSS 0.2    (2008) svn://svn.aleajecta.com/dlfss/trunk
+DLFSS 0.2    (2008) svn://svn.aleajecta.com/dlfss/0.2
 
 DLFSS 0.2  - Codename "Sunrise" - Optimize current Core and Game Feature,
 Adding more output and Calculation on Statictique.
@@ -12,6 +12,7 @@ Adding more output and Calculation on Statictique.
  * Drifting Style Score(UserConfigurable).
  * Max Speed Khm For each lap(UserConfigurable).
  * WR / PB / Split, Diff Output(UserConfigurable).
+ * Limited finish time after First finish. 
  * Auto restart race/qual on finish.
  * User Config from GUI interface
 

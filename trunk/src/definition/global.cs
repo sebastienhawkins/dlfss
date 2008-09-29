@@ -24,7 +24,7 @@ namespace Drive_LFSS.Definition_
     {
          public const string COLOR_DIFF_LOWER = "^3";
          public const string COLOR_DIFF_EVENT = "^8";
-         public const string COLOR_DIFF_HIGHER = "^4";
+         public const string COLOR_DIFF_HIGHER = "^6";
          public const string COLOR_DIFF_TOP = "^7";
     }
     public enum Config_User : byte
