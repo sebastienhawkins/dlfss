@@ -475,17 +475,17 @@ namespace Drive_LFSS.Game_
             if (((Driver)this).wr != null)
             {
                 //lapTime = lapTime.Insert();
-                AddMessageMiddle("^2WR " + PubStats.MSToString(((Driver)this).wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + ((Driver)this).wr.LicenceName, 6000);
+                AddMessageMiddle("^2WR " + ConvertX.MSToString(((Driver)this).wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + ((Driver)this).wr.LicenceName, 6000);
             }
 
             ((Driver)this).pb = Program.pubStats.GetPB(LicenceName, carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).pb != null && ((Driver)this).wr != null)
             {
-                AddMessageMiddle("^2PB " + PubStats.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + PubStats.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime,Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
+                AddMessageMiddle("^2PB " + ConvertX.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + ConvertX.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
             }
             else if (((Driver)this).pb != null)
             {
-                AddMessageMiddle("^2PB " + PubStats.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
+                AddMessageMiddle("^2PB " + ConvertX.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
             }
         }
         public void LeaveTrack()

@@ -20,5 +20,6 @@ namespace Drive_LFSS.Script_
 {
     public interface IRace
     {
+        bool CanVote();
     }
 }

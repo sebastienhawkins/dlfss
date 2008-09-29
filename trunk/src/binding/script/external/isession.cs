@@ -35,6 +35,7 @@ namespace Drive_LFSS.Script_
         void RemoveButton(ushort buttonEntry,byte licenceId);
         void AddMessageTopToAll(string text, uint duration);
         void AddMessageMiddleToAll(string text, uint duration);
+        bool CanVote();
         IDriver GetDriverWith(byte carId);
         Script Script
         {

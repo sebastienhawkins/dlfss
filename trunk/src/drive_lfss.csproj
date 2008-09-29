@@ -80,6 +80,7 @@
     <Compile Include="database\database_sqlite.cs" />
     <Compile Include="database\idatabase.cs" />
     <Compile Include="database\storage.cs" />
+    <Compile Include="drive_lfss\extention.cs" />
     <Compile Include="game\button.cs" />
     <Compile Include="game\car_motion.cs" />
     <Compile Include="game\grid.cs" />

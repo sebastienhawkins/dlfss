@@ -325,41 +325,6 @@ namespace Drive_LFSS.PubStats_
 
             return null;
         }
-        //Should create class "Stats" and put that function there.
-        public static string MSToString(uint msTime, string negativeColor, string positiveColor)
-        {
-            return MSToString((int)msTime,negativeColor, positiveColor);
-        }
-        public static string MSToString(int msTime,string negativeColor, string positiveColor)
-        {
-            string stringTime = "";
-            bool isNegative = msTime < 0 ? true : false;
-            msTime = Math.Abs(msTime);
-
-            //Hours
-            int _test = msTime / 3600000;
-            if (_test > 0)
-                stringTime += (_test > 9 ?_test.ToString():"0"+_test.ToString()) + ":";
-
-            //Minute
-            _test = msTime % 3600000 / 60000;
-            stringTime += (_test < 10 ? "0" + _test.ToString() : _test.ToString())+ ":";
-            
-            //Seconde
-            _test = msTime % 60000 / 1000;
-            stringTime += (_test < 10 ? "0" + _test.ToString() : _test.ToString())+ ".";
-
-            //Milieme
-            _test = msTime % 1000;
-            if (_test < 10)
-                stringTime += "00" + _test.ToString();
-            else if(_test < 100)
-                stringTime += "0" + _test.ToString();
-            else
-                stringTime += _test.ToString();
-
-            return isNegative ? negativeColor+"-" + stringTime : positiveColor+ stringTime;
-        }
 
         public void update(uint diff)
         {

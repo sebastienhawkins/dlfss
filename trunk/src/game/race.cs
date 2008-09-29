@@ -30,6 +30,10 @@ namespace Drive_LFSS.Game_
 
     public sealed class Race : IRace
 	{
+        private const int MIN_FORCED_FINISH_TIME = 40000;
+        private const int MAX_FORCED_FINISH_TIME = 120000;
+        private const int GTH_TIME_DIFF_FROM_GREEN_LIGHT = 16000;
+        
         public Race(Session _session): base()
         {
             iSession = _session;
@@ -158,13 +162,9 @@ namespace Drive_LFSS.Game_
                 if (timeTotalFromFirstRES == 0 && guid != 0)
                 {
                     timeTotalFromFirstRES = _packet.totalTime;
-                    uint pcDiff = timeTotalFromFirstRES / 100 * 5;
-                    if (pcDiff < 20000) //Minimal Race Force Finish
-                        pcDiff = 20000;
-                    else if (pcDiff > 60000) //Maximal Race Force Finish
-                        pcDiff = 60000;
-
-                    iSession.AddMessageTopToAll("^1Forced Finish Into ^7~" + ((double)pcDiff / 1000.0d)+" ^1sec", 3500);
+                    
+                    uint pcDiff = GetFirstRESTimePc(5);
+                    iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1,"^1Finish in ^7" + ((double)pcDiff / 1000.0d));
                 }
                 if (HasAllResult())
                     FinishRace();
@@ -195,25 +195,31 @@ namespace Drive_LFSS.Game_
                 RequestFinalQualResult();
             
             //This will bypass FinalQualifyResult.... This is Finishing a Race What Ever.
-            if (timeTotalFromFirstRES > 0 && RESTART_RACE_INTERVAL > 0)
+            if( timeTotalFromFirstRES > 0 )
             {
-                uint pcDiff = timeTotalFromFirstRES/100*5+20000;
-                if(pcDiff < 40000) //Minimal Race Force Finish
-                    pcDiff = 40000;
-                else if (pcDiff > 120000) //Maximal Race Force Finish
-                    pcDiff = 120000;
-
-                pcDiff += 16000; //+12000 is GTH time start before Green light.
-                //= SUM(INT(A1),MOD(A1,1)/0.6)
-                if((timeTotalFromFirstRES+pcDiff) < timeTotal*10)
+                uint pcDiff = GetFirstRESTimePc(5);
+                pcDiff += GTH_TIME_DIFF_FROM_GREEN_LIGHT; //+12000 is GTH time start before Green light.
+                if((timeTotalFromFirstRES+pcDiff) <= timeTotal*10)
                 {
+                    iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
                     timeTotalFromFirstRES = 0;
                     if(!HasAllResult())//In case we got all resulty before apply this.
                         FinishRace();
                 }
+                else
+                    iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1, "^1Finish in ^7" + ((timeTotalFromFirstRES + pcDiff) - (timeTotal * 10))/1000);
             }
         }
-
+        private uint GetFirstRESTimePc(uint percentage)
+        {
+            uint pcDiff = timeTotalFromFirstRES / 100 * percentage + (MIN_FORCED_FINISH_TIME / 2);
+            if (pcDiff < MIN_FORCED_FINISH_TIME) //Minimal Race Force Finish
+                pcDiff = MIN_FORCED_FINISH_TIME;
+            else if (pcDiff > MAX_FORCED_FINISH_TIME) //Maximal Race Force Finish
+                pcDiff = MAX_FORCED_FINISH_TIME; 
+                
+            return pcDiff;
+        }
         //LFS Insim Defined var
         private Race_Feature_Flag raceFeatureMask = Race_Feature_Flag.RACE_FLAG_NONE;
         private ushort nodeFinishIndex = 0;
@@ -271,10 +277,7 @@ namespace Drive_LFSS.Game_
                     }
                 }
                 
-            }
-            
-            if (raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE)
-            {
+ 
                 if (requestGTHInterval < diff)
                 {
                     PacketTiny packetTiny = new PacketTiny(1, Tiny_Type.TINY_GTH);
@@ -284,26 +287,27 @@ namespace Drive_LFSS.Game_
                 }
                 else
                     requestGTHInterval -= diff;
-            }
+            
 
-            //Feature Auto restart
-            if(timerRaceRestart > 0)
-            {
-                if(diff >= timerRaceRestart)
+                //Feature Auto restart
+                if(timerRaceRestart > 0)
                 {
-                    EndRestart();
-                    ExecRestart();
-                }
-                else
-                {
-                    timerRaceRestart -= diff;
-                    if (diff > advertRaceRestart)
+                    if(diff >= timerRaceRestart)
                     {
-                        advertRaceRestart = 300;
-                        iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1, "^2Restart in ^7" + Math.Round((decimal)(timerRaceRestart / 1000.00d), 1).ToString());
+                        EndRestart();
+                        ExecRestart();
                     }
                     else
-                        advertRaceRestart -=diff;
+                    {
+                        timerRaceRestart -= diff;
+                        if (diff > advertRaceRestart)
+                        {
+                            advertRaceRestart = 300;
+                            iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1, "^2Restart in ^7" + Math.Round((decimal)(timerRaceRestart / 1000.00d), 1).ToString());
+                        }
+                        else
+                            advertRaceRestart -=diff;
+                    }
                 }
             }
         }
@@ -337,6 +341,10 @@ namespace Drive_LFSS.Game_
             Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + raceLaps + ", saved to database.\r\n");
         }
         
+        public bool CanVote()
+        {
+            return (timeTotalFromFirstRES == 0);
+        }
         private void AddToGrid(CarMotion car)
         {
             grid.Add(car);
@@ -418,7 +426,7 @@ namespace Drive_LFSS.Game_
         {
             Log.debug(iSession.GetSessionNameForLog() + " StartRestart(), has been launched with  '" + RESTART_RACE_INTERVAL + "' to go.\r\n");
             timerRaceRestart = RESTART_RACE_INTERVAL;
-            iSession.AddMessageTopToAll("^2Race will restart in ^7" + RESTART_RACE_INTERVAL / 1000 + " ^2sec", (3000 > RESTART_RACE_INTERVAL ? RESTART_RACE_INTERVAL : 3000));
+            //iSession.AddMessageTopToAll("^2Race will restart in ^7" + RESTART_RACE_INTERVAL / 1000 + " ^2sec", (3000 > RESTART_RACE_INTERVAL ? RESTART_RACE_INTERVAL : 3000));
         }
         private void ExecRestart()
         {

@@ -92,7 +92,7 @@ namespace Drive_LFSS.Game_
         public void ProcessVoteAction(Vote_Action voteAction)
         {
             Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
-            if (voteInProgress)
+            if (!iSession.CanVote())
             {
                 SendVoteCancel();
                 return;
@@ -194,6 +194,10 @@ namespace Drive_LFSS.Game_
         private ushort  previousRaceEntry = 0;
         private bool doEnd = false; //Will serve for Know when RaceEnd Really happen and, if we load auto the next track.
 
+        public bool IsVoteInProgress()
+        {
+            return voteInProgress;
+        }
         public void update(uint diff)
         {
             if (voteTimer != 0)
@@ -231,7 +235,6 @@ namespace Drive_LFSS.Game_
                     nextRaceTimer -= diff;
             }
         }
-
         public List<ushort> GetSmartRaceMap()
         {
             List<ushort> _raceMap = new List<ushort>(raceMap);

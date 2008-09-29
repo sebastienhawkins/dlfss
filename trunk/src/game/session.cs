@@ -175,6 +175,10 @@ namespace Drive_LFSS.Game_
         {
             return race.IsRaceInProgress();
         }
+        public bool CanVote()
+        {
+            return race.CanVote() && !vote.IsVoteInProgress();
+        }
         
         private const uint TIMER_PING_PONG = 8000;
         private uint TimerPingPong = 7000;
