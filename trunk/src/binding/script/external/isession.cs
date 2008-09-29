@@ -33,6 +33,7 @@ namespace Drive_LFSS.Script_
         void SendUpdateButtonToAll(ushort buttonEntry, string text);
         void RemoveButtonToAll(ushort buttonEntry);
         void RemoveButton(ushort buttonEntry,byte licenceId);
+        void AddMessageTopToAll(string text, uint duration);
         void AddMessageMiddleToAll(string text, uint duration);
         IDriver GetDriverWith(byte carId);
         Script Script

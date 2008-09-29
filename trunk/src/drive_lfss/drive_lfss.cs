@@ -268,6 +268,7 @@ namespace Drive_LFSS
                         Log.normal("Initializing DLFSS client...\r\n");
                         Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                         Program.ConfigApply();
+                        Log.ConfigApply();
                         Log.normal("Completed initializing DLFSS client.\r\n\r\n");
 
                         Log.normal("Initializing mIRC Client...\r\n");
@@ -317,6 +318,7 @@ namespace Drive_LFSS
                         Log.normal("Initializing DLFSS Client...\r\n");
                         Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                         Program.ConfigApply();
+                        Log.ConfigApply();
                         Log.normal("Completed initializing DLFSS client.\r\n\r\n");
 
                         Log.normal("Initializing mIRC client...\r\n");

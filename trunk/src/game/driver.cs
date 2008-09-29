@@ -77,8 +77,27 @@ namespace Drive_LFSS.Game_
             }
             pb = Program.pubStats.GetPB(LicenceName, "");
         }
+        new public void ProcessCPR(PacketCPR _packet)
+        {
+            base.ProcessCPR(_packet);
+            if(_packet.driverName != driverName)
+            {
+                SaveToDB();
+                guid = 0;
+                driverName = _packet.driverName;
+                SetConfigData("");
+            }
+        }
         new public void Init(PacketNPL _packet)
         {
+            if(LicenceName == "" && !IsBot()) //What the ???
+            {
+                Log.error("Driver \""+driverName+"\", has no licence name and was Kicked, something weird happen.\r\n");
+                iSession.SendMSTMessage("/msg ^1driver ^7" + driverName+" ^1will be kicked for wrong licence.");
+                iSession.SendMSTMessage("/kick "+driverName);
+                
+                return;
+            }
             if (driverName != _packet.driverName)    //I think should be a check != null && != then Error... like custom cheater packet
                 driverName = _packet.driverName;
 

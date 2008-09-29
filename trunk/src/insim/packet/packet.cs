@@ -238,10 +238,10 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        public byte ReqI;
-        public byte UCID;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string PName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string Plate;
+        public byte requestId;
+        public byte tempLicenceId;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketCRS
     {

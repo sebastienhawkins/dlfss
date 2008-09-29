@@ -69,24 +69,25 @@ namespace Drive_LFSS.Log_
         //To be called After Config System is Initialised.
         public static void ConfigApply()
         {
+            //TODO: Log path
             logDisable = unchecked((Log_Type)Config.GetIntValue("Log", "Disable"));
         }
         public static void flush()
         {
             if (stringWriter.Count == 0)
                 return;
+
             streamWriter = System.IO.File.AppendText(logPath);
             
             List<string>.Enumerator itr = stringWriter.GetEnumerator();
             
             while (itr.MoveNext())
-            {
                 streamWriter.Write(itr.Current);
-            }
+
             streamWriter.Flush();
             streamWriter.Dispose();
 
-            stringWriter.Clear();
+            lock (stringWriter){stringWriter.Clear();}
         }
 
         public static void error(string msg)
@@ -108,7 +109,8 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void chat(string msg)
         {
@@ -121,7 +123,8 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void command(string msg)
         {
@@ -134,7 +137,8 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void commandHelp(string msg)
         {
@@ -143,7 +147,8 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.Write(msg);
                 Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void debug(string msg)
         {
@@ -156,19 +161,22 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void missingDefinition(string msg)
         {
             mutexConsoleColor.WaitOne();
             {
                 stringWriter.Add(System.DateTime.Now +  " MISSING: " + msg);
-                if ((logDisable & Log_Type.LOG_MISSING_DEFINITION) > 0)
-                    return;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write(msg);
-                Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+                if ((logDisable & Log_Type.LOG_MISSING_DEFINITION) == Log_Type.LOG_MISSING_DEFINITION)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(msg);
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void network(string msg)
         {
@@ -181,19 +189,22 @@ namespace Drive_LFSS.Log_
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void database(string msg)
         {
             if ((logDisable & Log_Type.LOG_DATABASE) > 0) 
                 return;
+
             mutexConsoleColor.WaitOne();
             {
                 stringWriter.Add(System.DateTime.Now + " DATABASE: " + msg);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;
-            } mutexConsoleColor.ReleaseMutex();
+            } 
+            mutexConsoleColor.ReleaseMutex();
         }
         public static void progress(string msg)
         {
@@ -201,6 +212,7 @@ namespace Drive_LFSS.Log_
             {
                 if ((logDisable & Log_Type.LOG_PROGRESS) == 0)
                     stringWriter.Add(System.DateTime.Now + " PROGRESS: " + msg);
+
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(ToASCII(msg));
                 Console.ForegroundColor = ConsoleColor.Gray;

@@ -17,10 +17,11 @@
  */
 namespace Drive_LFSS.Game_
 {
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Script_;
-    using Drive_LFSS.Storage_;
+    using Definition_;
+    using Packet_;
+    using Script_;
+    using Storage_;
+    using Log_;
 
     //Maybe flush this object and pout everything inside Driver, let see after making TOC
     public abstract class Licence : Button, ILicence
@@ -44,7 +45,7 @@ namespace Drive_LFSS.Game_
         {
             if (licenceId != _packet.tempLicenceId)
             {
-                //Should log this.
+                Log.error("Licence.Init(PacketNPL _packet), current licenceId was not same as packet licenceId, LicenceName: "+licenceName+".\r\n");
                 licenceId = _packet.tempLicenceId;
             }
 

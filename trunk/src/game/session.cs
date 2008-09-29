@@ -38,8 +38,9 @@ namespace Drive_LFSS.Game_
             race = new Race(this);
             vote = new Vote(this);
             driverList = new List<Driver>();
-            driverList.Add(new Driver((ISession)this)); //put Default Driver 0, will save some If.
-            driverList.Capacity = 256;
+            driverList.Capacity = 255;
+            //driverList.Add(new Driver((ISession)this)); //put Default Driver 0, will save some If.
+            //driverList.Capacity = 256;
             script = new Script(this);
             ping = new Ping();
             command = new CommandInGame(this);
@@ -148,25 +149,27 @@ namespace Drive_LFSS.Game_
         }
         public void SendUpdateButtonToAll(ushort buttonEntry, string text)
         {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].SendUpdateButton(buttonEntry, text);
+        }
+        public void AddMessageTopToAll(string text, uint duration)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+                driverList[itr].AddMessageTop(text, duration);
         }
         public void AddMessageMiddleToAll(string text, uint duration)
         {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].AddMessageMiddle(text,duration);
         }
         public void RemoveButtonToAll(ushort buttonEntry)
         {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].RemoveButton(buttonEntry);
         }
         public void RemoveButton(ushort buttonEntry, byte licenceId)
         {
-            driverList[GetLicenceIndexNoBot(licenceId)].RemoveButton(buttonEntry);
+            driverList[GetLicenceIndexNotBot(licenceId)].RemoveButton(buttonEntry);
         }
         public bool IsRaceInProgress()
         {
@@ -257,14 +260,18 @@ namespace Drive_LFSS.Game_
 
             //Prevent the Main thread from Doing the driverList.update()
             //Im not sure i love this design, since Mutex refresh time.
-            byte itr;
-            while ((itr = GetFirstLicenceIndex(_packet.tempLicenceId)) != 0)
+            byte index;
+            while ((index = GetFirstLicenceIndex(_packet.tempLicenceId)) != 255)
             {
-                driverList[itr].ProcessCNLPacket(_packet);
-                lock (this) {driverList.RemoveAt((int)itr); }
+                driverList[index].ProcessCNLPacket(_packet);
+                lock (this) { driverList.RemoveAt((int)index); }
             }
    
         }      // delete Connection
+        protected sealed override void processPacket(PacketCPR _packet)
+        {
+            driverList[GetLicenceIndexNotBot(_packet.tempLicenceId)].ProcessCPR(_packet);
+        }       //Driver Rename it self.
         protected sealed override void processPacket(PacketNPL _packet)
         {
             base.processPacket(_packet); //Keep the Log
@@ -275,34 +282,38 @@ namespace Drive_LFSS.Game_
                 return;
             }
 
+
             byte index;
             //this is first version, i expect some probleme into the case, we don't know Driver as Leave the Race or Disconnected... Let See.
+            Driver driver;
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
             {
-                if ((index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 0)
+                if ((index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 255)
                 {
                     driverList[index].Init(_packet);
+                    driver = driverList[index];
                 }
                 else
                 {
-                    Driver _driver = new Driver(this);
-                    _driver.Init(_packet);
-                    driverList.Add(_driver);
+                    driver = new Driver(this);
+                    driver.Init(_packet);
+                    driverList.Add(driver);
                 }
             }
             else    //Human
             {
                 index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName);
                 driverList[index].Init(_packet);
+                driver = driverList[index];
             }
-            race.ProcessCarJoinRace(((CarMotion)driverList[index]));
+            race.ProcessCarJoinRace(driver);
         }      // New Car Join Race
         protected sealed override void processPacket(PacketPLL _packet)
         {
             base.processPacket(_packet); //Keep the Log
 
             byte itr;
-            if ((itr = GetCarIndex(_packet.carId)) == 0)
+            if ((itr = GetCarIndex(_packet.carId)) == 255)
             {
                 Log.error(GetSessionNameForLog() + " Car left race, but no car association found, what to do?");
                 return;
@@ -316,15 +327,21 @@ namespace Drive_LFSS.Game_
         {
             //base.processPacket(_packet); // Will Reprocess the Old One
 
-
             CarInformation[] carInformation = _packet.carInformation;
             byte carIndex;
             for (byte itr = 0; itr < carInformation.Length; itr++)
             {
+                
                 if (carInformation[itr].carId == 0)
                     continue;
 
                 carIndex = GetCarIndex(carInformation[itr].carId);
+                if (carIndex == 255)
+                {
+                    //Log.error("processPacket(PacketMCI), we can find any driver with this car.\r\n");
+                    continue;
+                }
+
                 if (driverList[carIndex].LicenceId == 0) // This Bypass the Host CAR.
                     continue;
 
@@ -437,14 +454,24 @@ namespace Drive_LFSS.Game_
         protected sealed override void processPacket(PacketLAP _packet)
         {
             base.processPacket(_packet);
-
-            driverList[GetCarIndex(_packet.carId)].ProcessLapInformation(_packet);
+            byte index = GetCarIndex(_packet.carId);
+            if(index == 255)
+            {
+                Log.error("processPacket(PacketLAP), we can find any driver with this car.\r\n");
+                return;
+            }
+            driverList[index].ProcessLapInformation(_packet);
         }      // Lap Completed
         protected sealed override void processPacket(PacketSPX _packet)
         {
+            byte index = GetCarIndex(_packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketSPX), we can find any driver with this car.\r\n");
+                return;
+            }
             base.processPacket(_packet);
-
-            driverList[GetCarIndex(_packet.carId)].ProcessSplitInformation(_packet);
+            driverList[index].ProcessSplitInformation(_packet);
         }      // Split Time Receive
         protected sealed override void processPacket(PacketRES _packet)
         {
@@ -459,7 +486,7 @@ namespace Drive_LFSS.Game_
         {
             base.processPacket(_packet);
 
-            Driver driver = driverList[GetLicenceIndexNoBot(_packet.licenceId)];
+            Driver driver = driverList[GetLicenceIndexNotBot(_packet.licenceId)];
 
             switch ((Button_Entry)driver.GetButtonEntry(_packet.buttonId))
             {
@@ -565,7 +592,7 @@ namespace Drive_LFSS.Game_
         {
             base.processPacket(_packet);
 
-            byte driverIndex = GetLicenceIndexNoBot(_packet.licenceId);
+            byte driverIndex = GetLicenceIndexNotBot(_packet.licenceId);
             Car car = driverList[driverIndex];
             switch((Button_Entry)car.GetButtonEntry(_packet.buttonId))
             {
@@ -617,9 +644,9 @@ namespace Drive_LFSS.Game_
             switch (_packet.buttonFunction)
             {
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
-                    driverList[GetLicenceIndexNoBot(_packet.licenceId)].ProcessBFNClearAll(); break;
+                    driverList[GetLicenceIndexNotBot(_packet.licenceId)].ProcessBFNClearAll(); break;
                 case Button_Function.BUTTON_FUNCTION_REQUEST:
-                    driverList[GetLicenceIndexNoBot(_packet.licenceId)].ProcessBFNRequest(); break;
+                    driverList[GetLicenceIndexNotBot(_packet.licenceId)].ProcessBFNRequest(); break;
             }
         }      //Delete All Button or request Button.
         protected sealed override void processPacket(PacketVTN _packet)
@@ -628,20 +655,25 @@ namespace Drive_LFSS.Game_
         }      //Vote Notification
         protected sealed override void processPacket(PacketPLP _packet)         //Car enter garage
         {
+            byte index = GetCarIndex(_packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketSPX), we can find any driver with this car.\r\n");
+                return;
+            }
             base.processPacket(_packet);
-            driverList[GetCarIndex(_packet.carId)].ProcessEnterGarage();
-
+            driverList[index].ProcessEnterGarage();
         }
 
         private byte GetCarIndex(byte _carId)
         {
             int count = driverList.Count;
-            for (byte itr = 1; itr < count; itr++)
+            for (byte itr = 0; itr < count; itr++)
             {
                 if (((ICar)driverList[itr]).CarId == _carId)
                     return itr;
             }
-            return 0;
+            return 255;
         }
         private List<byte> GetLicenceIndexs(byte _licenceId)
         {
@@ -658,14 +690,14 @@ namespace Drive_LFSS.Game_
         private byte GetLicenceIndexWithName(byte _licenceId, string _driverName)
         {
             int count = driverList.Count;
-            for (byte itr = 1; itr < count; itr++)
+            for (byte itr = 0; itr < count; itr++)
             {
                 if (((ILicence)driverList[itr]).LicenceId == _licenceId && ((IDriver)driverList[itr]).DriverName == _driverName)
                     return itr;
             }
-            return 0;
+            return 255;
         }
-        private byte GetLicenceIndexNoBot(byte _licenceId)
+        private byte GetLicenceIndexNotBot(byte _licenceId)
         {
             int count = driverList.Count;
             for (byte itr = 1; itr < count; itr++)
@@ -673,28 +705,36 @@ namespace Drive_LFSS.Game_
                 if (driverList[itr].LicenceId == _licenceId && !driverList[itr].IsBot())
                     return itr;
             }
-            return 0;
+            return 255;
         }
         private byte GetFirstLicenceIndex(byte _licenceId)
         {
             int count = driverList.Count;
-            for (byte itr = 1; itr < count; itr++)
+            for (byte itr = 0; itr < count; itr++)
             {
                 if (((ILicence)driverList[itr]).LicenceId == _licenceId)
                     return itr;
             }
-            return 0;
+            return 255;
         }
         private bool IsExistLicenceId(byte _licenceId)
         {
             int count = driverList.Count;
-            for (byte itr = 1; itr < count; itr++)
+            for (byte itr = 0; itr < count; itr++)
             {
                 if (((ILicence)driverList[itr]).LicenceId == _licenceId)
                     return true;
             }
             return false;
         }
+        public IDriver GetDriverWith(byte carId)
+        {
+            byte carIndex = GetCarIndex(carId);
+            if(carIndex != 255)
+                return driverList[carIndex];
+            return null;
+        }
+
         public byte GetNbrOfDrivers()
         {
             return (byte)(driverList.Count - 1); // -1 remove the Host but... maybe not good idea removing it from here.
@@ -702,13 +742,6 @@ namespace Drive_LFSS.Game_
         public byte GetNbrOfConnection()
         {
             return (byte)(clientConnectionCount - 1); //Remove The Host
-        }
-        public IDriver GetDriverWith(byte carId)
-        {
-            byte carIndex = GetCarIndex(carId);
-            if(carIndex != 0)
-                return driverList[carIndex];
-            return null;
         }
     }
 }

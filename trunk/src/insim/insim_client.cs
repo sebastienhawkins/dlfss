@@ -288,6 +288,8 @@ namespace Drive_LFSS.InSim_
         }
         private void UdpReceive()
         {
+            if(!IsConnected())
+                return;
             while (udpClient.Available > 1)
             {
                 byte[] data = new byte[udpClient.Available];

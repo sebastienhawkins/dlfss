@@ -105,6 +105,11 @@ namespace Drive_LFSS.Game_
         {
             LeaveTrack();
         }
+        protected void ProcessCPR(PacketCPR _packet)
+        {
+            if(carPlate != _packet.carPlate)
+                carPlate = _packet.carPlate;
+        }
 
         private byte carId = 0;
         private string carPrefix = "";

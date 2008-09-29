@@ -37,12 +37,12 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_MCI_MULTICAR_INFORMATION:      processPacket((PacketMCI)_packet);break;
                 case Packet_Type.PACKET_MSO_CHAT_RECEIVED:             processPacket((PacketMSO)_packet);break;
                 case Packet_Type.PACKET_TINY_MULTI_PURPOSE:            processPacket((PacketTiny)_packet);break;
-                case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet); break;
+                case Packet_Type.PACKET_SMALL_MULTI_PURPOSE:           processPacket((PacketSmall)_packet);break;
                 case Packet_Type.PACKET_STA_DRIVER_RACE_STATE_CHANGE:  processPacket((PacketSTA)_packet);break;
-                case Packet_Type.PACKET_VTN_VOTE_NOTIFICATION:         processPacket((PacketVTN)_packet); break;
-                case Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME:         processPacket((PacketSPX)_packet); break;
-                case Packet_Type.PACKET_LAP_DRIVER_LAP_TIME:           processPacket((PacketLAP)_packet); break;
-                case Packet_Type.PACKET_NCN_NEW_CONNECTION:            processPacket((PacketNCN)_packet); break;
+                case Packet_Type.PACKET_VTN_VOTE_NOTIFICATION:         processPacket((PacketVTN)_packet);break;
+                case Packet_Type.PACKET_SPX_DRIVER_SPLIT_TIME:         processPacket((PacketSPX)_packet);break;
+                case Packet_Type.PACKET_LAP_DRIVER_LAP_TIME:           processPacket((PacketLAP)_packet);break;
+                case Packet_Type.PACKET_NCN_NEW_CONNECTION:            processPacket((PacketNCN)_packet);break;
                 case Packet_Type.PACKET_CNL_PART_CONNECTION:           processPacket((PacketCNL)_packet);break;
                 case Packet_Type.PACKET_NPL_DRIVER_JOIN_RACE:          processPacket((PacketNPL)_packet);break;
                 case Packet_Type.PACKET_PLL_DRIVER_LEAVE_RACE:         processPacket((PacketPLL)_packet);break;
@@ -54,7 +54,8 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_BTC_BUTTON_CLICK:              processPacket((PacketBTC)_packet);break;
                 case Packet_Type.PACKET_BTT_BUTTON_TYPE_IN_TEXT_OK:    processPacket((PacketBTT)_packet);break;
                 case Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE: processPacket((PacketBFN)_packet);break;
-                case Packet_Type.PACKET_PLP_ENTER_GARAGE:              processPacket((PacketPLP)_packet); break;
+                case Packet_Type.PACKET_PLP_ENTER_GARAGE:              processPacket((PacketPLP)_packet);break;
+                case Packet_Type.PACKET_CPR_LICENCE_DRIVER_RENAME:     processPacket((PacketCPR)_packet);break;
 
                 default: Log.missingDefinition("ProcessPacket(), No existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
@@ -87,7 +88,7 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketCPR _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " CPR_ClientRenames(), CPR->UCID=" + _packet.UCID + ", PName=" + _packet.PName + ", Plate=" + _packet.Plate + ", ReqI=" + _packet.ReqI + "\n\r");
+            Log.debug(((Session)this).GetSessionNameForLog() + " CPR_ClientRenames(), CPR->UCID=" + _packet.tempLicenceId + ", PName=" + _packet.driverName + ", Plate=" + _packet.carPlate + ", ReqI=" + _packet.requestId + "\n\r");
         }
         protected virtual void processPacket(PacketTOC _packet)
         {

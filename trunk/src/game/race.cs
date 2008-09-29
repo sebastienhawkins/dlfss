@@ -41,7 +41,7 @@ namespace Drive_LFSS.Game_
         public void ConfigApply()
         {
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "RaceSave");
-            RACE_RESTART_INTERVAL = (uint)Config.GetIntValue("Race",iSession.GetSessionName() ,"AutoRestart");
+            RESTART_RACE_INTERVAL = (uint)Config.GetIntValue("Race",iSession.GetSessionName() ,"AutoRestart");
             grid.ConfigApply();
         }
 
@@ -54,9 +54,15 @@ namespace Drive_LFSS.Game_
             gridOrder = "";
             carCount = _packet.carCount;
             uint driverGuid;
+            IDriver driver;
             for (byte itr = 0; itr < carCount; itr++)
             {
-                driverGuid = iSession.GetDriverWith(_packet.carIds[itr]).GetGuid();
+                driver = iSession.GetDriverWith(_packet.carIds[itr]);
+                if(driver == null)
+                    driverGuid = 0;
+                else
+                    driverGuid = driver.GetGuid();
+
                 gridOrder += (driverGuid >= (uint)Bot_GUI.FIRST ? 0 : driverGuid) + " ";
             }
 
@@ -126,6 +132,8 @@ namespace Drive_LFSS.Game_
                 }
                 hasToBeSavedIntoPPSTA = false;
             }
+            if (guid != 0 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING && HasAllResult())
+                FinishRace();
         }
         public void ProcessCarInformation(CarMotion car)
         {
@@ -140,12 +148,25 @@ namespace Drive_LFSS.Game_
                 || _packet.confirmMask != Confirm_Flag.CONFIRM_NONE)
             {
                 IDriver driver = iSession.GetDriverWith(_packet.carId);
+                if(driver == null) //Probaly return from a network failure and driver got disconnected during the failure, we will cancel this result.
+                    return;
                 if (driverGuidRESPos.ContainsKey(driver.GetGuid()))
                     driverGuidRESPos[driver.GetGuid()] = _packet.positionFinal;
                 else
                     driverGuidRESPos.Add(driver.GetGuid(),_packet.positionFinal);
 
-                if (driverGuidRESPos.Count-carFinishAndLeaveTrackCount == carCount)
+                if (timeTotalFromFirstRES == 0 && guid != 0)
+                {
+                    timeTotalFromFirstRES = _packet.totalTime;
+                    uint pcDiff = timeTotalFromFirstRES / 100 * 5;
+                    if (pcDiff < 20000) //Minimal Race Force Finish
+                        pcDiff = 20000;
+                    else if (pcDiff > 60000) //Maximal Race Force Finish
+                        pcDiff = 60000;
+
+                    iSession.AddMessageTopToAll("^1Forced Finish Into ^7~" + ((double)pcDiff / 1000.0d)+" ^1sec", 3500);
+                }
+                if (HasAllResult())
                     FinishRace();
             }
         }
@@ -168,11 +189,31 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessGTH(uint time)
         {
-           totalTime = time;
-           if(raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY && (totalTime/6000) >= qualificationMinute && finishedCount-carFinishAndLeaveTrackCount >= carCount && !requestedFinalResultDone)
-               RequestFinalResult();
+            timeTotal = time;
+
+            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY && (timeTotal / 6000.0d) >= qualificationMinute && HasAllResult() && !requestedFinalResultDone)
+                RequestFinalQualResult();
+            
+            //This will bypass FinalQualifyResult.... This is Finishing a Race What Ever.
+            if (timeTotalFromFirstRES > 0 && RESTART_RACE_INTERVAL > 0)
+            {
+                uint pcDiff = timeTotalFromFirstRES/100*5+20000;
+                if(pcDiff < 40000) //Minimal Race Force Finish
+                    pcDiff = 40000;
+                else if (pcDiff > 120000) //Maximal Race Force Finish
+                    pcDiff = 120000;
+
+                pcDiff += 16000; //+12000 is GTH time start before Green light.
+                //= SUM(INT(A1),MOD(A1,1)/0.6)
+                if((timeTotalFromFirstRES+pcDiff) < timeTotal*10)
+                {
+                    timeTotalFromFirstRES = 0;
+                    if(!HasAllResult())//In case we got all resulty before apply this.
+                        FinishRace();
+                }
+            }
         }
-        
+
         //LFS Insim Defined var
         private Race_Feature_Flag raceFeatureMask = Race_Feature_Flag.RACE_FLAG_NONE;
         private ushort nodeFinishIndex = 0;
@@ -193,7 +234,7 @@ namespace Drive_LFSS.Game_
         private string finishOrder = "";
         private byte carFinishAndLeaveTrackCount = 0;
         //
-        private uint totalTime = 0;
+        private uint timeTotal = 0;
         private Grid grid = new Grid();
         private bool requestedFinalResultDone = false;
         private byte finalResultCount = 0;
@@ -207,13 +248,14 @@ namespace Drive_LFSS.Game_
         //private byte[] positionToCarId = new byte[(int)PositionIndex.POSITION_LAST+1]; //index 0, mean nothing and index 193 mean Nothing too.
         private Dictionary<uint, byte> driverGuidRESPos = new Dictionary<uint, byte>(); //index 0, mean nothing and index 193 mean Nothing too.
         private bool triggerRaceRestart = false; 
-        private uint RACE_RESTART_INTERVAL = 0;
+        private uint RESTART_RACE_INTERVAL = 0;
         private uint timerRaceRestart = 0;
 
         private static uint SAVE_INTERVAL = 5000;
         private uint raceSaveInterval = 0;
         private uint requestGTHInterval = 0;
         private uint advertRaceRestart = 0;
+        private uint timeTotalFromFirstRES = 0;
 
         public void update(uint diff)
         {
@@ -231,14 +273,14 @@ namespace Drive_LFSS.Game_
                 
             }
             
-            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
+            if (raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE)
             {
                 if (requestGTHInterval < diff)
                 {
                     PacketTiny packetTiny = new PacketTiny(1, Tiny_Type.TINY_GTH);
                     Packet packet = new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, packetTiny);
                     ((Session)iSession).AddToTcpSendingQueud(packet);
-                    requestGTHInterval = 10000;
+                    requestGTHInterval = 5000;
                 }
                 else
                     requestGTHInterval -= diff;
@@ -317,6 +359,8 @@ namespace Drive_LFSS.Game_
         }
         private void FinishRace()
         {
+            timeTotalFromFirstRES = 0;
+
             Log.debug("Race: " + guid + ", was finished successfully.\r\n");
 
             Dictionary<uint,byte>.Enumerator enu = driverGuidRESPos.GetEnumerator();
@@ -341,17 +385,16 @@ namespace Drive_LFSS.Game_
             if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 qualifyRaceGuid = guid;
             guid = 0;
-
+            
             if (iSession.Script.RaceCompleted(gridOrder,finishOrder))
                 return;
             
             //Qualify need better support on finish before i can add this.
             //timerRaceRestart , should not be added into the if, since this should not be called twice... let see after qual fix.
-            if (RACE_RESTART_INTERVAL > 0)
+            if (RESTART_RACE_INTERVAL > 0)
                 StartRestart();
         }            //Is The Finish Race Procudure(A Sucess CompletedRace)
-        
-        private void RequestFinalResult()
+        private void RequestFinalQualResult()
         {
             requestedFinalResultDone = true;
             ((Session)iSession).AddToTcpSendingQueud
@@ -364,13 +407,18 @@ namespace Drive_LFSS.Game_
                 )
             );
         }
+        private bool HasAllResult()
+        {
+
+            return (driverGuidRESPos.Count - carFinishAndLeaveTrackCount >= carCount && carCount > 0);
+        }
         
         //Feature auto restart
         private void StartRestart()
         {
-            Log.debug(iSession.GetSessionNameForLog() + " StartRestart(), has been launched with  '" + RACE_RESTART_INTERVAL + "' to go.\r\n");
-            timerRaceRestart = RACE_RESTART_INTERVAL;
-            iSession.AddMessageMiddleToAll("^2Race will restart in ^7" + RACE_RESTART_INTERVAL / 1000 + " ^2sec , if no other action.", (4500 > RACE_RESTART_INTERVAL ? RACE_RESTART_INTERVAL : 4500));
+            Log.debug(iSession.GetSessionNameForLog() + " StartRestart(), has been launched with  '" + RESTART_RACE_INTERVAL + "' to go.\r\n");
+            timerRaceRestart = RESTART_RACE_INTERVAL;
+            iSession.AddMessageTopToAll("^2Race will restart in ^7" + RESTART_RACE_INTERVAL / 1000 + " ^2sec", (3000 > RESTART_RACE_INTERVAL ? RESTART_RACE_INTERVAL : 3000));
         }
         private void ExecRestart()
         {
