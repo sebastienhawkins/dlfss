@@ -117,7 +117,9 @@ namespace Drive_LFSS.Game_
         private void PingReceived()
         {
             long msTime = ping.Received();
+            #if DEBUG
             Log.network(GetSessionNameForLog() + " Pong! " +  msTime + "ms\r\n");
+            #endif
         }
         public long GetLatency()
         {
@@ -227,8 +229,10 @@ namespace Drive_LFSS.Game_
         }
         protected sealed override void processPacket(PacketNCN _packet)
         {
+            #if DEBUG
             base.processPacket(_packet); //Keep the Log
-
+            #endif
+            
             //Since we create the driver index 0 in this.construstor()
             //will conflit with the Host NCN receive packet, so here is a overide!
             //will have to rethink this later, that is looking like a HackFix, suck CPU for nothing.
@@ -254,7 +258,9 @@ namespace Drive_LFSS.Game_
         protected sealed override void processPacket(PacketCNL _packet)
         {
             //TODO: use _packet.Total as a Debug check to be sure we have same racer count into our memory as the server do. 
+            #if DEBUG
             base.processPacket(_packet); //Keep the Log
+            #endif
 
             if (!IsExistLicenceId(_packet.tempLicenceId))
             {
@@ -278,7 +284,9 @@ namespace Drive_LFSS.Game_
         }       //Driver Rename it self.
         protected sealed override void processPacket(PacketNPL _packet)
         {
+            #if DEBUG
             base.processPacket(_packet); //Keep the Log
+            #endif
 
             if (!IsExistLicenceId(_packet.tempLicenceId))
             {
@@ -314,7 +322,9 @@ namespace Drive_LFSS.Game_
         }      // New Car Join Race
         protected sealed override void processPacket(PacketPLL _packet)
         {
+            #if DEBUG
             base.processPacket(_packet); //Keep the Log
+            #endif
 
             byte itr;
             if ((itr = GetCarIndex(_packet.carId)) == 255)
@@ -329,7 +339,9 @@ namespace Drive_LFSS.Game_
         }      // Delete Car leave (spectate - loses slot)
         protected sealed override void processPacket(PacketMCI _packet)
         {
-            //base.processPacket(_packet); // Will Reprocess the Old One
+            #if DEBUG
+            //base.processPacket(_packet); //Keep the Log
+            #endif
 
             CarInformation[] carInformation = _packet.carInformation;
             byte carIndex;
@@ -355,7 +367,9 @@ namespace Drive_LFSS.Game_
         }      // Multiple Car Information
         protected sealed override void processPacket(PacketMSO _packet)
         {
-            //base.processPacket(_packet);
+            #if DEBUG
+            //base.processPacket(_packet); //Keep the Log
+            #endif
             //Chat_User_Type chatUserType = allo;
 
             //_packet.chatUserType;
@@ -366,7 +380,9 @@ namespace Drive_LFSS.Game_
 
             if (_packet.message[_packet.textStart] == commandPrefix) //Ingame Command
             {
+                #if DEBUG
                 Log.debug(GetSessionNameForLog() + " Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
+                #endif
                 CommandExec(_driver, _packet.message.Substring(_packet.textStart));
             }
             else if (_packet.chatUserType == Chat_User_Type.CHAT_USER_TYPE_SYSTEM) //Host chat
@@ -384,12 +400,16 @@ namespace Drive_LFSS.Game_
         }      // message out
         protected sealed override void processPacket(PacketREO _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
             race.Init(_packet);
         }      // Race Grid Order
         protected sealed override void processPacket(PacketRST _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
             race.Init(_packet);
 
             int count = driverList.Count;
@@ -400,7 +420,9 @@ namespace Drive_LFSS.Game_
         }      // Race Start
         protected sealed override void processPacket(PacketSTA _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
 
             string oldTrackPrefix =  race.GetTrackPrefix();
             if (_packet.currentCarId == 0)
@@ -419,11 +441,21 @@ namespace Drive_LFSS.Game_
         }      // State Change race/car
         protected sealed override void processPacket(PacketTiny _packet)
         {
-            //base.processPacket(_packet);
+            #if DEBUG
+            //base.processPacket(_packet); //Keep the Log
+            #endif
             switch (_packet.subTinyType)
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
-                case Tiny_Type.TINY_REN: Log.debug(GetSessionNameForLog() + " RACE END RACE END RACE END.\r\n"); race.ProcessRaceEnd(); vote.ProcessRaceEnd(); break; //Return Setup Screen(RaceEND)
+                case Tiny_Type.TINY_REN: 
+                {
+                    #if DEBUG
+                    Log.debug(GetSessionNameForLog() + " RACE END RACE END RACE END.\r\n"); 
+                    #endif
+
+                    race.ProcessRaceEnd(); 
+                    vote.ProcessRaceEnd(); 
+                }break; //Return Setup Screen(RaceEND)
                 case Tiny_Type.TINY_VTC: vote.ProcessVoteCancel(); break;
                 case Tiny_Type.TINY_CLR:
                 {
@@ -441,7 +473,9 @@ namespace Drive_LFSS.Game_
         }     // Multipurpose 
         protected sealed override void processPacket(PacketSmall _packet)
         {
-            //base.processPacket(_packet);
+            #if DEBUG
+            //base.processPacket(_packet); //Keep the Log
+            #endif
             switch (_packet.subType)
             {
                 case Small_Type.SMALL_VTA_VOTE_ACTION:
@@ -457,7 +491,9 @@ namespace Drive_LFSS.Game_
         }    // Multipurpose 
         protected sealed override void processPacket(PacketLAP _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
             byte index = GetCarIndex(_packet.carId);
             if(index == 255)
             {
@@ -468,27 +504,35 @@ namespace Drive_LFSS.Game_
         }      // Lap Completed
         protected sealed override void processPacket(PacketSPX _packet)
         {
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
             byte index = GetCarIndex(_packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketSPX), we can find any driver with this car.\r\n");
                 return;
             }
-            base.processPacket(_packet);
             driverList[index].ProcessSplitInformation(_packet);
         }      // Split Time Receive
         protected sealed override void processPacket(PacketRES _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
             race.ProcessResult(_packet);
         }      // Result, "Confimation" is only working for a race not qualify
         protected sealed override void processPacket(PacketFIN _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
         }      // Final Result, Only into a Race
         protected sealed override void processPacket(PacketBTC _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
 
             Driver driver = driverList[GetLicenceIndexNotBot(_packet.licenceId)];
 
@@ -594,7 +638,9 @@ namespace Drive_LFSS.Game_
         }      // Button Click Receive
         protected sealed override void processPacket(PacketBTT _packet)         // Button Text Receive
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
 
             byte driverIndex = GetLicenceIndexNotBot(_packet.licenceId);
             Car car = driverList[driverIndex];
@@ -643,7 +689,9 @@ namespace Drive_LFSS.Game_
         }
         protected sealed override void processPacket(PacketBFN _packet)
         {
-            base.processPacket(_packet);
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
 
             switch (_packet.buttonFunction)
             {
@@ -655,17 +703,24 @@ namespace Drive_LFSS.Game_
         }      //Delete All Button or request Button.
         protected sealed override void processPacket(PacketVTN _packet)
         {
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
             vote.ProcessVoteNotification(_packet.voteAction,_packet.tempLicenceId);
         }      //Vote Notification
         protected sealed override void processPacket(PacketPLP _packet)         //Car enter garage
         {
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
+
             byte index = GetCarIndex(_packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketSPX), we can find any driver with this car.\r\n");
                 return;
             }
-            base.processPacket(_packet);
+
             driverList[index].ProcessEnterGarage();
         }
 

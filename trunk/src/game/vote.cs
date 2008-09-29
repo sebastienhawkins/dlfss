@@ -64,7 +64,10 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessVoteNotification(Vote_Action voteAction, byte licenceId)
         {
+            #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " Vote notification was:" + voteAction + "\r\n");
+            #endif
+
             ushort[] keys = new ushort[6] { 0, 0, 0, 0, 0, 0 };
             voteOptions.Keys.CopyTo(keys, 0);
             switch (voteAction)
@@ -91,7 +94,10 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessVoteAction(Vote_Action voteAction)
         {
+            #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
+            #endif
+
             if (!iSession.CanVote())
             {
                 SendVoteCancel();
@@ -167,7 +173,9 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessVoteCancel()
         {
+            #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " A VOTE was CANCEL.\r\n");
+            #endif
         }
         public void ProcessRaceEnd()
         {

@@ -66,11 +66,6 @@ namespace Drive_LFSS.PubStats_
             get { return lapTime; }
             set { lapTime = value; }
         }
-
-        public void Debug()
-        {
-            Log.debug(trackPrefix + " " + carPrefix + " " + splits[1] + " " + lapTime + " " + lapCount + " " + timeStamp + "\r\n");
-        }
         //<track> <car> <split1> <split2> <split3> <laptime> <lapcount> <timestamp>
     }
     public class WR
@@ -113,11 +108,6 @@ namespace Drive_LFSS.PubStats_
         {
             get { return licenceName; }
             set { licenceName = value; }
-        }
-
-        public void Debug()
-        {
-            Log.debug(trackPrefix + " " + carPrefix + " " + splits[1] + " " + lapTime + " " + driverFlag + " " + licenceName + "\r\n");
         }
         //<id_wr> <track> <car> <split1> <split2> <split3> <laptime> <flags_hlaps> <racername>
     }

@@ -203,23 +203,14 @@ namespace Drive_LFSS.Game_
                 {
                     iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
                     timeTotalFromFirstRES = 0;
-                    if(!HasAllResult())//In case we got all resulty before apply this.
+                    if(guid != 0)//In case we got all resulty before apply this.
                         FinishRace();
                 }
                 else
                     iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1, "^1Finish in ^7" + ((timeTotalFromFirstRES + pcDiff) - (timeTotal * 10))/1000);
             }
         }
-        private uint GetFirstRESTimePc(uint percentage)
-        {
-            uint pcDiff = timeTotalFromFirstRES / 100 * percentage + (MIN_FORCED_FINISH_TIME / 2);
-            if (pcDiff < MIN_FORCED_FINISH_TIME) //Minimal Race Force Finish
-                pcDiff = MIN_FORCED_FINISH_TIME;
-            else if (pcDiff > MAX_FORCED_FINISH_TIME) //Maximal Race Force Finish
-                pcDiff = MAX_FORCED_FINISH_TIME; 
-                
-            return pcDiff;
-        }
+
         //LFS Insim Defined var
         private Race_Feature_Flag raceFeatureMask = Race_Feature_Flag.RACE_FLAG_NONE;
         private ushort nodeFinishIndex = 0;
@@ -420,24 +411,40 @@ namespace Drive_LFSS.Game_
 
             return (driverGuidRESPos.Count - carFinishAndLeaveTrackCount >= carCount && carCount > 0);
         }
-        
+        private uint GetFirstRESTimePc(uint percentage)
+        {
+            uint pcDiff = timeTotalFromFirstRES / 100 * percentage + (MIN_FORCED_FINISH_TIME / 2);
+            if (pcDiff < MIN_FORCED_FINISH_TIME) //Minimal Race Force Finish
+                pcDiff = MIN_FORCED_FINISH_TIME;
+            else if (pcDiff > MAX_FORCED_FINISH_TIME) //Maximal Race Force Finish
+                pcDiff = MAX_FORCED_FINISH_TIME;
+
+            return pcDiff;
+        }
+
         //Feature auto restart
         private void StartRestart()
         {
+            #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " StartRestart(), has been launched with  '" + RESTART_RACE_INTERVAL + "' to go.\r\n");
+            #endif
             timerRaceRestart = RESTART_RACE_INTERVAL;
             //iSession.AddMessageTopToAll("^2Race will restart in ^7" + RESTART_RACE_INTERVAL / 1000 + " ^2sec", (3000 > RESTART_RACE_INTERVAL ? RESTART_RACE_INTERVAL : 3000));
         }
         private void ExecRestart()
         {
+            #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " ExecRestart(), Exec /restart.\r\n");
+            #endif
             iSession.SendMSTMessage("/restart");
         }
         private void EndRestart()
         {
             if (timerRaceRestart > 0)
             {
+                #if DEBUG
                 Log.debug(iSession.GetSessionNameForLog()+" EndRestart(), was ended sucess.\r\n");
+                #endif
                 iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
                 timerRaceRestart = 0;
             }

@@ -233,8 +233,9 @@ namespace Drive_LFSS.InSim_
             byte[] _packet;
             while ((_packet = NextTcpSendQueud()) != null)
             {
-                
+                #if DEBUG
                 Log.network(((Session)this).GetSessionNameForLog() + " TcpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+                #endif
 
                 try{tcpSocket.Write(_packet,0,_packet.Length);}
                 catch(Exception _exception)
@@ -250,7 +251,10 @@ namespace Drive_LFSS.InSim_
             byte[] _packet;
             while( (_packet = NextUdpSendQueud()) != null)
             {
+                #if DEBUG
                 Log.network(((Session)this).GetSessionNameForLog() + " UdpSend(), Sending packet: " + (Packet_Type)_packet[1] + "\r\n");
+                #endif
+
                 udpClient.Send(_packet, _packet.Length);
             }
         }
@@ -269,7 +273,10 @@ namespace Drive_LFSS.InSim_
 
                 if (packetSize < 4) //maybe add a size/4 Check to be sure the Size is Conform to Scawen standart
                 {
+                    #if DEBUG
                     Log.network(((Session)this).GetSessionNameForLog() + " TcpReceive(), Dropped packet, too Small!, PacketSize->" + packetSize + "\r\n");
+                    #endif
+                    
                     continue;
                 }
 
@@ -297,7 +304,9 @@ namespace Drive_LFSS.InSim_
 
                 if (data[0] < 3)
                 {
+                    #if DEBUG
                     Log.network(((Session)this).GetSessionNameForLog() + " UdpReceive(), Dropped packet, too small!, PacketSize->" + data[0] + "\r\n");
+                    #endif
                     continue;
                 }
                 if (!struturedPacket.ContainsKey((Packet_Type)data[1]))
