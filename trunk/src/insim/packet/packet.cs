@@ -120,13 +120,13 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBFN
     {
-        public PacketBFN(byte _licenceId, byte _buttonId, Button_Function _buttonFunction)
+        public PacketBFN(byte _connectionId, byte _buttonId, Button_Function _buttonFunction)
         {
             packetSize = Packet_Size.PACKET_SIZE_BFN;
             packetType = Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE;
             requestId = 0;
             buttonFunction = _buttonFunction;
-            licenceId = _licenceId;
+            connectionId = _connectionId;
             buttonId = _buttonId;
             inst = 0;
             spare3 = 0;
@@ -135,7 +135,7 @@ namespace Drive_LFSS.Packet_
         internal Packet_Type packetType;
         public byte requestId;
         public Button_Function buttonFunction;
-        public byte licenceId;
+        public byte connectionId;
         public byte buttonId;
         internal byte inst;
         internal byte spare3;
@@ -145,7 +145,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetSize;
         internal byte packetType;
         public byte requestId;
-        public byte licenceId;
+        public byte connectionId;
         public byte buttonId;
         public byte extendedMask;
         public Button_Click_Flag clickMask;
@@ -153,12 +153,12 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketBTN
     {
-        public PacketBTN(byte _licenceId, byte _requestId, byte _buttonId, Button_Styles_Flag _buttonStyle, bool _isAllwaysVisible, byte _maxTextLength, byte _left, byte _top, byte _width, byte _height, string _text)
+        public PacketBTN(byte _connectionId, byte _requestId, byte _buttonId, Button_Styles_Flag _buttonStyle, bool _isAllwaysVisible, byte _maxTextLength, byte _left, byte _top, byte _width, byte _height, string _text)
         {
             packetSize = Packet_Size.PACKET_SIZE_BTN;
             packetType = Packet_Type.PACKET_BTN_BUTTON_DISPLAY;
             requestId = _requestId;
-            licenceId = _licenceId;
+            connectionId = _connectionId;
             buttonId = _buttonId;
             inst = (byte)(_isAllwaysVisible ? 128 : 0);
             styleMask = _buttonStyle;
@@ -172,7 +172,7 @@ namespace Drive_LFSS.Packet_
         internal Packet_Size packetSize;
         internal Packet_Type packetType;
         public byte requestId;
-        public byte licenceId;
+        public byte connectionId;
         public byte buttonId;
         public byte inst;
         public Button_Styles_Flag styleMask;
@@ -188,7 +188,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetSize;
         internal byte packetType;
         public byte requestId;
-        public byte licenceId;
+        public byte connectionId;
         public byte buttonId;
         public byte extendedMask;
         public byte originalTextLength;
@@ -211,7 +211,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetSize;
         internal byte packetType;
         public byte requestId;
-        public byte tempLicenceId;
+        public byte connectionId;
         public Leave_Reason quitReason;
         public byte total;
         internal byte spare2;
@@ -240,7 +240,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetSize;
         internal byte packetType;
         public byte requestId;
-        public byte tempLicenceId;
+        public byte connectionId;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]public string carPlate;
     }
@@ -283,7 +283,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte requestId;
         internal byte zero;
-        public byte licenceId;
+        public byte connectionId;
         public byte carId;
         internal byte spare2;
         internal byte spare3;
@@ -394,7 +394,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte ReqI;
         internal byte Zero;
-        public byte tempLicenceId;
+        public byte connectionId;
         public byte PLID;
         public Chat_User_Type chatUserType;
         public byte textStart;
@@ -450,19 +450,19 @@ namespace Drive_LFSS.Packet_
             packetType = Packet_Type.PACKET_MTC_CHAT_TO_LICENCE;
             requestId = 0;
             zero = 0;
-            licenceId = 0;
+            connectionId = 0;
             carId = _carId;
             spare1 = 0;
             spare2 = 0;
             message = _message;
         }
-        public PacketMTC(byte _licenceId, string _message, byte _requestId)
+        public PacketMTC(byte _connectionId, string _message, byte _requestId)
         {
             packetSize = Packet_Size.PACKET_SIZE_MTC;
             packetType = Packet_Type.PACKET_MTC_CHAT_TO_LICENCE;
             requestId = _requestId;
             zero = 0;
-            licenceId = _licenceId;
+            connectionId = _connectionId;
             carId = 0;
             spare1 = 0;
             spare2 = 0;
@@ -472,7 +472,7 @@ namespace Drive_LFSS.Packet_
         internal Packet_Type packetType;
         public byte requestId;
         internal byte zero;
-        public byte licenceId;
+        public byte connectionId;
         public byte carId;
         internal byte spare1;
         internal byte spare2;
@@ -483,7 +483,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetSize;
         internal byte packetType;
         public byte requestId;
-        public byte tempLicenceId;
+        public byte connectionId;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string licenceName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
         public byte adminStatus;
@@ -505,7 +505,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte requestId;
         public byte carId;
-        public byte tempLicenceId;
+        public byte connectionId;
         public Driver_Type_Flag driverTypeMask;
         public Driver_Flag driverMask;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=24)]public string driverName;
@@ -771,7 +771,7 @@ namespace Drive_LFSS.Packet_
         internal byte packetType;
         public byte requestId;
         internal byte zero;
-        public byte tempLicenceId;
+        public byte connectionId;
         public Vote_Action voteAction;
         internal byte spare2;
         internal byte spare3;

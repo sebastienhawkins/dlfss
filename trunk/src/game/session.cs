@@ -173,9 +173,9 @@ namespace Drive_LFSS.Game_
             for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].RemoveButton(buttonEntry);
         }
-        public void RemoveButton(ushort buttonEntry, byte licenceId)
+        public void RemoveButton(ushort buttonEntry, byte connectionId)
         {
-            driverList[GetLicenceIndexNotBot(licenceId)].RemoveButton(buttonEntry);
+            driverList[GetLicenceIndexNotBot(connectionId)].RemoveButton(buttonEntry);
         }
         public bool IsRaceInProgress()
         {
@@ -240,16 +240,16 @@ namespace Drive_LFSS.Game_
             //Since we create the driver index 0 in this.construstor()
             //will conflit with the Host NCN receive packet, so here is a overide!
             //will have to rethink this later, that is looking like a HackFix, suck CPU for nothing.
-            if (IsExistLicenceId(_packet.tempLicenceId))
+            if (IsExistconnectionId(_packet.connectionId))
             {
-                if (_packet.tempLicenceId == 0)
+                if (_packet.connectionId == 0)
                 {
                     driverList[0].Init(_packet);
                     return;
                 }
                 else
                 {
-                    Log.error(GetSessionNameForLog() + " New licence connection, but overrides an already existing LicenceId, what to do if that happens?");
+                    Log.error(GetSessionNameForLog() + " New licence connection, but overrides an already existing connectionId, what to do if that happens?");
                     return;
                 }
             }
@@ -266,16 +266,16 @@ namespace Drive_LFSS.Game_
             base.processPacket(_packet); //Keep the Log
             #endif
 
-            if (!IsExistLicenceId(_packet.tempLicenceId))
+            if (!IsExistconnectionId(_packet.connectionId))
             {
-                Log.error(GetSessionNameForLog() + " Licence disconnection, but no LicenceID associated with it, what to do?");
+                Log.error(GetSessionNameForLog() + " Licence disconnection, but no connectionId associated with it, what to do?");
                 return;
             }
 
             //Prevent the Main thread from Doing the driverList.update()
             //Im not sure i love this design, since Mutex refresh time.
             byte index;
-            while ((index = GetFirstLicenceIndex(_packet.tempLicenceId)) != 255)
+            while ((index = GetFirstLicenceIndex(_packet.connectionId)) != 255)
             {
                 driverList[index].ProcessCNLPacket(_packet);
                 lock (this) { driverList.RemoveAt((int)index); }
@@ -284,7 +284,7 @@ namespace Drive_LFSS.Game_
         }      // delete Connection
         protected sealed override void processPacket(PacketCPR _packet)
         {
-            driverList[GetLicenceIndexNotBot(_packet.tempLicenceId)].ProcessCPR(_packet);
+            driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessCPR(_packet);
         }       //Driver Rename it self.
         protected sealed override void processPacket(PacketNPL _packet)
         {
@@ -292,9 +292,9 @@ namespace Drive_LFSS.Game_
             base.processPacket(_packet); //Keep the Log
             #endif
 
-            if (!IsExistLicenceId(_packet.tempLicenceId))
+            if (!IsExistconnectionId(_packet.connectionId))
             {
-                Log.error(GetSessionNameForLog() + " New car joined race, but no LicenceId associated with it, what to do?");
+                Log.error(GetSessionNameForLog() + " New car joined race, but no ConnectionId associated with it, what to do?");
                 return;
             }
 
@@ -304,7 +304,7 @@ namespace Drive_LFSS.Game_
             Driver driver;
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
             {
-                if ((index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName)) != 255)
+                if ((index = GetLicenceIndexWithName(_packet.connectionId, _packet.driverName)) != 255)
                 {
                     driverList[index].Init(_packet);
                     driver = driverList[index];
@@ -318,7 +318,7 @@ namespace Drive_LFSS.Game_
             }
             else    //Human
             {
-                index = GetLicenceIndexWithName(_packet.tempLicenceId, _packet.driverName);
+                index = GetLicenceIndexWithName(_packet.connectionId, _packet.driverName);
                 driverList[index].Init(_packet);
                 driver = driverList[index];
             }
@@ -362,7 +362,7 @@ namespace Drive_LFSS.Game_
                     continue;
                 }
 
-                if (driverList[carIndex].LicenceId == 0) // This Bypass the Host CAR.
+                if (driverList[carIndex].ConnectionId == 0) // This Bypass the Host CAR.
                     continue;
 
                 ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
@@ -377,10 +377,10 @@ namespace Drive_LFSS.Game_
             //Chat_User_Type chatUserType = allo;
 
             //_packet.chatUserType;
-            if (!IsExistLicenceId(_packet.tempLicenceId))
+            if (!IsExistconnectionId(_packet.connectionId))
                 return;
 
-            Driver _driver = driverList[GetFirstLicenceIndex(_packet.tempLicenceId)];
+            Driver _driver = driverList[GetFirstLicenceIndex(_packet.connectionId)];
 
             if (_packet.message[_packet.textStart] == commandPrefix) //Ingame Command
             {
@@ -538,7 +538,7 @@ namespace Drive_LFSS.Game_
             base.processPacket(_packet); //Keep the Log
             #endif
 
-            Driver driver = driverList[GetLicenceIndexNotBot(_packet.licenceId)];
+            Driver driver = driverList[GetLicenceIndexNotBot(_packet.connectionId)];
 
             switch ((Button_Entry)driver.GetButtonEntry(_packet.buttonId))
             {
@@ -628,12 +628,12 @@ namespace Drive_LFSS.Game_
                 {
                     driver.RemoveGui((ushort)Gui_Entry.TEXT);
                 } break;
-                case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_4: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_5: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.licenceId); break;
-                case Button_Entry.VOTE_OPTION_6: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.licenceId); break;
+                case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_4: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_5: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_6: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.connectionId); break;
                 default:
                 {
                     Log.error("We received a button ClickId from an unknown source, licenceName: " + driver.LicenceName + "\r\n");
@@ -646,7 +646,7 @@ namespace Drive_LFSS.Game_
             base.processPacket(_packet); //Keep the Log
             #endif
 
-            byte driverIndex = GetLicenceIndexNotBot(_packet.licenceId);
+            byte driverIndex = GetLicenceIndexNotBot(_packet.connectionId);
             Car car = driverList[driverIndex];
             switch((Button_Entry)car.GetButtonEntry(_packet.buttonId))
             {
@@ -700,9 +700,9 @@ namespace Drive_LFSS.Game_
             switch (_packet.buttonFunction)
             {
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
-                    driverList[GetLicenceIndexNotBot(_packet.licenceId)].ProcessBFNClearAll(); break;
+                    driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNClearAll(); break;
                 case Button_Function.BUTTON_FUNCTION_REQUEST:
-                    driverList[GetLicenceIndexNotBot(_packet.licenceId)].ProcessBFNRequest(); break;
+                    driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNRequest(); break;
             }
         }      //Delete All Button or request Button.
         protected sealed override void processPacket(PacketVTN _packet)
@@ -710,7 +710,7 @@ namespace Drive_LFSS.Game_
             #if DEBUG
             base.processPacket(_packet); //Keep the Log
             #endif
-            vote.ProcessVoteNotification(_packet.voteAction,_packet.tempLicenceId);
+            vote.ProcessVoteNotification(_packet.voteAction,_packet.connectionId);
         }      //Vote Notification
         protected sealed override void processPacket(PacketPLP _packet)         //Car enter garage
         {
@@ -738,54 +738,54 @@ namespace Drive_LFSS.Game_
             }
             return 255;
         }
-        private List<byte> GetLicenceIndexs(byte _licenceId)
+        private List<byte> GetLicenceIndexs(byte connectionId)
         {
             List<byte> _return = new List<byte>();
 
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
             {
-                if (((ILicence)driverList[itr]).LicenceId == _licenceId)
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
                     _return.Add(itr);
             }
             return _return;
         }
-        private byte GetLicenceIndexWithName(byte _licenceId, string _driverName)
+        private byte GetLicenceIndexWithName(byte connectionId, string _driverName)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
             {
-                if (((ILicence)driverList[itr]).LicenceId == _licenceId && ((IDriver)driverList[itr]).DriverName == _driverName)
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId && ((IDriver)driverList[itr]).DriverName == _driverName)
                     return itr;
             }
             return 255;
         }
-        private byte GetLicenceIndexNotBot(byte _licenceId)
+        private byte GetLicenceIndexNotBot(byte connectionId)
         {
             int count = driverList.Count;
             for (byte itr = 1; itr < count; itr++)
             {
-                if (driverList[itr].LicenceId == _licenceId && !driverList[itr].IsBot())
+                if (driverList[itr].ConnectionId == connectionId && !driverList[itr].IsBot())
                     return itr;
             }
             return 255;
         }
-        private byte GetFirstLicenceIndex(byte _licenceId)
+        private byte GetFirstLicenceIndex(byte connectionId)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
             {
-                if (((ILicence)driverList[itr]).LicenceId == _licenceId)
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
                     return itr;
             }
             return 255;
         }
-        private bool IsExistLicenceId(byte _licenceId)
+        private bool IsExistconnectionId(byte connectionId)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
             {
-                if (((ILicence)driverList[itr]).LicenceId == _licenceId)
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
                     return true;
             }
             return false;

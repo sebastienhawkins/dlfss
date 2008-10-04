@@ -100,7 +100,6 @@
     <Compile Include="config\config.cs" />
     <Compile Include="game\race.cs" />
     <Compile Include="game\car.cs" />
-    <Compile Include="game\licence.cs" />
     <Compile Include="drive_lfss\session_list.cs" />
     <Compile Include="log\log.cs" />
     <Compile Include="drive_lfss\drive_lfss.cs" />

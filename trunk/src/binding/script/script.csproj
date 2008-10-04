@@ -57,9 +57,6 @@
     <Compile Include="external\idriver.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="external\ilicence.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="external\irace.cs">
       <SubType>Code</SubType>
     </Compile>

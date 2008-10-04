@@ -82,15 +82,15 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketNCN _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " LicenceJoinsHost(), NCN -> UCID= " + _packet.tempLicenceId + ", UName=" + _packet.licenceName + ", PName=" + _packet.driverName + ", Flags=" + _packet.driverTypeMask + ", Admin=" + _packet.adminStatus + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " LicenceJoinsHost(), NCN -> UCID= " + _packet.connectionId + ", UName=" + _packet.licenceName + ", PName=" + _packet.driverName + ", Flags=" + _packet.driverTypeMask + ", Admin=" + _packet.adminStatus + "\r\n");
         }
         protected virtual void processPacket(PacketCNL _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " CNL_ClientLeavesHost, CNL -> UCID= " + _packet.tempLicenceId + ", Reason=" + _packet.quitReason + ", Total=" + _packet.total + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " CNL_ClientLeavesHost, CNL -> UCID= " + _packet.connectionId + ", Reason=" + _packet.quitReason + ", Total=" + _packet.total + "\r\n");
         }
         protected virtual void processPacket(PacketCPR _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " CPR_ClientRenames(), CPR->UCID=" + _packet.tempLicenceId + ", PName=" + _packet.driverName + ", Plate=" + _packet.carPlate + ", ReqI=" + _packet.requestId + "\n\r");
+            Log.debug(((Session)this).GetSessionNameForLog() + " CPR_ClientRenames(), CPR->UCID=" + _packet.connectionId + ", PName=" + _packet.driverName + ", Plate=" + _packet.carPlate + ", ReqI=" + _packet.requestId + "\n\r");
         }
         protected virtual void processPacket(PacketTOC _packet)
         {
@@ -113,7 +113,7 @@ namespace Drive_LFSS.Packet_
         // A player joins the race. If PLID already exists, then player leaves pit.
         protected virtual void processPacket(PacketNPL _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " NPL_PlayerJoinsRace(), NPL -> CName=" + _packet.carPrefix + ", PName=" + _packet.driverName + ", PLID=" + _packet.carId + ", UCID=" + _packet.tempLicenceId + ", PType=" + _packet.driverTypeMask + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " NPL_PlayerJoinsRace(), NPL -> CName=" + _packet.carPrefix + ", PName=" + _packet.driverName + ", PLID=" + _packet.carId + ", UCID=" + _packet.connectionId + ", PType=" + _packet.driverTypeMask + "\r\n");
         }
         protected virtual void processPacket(PacketLAP _packet)
         {
@@ -142,15 +142,15 @@ namespace Drive_LFSS.Packet_
         // A player pressed KEY_SHIFT+I or KEY_SHIFT+B
         protected virtual void processPacket(PacketBFN _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " BFN_PlayerRequestsButtons(), BFN -> UCID=" + _packet.licenceId + ", MultiId=" + _packet.buttonId + ", ButtonFunc=" + _packet.buttonFunction + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " BFN_PlayerRequestsButtons(), BFN -> UCID=" + _packet.connectionId + ", MultiId=" + _packet.buttonId + ", ButtonFunc=" + _packet.buttonFunction + "\r\n");
         }
         protected virtual void processPacket(PacketBTC _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " BTC_ButtonClicked(), extendedmask=" +_packet.extendedMask+", requestId="+_packet.requestId+", UCID=" + _packet.licenceId + ",ClickID=" + _packet.buttonId + ", CFlags=" + _packet.clickMask + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " BTC_ButtonClicked(), extendedmask=" +_packet.extendedMask+", requestId="+_packet.requestId+", UCID=" + _packet.connectionId + ",ClickID=" + _packet.buttonId + ", CFlags=" + _packet.clickMask + "\r\n");
         }
         protected virtual void processPacket(PacketBTT _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " BTT_TextBoxOkClicked(), BTT -> UCID=" + _packet.licenceId + ", ClickID=" + _packet.buttonId + ", Text=" + _packet.typedText + ", TypeIn=" + _packet.originalTextLength + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " BTT_TextBoxOkClicked(), BTT -> UCID=" + _packet.connectionId + ", ClickID=" + _packet.buttonId + ", Text=" + _packet.typedText + ", TypeIn=" + _packet.originalTextLength + "\r\n");
         }
         protected virtual void processPacket(PacketPEN _packet)
         {
@@ -234,7 +234,7 @@ namespace Drive_LFSS.Packet_
         // A vote got called
         protected virtual void processPacket(PacketVTN _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " VTN_VoteNotify(), VTN -> UCID=" + _packet.tempLicenceId + ", Action=" + _packet.voteAction + ", Spare2=" + _packet.spare2 + ", Spare3=" + _packet.spare3 + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " VTN_VoteNotify(), VTN -> UCID=" + _packet.connectionId + ", Action=" + _packet.voteAction + ", Spare2=" + _packet.spare2 + ", Spare3=" + _packet.spare3 + "\r\n");
         }
         // Detailed car information packet (max 8 per packet)
         protected virtual void processPacket(PacketMCI _packet)
@@ -249,7 +249,7 @@ namespace Drive_LFSS.Packet_
         // A /i message got sent to this program
         protected virtual void processPacket(PacketIII _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " III_InSimInfo(), III -> Msg=" + _packet.message + ", PLID=" + _packet.carId + ", UCID=" + _packet.licenceId + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " III_InSimInfo(), III -> Msg=" + _packet.message + ", PLID=" + _packet.carId + ", UCID=" + _packet.connectionId + "\r\n");
         }
 
     }

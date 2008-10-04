@@ -52,7 +52,11 @@ namespace Drive_LFSS.Game_
             driverTypeMask = _packet.driverTypeMask;
             //_packet.total;// What is Total????
 
-            base.Init(_packet);
+            licenceName = _packet.licenceName;
+            connectionId = _packet.connectionId;
+           
+            if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
+                licenceName = "AI";
 
             //Only a Host will trigger a NCN as a Bot, real AI Bot trigger only a NPL
             if (IsBot()) 
@@ -60,6 +64,7 @@ namespace Drive_LFSS.Game_
 
             SendBanner();
             SendTrackPrefix();
+
             //To make the MOTD look on a very Black BG
             for (byte itr = 0; ++itr < 5; )
                 SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
@@ -112,6 +117,15 @@ namespace Drive_LFSS.Game_
 
             //_packet.SName; //What is that???
             //_packet.numberInRaceCar_NSURE // What is That???
+            if (connectionId != _packet.connectionId)
+            {
+                if(connectionId != 0)
+                    Log.error("Licence.Init(PacketNPL _packet), current connectionId("+connectionId+") was not same as packet connectionId("+_packet.connectionId+"), LicenceName: "+licenceName+".\r\n");
+                connectionId = _packet.connectionId;
+            }
+
+            if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
+                licenceName = "AI";
 
             base.Init(_packet);
 
@@ -241,7 +255,7 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessCNLPacket(PacketCNL _packet) //Disconnect
         {
-            QuitReason = _packet.quitReason;
+            quitReason = _packet.quitReason;
             
             //Only a host will trigger this a real bot trigger only a Leave race.
             if(IsBot())
@@ -256,18 +270,17 @@ namespace Drive_LFSS.Game_
         private bool isTimeDiffLap = true;
         private bool isTimeDiffSplit = true;
         private bool isAdmin = false;
+        private string licenceName = "";
+        private byte connectionId = 0;
+        private byte unkFlag = 0;
         private string driverName = "";
         private byte driverModel = 0;
         public Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
+        private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
         private ISession iSession;
         private uint guid = 0;
         private string[] configData;
-        private List<Lap> laps = new List<Lap>();
-        public PB pb = null;
-        public WR wr = null;
-        private Dictionary<string,Dictionary<string,Rank>> rank = null;
-        
         private class Lap
         {
             public Lap()
@@ -376,8 +389,54 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
+        private List<Lap> laps = new List<Lap>();
+        public PB pb = null;
+        public WR wr = null;
+        private Dictionary<string,Dictionary<string,Rank>> rank = null;
+        
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
+        new public void update(uint diff) 
+        {
+            driverSaveInterval += diff;
+            if (SAVE_INTERVAL < driverSaveInterval  ) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
+            {
+                if (!IsBot())
+                {
+                    Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + LicenceName + ", saved to database.\r\n");
+                    SaveToDB();
+
+                    if (laps.Count > 0)
+                    {
+                        lock (laps)
+                        {
+                            Lap currentLap = laps[laps.Count - 1];
+                            List<Lap>.Enumerator itr = laps.GetEnumerator();
+                            while (itr.MoveNext())
+                            {
+                                Lap lap = itr.Current;
+                                if (lap.LapTime < 1)
+                                    continue;
+                                SaveLapsToDB(lap);
+                                Log.database(iSession.GetSessionNameForLog() + "Lap for DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved to database.\r\n");
+                            }
+                            laps.Clear();
+                            if (currentLap.LapTime < 1)
+                                laps.Add(currentLap);
+                            else
+                                laps.Add(new Lap());
+                        }
+                    }
+                }
+                else //this is Bot Only
+                {
+                    laps.Clear();
+                    laps.Add(new Lap());
+                }
+            }
+            base.update(diff);
+        }
+
         private void LoadFromDB()
         {
             lock (Program.dlfssDatabase)
@@ -468,7 +527,6 @@ namespace Drive_LFSS.Game_
             configStrings.CopyTo(configData,0);
             ApplyConfigData();
         }
-
         public ushort GetConfigUint16(Config_User index)
         {
             return  Convert.ToUInt16(configData[(int)index]);
@@ -485,52 +543,10 @@ namespace Drive_LFSS.Game_
         {
             configData[(int)index] = value;
         }
-        new public void update(uint diff) 
-        {
-            driverSaveInterval += diff;
-            if (SAVE_INTERVAL < driverSaveInterval  ) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
-            {
-                if (!IsBot())
-                {
-                    Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + LicenceName + ", saved to database.\r\n");
-                    SaveToDB();
-
-                    if (laps.Count > 0)
-                    {
-                        lock (laps)
-                        {
-                            Lap currentLap = laps[laps.Count - 1];
-                            List<Lap>.Enumerator itr = laps.GetEnumerator();
-                            while (itr.MoveNext())
-                            {
-                                Lap lap = itr.Current;
-                                if (lap.LapTime < 1)
-                                    continue;
-                                SaveLapsToDB(lap);
-                                Log.database(iSession.GetSessionNameForLog() + "Lap for DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved to database.\r\n");
-                            }
-                            laps.Clear();
-                            if (currentLap.LapTime < 1)
-                                laps.Add(currentLap);
-                            else
-                                laps.Add(new Lap());
-                        }
-                    }
-                }
-                else //this is Bot Only
-                {
-                    laps.Clear();
-                    laps.Add(new Lap());
-                }
-            }
-            base.update(diff);
-        }
-
         public ISession ISession
         {
             get { return iSession; }
         }
-        
         public Rank GetRank(string trackPrefix, string carPrefix)
         {
             if( rank != null && rank.ContainsKey(trackPrefix) && rank[trackPrefix].ContainsKey(carPrefix))
@@ -547,6 +563,14 @@ namespace Drive_LFSS.Game_
         {
             get { return driverName; }
            // set { driverName = value; }
+        }
+        public string LicenceName 
+        { 
+            get { return licenceName; } 
+        }
+        public byte ConnectionId 
+        { 
+            get { return connectionId; } 
         }
         public bool IsTimeDiffLap
         {
@@ -572,7 +596,7 @@ namespace Drive_LFSS.Game_
         }
         public bool IsBot()
         {
-            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || LicenceId == 0);
+            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || ConnectionId == 0);
         }
         public void SendMTCMessage(string message)
         {
@@ -581,13 +605,13 @@ namespace Drive_LFSS.Game_
                 return;
             PacketMTC _packet;
             if (CarId == 0)
-                _packet = new PacketMTC(LicenceId, message, 0);
+                _packet = new PacketMTC(ConnectionId, message, 0);
             else
                 _packet = new PacketMTC(CarId, message);
 
             ((Session)iSession).AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, _packet));
        
-            Log.progress("Sending MTC packet to: " + CarId + ", with Licence: " + LicenceId + "\r\n");
+            Log.progress("Sending MTC packet to: " + CarId + ", with ConnectionId: " + ConnectionId + "\r\n");
         }
     }
 }

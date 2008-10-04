@@ -62,7 +62,7 @@ namespace Drive_LFSS.Game_
                 reader.Dispose();
             }
         }
-        public void ProcessVoteNotification(Vote_Action voteAction, byte licenceId)
+        public void ProcessVoteNotification(Vote_Action voteAction, byte connectionId)
         {
             #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " Vote notification was:" + voteAction + "\r\n");
@@ -84,12 +84,12 @@ namespace Drive_LFSS.Game_
             }
             if (voteInProgress)
             {
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_1, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_2, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_3, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_4, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_5, licenceId);
-                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, licenceId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_1, connectionId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_2, connectionId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_3, connectionId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_4, connectionId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_5, connectionId);
+                iSession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, connectionId);
             }
         }
         public void ProcessVoteAction(Vote_Action voteAction)

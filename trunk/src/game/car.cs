@@ -29,7 +29,7 @@ namespace Drive_LFSS.Game_
     using PubStats_;
     using Ranking_;
 
-    public abstract class Car : Licence, ICar, CarMotion
+    public abstract class Car : Button, ICar, CarMotion
     {
         public Car() : base()
         {
@@ -38,14 +38,8 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        new protected void Init(PacketNCN _packet)
-        {
-            base.Init(_packet);
-        } //When Connection
         new protected void Init(PacketNPL _packet)
         {
-            base.Init(_packet);
-            
             bool firstTime = false;
             if (carId != _packet.carId || carPrefix != _packet.carPrefix)
                 firstTime = true;
@@ -475,7 +469,7 @@ namespace Drive_LFSS.Game_
                 AddMessageMiddle("^2WR " + ConvertX.MSToString(((Driver)this).wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + ((Driver)this).wr.LicenceName, 6000);
             }
 
-            ((Driver)this).pb = Program.pubStats.GetPB(LicenceName, carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
+            ((Driver)this).pb = Program.pubStats.GetPB(((IDriver)this).LicenceName, carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).pb != null && ((Driver)this).wr != null)
             {
                 AddMessageMiddle("^2PB " + ConvertX.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + ConvertX.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);

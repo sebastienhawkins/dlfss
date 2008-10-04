@@ -267,7 +267,7 @@ namespace Drive_LFSS.Game_
                 (
                     Packet_Size.PACKET_SIZE_BFN,
                     Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,
-                    new PacketBFN(((Licence)this).LicenceId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
+                    new PacketBFN(((IDriver)this).ConnectionId, buttonId, Button_Function.BUTTON_FUNCTION_DEL)
                 )
             );
         }
@@ -349,7 +349,7 @@ namespace Drive_LFSS.Game_
 
             if( buttonId == 0xFF )
             {
-                Log.error("Button system> Max button count reached for Driver: " + ((Driver)this).DriverName + ", Licence: " + ((Licence)this).LicenceName + "\r\n");
+                Log.error("Button system> Max button count reached for Driver: " + ((IDriver)this).DriverName + ", Licence: " + ((IDriver)this).LicenceName + "\r\n");
                 return;
             }
 
@@ -363,7 +363,7 @@ namespace Drive_LFSS.Game_
                 (
                     Packet_Size.PACKET_SIZE_BTN,
                     Packet_Type.PACKET_BTN_BUTTON_DISPLAY,
-                    new PacketBTN(((Licence)this).LicenceId, 1, buttonId, (Button_Styles_Flag)buttonStyleMask, isAllwaysVisible, maxTextLength, left, top, width, height, text)
+                    new PacketBTN(((IDriver)this).ConnectionId, 1, buttonId, (Button_Styles_Flag)buttonStyleMask, isAllwaysVisible, maxTextLength, left, top, width, height, text)
                 )
             );
         }
