@@ -20,6 +20,7 @@ using System;
 
 namespace Drive_LFSS
 {
+    //Real extention required .net 3.0 , since we don't need .net 3.0 for the rest , i prefer stay .net 2.0
     public static class ConvertX
     {
         public static string MSToString(uint msTime, string negativeColor, string positiveColor)

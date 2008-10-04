@@ -146,6 +146,7 @@ namespace Drive_LFSS.PubStats_
             if (threadRequest.ThreadState == ThreadState.Unstarted)
                 threadRequest.Start();
 
+            Log.commandHelp("  Testing if Premium Service Available...\r\n");
             if (HasPremiumService())
                 Log.commandHelp("  Premium Service Enable\r\n");
             else

@@ -200,7 +200,7 @@ CREATE TABLE `driver_lap` (
   `lap_time` int(12) unsigned NOT NULL,
   `total_time` int(12) unsigned NOT NULL,
   `lap_completed` mediumint(5) unsigned NOT NULL default '0',
-  `max_speed_kmh` float NOT NULL default '0',
+  `max_speed_ms` float NOT NULL default '0',
   `current_penalty` tinyint(2) unsigned NOT NULL default '0',
   `pit_stop_count` tinyint(3) unsigned NOT NULL,
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
@@ -364,6 +364,32 @@ INSERT INTO `race_template` VALUES (20,'Fern Bay Club Rev, F GTR',19,'11 12',0,0
 UNLOCK TABLES;
 
 --
+-- Table structure for table `stats_rank_driver`
+--
+
+DROP TABLE IF EXISTS `stats_rank_driver`;
+CREATE TABLE `stats_rank_driver` (
+  `licence_name` varchar(32) character set latin1 collate latin1_general_ci NOT NULL,
+  `track_prefix` varchar(4) NOT NULL default '',
+  `car_prefix` varchar(3) NOT NULL default '',
+  `best_lap_rank` smallint(5) NOT NULL default '0',
+  `average_lap_rank` smallint(5) NOT NULL default '0',
+  `stability_rank` smallint(5) NOT NULL default '0',
+  `race_win_rank` smallint(5) NOT NULL,
+  `total_rank` smallint(5) NOT NULL default '0',
+  PRIMARY KEY  (`licence_name`,`track_prefix`,`car_prefix`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `stats_rank_driver`
+--
+
+LOCK TABLES `stats_rank_driver` WRITE;
+/*!40000 ALTER TABLE `stats_rank_driver` DISABLE KEYS */;
+/*!40000 ALTER TABLE `stats_rank_driver` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `track_template`
 --
 
@@ -455,4 +481,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-09-26 11:01:00
+-- Dump completed on 2008-10-04  1:53:16

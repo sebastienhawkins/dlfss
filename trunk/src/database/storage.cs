@@ -132,6 +132,7 @@ namespace Drive_LFSS.Storage_
                 return data[entry];
             return null;
         }
+        
         protected virtual object[] GetCustom(int fieldIndex, string equalTo)
         {
             Dictionary<uint,object[]>.Enumerator itr = data.GetEnumerator();
@@ -152,6 +153,72 @@ namespace Drive_LFSS.Storage_
             }
             return null;
         }
+        protected virtual object[] GetCustom(int fieldIndex, int equalTo)
+        {
+            Dictionary<uint, object[]>.Enumerator itr = data.GetEnumerator();
+            while (itr.MoveNext())
+            {
+                if (itr.Current.Value.Length > fieldIndex && (int)itr.Current.Value[fieldIndex] == equalTo)
+                    return itr.Current.Value;
+            }
+            return null;
+        }
+        
+        protected virtual object[] GetCustom(int[] fieldIndex, string[] equalTo)
+        {
+            Dictionary<uint,object[]>.Enumerator itr = data.GetEnumerator();
+            while(itr.MoveNext())
+            {
+                bool good = true;
+                foreach(int index in fieldIndex)
+                {
+                    if (itr.Current.Value.Length > fieldIndex[index] && (string)itr.Current.Value[fieldIndex[index]] == equalTo[index])
+                        continue;
+                    good = false;
+                    break;
+                }
+                if(good)
+                    return itr.Current.Value;
+            }
+            return null;
+        }
+        protected virtual object[] GetCustom(int[] fieldIndex, uint[] equalTo)
+        {
+            Dictionary<uint,object[]>.Enumerator itr = data.GetEnumerator();
+            while(itr.MoveNext())
+            {
+                bool good = true;
+                foreach(int index in fieldIndex)
+                {
+                    if (itr.Current.Value.Length > fieldIndex[index] && (uint)itr.Current.Value[fieldIndex[index]] == equalTo[index])
+                        continue;
+                    good = false;
+                    break;
+                }
+                if(good)
+                    return itr.Current.Value;
+            }
+            return null;
+        }
+        protected virtual object[] GetCustom(int[] fieldIndex, int[] equalTo)
+        {
+            Dictionary<uint,object[]>.Enumerator itr = data.GetEnumerator();
+            while(itr.MoveNext())
+            {
+                bool good = true;
+                foreach(int index in fieldIndex)
+                {
+                    if (itr.Current.Value.Length > fieldIndex[index] && (int)itr.Current.Value[fieldIndex[index]] == equalTo[index])
+                        continue;
+                    good = false;
+                    break;
+                }
+                if(good)
+                    return itr.Current.Value;
+            }
+            return null;
+        }
+
         private void SetMaxEntry()
         {
             Dictionary<uint, object[]>.KeyCollection keys = data.Keys;
@@ -595,4 +662,54 @@ namespace Drive_LFSS.Storage_
         private uint endTime;
         private bool expired;
     }
+    
+    /*public sealed class DriverRank : Storage
+    {
+        public DriverRank(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~DriverRank()
+        {
+            if (true == false) { }
+        }
+        new public DriverRankInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new DriverRankInfo(_temp);
+            else
+                return null;
+        }
+        public DriverRankInfo GetCarPrefix(string carPrefix)
+        {
+            object[] _temp = base.GetCustom(1, carPrefix);
+            if(_temp != null)
+                return new DriverRankInfo(_temp);
+
+            return null;
+        }
+    }
+    public sealed class DriverRankInfo
+    {
+        public DriverRankInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt32(rowInfos[0]);
+            licenceName = (string)rowInfos[1];
+            fromLicenceName = (string)rowInfos[2];
+            reason = (string)rowInfos[3];
+            startTime = Convert.ToUInt32(rowInfos[4]);
+            endTime = Convert.ToUInt32(rowInfos[5]);
+            expired = Convert.ToUInt16(rowInfos[6]) == 1 ? true : false;
+        }
+        ~DriverRankInfo()
+        {
+            if (true == false) { }
+        }
+        private uint entry;
+        private string licenceName;
+        private string fromLicenceName;
+        private string reason;
+        private uint startTime;
+        private uint endTime;
+        private bool expired;
+    }*/
+    
 }

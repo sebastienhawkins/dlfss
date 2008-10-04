@@ -24,8 +24,8 @@ namespace Drive_LFSS.CommandConsole_
     using Log_;
     using Packet_;
     using Game_;
-    using Game_;
-
+    using Ranking_;
+    
     static class CommandConsole
     {
         public static void Exec(string _commandText)
@@ -41,6 +41,8 @@ namespace Drive_LFSS.CommandConsole_
                 case "reload": Reload(args); break;
                 case "status": Status(args); break;
                 case "say": Say(args); break;
+                case "top10": Top10(args); break; 
+                case "rank": Rank(args); break;                           
                 case "exit": Exit(); break;
                 default:
                 {
@@ -115,6 +117,32 @@ namespace Drive_LFSS.CommandConsole_
                 else
                     Log.command("Command - announce, serverName Not Found: " + args[1] + "\r\n");
             }
+        }
+        private static void Top10(string []args)
+        {
+            if (args.Length != 3)
+            {
+                Log.commandHelp("Command - top10, Syntax error.\r\n  Usage:\r\n    top10 $trackPrefix $carPrefix\r\n");
+                return;
+            }
+            string data = Ranking.GetTop10(args[1].ToUpperInvariant(),args[2].ToUpperInvariant());
+            if(data == "")
+                Log.commandHelp("No rank data for trackPrefix "+args[2]+" and carPrefix "+args[3]+".\r\n");
+            else 
+            Log.commandHelp("licence_name best avg sta win total\r\n"+data+"\r\n");
+        }
+        private static void Rank(string []args)
+        {
+            if (args.Length != 4)
+            {
+                Log.commandHelp("Command - rank, Syntax error.\r\n  Usage:\r\n    rank $trackPrefix $carPrefix $licenceName\r\n");
+                return;
+            }
+            string data = Ranking.GetRank(args[1].ToUpperInvariant(),args[2].ToUpperInvariant(),args[3].ToUpperInvariant());
+            if(data == "")
+                Log.commandHelp("Licence "+args[1]+" has no rank data for trackPrefix "+args[2]+" and carPrefix "+args[3]+".\r\n");
+            else 
+                Log.commandHelp("best avg sta win total\r\n"+data+"\r\n");
         }
         private static void Reload(string[] args)
         {

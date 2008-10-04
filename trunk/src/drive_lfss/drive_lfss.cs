@@ -24,15 +24,16 @@ using System.Runtime.InteropServices;
 
 namespace Drive_LFSS
 {
-    using Drive_LFSS.Config_;
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Log_;
-    using Drive_LFSS.CommandConsole_;
-    using Drive_LFSS.Database_;
-    using Drive_LFSS.Storage_;
-    using Drive_LFSS.Irc_;
-    using Drive_LFSS.Irc_.Data_;
-    using Drive_LFSS.PubStats_;
+    using Config_;
+    using Definition_;
+    using Log_;
+    using CommandConsole_;
+    using Database_;
+    using Storage_;
+    using Irc_;
+    using Irc_.Data_;
+    using PubStats_;
+    using Ranking_;
 
     public sealed class Program
     {
@@ -155,6 +156,14 @@ namespace Drive_LFSS
                 Log.commandHelp("  mIRC client is disabled.\r\n");
             Log.normal("Completed initializing mIRC client.\r\n\r\n");
 
+            //Ranking Initialization
+            Log.normal("Initializing Ranking...\r\n");
+            if(!Ranking.Initialize())
+                Log.commandHelp("  Ranking system disable.\r\n");
+            else
+                Ranking.ConfigApply();
+            Log.normal("Completed initializing Ranking.\r\n\r\n");
+            
             //PubStats Initialization
             Log.normal("Initializing PubStats...\r\n");
             pubStats.ConfigApply();
