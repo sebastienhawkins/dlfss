@@ -228,6 +228,12 @@ namespace Drive_LFSS.Server_
                     driver.AddMessageMiddle("^8Status - serverName(^7"+serverName+")^8 not found.",4500);
             }
         }
+        private void Rank(Driver driver, string[] args)
+        {
+        }
+        private void Top10(Driver driver, string[] args)
+        {
+        }
         #endregion
     }
 }

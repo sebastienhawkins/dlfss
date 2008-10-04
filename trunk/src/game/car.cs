@@ -27,6 +27,7 @@ namespace Drive_LFSS.Game_
     using Log_;
     using Storage_;
     using PubStats_;
+    using Ranking_;
 
     public abstract class Car : Licence, ICar, CarMotion
     {
@@ -43,8 +44,6 @@ namespace Drive_LFSS.Game_
         } //When Connection
         new protected void Init(PacketNPL _packet)
         {
-            carPrefix = _packet.carPrefix;
-
             if (carId != _packet.carId || carPrefix != _packet.carPrefix)
             {
                 carPrefix = _packet.carPrefix;
@@ -83,9 +82,11 @@ namespace Drive_LFSS.Game_
             z = _carInformation.posZ / 65536.0d;
 
             speedMs = _carInformation.speed / 327.68d;
-            speedKmh = speedMs * 3.624d;
-            if (maxSpeedKmh < speedKmh)
-                maxSpeedKmh = speedKmh;
+            if (maxSpeedMs < speedMs)
+                maxSpeedMs = speedMs;
+
+            speedKmh = ConvertX.MSToKhm(speedMs);
+
 
             tracjectory = _carInformation.direction;
             orientation = _carInformation.heading;
@@ -123,7 +124,7 @@ namespace Drive_LFSS.Game_
         private Car_Tyres tyreRearLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Car_Tyres tyreRearRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
         private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
-        protected double maxSpeedKmh = 0.0d;
+        protected double maxSpeedMs = 0.0d;
         private ushort lapCompleted = 0;
         private ushort node = 0;
         private byte racePosition = 0;
@@ -487,6 +488,15 @@ namespace Drive_LFSS.Game_
             {
                 AddMessageMiddle("^2PB " + ConvertX.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
             }
+
+            Rank _rank = ((Driver)this).GetRank(((Driver)this).ISession.GetRaceTrackPrefix(),CarPrefix);
+            if(_rank != null)
+            {
+                ((Driver)this).ISession.SendMSXMessage(((IDriver)this).DriverName+" ^2Rank ^5"+carPrefix+" ^7"+_rank.Total.ToString()+" ^2- "+(((_rank.Position > 0)?"^5"+_rank.Position:"^1NA"))+"^2/^7"+Ranking.GetRankedCount(((Driver)this).ISession.GetRaceTrackPrefix(),CarPrefix)+" ^2grade ^7"+_rank.GetGrade());
+                AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
+            }
+            else
+                AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
         }
         public void LeaveTrack()
         {

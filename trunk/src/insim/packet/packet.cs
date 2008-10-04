@@ -97,6 +97,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_RES_RESULT_CONFIRMED, new PacketRES());
             Add(Packet_Type.PACKET_VTN_VOTE_NOTIFICATION, new PacketVTN());
             Add(Packet_Type.PACKET_PLP_ENTER_GARAGE, new PacketPLP());
+            Add(Packet_Type.PACKET_MSX_SEND_BIG_CHAT, new PacketMSX());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -427,12 +428,19 @@ namespace Drive_LFSS.Packet_
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMSX
     {
-        internal byte packetSize;
-        internal byte packetType;
-        public byte ReqI;
-        internal byte Zero;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=96)]
-        public string Msg;
+        public PacketMSX(string _message)
+        {
+            packetSize = Packet_Size.PACKET_SIZE_MSX;
+            packetType = Packet_Type.PACKET_MSX_SEND_BIG_CHAT;
+            requestId = 0;
+            zero = 0;
+            message = _message;
+        }
+        internal Packet_Size packetSize;
+        internal Packet_Type packetType;
+        private byte requestId;
+        internal byte zero;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=96)]public string message;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMTC
     {

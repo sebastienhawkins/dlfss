@@ -375,9 +375,11 @@ CREATE TABLE `stats_rank_driver` (
   `best_lap_rank` smallint(5) NOT NULL default '0',
   `average_lap_rank` smallint(5) NOT NULL default '0',
   `stability_rank` smallint(5) NOT NULL default '0',
-  `race_win_rank` smallint(5) NOT NULL,
-  `total_rank` smallint(5) NOT NULL default '0',
-  PRIMARY KEY  (`licence_name`,`track_prefix`,`car_prefix`)
+  `race_win_rank` mediumint(8) unsigned NOT NULL default '0',
+  `total_rank` mediumint(8) unsigned NOT NULL default '0',
+  `position` int(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`licence_name`,`track_prefix`,`car_prefix`),
+  KEY `prefix` (`track_prefix`,`car_prefix`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -481,4 +483,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-10-04  1:53:16
+-- Dump completed on 2008-10-04  7:07:50

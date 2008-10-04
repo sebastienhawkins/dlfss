@@ -28,6 +28,7 @@ namespace Drive_LFSS.Game_
     using Config_;
     using Game_;
     using PubStats_;
+    using Ranking_;
 
     public sealed class Driver : Car, IDriver
     {
@@ -73,9 +74,10 @@ namespace Drive_LFSS.Game_
             if (guid == 0)
             {
                 if (!SetNewGuid())
-                    Log.error("Error when creating a new GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
+                    Log.error("Error when creating a new GUID for licenceName: " + LicenceName + ", driverName: " + driverName + "\r\n");
             }
             pb = Program.pubStats.GetPB(LicenceName, "");
+            lock(Program.dlfssDatabase){rank = Ranking.GetDriverRanks(LicenceName);}
         }
         new public void ProcessCPR(PacketCPR _packet)
         {
@@ -133,14 +135,14 @@ namespace Drive_LFSS.Game_
                 if (guid == 0)
                 {
                     if (!SetNewGuid())
-                        Log.error("Error when creating a new GUID for licenceName: " + licenceName + ", driverName: " + driverName + "\r\n");
+                        Log.error("Error when creating a new GUID for licenceName: " + LicenceName + ", driverName: " + driverName + "\r\n");
                 }
             }
         }
         public void ProcessLapInformation(PacketLAP _packet)
         {
             Lap lap = laps[laps.Count - 1];
-            lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedKmh);
+            lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
 
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
@@ -185,8 +187,8 @@ namespace Drive_LFSS.Game_
                 }
             }
             
-            AddMessageMiddle("^2MS ^7" + Math.Round((decimal)maxSpeedKmh, 2) + " ^7Kmh", 6000);
-            maxSpeedKmh = 0.0d; 
+            AddMessageMiddle("^2MS ^7" + Math.Round((decimal)ConvertX.MSToKhm(maxSpeedMs), 2) + " ^7Kmh", 6000);
+            maxSpeedMs = 0.0d; 
 
             laps.Add(new Lap());
         }
@@ -222,7 +224,7 @@ namespace Drive_LFSS.Game_
         {
             wr = Program.pubStats.GetWR("");
             laps.Add(new Lap());
-            maxSpeedKmh = 0.0d;
+            maxSpeedMs = 0.0d;
         }
         public void ProcessRaceEnd()
         {
@@ -264,7 +266,8 @@ namespace Drive_LFSS.Game_
         private List<Lap> laps = new List<Lap>();
         public PB pb = null;
         public WR wr = null;
-
+        private Dictionary<string,Dictionary<string,Rank>> rank = null;
+        
         private class Lap
         {
             public Lap()
@@ -354,7 +357,7 @@ namespace Drive_LFSS.Game_
             {
                 get { return lapCompleted; }
             }
-            public double MaxSpeedKmh
+            public double MaxSpeedMs
             {
                 get { return maxSpeedKhm; }
             }
@@ -379,7 +382,7 @@ namespace Drive_LFSS.Game_
         {
             lock (Program.dlfssDatabase)
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`='" + licenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "' AND `driver_name`='" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`='" + LicenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "' AND `driver_name`='" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
@@ -390,14 +393,14 @@ namespace Drive_LFSS.Game_
         }
         private void SaveLapsToDB(Lap lap)
         {
-            string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`max_speed_kmh`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
-            query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + ","+ lap.MaxSpeedKmh +","+ (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount + ")";
+            string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`max_speed_ms`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
+            query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + ","+ lap.MaxSpeedMs +","+ (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount + ")";
             Program.dlfssDatabase.ExecuteNonQuery(query);
         }
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`last_connection_time`) VALUES (" + guid + ", '" + licenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "','" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "', '" + String.Join(" ", configData) + "', " + (System.DateTime.Now.Ticks / 10000000) + ")");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`last_connection_time`) VALUES (" + guid + ", '" + LicenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "','" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "', '" + String.Join(" ", configData) + "', " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
         }
         private bool SetNewGuid()
@@ -489,7 +492,7 @@ namespace Drive_LFSS.Game_
             {
                 if (!IsBot())
                 {
-                    Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + licenceName + ", saved to database.\r\n");
+                    Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + LicenceName + ", saved to database.\r\n");
                     SaveToDB();
 
                     if (laps.Count > 0)
@@ -528,6 +531,13 @@ namespace Drive_LFSS.Game_
             get { return iSession; }
         }
         
+        public Rank GetRank(string trackPrefix, string carPrefix)
+        {
+            if(rank.ContainsKey(trackPrefix) && rank[trackPrefix].ContainsKey(carPrefix))
+                return rank[trackPrefix][carPrefix];
+            else
+                return null;
+        }
         public bool IsAdmin
         {
             get { return isAdmin; }

@@ -300,7 +300,7 @@ namespace Drive_LFSS.PubStats_
             if (!requestQueue.Contains(request))
             {
                 //storagePB.Add(key, null); //this create a null index, so we don't ask for this PB anymore.
-                requestQueue.Enqueue(request);
+                lock(requestQueue){requestQueue.Enqueue(request);}
             }
 
             return null;
@@ -312,8 +312,9 @@ namespace Drive_LFSS.PubStats_
 
             Request request = new Request(new FetchDelegate(FetchWR), "");
             if (!requestQueue.Contains(request))
-                requestQueue.Enqueue(request);
-
+            {
+                lock(requestQueue){requestQueue.Enqueue(request);}
+            }
             return null;
         }
 

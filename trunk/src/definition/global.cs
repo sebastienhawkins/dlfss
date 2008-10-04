@@ -122,6 +122,7 @@ namespace Drive_LFSS.Definition_
         CONFIG_USER = 2,
         HELP = 3,
         TEXT = 4,
+        RANK = 5,
     }
     public enum Button_Safe_Coord_Range
     {

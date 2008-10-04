@@ -142,7 +142,7 @@ namespace Drive_LFSS.CommandConsole_
             if(data == "")
                 Log.commandHelp("Licence "+args[1]+" has no rank data for trackPrefix "+args[2]+" and carPrefix "+args[3]+".\r\n");
             else 
-                Log.commandHelp("best avg sta win total\r\n"+data+"\r\n");
+                Log.commandHelp("best avg sta win total position\r\n"+data+"\r\n");
         }
         private static void Reload(string[] args)
         {

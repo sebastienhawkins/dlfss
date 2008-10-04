@@ -57,6 +57,10 @@ namespace Drive_LFSS
 
             return isNegative ? negativeColor+"-" + stringTime : positiveColor+ stringTime;
         }
+        public static double MSToKhm(double ms)
+        {
+            return ms * 3.624d;
+        }
     }
 }
     

@@ -53,7 +53,7 @@ namespace Drive_LFSS.Game_
                 licenceName = "AI";
         }
         
-        protected string licenceName = "";
+        private string licenceName = "";
         private byte licenceId = 0;
         private byte unkFlag = 0;
         private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;

@@ -149,6 +149,10 @@ namespace Drive_LFSS.Game_
         {
             AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
         }
+        public void SendMSXMessage(string message)
+        {
+            AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MSX, Packet_Type.PACKET_MSX_SEND_BIG_CHAT, new PacketMSX(message)));
+        }
         public void SendUpdateButtonToAll(ushort buttonEntry, string text)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)

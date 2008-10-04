@@ -411,6 +411,14 @@ namespace Drive_LFSS.Game_
         {
             RemoveGui((ushort)Gui_Entry.HELP);
         }
+        public void SendRankGui()
+        {
+            SendGui((ushort)Gui_Entry.RANK);
+        }
+        public void RemoveRankGui()
+        {
+            RemoveGui((ushort)Gui_Entry.RANK);
+        }
         
         private byte GetButtonId(ushort buttonEntry)
         {

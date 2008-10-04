@@ -24,6 +24,7 @@ namespace Drive_LFSS.Packet_
         PACKET_SIZE_BFN = 8,
         PACKET_SIZE_MTC = 72,
         PACKET_SIZE_MST = 68,
+        PACKET_SIZE_MSX = 100,
         PACKET_SIZE_ISI = 44,
         PACKET_SIZE_REO = 36,
         PACKET_SIZE_TINY = 4
@@ -65,14 +66,14 @@ namespace Drive_LFSS.Packet_
         PACKET_FLG_DRIVER_BLUE_YELLOW_FLAG,	        // 32 - info			: flag (yellow or blue)
         PACKET_PFL_DRIVER_FLAG,		                // 33 - info			: player flags (help flags)
         PACKET_FIN_DRIVER_FINISH_RACE,		        // 34 - info			: finished race
-        PACKET_RES_RESULT_CONFIRMED, // 35 - info			: result confirmed
+        PACKET_RES_RESULT_CONFIRMED,                // 35 - info			: result confirmed
         PACKET_REO_RACE_GRID_ORDER,		            // 36 - both ways		: reorder (info or instruction)
         PACKET_NLP_DRIVER_NODE_LAP,		            // 37 - info			: node and lap packet
         PACKET_MCI_MULTICAR_INFORMATION,		    // 38 - info			: multi car info
-        PACKET_ISP_MSX,		                        // 39 - instruction		: type message
+        PACKET_MSX_SEND_BIG_CHAT,		                        // 39 - instruction		: type message
         PACKET_MSL_MESSAGE_TO_LOCAL,		        // 40 - instruction		: message to local computer
         PACKET_CRS_DRIVER_RESET_CAR,		        // 41 - info			: car reset
-        PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,		    // 42 - both ways		: delete buttons / receive button requests
+        PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE,		// 42 - both ways		: delete buttons / receive button requests
         PACKET_AXI_AUTOCROSS_LAYOUT,		        // 43 - info			: autocross layout information
         PACKET_AXO_DRIVER_HIT_AUTOCROSS_OBJECT,	    // 44 - info			: hit an autocross object
         PACKET_BTN_BUTTON_DISPLAY,		            // 45 - instruction		: show a button on local or remote screen
