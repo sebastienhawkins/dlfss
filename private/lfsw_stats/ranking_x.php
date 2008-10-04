@@ -228,7 +228,7 @@ foreach($licenceNames as $licenceName)
 			$driverWinS = (int)$driverWinS;
 			$result = mysql_query("DELETE FROM `drive_lfss`.`stats_rank_driver` WHERE `licence_name`='$licenceName' AND `track_prefix`='$trackName' AND `car_prefix`='$carPrefix'",$link);
 			if (!$result) {die(mysql_error());}
-			$result = mysql_query("INSERT INTO `drive_lfss`.`stats_rank_driver` VALUES('$licenceName','$trackName','$carPrefix','$driverBestS','$driverAverageS','$driverStabilityS','$driverWinS','$rank')",$link);
+			$result = mysql_query("INSERT INTO `drive_lfss`.`stats_rank_driver` VALUES('$licenceName','$trackName','$carPrefix','$driverBestS','$driverAverageS','$driverStabilityS','$driverWinS','$rank','0')",$link);
 			if (!$result) {die(mysql_error());}
 			
 
@@ -236,12 +236,9 @@ foreach($licenceNames as $licenceName)
 		}
 	}
 }
-//$result = mysql_query("DELETE FROM `drive_lfss`.`stats_rank_driver` WHERE `licence_name`=''",$link);
-//if (!$result) {die(mysql_error());}
-
 
 mysql_close($link);
-
+include("ranking_position.php");
 
 function LFSWTrackToTrackPrefix(&$lfswTrack)
 {
