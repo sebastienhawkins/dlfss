@@ -58,9 +58,10 @@ namespace Drive_LFSS.Server_
         public void Exec(Driver driver, string _commandText)
         {
             string[] args = _commandText.Split(' ');                 //Can Be little faster... since we need only left to first white space
-            args[0] = args[0].Substring(1);                         //Remove "Prefix Command String".
-
-            if (args.Length < 1 || !command.ContainsKey(args[0].ToLowerInvariant()) ) 
+            args[0] = args[0].Substring(1);                          //Remove "Prefix Command String".
+            args[0] = args[0].ToLowerInvariant();
+            
+            if (args.Length < 1 || !command.ContainsKey(args[0]) ) 
             {
                 driver.AddMessageMiddle("^7Unknown command: ^3" + _commandText + ".", 4500);
                 Log.command("Command.Exec(), Invalid command from User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
