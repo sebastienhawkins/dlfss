@@ -33,7 +33,7 @@ namespace Drive_LFSS.Game_
     public sealed class Driver : Car, IDriver
     {
         private static bool[] botGuid = new bool[128];
-        public Driver(ISession _session): base()
+        internal Driver(ISession _session): base()
         {
             iSession = _session;
         }
@@ -41,11 +41,11 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        public static void ConfigApply()
+        internal static void ConfigApply()
         {
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "DriverSave");
         }
-        new public void Init(PacketNCN _packet)
+        new internal void Init(PacketNCN _packet)
         {
             isAdmin = _packet.adminStatus > 0 ? true : false;
             driverName = _packet.driverName;
@@ -84,7 +84,7 @@ namespace Drive_LFSS.Game_
             pb = Program.pubStats.GetPB(LicenceName, "");
             lock(Program.dlfssDatabase){rank = Ranking.GetDriverRanks(LicenceName);}
         }
-        new public void ProcessCPR(PacketCPR _packet)
+        new internal void ProcessCPR(PacketCPR _packet)
         {
             base.ProcessCPR(_packet);
             if(_packet.driverName != driverName)
@@ -95,7 +95,7 @@ namespace Drive_LFSS.Game_
                 SetConfigData("");
             }
         }
-        new public void Init(PacketNPL _packet)
+        new internal void Init(PacketNPL _packet)
         {
             if(LicenceName == "" && !IsBot()) //What the ???
             {
@@ -153,7 +153,7 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
-        public void ProcessLapInformation(PacketLAP _packet)
+        internal void ProcessLapInformation(PacketLAP _packet)
         {
             Lap lap = laps[laps.Count - 1];
             lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
@@ -206,7 +206,7 @@ namespace Drive_LFSS.Game_
 
             laps.Add(new Lap());
         }
-        public void ProcessSplitInformation(PacketSPX _packet)
+        internal void ProcessSplitInformation(PacketSPX _packet)
         {
             //Internal Lap
             Lap lap = laps[laps.Count -1];
@@ -234,16 +234,16 @@ namespace Drive_LFSS.Game_
                     AddMessageMiddle("^2Split " + ConvertX.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
             }
         }
-        public void ProcessRaceStart()
+        internal void ProcessRaceStart()
         {
             wr = Program.pubStats.GetWR("");
             laps.Add(new Lap());
             maxSpeedMs = 0.0d;
         }
-        public void ProcessRaceEnd()
+        internal void ProcessRaceEnd()
         {
         }
-        new public void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
+        new internal void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
         {
             base.ProcessLeaveRace(_packet);
             
@@ -253,7 +253,7 @@ namespace Drive_LFSS.Game_
                 guid = 0;
             }
         }
-        public void ProcessCNLPacket(PacketCNL _packet) //Disconnect
+        internal void ProcessCNLPacket(PacketCNL _packet) //Disconnect
         {
             quitReason = _packet.quitReason;
             
@@ -275,7 +275,7 @@ namespace Drive_LFSS.Game_
         private byte unkFlag = 0;
         private string driverName = "";
         private byte driverModel = 0;
-        public Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
+        internal Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
         private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
         private ISession iSession;
@@ -390,13 +390,13 @@ namespace Drive_LFSS.Game_
             }
         }
         private List<Lap> laps = new List<Lap>();
-        public PB pb = null;
-        public WR wr = null;
+        internal PB pb = null;
+        internal WR wr = null;
         private Dictionary<string,Dictionary<string,Rank>> rank = null;
         
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
-        new public void update(uint diff) 
+        new internal void update(uint diff) 
         {
             driverSaveInterval += diff;
             if (SAVE_INTERVAL < driverSaveInterval  ) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
@@ -527,27 +527,27 @@ namespace Drive_LFSS.Game_
             configStrings.CopyTo(configData,0);
             ApplyConfigData();
         }
-        public ushort GetConfigUint16(Config_User index)
+        internal ushort GetConfigUint16(Config_User index)
         {
             return  Convert.ToUInt16(configData[(int)index]);
         }
-        public uint GetConfigUint32(Config_User index)
+        internal uint GetConfigUint32(Config_User index)
         {
             return Convert.ToUInt32(configData[(int)index]);
         }
-        public string GetConfigString(Config_User index)
+        internal string GetConfigString(Config_User index)
         {
             return configData[(int)index];
         }
-        public void SetConfigValue(Config_User index, string value)
+        internal void SetConfigValue(Config_User index, string value)
         {
             configData[(int)index] = value;
         }
-        public ISession ISession
+        internal ISession ISession
         {
             get { return iSession; }
         }
-        public Rank GetRank(string trackPrefix, string carPrefix)
+        internal Rank GetRank(string trackPrefix, string carPrefix)
         {
             if( rank != null && rank.ContainsKey(trackPrefix) && rank[trackPrefix].ContainsKey(carPrefix))
                 return rank[trackPrefix][carPrefix];
@@ -572,7 +572,7 @@ namespace Drive_LFSS.Game_
         { 
             get { return connectionId; } 
         }
-        public bool IsTimeDiffLap
+        internal bool IsTimeDiffLap
         {
             get { return isTimeDiffLap; }
             set 
@@ -581,7 +581,7 @@ namespace Drive_LFSS.Game_
                 SetConfigValue(Config_User.TIMEDIFF_LAP, (isTimeDiffLap ? "1" : "0"));
             }
         }
-        public bool IsTimeDiffSplit
+        internal bool IsTimeDiffSplit
         {
             get { return isTimeDiffSplit; }
             set 

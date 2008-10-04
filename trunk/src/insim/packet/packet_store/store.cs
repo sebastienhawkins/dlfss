@@ -29,7 +29,7 @@ namespace Drive_LFSS.PacketStore_
 
     public abstract class Store
     {
-        public Store()
+        protected Store()
         {
         }
         ~Store()
@@ -175,7 +175,7 @@ namespace Drive_LFSS.PacketStore_
            return packet.data;
         }
 
-        public object toStruct(Packet_Type _packetType, byte[] _data)
+        protected object toStruct(Packet_Type _packetType, byte[] _data)
         {
             //Program.Log.network("toStruct(), Constructor For packetType->" + _packetType + "\r\n");
 

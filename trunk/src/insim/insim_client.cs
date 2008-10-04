@@ -62,7 +62,7 @@ namespace Drive_LFSS.InSim_
 
     public abstract class InSimClient : PacketHandler
     {
-        public InSimClient(InSimSetting _inSimSetting)
+        internal InSimClient(InSimSetting _inSimSetting)
         {
             threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
             threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
@@ -182,7 +182,7 @@ namespace Drive_LFSS.InSim_
                 udpClient.Close();
         }
 
-        public void DoConnect()
+        internal void DoConnect()
         {
             if (threadConnectionProcess.ThreadState != ThreadState.Unstarted)
                 threadConnectionProcess = new Thread(new ThreadStart(Connect));
@@ -190,11 +190,11 @@ namespace Drive_LFSS.InSim_
             threadConnectionProcess.Name = inSimSetting.serverName + " Connection Thread";
             threadConnectionProcess.Start();
         }
-        public bool IsConnecting()
+        internal bool IsConnecting()
         {
             return (threadConnectionProcess.ThreadState == ThreadState.Running);
         }
-        public bool IsConnected()
+        internal bool IsConnected()
         {
             //Important "ISISended" stay first and "tcpClient" 
             //is not called when false , since can mean tcpClient is destroy
@@ -203,7 +203,7 @@ namespace Drive_LFSS.InSim_
 
             return false;
         }
-        public void Disconnect()
+        internal void Disconnect()
         {
             if (IsConnected())
             {

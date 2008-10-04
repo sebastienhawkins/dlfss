@@ -31,7 +31,7 @@ namespace Drive_LFSS.Game_
 
     public sealed class Session : InSimClient, ISession
     {
-        public Session(string _serverName, InSimSetting _inSimSetting): base( _inSimSetting)
+        internal Session(string _serverName, InSimSetting _inSimSetting): base( _inSimSetting)
         {
             sessionName = _serverName;
             commandPrefix = _inSimSetting.commandPrefix;
@@ -50,12 +50,12 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        public void ConfigApply(InSimSetting _inSimSetting)
+        internal void ConfigApply(InSimSetting _inSimSetting)
         {
             base.SetInSimSetting(_inSimSetting);
             ConfigApply();
         }
-        new public void ConfigApply()
+        new internal void ConfigApply()
         {
             base.ConfigApply();
 
@@ -96,7 +96,7 @@ namespace Drive_LFSS.Game_
         private Ping ping;
         private string sessionName;
         private char commandPrefix;
-        public bool connectionRequest;
+        internal bool connectionRequest;
         private byte clientConnectionCount = 0;
 
         //Object
@@ -188,7 +188,7 @@ namespace Drive_LFSS.Game_
         
         private const uint TIMER_PING_PONG = 8000;
         private uint TimerPingPong = 7000;
-        public void update(uint diff)
+        internal void update(uint diff)
         {
             // For moment will test processPacket from the network thread! gave better reaction time.
             //ProcessReceivedPacket();
@@ -213,11 +213,11 @@ namespace Drive_LFSS.Game_
 
         }
 
-        new public void AddToTcpSendingQueud(Packet _serverPacket)
+        new internal void AddToTcpSendingQueud(Packet _serverPacket)
         {
             base.AddToTcpSendingQueud(_serverPacket);
         }
-        new public void AddToUdpSendingQueud(Packet _serverPacket)
+        new internal void AddToUdpSendingQueud(Packet _serverPacket)
         {
             base.AddToUdpSendingQueud(_serverPacket);
         }

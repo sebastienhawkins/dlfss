@@ -30,7 +30,7 @@ namespace Drive_LFSS.Game_
     public abstract class Button : IButton
     {
         private const byte BUTTON_MAX_COUNT = 240;
-        public Button() 
+        internal Button() 
         {
             //maybe a simple buttonList.Initialize(), will be ok
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
@@ -42,7 +42,7 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        public void ProcessBFNClearAll()
+        internal void ProcessBFNClearAll()
         {
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
             {
@@ -56,7 +56,7 @@ namespace Drive_LFSS.Game_
             currentGui = 0;
             SendConfigGui();
         }
-        public void ProcessBFNRequest()
+        internal void ProcessBFNRequest()
         {
             SendConfigGui();
         }
@@ -175,7 +175,7 @@ namespace Drive_LFSS.Game_
                     buttonMessageMiddle.Dequeue();
             }
         }
-        public void SendGui(ushort guiEntry,string text)
+        internal void SendGui(ushort guiEntry,string text)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             guiInfo.Text = text;
@@ -186,7 +186,7 @@ namespace Drive_LFSS.Game_
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             SendGui(guiInfo);
         }
-        public void SendGui(GuiTemplateInfo guiInfo)
+        internal void SendGui(GuiTemplateInfo guiInfo)
         {
             if (((Driver)this).IsBot())
                 return;
@@ -294,7 +294,7 @@ namespace Drive_LFSS.Game_
         {
             AddTimedButton(time, Program.buttonTemplate.GetEntry(buttonEntry));
         }
-        public void AddTimedButton(uint time, ButtonTemplateInfo buttonInfo)
+        internal void AddTimedButton(uint time, ButtonTemplateInfo buttonInfo)
         {
             lock (buttonTimedList) 
             {
@@ -303,17 +303,17 @@ namespace Drive_LFSS.Game_
             //SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
             SendUpdateButton(buttonInfo);
         }
-        public void SendUniqueButton(ushort buttonEntry)
+        internal void SendUniqueButton(ushort buttonEntry)
         {
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
             SendUniqueButton(buttonInfo);
         }
-        public void SendUniqueButton(ButtonTemplateInfo buttonInfo)
+        internal void SendUniqueButton(ButtonTemplateInfo buttonInfo)
         {
             if (GetButtonId(buttonInfo.Entry) == 0xFF)
                 SendButton(newButtonId(buttonInfo.Entry), buttonInfo);
         }
-        public void SendUpdateButton(ButtonTemplateInfo buttonInfo)
+        internal void SendUpdateButton(ButtonTemplateInfo buttonInfo)
         {
             byte buttonId = GetButtonId(buttonInfo.Entry);
             if (buttonId != 0xFF)
@@ -338,7 +338,7 @@ namespace Drive_LFSS.Game_
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
             SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
         }
-        public void SendButton(byte buttonId, ButtonTemplateInfo buttonInfo)
+        internal void SendButton(byte buttonId, ButtonTemplateInfo buttonInfo)
         {
             SendButton(buttonId, buttonInfo.Entry, (byte)buttonInfo.StyleMask, buttonInfo.IsAllwaysVisible, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text, buttonInfo.TextCaption);
         }
@@ -368,26 +368,26 @@ namespace Drive_LFSS.Game_
             );
         }
 
-        public void SendBanner()
+        internal void SendBanner()
         {
             //Send Banner
             SendUniqueButton((ushort)Button_Entry.BANNER);
         }
-        public void RemoveBanner()
+        internal void RemoveBanner()
         {
             RemoveButton((ushort)Button_Entry.BANNER);
         }
-        public void SendTrackPrefix()
+        internal void SendTrackPrefix()
         {
             ButtonTemplateInfo button = Program.buttonTemplate.GetEntry((uint)Button_Entry.TRACK_PREFIX);
             button.Text += button.Text + ((Driver)this).ISession.GetRaceTrackPrefix();
             SendUpdateButton(button);
         }
-        public void RemoveTrackPrefix()
+        internal void RemoveTrackPrefix()
         {
             RemoveButton((ushort)Button_Entry.TRACK_PREFIX);
         }
-        public void SendConfigGui()
+        internal void SendConfigGui()
         {
             SendGui((ushort)Gui_Entry.CONFIG_USER);
             
@@ -399,23 +399,23 @@ namespace Drive_LFSS.Game_
             SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (((Driver)this).IsTimeDiffLap ? "^7" : "^8") + " PB vs lap");
             SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (((Driver)this).IsTimeDiffSplit ? "^7" : "^8") + " PB vs Split");
         }
-        public void RemoveConfigGui()
+        internal void RemoveConfigGui()
         {
             RemoveGui((ushort)Gui_Entry.CONFIG_USER);
         }
-        public void SendHelpGui()
+        internal void SendHelpGui()
         {
             SendGui((ushort)Gui_Entry.HELP);
         }
-        public void RemoveHelpGui()
+        internal void RemoveHelpGui()
         {
             RemoveGui((ushort)Gui_Entry.HELP);
         }
-        public void SendRankGui()
+        internal void SendRankGui()
         {
             SendGui((ushort)Gui_Entry.RANK);
         }
-        public void RemoveRankGui()
+        internal void RemoveRankGui()
         {
             RemoveGui((ushort)Gui_Entry.RANK);
         }
@@ -455,7 +455,7 @@ namespace Drive_LFSS.Game_
             }
             return 0xFF;
         }
-        public ushort GetButtonEntry(byte buttonId)
+        internal ushort GetButtonEntry(byte buttonId)
         {
             return buttonList[buttonId];
         }

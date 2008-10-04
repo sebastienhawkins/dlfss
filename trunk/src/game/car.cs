@@ -31,7 +31,7 @@ namespace Drive_LFSS.Game_
 
     public abstract class Car : Button, ICar, CarMotion
     {
-        public Car() : base()
+        internal Car() : base()
         {
         }
         ~Car()
@@ -59,7 +59,7 @@ namespace Drive_LFSS.Game_
             EnterTrack(firstTime);
 
         }  //When joining Race
-        public void ProcessCarInformation(CarInformation _carInformation)
+        internal void ProcessCarInformation(CarInformation _carInformation)
         {
             node = _carInformation.nodeTrack;
             lapCompleted = _carInformation.lapNumber;
@@ -85,12 +85,12 @@ namespace Drive_LFSS.Game_
 
             //base.Init(_packet);
         }
-        public void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
+        internal void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
         {
             carId = 0;
             LeaveTrack();
         }
-        public void ProcessEnterGarage()                //When a car enter garage.
+        internal void ProcessEnterGarage()                //When a car enter garage.
         {
             LeaveTrack();
         }
@@ -175,7 +175,7 @@ namespace Drive_LFSS.Game_
                 if (((Driver)car).ISession.Script.CarAccelerationSucess((ICar)car, (ushort)startSpeed, (ushort)endSpeed, timeElapsed))
                     return;
             }
-            public double StartSpeed
+            internal double StartSpeed
             {
                 get { return startSpeed; }
                 set 
@@ -184,7 +184,7 @@ namespace Drive_LFSS.Game_
                     End();
                 }
             }
-            public double EndSpeed
+            internal double EndSpeed
             {
                 get { return endSpeed; }
                 set 
@@ -193,39 +193,39 @@ namespace Drive_LFSS.Game_
                     End();
                 }
             }
-            public void SetOnOff(bool on)
+            internal void SetOnOff(bool on)
             {
                 isOn = on;
                 End();
             }
-            public bool IsOn()
+            internal bool IsOn()
             {
                 return isOn;
             }
         }
-        public bool IsAccelerationOn()
+        internal bool IsAccelerationOn()
         {
             return featureAcceleration.IsOn();
         }
-        public ushort GetAccelerationStartSpeed()
+        internal ushort GetAccelerationStartSpeed()
         {
             return (featureAcceleration.StartSpeed < 1.0d ? (ushort)0 : (ushort)featureAcceleration.StartSpeed);
         }
-        public ushort GetAccelerationEndSpeed()
+        internal ushort GetAccelerationEndSpeed()
         {
             return (ushort)featureAcceleration.EndSpeed;
         }
-        public void SetAccelerationStartSpeed(ushort startKmh)
+        internal void SetAccelerationStartSpeed(ushort startKmh)
         {
             featureAcceleration.StartSpeed = (startKmh > 0 ? (double)startKmh : 0.9d);
             ((Driver)this).SetConfigValue(Config_User.ACCELERATION_START, startKmh.ToString());
         }
-        public void SetAccelerationEndSpeed(ushort endKmh)
+        internal void SetAccelerationEndSpeed(ushort endKmh)
         {
             featureAcceleration.EndSpeed = (double)endKmh;
             ((Driver)this).SetConfigValue(Config_User.ACCELERATION_STOP, endKmh.ToString());
         }
-        public void SetAccelerationOn(bool isOn)
+        internal void SetAccelerationOn(bool isOn)
         {
             featureAcceleration.SetOnOff(isOn);
             ((Driver)this).SetConfigValue(Config_User.ACCELERATION_ON, (isOn ? "1" : "0"));
@@ -407,11 +407,11 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
-        public bool IsDriftScoreOn()
+        internal bool IsDriftScoreOn()
         {
             return featureDriftScore.IsOn;
         }
-        public void SetDriftScoreOn(bool isOn)
+        internal void SetDriftScoreOn(bool isOn)
         {
             featureDriftScore.IsOn = isOn;
             ((Driver)this).SetConfigValue(Config_User.DRIFT_SCORE_ON, (isOn ? "1" : "0"));
@@ -446,11 +446,11 @@ namespace Drive_LFSS.Game_
             if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
                 return;
         }*/
-        public void EnterPit()
+        private void EnterPit()
         {
 
         }
-        public void EnterTrack(bool firstTime)
+        private void EnterTrack(bool firstTime)
         {
             isOnTrack = true;
 
@@ -460,7 +460,7 @@ namespace Drive_LFSS.Game_
             EnterTrackFirstTime();
         }
         //should be into driver
-        public void EnterTrackFirstTime()
+        private void EnterTrackFirstTime()
         {
             ((Driver)this).wr = Program.pubStats.GetWR(carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
             if (((Driver)this).wr != null)
@@ -488,7 +488,7 @@ namespace Drive_LFSS.Game_
             else
                 AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
         }
-        public void LeaveTrack()
+        internal void LeaveTrack()
         {
             isOnTrack = false;
             SendBanner();
