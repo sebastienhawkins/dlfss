@@ -533,7 +533,7 @@ namespace Drive_LFSS.Game_
         
         public Rank GetRank(string trackPrefix, string carPrefix)
         {
-            if(rank.ContainsKey(trackPrefix) && rank[trackPrefix].ContainsKey(carPrefix))
+            if( rank != null && rank.ContainsKey(trackPrefix) && rank[trackPrefix].ContainsKey(carPrefix))
                 return rank[trackPrefix][carPrefix];
             else
                 return null;

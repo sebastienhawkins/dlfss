@@ -44,18 +44,14 @@ namespace Drive_LFSS.Game_
         } //When Connection
         new protected void Init(PacketNPL _packet)
         {
+            base.Init(_packet);
+            
+            bool firstTime = false;
             if (carId != _packet.carId || carPrefix != _packet.carPrefix)
-            {
-                carPrefix = _packet.carPrefix;
-                carId = _packet.carId;
-                EnterTrackFirstTime();
-            }
-            else
-            {
-                carPrefix = _packet.carPrefix;
-                carId = _packet.carId;
-            }
+                firstTime = true;
 
+            carPrefix = _packet.carPrefix;
+            carId = _packet.carId;
             carPlate = _packet.carPlate;
             carSkin = _packet.skinName;
             addedIntakeRestriction = _packet.addedIntakeRestriction;
@@ -65,10 +61,8 @@ namespace Drive_LFSS.Game_
             tyreFrontRight = _packet.tyreFrontRight;
             tyreRearLeft = _packet.tyreRearLeft;
             tyreRearRight =_packet.tyreRearRight;
-            //
-            EnterTrack();
-            
-            base.Init(_packet);
+
+            EnterTrack(firstTime);
 
         }  //When joining Race
         public void ProcessCarInformation(CarInformation _carInformation)
@@ -462,12 +456,14 @@ namespace Drive_LFSS.Game_
         {
 
         }
-        public void EnterTrack()
+        public void EnterTrack(bool firstTime)
         {
             isOnTrack = true;
 
             RemoveTrackPrefix();
             RemoveBanner();
+            
+            EnterTrackFirstTime();
         }
         //should be into driver
         public void EnterTrackFirstTime()
