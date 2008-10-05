@@ -45,6 +45,7 @@ namespace Drive_LFSS.Database_
         private IDbCommand command;
         private IDbTransaction transaction;
         private Mutex mutexDataReader = new Mutex();
+        private IDataReader dataReader = null;
         
         //Thread ???
         public void CancelCommand()
@@ -52,40 +53,44 @@ namespace Drive_LFSS.Database_
             try { command.Cancel(); }
             catch (Exception) { }
         }
+        public void Lock()
+        {
+            mutexDataReader.WaitOne();
+            command.Dispose();
+        }
+        public void Unlock()
+        {
+            if(dataReader != null)
+            {
+                dataReader.Dispose();
+                dataReader = null;
+            }
+            mutexDataReader.ReleaseMutex();
+        }
         public void NewTransaction()
         {
-            mutexDataReader.WaitOne(-1, true);
             transaction = connection.BeginTransaction(IsolationLevel.Serializable); 
         }
         public void EndTransaction()
         {
             transaction.Commit();
             transaction.Dispose();
-            mutexDataReader.ReleaseMutex();
         }
         public int ExecuteNonQuery(string _command)
         {
             int _return;
-
-            command.Dispose();
             command = connection.CreateCommand();
             command.CommandText = _command;
             _return = command.ExecuteNonQuery();
-
             ResetTimerKeepAlive();
-
             return _return;
         }
         public IDataReader ExecuteQuery(string _command)
         {
-            IDataReader dataReader;
-            command.Dispose();
             command = connection.CreateCommand();
             command.CommandText = _command;
-
             dataReader = command.ExecuteReader(/*CommandBehavior.SequentialAccess*/);
             ResetTimerKeepAlive();
-            
             return dataReader;
         }
 

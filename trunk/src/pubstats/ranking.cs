@@ -118,16 +118,16 @@ namespace Drive_LFSS.Ranking_
             if(!LoadDriverRankedCount())
                 return false;
 
-            if(!LoadTop10())
+            if(!LoadTop20())
                 return false;
 
             isActived = true;
             return true;
         }
-        private static bool LoadTop10()
+        private static bool LoadTop20()
         {
             Log.commandHelp("  Start loading Top10 data.\r\n");
-            top10ByTrackCar.Clear();
+            top20ByTrackCar.Clear();
 
             List<string> trackPrefix = new List<string>();
             string query = "SELECT `name_prefix` FROM `track_template`;";
@@ -146,20 +146,20 @@ namespace Drive_LFSS.Ranking_
             uint count = 0;
             foreach(string itrTrack in trackPrefix)
             {
-                if(!top10ByTrackCar.ContainsKey(itrTrack))
-                    top10ByTrackCar.Add(itrTrack,new Dictionary<string,List<string>>());
+                if(!top20ByTrackCar.ContainsKey(itrTrack))
+                    top20ByTrackCar.Add(itrTrack,new Dictionary<string,List<string>>());
 
                 foreach(string itrCar in carPrefix)
                 {
-                    query = "SELECT `licence_name`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank` FROM `stats_rank_driver` WHERE `car_prefix`='"+itrCar+"' AND `track_prefix`='"+itrTrack+"' ORDER BY `total_rank` DESC LIMIT 10";
+                    query = "SELECT `licence_name`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank` FROM `stats_rank_driver` WHERE `car_prefix`='"+itrCar+"' AND `track_prefix`='"+itrTrack+"' ORDER BY `total_rank` DESC LIMIT 20";
                     reader = Program.dlfssDatabase.ExecuteQuery(query);
                     while(reader.Read())
                     {
                         count++;
-                        if(!top10ByTrackCar[itrTrack].ContainsKey(itrCar))
-                            top10ByTrackCar[itrTrack].Add(itrCar,new List<string>());
+                        if(!top20ByTrackCar[itrTrack].ContainsKey(itrCar))
+                            top20ByTrackCar[itrTrack].Add(itrCar,new List<string>());
                         
-                        top10ByTrackCar[itrTrack][itrCar].Add(reader.GetString(0)+" "+reader.GetString(1)+" "+reader.GetString(2)+" "+reader.GetString(3)+" "+reader.GetString(4)+" "+reader.GetString(5));
+                        top20ByTrackCar[itrTrack][itrCar].Add(reader.GetString(0)+" "+reader.GetString(1)+" "+reader.GetString(2)+" "+reader.GetString(3)+" "+reader.GetString(4)+" "+reader.GetString(5));
                     }
                     reader.Dispose();
                 }
@@ -182,17 +182,24 @@ namespace Drive_LFSS.Ranking_
 
             List<string> trackPrefix = new List<string>();
             string query = "SELECT `name_prefix` FROM `track_template`;";
-            IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
-            while(reader.Read())
-                trackPrefix.Add(reader.GetString(0));
-            reader.Dispose();
+            Program.dlfssDatabase.Lock();
+            {
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                while(reader.Read())
+                    trackPrefix.Add(reader.GetString(0));
+            }
+            Program.dlfssDatabase.Unlock();
             
             List<string> carPrefix = new List<string>();
             query = "SELECT `name_prefix` FROM `car_template`;";
-            reader = Program.dlfssDatabase.ExecuteQuery(query);
-            while(reader.Read())
-                carPrefix.Add(reader.GetString(0));
-            reader.Dispose();
+            Program.dlfssDatabase.Lock();
+            {
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                while(reader.Read())
+                    carPrefix.Add(reader.GetString(0));
+                reader.Dispose();
+            }
+            Program.dlfssDatabase.Unlock();
             
             foreach(string itrTrack in trackPrefix)
             {
@@ -205,13 +212,16 @@ namespace Drive_LFSS.Ranking_
                         driverRankedCount[itrTrack].Add(itrCar,0);
 
                     query = "SELECT DISTINCT COUNT(`licence_name`) FROM `stats_rank_driver` WHERE `track_prefix`='"+itrTrack+"' AND `car_prefix`='"+itrCar+"'";
-                    reader = Program.dlfssDatabase.ExecuteQuery(query);
-                    if(reader.Read())
+                    Program.dlfssDatabase.Lock();
                     {
-                       driverRankedCount[itrTrack][itrCar] = (uint)reader.GetInt32(0);
-                       count += driverRankedCount[itrTrack][itrCar];
+                        IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                        if(reader.Read())
+                        {
+                           driverRankedCount[itrTrack][itrCar] = (uint)reader.GetInt32(0);
+                           count += driverRankedCount[itrTrack][itrCar];
+                        }
                     }
-                   reader.Dispose();
+                    Program.dlfssDatabase.Unlock();
                 }
             }
             Log.commandHelp("  driver ranked count for each Track/Car "+count.ToString()+".\r\n");
@@ -222,25 +232,28 @@ namespace Drive_LFSS.Ranking_
         
         //<track_prefix,car_prefix,licence_name best avg sta win total>
         private static Dictionary<string,Dictionary<string,uint>> driverRankedCount = new Dictionary<string,Dictionary<string,uint>>();
-        private static Dictionary<string,Dictionary<string,List<string>>> top10ByTrackCar = new Dictionary<string,Dictionary<string,List<string>>>();  
+        private static Dictionary<string,Dictionary<string,List<string>>> top20ByTrackCar = new Dictionary<string,Dictionary<string,List<string>>>();  
         private static bool isActived = false;
         
-        public static bool IsActived()
+        internal static bool IsActived()
         {
             return isActived;
         }
-        public static string GetRank(string trackPrefix, string carPrefix, string licenceName)
+        internal static string GetRank(string trackPrefix, string carPrefix, string licenceName)
         {
             string data = "";
             string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`='"+licenceName+"'";
-            IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
-            if(reader.Read())
-                data = reader.GetString(0)+" "+reader.GetString(1)+" "+reader.GetString(2)+" "+reader.GetString(3)+" "+reader.GetString(4)+" "+reader.GetString(5);
-            reader.Dispose();
+            Program.dlfssDatabase.Lock();
+            {
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                if(reader.Read())
+                    data = reader.GetString(0)+" "+reader.GetString(1)+" "+reader.GetString(2)+" "+reader.GetString(3)+" "+reader.GetString(4)+" "+reader.GetString(5);
+            }
+            Program.dlfssDatabase.Unlock();
             
             return data;
         }
-        public static Dictionary<string,Dictionary<string,Rank>> GetDriverRanks(string licenceName)
+        internal static Dictionary<string,Dictionary<string,Rank>> GetDriverRanks(string licenceName)
         {
             Dictionary<string,Dictionary<string,Rank>> data = new Dictionary<string,Dictionary<string,Rank>>();
             
@@ -248,31 +261,34 @@ namespace Drive_LFSS.Ranking_
             string trackPrefix = "";
             string carPrefix = "";
             
-            IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
-            while(reader.Read())
+            Program.dlfssDatabase.Lock();
             {
-                trackPrefix = reader.GetString(0);
-                carPrefix = reader.GetString(1);
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                while(reader.Read())
+                {
+                    trackPrefix = reader.GetString(0);
+                    carPrefix = reader.GetString(1);
 
-                if(!data.ContainsKey(trackPrefix))
-                    data.Add(trackPrefix,new Dictionary<string,Rank>());
-                
-                if(!data[trackPrefix].ContainsKey(carPrefix))
-                    data[trackPrefix].Add(carPrefix,null);
+                    if(!data.ContainsKey(trackPrefix))
+                        data.Add(trackPrefix,new Dictionary<string,Rank>());
+                    
+                    if(!data[trackPrefix].ContainsKey(carPrefix))
+                        data[trackPrefix].Add(carPrefix,null);
 
-                data[trackPrefix][carPrefix] = new Rank(reader.GetInt16(2),reader.GetInt16(3),reader.GetInt16(4),reader.GetInt32(5),reader.GetInt32(6),(uint)reader.GetInt32(7));
+                    data[trackPrefix][carPrefix] = new Rank(reader.GetInt16(2),reader.GetInt16(3),reader.GetInt16(4),reader.GetInt32(5),reader.GetInt32(6),(uint)reader.GetInt32(7));
+                }
             }
-            reader.Dispose();
-
+            Program.dlfssDatabase.Unlock();
+            
             return data;
         }
-        public static string GetTop10(string trackPrefix, string carPrefix)
+        internal static string[] GetTop20(string trackPrefix, string carPrefix)
         {
-            if(!top10ByTrackCar.ContainsKey(trackPrefix) || !top10ByTrackCar[trackPrefix].ContainsKey(carPrefix))
-                return "";
-            return String.Join("\r\n",top10ByTrackCar[trackPrefix][carPrefix].ToArray());
+            if(!top20ByTrackCar.ContainsKey(trackPrefix) || !top20ByTrackCar[trackPrefix].ContainsKey(carPrefix))
+                return new string[0];
+            return top20ByTrackCar[trackPrefix][carPrefix].ToArray();
         }
-        public static uint GetRankedCount(string trackPrefix, string carPrefix)
+        internal static uint GetRankedCount(string trackPrefix, string carPrefix)
         {
             if(driverRankedCount.ContainsKey(trackPrefix) && driverRankedCount[trackPrefix].ContainsKey(carPrefix))
                 return driverRankedCount[trackPrefix][carPrefix];

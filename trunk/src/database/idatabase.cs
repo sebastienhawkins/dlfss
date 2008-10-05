@@ -3,6 +3,8 @@ namespace Drive_LFSS.Database_
 {
     public interface IDatabase
     {
+        void Lock();
+        void Unlock();
         void CancelCommand();
         void EndTransaction();
         int ExecuteNonQuery(string _command);

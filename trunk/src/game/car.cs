@@ -482,11 +482,12 @@ namespace Drive_LFSS.Game_
             Rank _rank = ((Driver)this).GetRank(((Driver)this).ISession.GetRaceTrackPrefix(),CarPrefix);
             if(_rank != null)
             {
-                ((Driver)this).ISession.SendMSXMessage(((IDriver)this).DriverName+" ^2Rank ^5"+carPrefix+" ^7"+_rank.Total.ToString()+" ^2- "+(((_rank.Position > 0)?"^5"+_rank.Position:"^1NA"))+"^2/^7"+Ranking.GetRankedCount(((Driver)this).ISession.GetRaceTrackPrefix(),CarPrefix)+" ^2grade ^7"+_rank.GetGrade());
-                AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
+                ((Driver)this).ISession.SendMSXMessage(((IDriver)this).DriverName+"^2, is a grade '^7"+_rank.GetGrade()+"^2' driver.");
+                //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
             }
             else
-                AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
+                ((Driver)this).ISession.SendMSXMessage(((IDriver)this).DriverName+"^2, is a '^3unknow^2' grade driver.");
+                //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
         }
         internal void LeaveTrack()
         {

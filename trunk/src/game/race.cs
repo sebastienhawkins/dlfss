@@ -130,10 +130,11 @@ namespace Drive_LFSS.Game_
 
             if (hasToBeSavedIntoPPSTA)
             {
-                lock (Program.dlfssDatabase)
+                Program.dlfssDatabase.Lock();
                 {
                     SaveToDB();
                 }
+                Program.dlfssDatabase.Unlock();
                 hasToBeSavedIntoPPSTA = false;
             }
             if (guid != 0 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING && HasAllResult())
@@ -264,7 +265,13 @@ namespace Drive_LFSS.Game_
                     if(stateHasChange)
                     {
                         if ((raceSaveInterval += diff) >= SAVE_INTERVAL)
-                            SaveToDB();
+                        {
+                            Program.dlfssDatabase.Lock();
+                            {
+                                SaveToDB();
+                            }
+                            Program.dlfssDatabase.Unlock();
+                        }
                     }
                 }
                 
@@ -305,18 +312,18 @@ namespace Drive_LFSS.Game_
         private bool SetNewGuid()
         {
             bool returnValue = false;
-            lock (Program.dlfssDatabase)
+            Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `race`");
                 if (reader.Read())
                 {
                     guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
                     returnValue = true;
-                    reader.Close();
+                    reader.Dispose();
                     SaveToDB();
                 }
-                reader.Dispose();
             }
+            Program.dlfssDatabase.Unlock();
             return returnValue;
         }
         private void SaveToDB()
@@ -326,7 +333,6 @@ namespace Drive_LFSS.Game_
             query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / (Program.tickPerMs * 1000)) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
             //Since this is GUID creation, important 1 at time is created.
             Program.dlfssDatabase.ExecuteNonQuery(query);
-
             raceSaveInterval = 0;
             stateHasChange = false;
             Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + raceLaps + ", saved to database.\r\n");
@@ -376,11 +382,11 @@ namespace Drive_LFSS.Game_
                 }
                 enu = driverGuidRESPos.GetEnumerator();
             }
-            lock (Program.dlfssDatabase)
+            Program.dlfssDatabase.Lock();
             {
                 SaveToDB();
             }
-
+            Program.dlfssDatabase.Unlock();
             if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 qualifyRaceGuid = guid;
             guid = 0;

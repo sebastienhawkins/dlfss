@@ -60,7 +60,8 @@ namespace Drive_LFSS.Database_
         {
             return 0;
         }
-
+        public void Lock(){}
+        public void Unlock(){}
         //Thread Safe
         public void CancelCommand()
         {

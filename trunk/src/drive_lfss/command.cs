@@ -41,7 +41,7 @@ namespace Drive_LFSS.CommandConsole_
                 case "reload": Reload(args); break;
                 case "status": Status(args); break;
                 case "say": Say(args); break;
-                case "top10": Top10(args); break; 
+                case "top20": Top20(args); break; 
                 case "rank": Rank(args); break;                           
                 case "exit": Exit(); break;
                 default:
@@ -118,18 +118,18 @@ namespace Drive_LFSS.CommandConsole_
                     Log.command("Command - announce, serverName Not Found: " + args[1] + "\r\n");
             }
         }
-        private static void Top10(string []args)
+        private static void Top20(string []args)
         {
             if (args.Length != 3)
             {
-                Log.commandHelp("Command - top10, Syntax error.\r\n  Usage:\r\n    top10 $trackPrefix $carPrefix\r\n");
+                Log.commandHelp("Command - top20, Syntax error.\r\n  Usage:\r\n    top20 $trackPrefix $carPrefix\r\n");
                 return;
             }
-            string data = Ranking.GetTop10(args[1].ToUpperInvariant(),args[2].ToUpperInvariant());
-            if(data == "")
+            string[] data = Ranking.GetTop20(args[1].ToUpperInvariant(),args[2].ToUpperInvariant());
+            if(data.Length < 1)
                 Log.commandHelp("No rank data for trackPrefix "+args[2]+" and carPrefix "+args[3]+".\r\n");
             else 
-            Log.commandHelp("licence_name best avg sta win total\r\n"+data+"\r\n");
+                Log.commandHelp("licence_name best avg sta win total\r\n"+String.Join("\r\n",data)+"\r\n");
         }
         private static void Rank(string []args)
         {
@@ -138,7 +138,8 @@ namespace Drive_LFSS.CommandConsole_
                 Log.commandHelp("Command - rank, Syntax error.\r\n  Usage:\r\n    rank $trackPrefix $carPrefix $licenceName\r\n");
                 return;
             }
-            string data = Ranking.GetRank(args[1].ToUpperInvariant(),args[2].ToUpperInvariant(),args[3].ToUpperInvariant());
+            string data = "";
+            lock(Program.dlfssDatabase){data = Ranking.GetRank(args[1].ToUpperInvariant(),args[2].ToUpperInvariant(),args[3].ToUpperInvariant());}
             if(data == "")
                 Log.commandHelp("Licence "+args[1]+" has no rank data for trackPrefix "+args[2]+" and carPrefix "+args[3]+".\r\n");
             else 

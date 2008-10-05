@@ -20,12 +20,13 @@ using System;
 using System.Collections.Generic;
 namespace Drive_LFSS.Game_
 {
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Game_;
-    using Drive_LFSS.Script_;
-    using Drive_LFSS.Storage_;
-    using Drive_LFSS.Log_;
+    using Definition_;
+    using Packet_;
+    using Game_;
+    using Script_;
+    using Storage_;
+    using Log_;
+    using Ranking_;
 
     public abstract class Button : IButton
     {
@@ -244,6 +245,10 @@ namespace Drive_LFSS.Game_
             }
             currentGui = (ushort)0;
         }
+        public byte RemoveButton(Button_Entry buttonEntry)
+        {
+            return RemoveButton((ushort)buttonEntry);
+        }
         public byte RemoveButton(ushort buttonEntry)
         {
             if (((Driver)this).IsBot())
@@ -327,11 +332,20 @@ namespace Drive_LFSS.Game_
                 SendButton(buttonId,buttonInfo);
             }
         }
+        public void SendUpdateButton(Button_Entry buttonEntry, string text)
+        {
+            SendUpdateButton((ushort)buttonEntry,text);
+        }
         public void SendUpdateButton(ushort buttonEntry, string text)
         {
+            
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
             buttonInfo.Text = text;
             SendUpdateButton(buttonInfo);
+        }
+        public void SendButton(Button_Entry buttonEntry)
+        {
+            SendButton((ushort)buttonEntry);
         }
         public void SendButton(ushort buttonEntry)
         {
@@ -411,9 +425,156 @@ namespace Drive_LFSS.Game_
         {
             RemoveGui((ushort)Gui_Entry.HELP);
         }
-        internal void SendRankGui()
+        internal void SendRankGui(Button_Entry startWith)
         {
             SendGui((ushort)Gui_Entry.RANK);
+            switch(startWith)
+            {
+                case Button_Entry.RANK_BUTTON_TOP20:
+                    SendRankTop20();break;
+                case Button_Entry.RANK_BUTTON_CURRENT:
+                    SendRankCurrent(0);break;
+            }
+            
+        }
+        private void ClearRankDisplay()
+        {
+            RemoveButton(Button_Entry.RANK_NAME);
+            RemoveButton(Button_Entry.RANK_PB);
+            RemoveButton(Button_Entry.RANK_AVERAGE);
+            RemoveButton(Button_Entry.RANK_STABILITY);
+            RemoveButton(Button_Entry.RANK_WIN);
+            RemoveButton(Button_Entry.RANK_TOTAL);
+            RemoveButton(Button_Entry.RANK_POSITION);
+            SendButton(Button_Entry.RANK_NAME);
+            SendButton(Button_Entry.RANK_PB);
+            SendButton(Button_Entry.RANK_AVERAGE);
+            SendButton(Button_Entry.RANK_STABILITY);
+            SendButton(Button_Entry.RANK_WIN);
+            SendButton(Button_Entry.RANK_TOTAL);
+            SendButton(Button_Entry.RANK_POSITION);
+        }
+        internal void SendRankCurrent(byte witchPage)
+        {
+            SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
+            SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
+            SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^7Current");
+            ClearRankDisplay();
+            
+            string trackPrefix = ((Driver)this).ISession.GetRaceTrackPrefix();
+            string carPrefix = ((ICar)this).CarPrefix;
+            uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
+            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7"+carPrefix+", ^2Track:^7 "+trackPrefix+", ^2Count: ^7"+rankedCount);
+            if(rankedCount < 1)
+                return;
+            List<Driver> driver = ((Session)((Driver)this).ISession).GetDriverList();
+            
+            ButtonTemplateInfo bName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_NAME);
+            ButtonTemplateInfo bPB = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_PB);
+            ButtonTemplateInfo bAverage = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_AVERAGE);
+            ButtonTemplateInfo bStability = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_STABILITY);
+            ButtonTemplateInfo bWin = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_WIN);
+            ButtonTemplateInfo bTotal = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_TOTAL);
+            ButtonTemplateInfo bPosition = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_POSITION);
+
+            byte top = bName.Top;
+            byte height = bName.Height;
+            byte rankedCountSended = 0;
+            witchPage = (byte)(20*witchPage); 
+            for(byte itr = witchPage; itr < driver.Count && itr < witchPage+20; itr++)
+            {
+                Rank rank = driver[itr].GetRank(trackPrefix,carPrefix);
+                if(rank != null)
+                {
+                   
+                   bName.Text = "^2"+driver[itr].LicenceName;
+                   bName.Top = (byte)((height*(rankedCountSended+1))+top);
+                   bPB.Text = "^7"+rank.BestLap;
+                   bPB.Top = (byte)((height*(rankedCountSended+1))+top);
+                   bAverage.Text = "^2"+rank.AverageLap;
+                   bAverage.Top = (byte)((height*(rankedCountSended+1))+top);
+                   bStability.Text = "^7"+rank.Stability;
+                   bStability.Top = (byte)((height*(rankedCountSended+1))+top);
+                   bWin.Text = "^2"+rank.RaceWin;
+                   bWin.Top = (byte)((height*(rankedCountSended+1))+top);
+                   bTotal.Text = "^7"+rank.Total;
+                   bTotal.Top = (byte)((height*(rankedCountSended+1))+top);
+                   bPosition.Text = "^2"+rank.Position;
+                   bPosition.Top = (byte)((height*(rankedCountSended+1))+top);
+                   
+                   SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
+                   SendButton(newButtonId(Button_Entry.RANK_PB), bPB);
+                   SendButton(newButtonId(Button_Entry.RANK_AVERAGE), bAverage);
+                   SendButton(newButtonId(Button_Entry.RANK_STABILITY), bStability);
+                   SendButton(newButtonId(Button_Entry.RANK_WIN), bWin);
+                   SendButton(newButtonId(Button_Entry.RANK_TOTAL), bTotal);
+                   SendButton(newButtonId(Button_Entry.RANK_POSITION), bPosition); 
+                   
+                   rankedCountSended++;
+                }
+                    
+            }
+            
+        }
+        internal void SendRankTop20()
+        {
+
+            SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^7Top20");
+            SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
+            SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
+            ClearRankDisplay();
+
+            string trackPrefix = ((Driver)this).ISession.GetRaceTrackPrefix();
+            string carPrefix = ((ICar)this).CarPrefix;
+            uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
+            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7"+carPrefix+", ^2Track:^7 "+trackPrefix+", ^2Count: ^7"+rankedCount);
+            if(rankedCount < 1)
+                return;
+
+            string[] row = Ranking.GetTop20(trackPrefix,carPrefix);
+
+            ButtonTemplateInfo bName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_NAME);
+            ButtonTemplateInfo bPB = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_PB);
+            ButtonTemplateInfo bAverage = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_AVERAGE);
+            ButtonTemplateInfo bStability = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_STABILITY);
+            ButtonTemplateInfo bWin = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_WIN);
+            ButtonTemplateInfo bTotal = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_TOTAL);
+            ButtonTemplateInfo bPosition = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_POSITION);
+            
+            byte top = bName.Top;
+            byte height = bName.Height;
+            for(int itr = 0; itr < row.Length; itr++)
+            {
+               string[] colum = row[itr].Split(new char[]{' '});
+               if(colum.Length != 6)
+               {
+                    Log.error("Button.SendRankTop10(), Found a bad Rank Row\r\n");
+                    return;
+               }
+               
+               bName.Text = "^2"+colum[0];
+               bName.Top = (byte)((height*(itr+1))+top);
+               bPB.Text = "^7"+colum[1];
+               bPB.Top = (byte)((height*(itr+1))+top);
+               bAverage.Text = "^2"+colum[2];
+               bAverage.Top = (byte)((height*(itr+1))+top);
+               bStability.Text = "^7"+colum[3];
+               bStability.Top = (byte)((height*(itr+1))+top);
+               bWin.Text = "^2"+colum[4];
+               bWin.Top = (byte)((height*(itr+1))+top);
+               bTotal.Text = "^7"+colum[5];
+               bTotal.Top = (byte)((height*(itr+1))+top);
+               bPosition.Text = "^2"+(itr+1).ToString();
+               bPosition.Top = (byte)((height*(itr+1))+top);
+               
+               SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
+               SendButton(newButtonId(Button_Entry.RANK_PB), bPB);
+               SendButton(newButtonId(Button_Entry.RANK_AVERAGE), bAverage);
+               SendButton(newButtonId(Button_Entry.RANK_STABILITY), bStability);
+               SendButton(newButtonId(Button_Entry.RANK_WIN), bWin);
+               SendButton(newButtonId(Button_Entry.RANK_TOTAL), bTotal);
+               SendButton(newButtonId(Button_Entry.RANK_POSITION), bPosition);
+            }
         }
         internal void RemoveRankGui()
         {
@@ -430,6 +591,10 @@ namespace Drive_LFSS.Game_
                 }
             }
             return 0xFF;
+        }
+        private byte newButtonId(Button_Entry buttonEntry)
+        {
+            return newButtonId((ushort)buttonEntry);
         }
         private byte newButtonId(ushort buttonEntry)
         {

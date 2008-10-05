@@ -29,7 +29,11 @@ namespace Drive_LFSS.Database_
             {
                 TimerKeepAlive = 0;
                 Log.progress("Ping database\r\n");
-                ((IDatabase)this).ExecuteNonQuery("SELECT 1");
+                ((IDatabase)this).Lock();
+                {
+                    ((IDatabase)this).ExecuteNonQuery("SELECT 1");
+                }
+                ((IDatabase)this).Unlock();
 
             }
         }

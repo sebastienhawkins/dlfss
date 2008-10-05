@@ -145,6 +145,10 @@ namespace Drive_LFSS.Game_
         {
             return race.GetTrackPrefix();
         }
+        public List<Driver> GetDriverList()
+        {
+            return driverList;
+        }
         public void SendMSTMessage(string message)
         {
             AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
@@ -627,6 +631,22 @@ namespace Drive_LFSS.Game_
                 case Button_Entry.TEXT_BUTTON_DRIVE:
                 {
                     driver.RemoveGui((ushort)Gui_Entry.TEXT);
+                } break;
+                case Button_Entry.RANK_BUTTON_CLOSE:
+                {
+                    driver.RemoveRankGui();
+                } break;
+                case Button_Entry.RANK_BUTTON_TOP20:
+                {
+                    driver.SendRankTop20();
+                } break;
+                case Button_Entry.RANK_BUTTON_SEARCH:
+                {
+
+                } break;
+                case Button_Entry.RANK_BUTTON_CURRENT:
+                {
+                    driver.SendRankCurrent(0);
                 } break;
                 case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
                 case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;

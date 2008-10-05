@@ -82,14 +82,18 @@ namespace Drive_LFSS.Game_
                     Log.error("Error when creating a new GUID for licenceName: " + LicenceName + ", driverName: " + driverName + "\r\n");
             }
             pb = Program.pubStats.GetPB(LicenceName, "");
-            lock(Program.dlfssDatabase){rank = Ranking.GetDriverRanks(LicenceName);}
+            rank = Ranking.GetDriverRanks(LicenceName);
         }
         new internal void ProcessCPR(PacketCPR _packet)
         {
             base.ProcessCPR(_packet);
             if(_packet.driverName != driverName)
             {
-                SaveToDB();
+                Program.dlfssDatabase.Lock();
+                {
+                    SaveToDB();
+                }
+                Program.dlfssDatabase.Unlock();
                 guid = 0;
                 driverName = _packet.driverName;
                 SetConfigData("");
@@ -261,10 +265,11 @@ namespace Drive_LFSS.Game_
             if(IsBot())
                 return;
 
-            lock( Program.dlfssDatabase)
+            Program.dlfssDatabase.Lock();
             {
                 SaveToDB();
             }
+            Program.dlfssDatabase.Unlock();
         }
 
         private bool isTimeDiffLap = true;
@@ -404,20 +409,29 @@ namespace Drive_LFSS.Game_
                 if (!IsBot())
                 {
                     Log.database(iSession.GetSessionNameForLog() + "Driver DriverGuid: " + guid + ", DriverName: " + driverName + ", licenceName:" + LicenceName + ", saved to database.\r\n");
-                    SaveToDB();
-
+                    Program.dlfssDatabase.Lock();
+                    {
+                        SaveToDB();
+                    }
+                    Program.dlfssDatabase.Unlock();
                     if (laps.Count > 0)
                     {
                         lock (laps)
                         {
                             Lap currentLap = laps[laps.Count - 1];
                             List<Lap>.Enumerator itr = laps.GetEnumerator();
+
+                            
                             while (itr.MoveNext())
                             {
                                 Lap lap = itr.Current;
                                 if (lap.LapTime < 1)
                                     continue;
-                                SaveLapsToDB(lap);
+                                Program.dlfssDatabase.Lock();
+                                {   
+                                    SaveLapsToDB(lap);
+                                }
+                                Program.dlfssDatabase.Unlock();
                                 Log.database(iSession.GetSessionNameForLog() + "Lap for DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved to database.\r\n");
                             }
                             laps.Clear();
@@ -439,7 +453,7 @@ namespace Drive_LFSS.Game_
 
         private void LoadFromDB()
         {
-            lock (Program.dlfssDatabase)
+            Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`='" + LicenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "' AND `driver_name`='" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "'");
                 if (reader.Read())
@@ -447,14 +461,15 @@ namespace Drive_LFSS.Game_
                     guid = (uint)reader.GetInt32(0);
                     SetConfigData(reader.GetString(1));
                 }
-                reader.Dispose();
             }
+            Program.dlfssDatabase.Unlock();
         }
         private void SaveLapsToDB(Lap lap)
         {
             string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`max_speed_ms`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
             query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + ","+ lap.MaxSpeedMs +","+ (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount + ")";
             Program.dlfssDatabase.ExecuteNonQuery(query);
+
         }
         private void SaveToDB()
         {
@@ -465,18 +480,18 @@ namespace Drive_LFSS.Game_
         private bool SetNewGuid()
         {
             bool returnValue = false;
-            lock (Program.dlfssDatabase)
+            Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver`");
                 if (reader.Read())
                 {
                     guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
-                    reader.Close();
+                    reader.Dispose();
                     SaveToDB();
                     returnValue = true;
                 }
-                reader.Dispose();
             }
+            Program.dlfssDatabase.Unlock();
             return returnValue;
         }
         private void ApplyConfigData()

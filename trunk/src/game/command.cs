@@ -36,6 +36,10 @@ namespace Drive_LFSS.Server_
            command["help"] = new CommandName(0, new CommandDelegate(Help));
            command["config"] = new CommandName(0, new CommandDelegate(Config));
            command["status"] = new CommandName(0, new CommandDelegate(Status));
+           command["rank"] = new CommandName(0, new CommandDelegate(Rank));
+           command["top"] = new CommandName(0, new CommandDelegate(Rank));
+           command["top10"] = new CommandName(0, new CommandDelegate(Rank));
+           command["top20"] = new CommandName(0, new CommandDelegate(Rank));
         }
         ~CommandInGame()
         {
@@ -230,9 +234,7 @@ namespace Drive_LFSS.Server_
         }
         private void Rank(Driver driver, string[] args)
         {
-        }
-        private void Top10(Driver driver, string[] args)
-        {
+            driver.SendRankGui(Button_Entry.RANK_BUTTON_TOP20);
         }
         #endregion
     }

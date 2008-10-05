@@ -103,6 +103,21 @@ namespace Drive_LFSS.Definition_
         HELP_BUTTON_DRIVE = 34,
         HELP_BUTTON_CONFIG = 35,
         TEXT_BUTTON_DRIVE = 45,
+        RANK_BG = 47,
+        RANK_NAME = 50,
+        RANK_PB = 51,
+        RANK_AVERAGE = 52,
+        RANK_STABILITY = 53,
+        RANK_WIN = 54,
+        RANK_TOTAL = 55,
+        RANK_POSITION = 56,
+        RANK_LAST_UPDATE = 57,
+        RANK_NEXT_UPDATE = 58,
+        RANK_BUTTON_TOP20 = 59,
+        RANK_BUTTON_SEARCH = 60,
+        RANK_BUTTON_CURRENT = 61,
+        RANK_BUTTON_CLOSE = 62,
+        RANK_INFO = 64,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
