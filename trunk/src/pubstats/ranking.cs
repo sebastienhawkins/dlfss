@@ -239,19 +239,19 @@ namespace Drive_LFSS.Ranking_
         {
             return isActived;
         }
-        internal static string GetRank(string trackPrefix, string carPrefix, string licenceName)
+        internal static Rank GetRank(string trackPrefix, string carPrefix, string licenceName)
         {
-            string data = "";
+            Rank rank = null;
             string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`='"+licenceName+"'";
             Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
                 if(reader.Read())
-                    data = reader.GetString(0)+" "+reader.GetString(1)+" "+reader.GetString(2)+" "+reader.GetString(3)+" "+reader.GetString(4)+" "+reader.GetString(5);
+                    rank = new Rank(reader.GetInt16(0),reader.GetInt16(1),reader.GetInt16(2),reader.GetInt32(3),reader.GetInt32(4),(uint)reader.GetInt32(5));
             }
             Program.dlfssDatabase.Unlock();
             
-            return data;
+            return rank;
         }
         internal static Dictionary<string,Dictionary<string,Rank>> GetDriverRanks(string licenceName)
         {

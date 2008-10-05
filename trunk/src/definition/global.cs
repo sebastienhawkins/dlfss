@@ -118,6 +118,9 @@ namespace Drive_LFSS.Definition_
         RANK_BUTTON_CURRENT = 61,
         RANK_BUTTON_CLOSE = 62,
         RANK_INFO = 64,
+        RANK_SEARCH_BUTTON_TRACK = 65,
+        RANK_SEARCH_BUTTON_CAR = 66,
+        RANK_SEARCH_BUTTON_LICENCE = 67,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {

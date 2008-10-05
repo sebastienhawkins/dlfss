@@ -642,12 +642,13 @@ namespace Drive_LFSS.Game_
                 } break;
                 case Button_Entry.RANK_BUTTON_SEARCH:
                 {
-
+                    driver.SendRankSearch();
                 } break;
                 case Button_Entry.RANK_BUTTON_CURRENT:
                 {
                     driver.SendRankCurrent(0);
                 } break;
+
                 case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
                 case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;
                 case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.connectionId); break;
@@ -709,6 +710,18 @@ namespace Drive_LFSS.Game_
                     car.SetAccelerationEndSpeed(endKmh);
                     car.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + car.GetAccelerationStartSpeed() + "^2-^7" + car.GetAccelerationEndSpeed() + " ^2Kmh");
                 } break;
+                case Button_Entry.RANK_SEARCH_BUTTON_TRACK:
+                {
+                    car.RankSearchTrack(_packet.typedText.ToUpperInvariant());
+                } break;
+                case Button_Entry.RANK_SEARCH_BUTTON_CAR:
+                {
+                    car.RankSearchCar(_packet.typedText.ToUpperInvariant());
+                } break;
+                case Button_Entry.RANK_SEARCH_BUTTON_LICENCE:
+                {
+                    car.RankSearchAdd(_packet.typedText);
+                }break;
             }
         }
         protected sealed override void processPacket(PacketBFN _packet)

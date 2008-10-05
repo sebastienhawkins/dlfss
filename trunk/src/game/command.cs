@@ -234,7 +234,7 @@ namespace Drive_LFSS.Server_
         }
         private void Rank(Driver driver, string[] args)
         {
-            driver.SendRankGui(Button_Entry.RANK_BUTTON_TOP20);
+            driver.SendRankGui(Button_Entry.NONE);
         }
         #endregion
     }

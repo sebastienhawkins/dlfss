@@ -55,7 +55,8 @@ namespace Drive_LFSS.Irc_
         private IrcServerInfo ircServerInfo = null;
         private Thread threadMircClient;
         private bool registrationSend = false;
-
+        private bool completedRegistration = false;
+        
         public bool IsConnected
         {
             get { return (socket != null && socket.Connected); }
@@ -92,8 +93,12 @@ namespace Drive_LFSS.Irc_
         private void CompleteRegistration(string data)
         {
             SendServerData("PONG " + data);
-
+            
+            string[] channelInfo = ircServerInfo.Channel.Split(new char[]{' '});
             SendServerData("JOIN #"+ircServerInfo.Channel); // for debug purpose will need to be at is right place.
+            if(channelInfo.Length == 2)
+               ircServerInfo.Channel =  channelInfo[0];
+
             registrationSend = false;
         }
         public void Disconnect()
@@ -181,6 +186,8 @@ namespace Drive_LFSS.Irc_
                         rawDatas = rawDatas[1].Split(new char[] { ':' }, 2);
                         ircMessage.to = rawDatas[0];
                         ircMessage.data = rawDatas[1];
+                        if (registrationSend)
+                            CompleteRegistration(ircMessage.data);
                     } break;
                     case Irc_Command.PING:
                     {
@@ -216,9 +223,9 @@ namespace Drive_LFSS.Irc_
                             switch (ircMessage.replyCode)
                             {
                                 case Irc_Reply_Code.NOT_REGISTERED:
-                                    {
-                                        SendRegistration();
-                                    } break;
+                                {
+                                    SendRegistration();
+                                } break;
                             }
                         } break;
                     default:
@@ -339,6 +346,7 @@ namespace Drive_LFSS.Irc_.Data_
         public string Channel
         {
             get { return _channel; }
+            set { _channel = value;}
         }
         public ushort ConfigFlag
         {

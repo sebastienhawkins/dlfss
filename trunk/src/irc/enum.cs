@@ -151,7 +151,7 @@ namespace Drive_LFSS.Irc_.Data_
         ErrorErroneusNickname = 432,
         ErrorNicknameInUse = 433,
         ErrorNicknameCollision = 436,
-        ErrorUnavailableResource = 437,
+        ErrorUnavailableResource =      437,
         ErrorUserNotInChannel = 441,
         ErrorNotOnChannel = 442,
         ErrorUserOnChannel = 443,

@@ -138,12 +138,12 @@ namespace Drive_LFSS.CommandConsole_
                 Log.commandHelp("Command - rank, Syntax error.\r\n  Usage:\r\n    rank $trackPrefix $carPrefix $licenceName\r\n");
                 return;
             }
-            string data = "";
+            Rank data = null;
             lock(Program.dlfssDatabase){data = Ranking.GetRank(args[1].ToUpperInvariant(),args[2].ToUpperInvariant(),args[3].ToUpperInvariant());}
-            if(data == "")
+            if(data == null)
                 Log.commandHelp("Licence "+args[1]+" has no rank data for trackPrefix "+args[2]+" and carPrefix "+args[3]+".\r\n");
             else 
-                Log.commandHelp("best avg sta win total position\r\n"+data+"\r\n");
+                Log.commandHelp("best avg sta win total position\r\n"+data.BestLap+" "+data.AverageLap+" "+data.Stability+" "+data.RaceWin+" "+data.Total+" "+data.Position+"\r\n");
         }
         private static void Reload(string[] args)
         {

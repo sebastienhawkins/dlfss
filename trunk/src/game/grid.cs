@@ -50,8 +50,8 @@ namespace Drive_LFSS.Game_
             carContainer[car] = car.GetNode();
             checkCollision(car);
             
-            if(((IDriver)car).IsAdmin)
-                ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3Z ^7" + car.GetPosZ());
+            //if(((IDriver)car).IsAdmin)
+                //((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3Z ^7" + car.GetPosZ());
         }
         public void Remove(CarMotion car)
         {
