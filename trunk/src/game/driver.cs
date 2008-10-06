@@ -66,11 +66,13 @@ namespace Drive_LFSS.Game_
             SendTrackPrefix();
 
             //To make the MOTD look on a very Black BG
-            for (byte itr = 0; ++itr < 5; )
-                SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
+            if (!ISession.IsFreezeMotdSend())
+            {
+                for (byte itr = 0; ++itr < 5; )
+                    SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
 
-            SendGui((ushort)Gui_Entry.MOTD);
-
+                SendGui((ushort)Gui_Entry.MOTD);
+            }
             configData = new string[(int)Config_User.END];
             for (byte itr = 0; itr < (byte)Config_User.END; itr++)
                 configData[itr] = "0";
@@ -213,7 +215,17 @@ namespace Drive_LFSS.Game_
         internal void ProcessSplitInformation(PacketSPX _packet)
         {
             //Internal Lap
+            if (laps.Count == 0)
+            {
+                Log.error("ProcessSplitInformation(PacketSPX), Laps.Count is 0, Driver is " + driverName + "\r\n");
+                return;
+            }
             Lap lap = laps[laps.Count -1];
+            if (lap == null)
+            {
+                Log.error("ProcessSplitInformation(PacketSPX), Lap is Null, Driver is "+driverName+"\r\n");
+                return;
+            }
             lap.ProcessPacketSplit(_packet);
             
             //PubStats
@@ -455,7 +467,7 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.Lock();
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`='" + LicenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "' AND `driver_name`='" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`LIKE'%" + ConvertX.SQLString(LicenceName) + "%' AND `driver_name`LIKE'%" + ConvertX.SQLString(driverName)+ "%'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);

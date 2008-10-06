@@ -20,6 +20,7 @@ namespace Drive_LFSS.Script_
 {
     public interface ISession
     {
+        bool IsFreezeMotdSend();
         long GetLatency();
         long GetReactionTime();
         byte GetNbrOfDrivers();

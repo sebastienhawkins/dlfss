@@ -98,6 +98,7 @@ namespace Drive_LFSS.Game_
         private char commandPrefix;
         internal bool connectionRequest;
         private byte clientConnectionCount = 0;
+        private uint freezeMotdSend = 7000;
 
         //Object
         private Script script;
@@ -109,7 +110,11 @@ namespace Drive_LFSS.Game_
         private Race race;
         private Vote vote;
         private List<Driver> driverList;
-
+        
+        public bool IsFreezeMotdSend()
+        {
+            return freezeMotdSend > 0;
+        }
         private void CommandExec(Driver driver, string _commandText)
         {
             command.Exec(driver, _commandText);
@@ -210,7 +215,11 @@ namespace Drive_LFSS.Game_
                 driverList[itr].update(diff);
             race.update(diff);
             script.update(diff);
-
+            
+            if(freezeMotdSend < diff)
+                freezeMotdSend = 0;
+            else
+                freezeMotdSend -= diff;
             //Delete Handle
             //Since im multithreading into processPacket Delete of: Race/Driver Should take place Bellow here.
             // Use Lock on the Object, since during Delete operation we can receive packet, this will pause other thread

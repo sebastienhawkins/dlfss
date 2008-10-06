@@ -61,6 +61,10 @@ namespace Drive_LFSS
         {
             return ms * 3.624d;
         }
+        public static string SQLString(string value)
+        {
+            return value.Replace(@"\", @"\\").Replace(@"'", @"\'").Replace(" ", "%");
+        }
     }
 }
     

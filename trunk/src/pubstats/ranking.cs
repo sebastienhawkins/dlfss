@@ -242,7 +242,7 @@ namespace Drive_LFSS.Ranking_
         internal static Rank GetRank(string trackPrefix, string carPrefix, string licenceName)
         {
             Rank rank = null;
-            string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`='"+licenceName+"'";
+            string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`LIKE'%"+ConvertX.SQLString(licenceName)+"%'";
             Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
@@ -256,8 +256,8 @@ namespace Drive_LFSS.Ranking_
         internal static Dictionary<string,Dictionary<string,Rank>> GetDriverRanks(string licenceName)
         {
             Dictionary<string,Dictionary<string,Rank>> data = new Dictionary<string,Dictionary<string,Rank>>();
-            
-            string query = "SELECT `track_prefix`,`car_prefix`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `licence_name`='"+licenceName+"'";
+
+            string query = "SELECT `track_prefix`,`car_prefix`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `licence_name`='" + ConvertX.SQLString(licenceName) + "'";
             string trackPrefix = "";
             string carPrefix = "";
             
