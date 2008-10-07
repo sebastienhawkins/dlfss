@@ -127,7 +127,7 @@ namespace Drive_LFSS.CommandConsole_
             }
             string[] data = Ranking.GetTop20(args[1].ToUpperInvariant(),args[2].ToUpperInvariant());
             if(data.Length < 1)
-                Log.commandHelp("No rank data for trackPrefix "+args[2]+" and carPrefix "+args[3]+".\r\n");
+                Log.commandHelp("No rank data for trackPrefix "+args[1]+" and carPrefix "+args[2]+".\r\n");
             else 
                 Log.commandHelp("licence_name best avg sta win total\r\n"+String.Join("\r\n",data)+"\r\n");
         }

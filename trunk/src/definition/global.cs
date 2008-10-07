@@ -37,6 +37,22 @@ namespace Drive_LFSS.Definition_
         TIMEDIFF_SPLIT = 5,
         END = 6,
     }
+    [Flags]public enum Rank_Change_Mask : uint
+    {
+		NONE = 0,
+		PB_LOW = 1,
+		PB_HIGH = 2,
+		AVG_LOW = 4,
+		AVG_HIGH = 8,
+		STA_LOW = 16,
+		STA_HIGH = 32,
+		WIN_LOW = 64,
+		WIN_HIGH = 128,
+		TOTAL_LOW = 256,
+		TOTAL_HIGH = 512,
+		POSITION_LOW = 1024,
+		POSITION_HIGH = 2048
+    }
     [Flags]public enum Race_Template_Flag : ushort
     {
         NONE = 0,

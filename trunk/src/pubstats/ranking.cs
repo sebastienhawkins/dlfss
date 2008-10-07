@@ -32,7 +32,7 @@ namespace Drive_LFSS.Ranking_
     using Drive_LFSS.Definition_;
     public class Rank
     {
-        internal Rank(short _bestLap, short _averageLap, short _stability, int _raceWin, int _total, uint _position)
+        internal Rank(short _bestLap, short _averageLap, short _stability, int _raceWin, int _total, uint _position, uint _changeMask)
         {
             bestLap = _bestLap;
             averageLap = _averageLap;
@@ -40,6 +40,50 @@ namespace Drive_LFSS.Ranking_
             raceWin = _raceWin;
             total =_total;
             position = _position;
+            changeMask = (Rank_Change_Mask)_changeMask;
+            
+            rankGuiString = new string[6];
+            if ((changeMask & Rank_Change_Mask.PB_HIGH) == Rank_Change_Mask.PB_HIGH)
+                rankGuiString[0] = "^3"+bestLap;
+            else if ((changeMask & Rank_Change_Mask.PB_LOW) == Rank_Change_Mask.PB_LOW)
+                rankGuiString[0] = "^6" + bestLap;
+            else
+                rankGuiString[0] = "^7" + bestLap;
+
+            if ((changeMask & Rank_Change_Mask.AVG_HIGH) == Rank_Change_Mask.AVG_HIGH)
+                rankGuiString[1] = "^3" + averageLap;
+            else if ((changeMask & Rank_Change_Mask.AVG_LOW) == Rank_Change_Mask.AVG_LOW)
+                rankGuiString[1] = "^6" + averageLap;
+            else
+                rankGuiString[1] = "^7" + averageLap;
+
+            if ((changeMask & Rank_Change_Mask.STA_HIGH) == Rank_Change_Mask.STA_HIGH)
+                rankGuiString[2] = "^3" + stability;
+            else if ((changeMask & Rank_Change_Mask.STA_LOW) == Rank_Change_Mask.STA_LOW)
+                rankGuiString[2] = "^6" + stability;
+            else
+                rankGuiString[2] = "^7" + stability;
+
+            if ((changeMask & Rank_Change_Mask.WIN_HIGH) == Rank_Change_Mask.WIN_HIGH)
+                rankGuiString[3] = "^3" + raceWin;
+            else if ((changeMask & Rank_Change_Mask.WIN_LOW) == Rank_Change_Mask.WIN_LOW)
+                rankGuiString[3] = "^6" + raceWin;
+            else
+                rankGuiString[3] = "^7" + raceWin;
+
+            if ((changeMask & Rank_Change_Mask.TOTAL_HIGH) == Rank_Change_Mask.TOTAL_HIGH)
+                rankGuiString[4] = "^3" + total;
+            else if ((changeMask & Rank_Change_Mask.TOTAL_LOW) == Rank_Change_Mask.TOTAL_LOW)
+                rankGuiString[4] = "^6" + total;
+            else
+                rankGuiString[4] = "^7" + total;
+
+            if ((changeMask & Rank_Change_Mask.POSITION_LOW) == Rank_Change_Mask.POSITION_LOW)
+                rankGuiString[5] = "^3" + position;
+            else if ((changeMask & Rank_Change_Mask.POSITION_HIGH) == Rank_Change_Mask.POSITION_HIGH)
+                rankGuiString[5] = "^6" + position;
+            else
+                rankGuiString[5] = "^7" + position;
         }
         ~Rank()
         {
@@ -52,6 +96,8 @@ namespace Drive_LFSS.Ranking_
         int raceWin = 0;
         int total = 0;
         uint position = 0;
+        Rank_Change_Mask changeMask = Rank_Change_Mask.NONE;
+        private string[] rankGuiString;
 
         public short BestLap
         {
@@ -79,24 +125,30 @@ namespace Drive_LFSS.Ranking_
         }
         public string GetGrade()
         {
-            if(total > 17999)
+            if (total > 17500)   // 17125 x
+                return "x";
+            if (total > 15700)   // 15700 a+
                 return "a+";
-            if(total > 16999)
+            if (total > 14713)   // 14713 a
                 return "a";
-            if(total > 15999)
+            if (total > 13999)   // 14113 a-
                 return "a-";
-            if(total > 14999)
+            if (total > 13456)   // 13456 b+
                 return "b+";
-            if(total > 13999)
+            if (total > 12874)  // 12874 b
                 return "b";
-            if(total > 12999)
+            if (total > 12017)  // 12017 b-
                 return "b-";
-            if(total > 11999)
+            if (total > 11500)  // 11500 c+
                 return "c+";
-            if(total > 10999)
+            if(total > 11000)    // 10000 c
                 return "c";
 
             return "c-";
+        }
+        public string[] GetRankGuiString
+        {
+            get{return rankGuiString;}
         }
     } 
     public sealed class Ranking
@@ -126,7 +178,7 @@ namespace Drive_LFSS.Ranking_
         }
         private static bool LoadTop20()
         {
-            Log.commandHelp("  Start loading Top10 data.\r\n");
+            Log.commandHelp("  Start loading Top20 data.\r\n");
             top20ByTrackCar.Clear();
 
             List<string> trackPrefix = new List<string>();
@@ -167,7 +219,7 @@ namespace Drive_LFSS.Ranking_
             
             if(count > 0)
             {
-                Log.commandHelp("  Loaded "+count+" Top10\r\n");
+                Log.commandHelp("  Loaded "+count+" Top20\r\n");
                 return true;
             }
             else
@@ -242,12 +294,12 @@ namespace Drive_LFSS.Ranking_
         internal static Rank GetRank(string trackPrefix, string carPrefix, string licenceName)
         {
             Rank rank = null;
-            string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`LIKE'%"+ConvertX.SQLString(licenceName)+"%'";
+            string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position`,`change_mask` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`LIKE'%"+ConvertX.SQLString(licenceName)+"%'";
             Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
                 if(reader.Read())
-                    rank = new Rank(reader.GetInt16(0),reader.GetInt16(1),reader.GetInt16(2),reader.GetInt32(3),reader.GetInt32(4),(uint)reader.GetInt32(5));
+                    rank = new Rank(reader.GetInt16(0),reader.GetInt16(1),reader.GetInt16(2),reader.GetInt32(3),reader.GetInt32(4),(uint)reader.GetInt32(5),(uint)reader.GetInt32(6));
             }
             Program.dlfssDatabase.Unlock();
             
@@ -257,7 +309,7 @@ namespace Drive_LFSS.Ranking_
         {
             Dictionary<string,Dictionary<string,Rank>> data = new Dictionary<string,Dictionary<string,Rank>>();
 
-            string query = "SELECT `track_prefix`,`car_prefix`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position` FROM `stats_rank_driver` WHERE `licence_name`='" + ConvertX.SQLString(licenceName) + "'";
+            string query = "SELECT `track_prefix`,`car_prefix`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position`,`change_mask` FROM `stats_rank_driver` WHERE `licence_name`='" + ConvertX.SQLString(licenceName) + "'";
             string trackPrefix = "";
             string carPrefix = "";
             
@@ -275,7 +327,7 @@ namespace Drive_LFSS.Ranking_
                     if(!data[trackPrefix].ContainsKey(carPrefix))
                         data[trackPrefix].Add(carPrefix,null);
 
-                    data[trackPrefix][carPrefix] = new Rank(reader.GetInt16(2),reader.GetInt16(3),reader.GetInt16(4),reader.GetInt32(5),reader.GetInt32(6),(uint)reader.GetInt32(7));
+                    data[trackPrefix][carPrefix] = new Rank(reader.GetInt16(2), reader.GetInt16(3), reader.GetInt16(4), reader.GetInt32(5), reader.GetInt32(6), (uint)reader.GetInt32(7), (uint)reader.GetInt32(8));
                 }
             }
             Program.dlfssDatabase.Unlock();

@@ -555,17 +555,17 @@ namespace Drive_LFSS.Game_
                    
                    bName.Text = "^2"+driver[itr].LicenceName;
                    bName.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bPB.Text = "^7"+rank.BestLap;
+                   bPB.Text = rank.GetRankGuiString[0];
                    bPB.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bAverage.Text = "^2"+rank.AverageLap;
+                   bAverage.Text = rank.GetRankGuiString[1];
                    bAverage.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bStability.Text = "^7"+rank.Stability;
+                   bStability.Text = rank.GetRankGuiString[2];
                    bStability.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bWin.Text = "^2"+rank.RaceWin;
+                   bWin.Text = rank.GetRankGuiString[3];
                    bWin.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bTotal.Text = "^7"+rank.Total;
+                   bTotal.Text = rank.GetRankGuiString[4];
                    bTotal.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bPosition.Text = "^2"+rank.Position;
+                   bPosition.Text = rank.GetRankGuiString[5];
                    bPosition.Top = (byte)((height*(rankedCountSended+1))+top);
                    
                    SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
@@ -582,15 +582,15 @@ namespace Drive_LFSS.Game_
                 {
                    bName.Text = "^2"+driver[itr].LicenceName;
                    bName.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bPB.Text = "^70";
+                   bPB.Text = "^80";
                    bPB.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bAverage.Text = "^20";
+                   bAverage.Text = "^80";
                    bAverage.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bStability.Text = "^70";
+                   bStability.Text = "^80";
                    bStability.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bWin.Text = "^20";
+                   bWin.Text = "^80";
                    bWin.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bTotal.Text = "^70";
+                   bTotal.Text = "^80";
                    bTotal.Top = (byte)((height*(rankedCountSended+1))+top);
                    bPosition.Text = "^1NA";
                    bPosition.Top = (byte)((height*(rankedCountSended+1))+top);
@@ -716,17 +716,17 @@ namespace Drive_LFSS.Game_
             
             bName.Text = "^2"+_licenceName;
             bName.Top = (byte)((height*(rankSearchDisplayCount+1))+top);
-            bPB.Text = "^7"+_rank.BestLap;
+            bPB.Text = _rank.GetRankGuiString[0];
             bPB.Top = (byte)((height*(rankSearchDisplayCount+1))+top);
-            bAverage.Text = "^2"+_rank.AverageLap;
+            bAverage.Text = _rank.GetRankGuiString[1];
             bAverage.Top = (byte)((height*(rankSearchDisplayCount+1))+top);
-            bStability.Text = "^7"+_rank.Stability;
+            bStability.Text = _rank.GetRankGuiString[2];
             bStability.Top = (byte)((height*(rankSearchDisplayCount+1))+top);
-            bWin.Text = "^2"+_rank.RaceWin;
+            bWin.Text = _rank.GetRankGuiString[3];
             bWin.Top = (byte)((height*(rankSearchDisplayCount+1))+top);
-            bTotal.Text = "^7"+_rank.Total;
+            bTotal.Text = _rank.GetRankGuiString[4];
             bTotal.Top = (byte)((height*(rankSearchDisplayCount+1))+top);
-            bPosition.Text = "^2"+_rank.Position;
+            bPosition.Text = _rank.GetRankGuiString[5];
             bPosition.Top = (byte)((height*(rankSearchDisplayCount+1))+top);
 
             SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
