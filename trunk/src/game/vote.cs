@@ -344,25 +344,37 @@ namespace Drive_LFSS.Game_
         }
         private void LoadNextTrack()
         {
-            iSession.SendMSTMessage("/select no");
-            iSession.SendMSTMessage("/track " + Program.trackTemplate.GetEntry(nextRace.TrackEntry).NamePrefix);
+            iSession.SendMSTMessage("/select "+(nextRace.HasRaceTemplateFlag(Race_Template_Flag.CAN_SELECT_TRACK) ? "ban" : "no"));
+            if (nextRace.TrackEntry != 0)
+                iSession.SendMSTMessage("/track " + Program.trackTemplate.GetEntry(nextRace.TrackEntry).NamePrefix);
             iSession.SendMSTMessage("/qual " + nextRace.QualifyMinute);
             iSession.SendMSTMessage("/laps " + nextRace.LapCount);
             iSession.SendMSTMessage("/weather " + (byte)nextRace.Weather);
             iSession.SendMSTMessage("/wind " + (byte)nextRace.Wind);
             iSession.SendMSTMessage("/rstend 0");
-            iSession.SendMSTMessage("/autokick no");
+            iSession.SendMSTMessage("/vote " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.CAN_VOTE) ? "yes" : "no"));
+            
+            iSession.SendMSTMessage("/autokick "+(nextRace.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_BAN) ? "ban" : "no"));
+            iSession.SendMSTMessage("/autokick "+(nextRace.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_KICK) ? "kick" : "no"));
+            iSession.SendMSTMessage("/autokick "+(nextRace.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_SPEC) ? "spec" : "no"));
+
             iSession.SendMSTMessage("/clear");
             iSession.SendMSTMessage("/cruise " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
             iSession.SendMSTMessage("/canreset " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.CAN_RESET) ? "yes" : "no"));
             iSession.SendMSTMessage("/fcv " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.FORCE_COCKPIT_VIEW) ? "yes" : "no"));
             iSession.SendMSTMessage("/midrace " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.MID_RACE_JOIN) ? "yes" : "no"));
             iSession.SendMSTMessage("/mustpit " + (nextRace.HasRaceTemplateFlag(Race_Template_Flag.MUST_PIT) ? "yes" : "no"));
-            string[] carEntrys = nextRace.CarEntryAllowed.Split(new char[] { ' ' });
+
             string carPrefix = "";
-            for (byte itr = 0; itr < carEntrys.Length; itr++)
-                carPrefix += Program.carTemplate.GetEntry(Convert.ToUInt32(carEntrys[itr])).NamePrefix + "+";
-            carPrefix = carPrefix.TrimEnd(new char[] { '+' });
+            if(nextRace.CarEntryAllowed.IndexOf("all",StringComparison.InvariantCultureIgnoreCase) != -1)
+                carPrefix = "all";
+            else
+            {
+                string[] carEntrys = nextRace.CarEntryAllowed.Split(new char[] { ' ' });
+                for (byte itr = 0; itr < carEntrys.Length; itr++)
+                    carPrefix += Program.carTemplate.GetEntry(Convert.ToUInt32(carEntrys[itr])).NamePrefix + "+";
+                carPrefix = carPrefix.TrimEnd(new char[] { '+' });
+            }
             iSession.SendMSTMessage("/cars " + carPrefix);
         }
         private void EndRace()

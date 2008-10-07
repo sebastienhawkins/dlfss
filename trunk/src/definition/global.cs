@@ -37,14 +37,21 @@ namespace Drive_LFSS.Definition_
         TIMEDIFF_SPLIT = 5,
         END = 6,
     }
-    [Flags]public enum Race_Template_Flag : byte
+    [Flags]public enum Race_Template_Flag : ushort
     {
         NONE = 0,
         MID_RACE_JOIN = 1,
         MUST_PIT = 2,
         CAN_RESET = 4,
         FORCE_COCKPIT_VIEW = 8,
-        ALLOW_WRONG_WAY = 16
+        ALLOW_WRONG_WAY = 16,
+        CAN_VOTE = 32,
+        CAN_SELECT_TRACK = 64,
+        AUTO_KICK_KICK = 128,
+        AUTO_KICK_BAN = 256,
+        AUTO_KICK_SPEC = 512,
+
+        
     }
     public enum Racing_Flag : byte
     {

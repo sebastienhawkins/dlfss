@@ -87,6 +87,27 @@ INSERT INTO `button_template` VALUES (41,'config timediff title',8,0,0,50,31,20,
 INSERT INTO `button_template` VALUES (44,'text line',32,0,0,1,45,110,6,'','');
 INSERT INTO `button_template` VALUES (45,'text title and close',40,0,0,30,32,50,12,'^3Text Display','');
 INSERT INTO `button_template` VALUES (46,'text close button',0,0,0,71,39,8,4,'^2close','');
+INSERT INTO `button_template` VALUES (64,'rank info',16,0,0,1,37,79,5,'^2Car: ^7FBM, ^2Track:^7 BL1R, ^2Count: ^7154356','');
+INSERT INTO `button_template` VALUES (63,'rank text close',0,0,0,115,8,8,5,'^2 Close','');
+INSERT INTO `button_template` VALUES (62,'rank tittle and close',40,0,0,75,0,50,13,'^3Ranking','');
+INSERT INTO `button_template` VALUES (61,'rank current button',40,0,0,53,158,26,10,'^2Current','');
+INSERT INTO `button_template` VALUES (67,'rank search button add',40,0,32,53,151,26,7,'^2Add','Licence Name');
+INSERT INTO `button_template` VALUES (60,'rank search button',40,0,0,27,158,26,10,'^2Search','');
+INSERT INTO `button_template` VALUES (58,'rank next update',64,0,0,24,31,20,5,'^6Next ^72008^2/^7Oct^2/^706','');
+INSERT INTO `button_template` VALUES (57,'rank last update',64,0,0,1,31,20,5,'^0Last ^72008^2/^7Oct^2/^704','');
+INSERT INTO `button_template` VALUES (56,'rank position',144,0,0,69,42,11,5,'^8position','');
+INSERT INTO `button_template` VALUES (55,'rank total',16,0,0,60,42,9,5,'^8total','');
+INSERT INTO `button_template` VALUES (54,'rank win',16,0,0,52,42,8,5,'^8win','');
+INSERT INTO `button_template` VALUES (53,'rank sta',16,0,0,44,42,8,5,'^8stabi','');
+INSERT INTO `button_template` VALUES (52,'rank average',16,0,0,36,42,8,5,'^8avera','');
+INSERT INTO `button_template` VALUES (51,'rank pb',16,0,0,28,42,8,5,'^8best','');
+INSERT INTO `button_template` VALUES (49,'rank text help',32,0,0,82,108,75,7,'','');
+INSERT INTO `button_template` VALUES (50,'rank name',16,0,0,1,42,27,5,'^8name','');
+INSERT INTO `button_template` VALUES (47,'rank bg',32,0,0,0,30,81,141,'','');
+INSERT INTO `button_template` VALUES (48,'rank title',144,0,0,1,31,79,5,'^7A^3leajecta Ranking','');
+INSERT INTO `button_template` VALUES (66,'rank search button car',40,0,3,27,151,26,7,'^2Car','Car Prefix');
+INSERT INTO `button_template` VALUES (65,'rank search button track',40,0,4,1,151,26,7,'^2Track','Track Prefix');
+INSERT INTO `button_template` VALUES (59,'rank top10 button',40,0,0,1,158,26,10,'^2Top20','');
 /*!40000 ALTER TABLE `button_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -239,8 +260,9 @@ LOCK TABLES `gui_template` WRITE;
 /*!40000 ALTER TABLE `gui_template` DISABLE KEYS */;
 INSERT INTO `gui_template` VALUES (1,'motd','2 3 5 30 36',4,'^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.');
 INSERT INTO `gui_template` VALUES (2,'user config','22 23 24 25 26 27 28 29 37 38 40 41 42 43',39,'^8Config Help\r\n^7Title ^3 will enable or disable the feature\r\n^3Green ^2button ^3will trigger a action for this feature.');
-INSERT INTO `gui_template` VALUES (3,'help','31 32 33 34 35',33,'^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7,^2!status^7, ^5!kick^7, ^5!exit^7, ^5!reload\r\n^7\r\n^7Did you know \"SHIFT-i\" will reset button and make Config screen appear.\r\n^7\r\n^5Greenseed^7.');
+INSERT INTO `gui_template` VALUES (3,'help','31 32 33 34 35',33,'^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^2!rank^7, ^2!status^7, ^5!kick^7, ^5!exit^7, ^5!reload\r\n^7\r\n^7Did you know \"SHIFT-i\" will reset button and make Config screen appear.\r\n^7\r\n^5Greenseed^7.');
 INSERT INTO `gui_template` VALUES (4,'text','45 46',44,'');
+INSERT INTO `gui_template` VALUES (5,'rank','47 48 57 58 59 60 61 62 63 64',49,'^7Top20 ^2is the 20 Best Driver for this Track/Car.\r\n^7Search ^2search for a Track/Car/Driver rank.\r\n^7Current ^2show rank for all online driver by Track/Car.');
 /*!40000 ALTER TABLE `gui_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -292,6 +314,16 @@ CREATE TABLE `race_map` (
 
 LOCK TABLES `race_map` WRITE;
 /*!40000 ALTER TABLE `race_map` DISABLE KEYS */;
+INSERT INTO `race_map` VALUES (1,21);
+INSERT INTO `race_map` VALUES (1,22);
+INSERT INTO `race_map` VALUES (1,23);
+INSERT INTO `race_map` VALUES (1,24);
+INSERT INTO `race_map` VALUES (1,25);
+INSERT INTO `race_map` VALUES (1,26);
+INSERT INTO `race_map` VALUES (1,27);
+INSERT INTO `race_map` VALUES (1,28);
+INSERT INTO `race_map` VALUES (1,29);
+INSERT INTO `race_map` VALUES (1,30);
 INSERT INTO `race_map` VALUES (2,1);
 INSERT INTO `race_map` VALUES (2,2);
 INSERT INTO `race_map` VALUES (2,3);
@@ -312,6 +344,15 @@ INSERT INTO `race_map` VALUES (2,17);
 INSERT INTO `race_map` VALUES (2,18);
 INSERT INTO `race_map` VALUES (2,19);
 INSERT INTO `race_map` VALUES (2,20);
+INSERT INTO `race_map` VALUES (3,31);
+INSERT INTO `race_map` VALUES (3,32);
+INSERT INTO `race_map` VALUES (3,33);
+INSERT INTO `race_map` VALUES (3,34);
+INSERT INTO `race_map` VALUES (3,35);
+INSERT INTO `race_map` VALUES (3,36);
+INSERT INTO `race_map` VALUES (3,37);
+INSERT INTO `race_map` VALUES (3,38);
+INSERT INTO `race_map` VALUES (3,39);
 /*!40000 ALTER TABLE `race_map` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -330,7 +371,7 @@ CREATE TABLE `race_template` (
   `lap_count` tinyint(3) unsigned NOT NULL default '0',
   `qualify_minute` tinyint(3) unsigned NOT NULL default '0',
   `grid_start_beviator` tinyint(3) unsigned NOT NULL default '0',
-  `race_template_mask` tinyint(3) unsigned NOT NULL default '0',
+  `race_template_mask` smallint(5) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -360,6 +401,25 @@ INSERT INTO `race_template` VALUES (17,'Blackwood Rallycross, LX6',3,'5',2,0,18,
 INSERT INTO `race_template` VALUES (18,'Blackwood Rallycross Rev, LX6',4,'5',2,0,18,5,0,1);
 INSERT INTO `race_template` VALUES (19,'Fern Bay Club, MRT',18,'2 3',0,0,11,5,0,1);
 INSERT INTO `race_template` VALUES (20,'Fern Bay Club Rev, F GTR',19,'11 12',0,0,14,5,0,1);
+INSERT INTO `race_template` VALUES (30,'Blackwood Rally, RB4',3,'6',0,0,9,0,0,1);
+INSERT INTO `race_template` VALUES (29,'Fernbay Green Rev, FOX',21,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (28,'Southcity Town Rev, UFR/XFR',15,'11 12',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (27,'Southcity Chicane Rev, UFR/XFR',17,'11 12',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (26,'Southcity Sprint2 Rev, FXO/XRT',11,'7 8',0,0,14,0,0,1);
+INSERT INTO `race_template` VALUES (25,'Southcity Classic, FXO/XRT',6,'7 8',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (24,'Southcity Town, FXO/XRT',14,'7 8',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (23,'Aston Club Rev, FOX',45,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (22,'Fernbay Gold Rev, FOX',23,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (37,'Aston Cadet Rev, FBM',43,'17',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (36,'Southcity Classic, FBM',6,'17',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (33,'Fernbay Club Rev, XFG/XRG',19,'2 3',0,0,12,0,0,1);
+INSERT INTO `race_template` VALUES (35,'Southcity Classic Rev, XFG/XRG',7,'2 3',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (34,'Fernbay Rally, XFG/XRG',28,'2 3',0,0,9,0,0,1);
+INSERT INTO `race_template` VALUES (21,'Fernbay Green Rev, FOX',21,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (32,'Fernbay Club, XFG/XRG',18,'2 3',0,0,12,0,0,1);
+INSERT INTO `race_template` VALUES (31,'Southcity Sprint2 Rev, XFG/XRG',11,'2 3',0,0,10,0,0,1);
+INSERT INTO `race_template` VALUES (38,'Southcity Sprint1, FBM',9,'17',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (39,'Blackwood GP, FBM',1,'17',0,0,7,0,0,1);
 /*!40000 ALTER TABLE `race_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -483,4 +543,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-10-04  7:07:50
+-- Dump completed on 2008-10-07  8:29:53

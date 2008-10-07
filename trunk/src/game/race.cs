@@ -165,7 +165,8 @@ namespace Drive_LFSS.Game_
                     timeTotalFromFirstRES = _packet.totalTime;
                     
                     uint pcDiff = GetFirstRESTimePc(5);
-                    iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1,"^1Finish in ^7" + ((double)pcDiff / 1000.0d));
+                    iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1,"^1Finish in ^7" + (pcDiff / 1000));
+                    //iSession.SendMSTMessage("/rstend " + (pcDiff / 1000));
                 }
                 if (HasAllResult())
                     FinishRace();
