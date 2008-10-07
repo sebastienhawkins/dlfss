@@ -35,6 +35,7 @@ namespace Drive_LFSS.Game_
         VOTE = 1,
         NO_CHANGE = 2,
         AUTO = 4,
+        SEQUENCE = 5,
     }
     public abstract class Vote : IVote
     {
@@ -46,6 +47,7 @@ namespace Drive_LFSS.Game_
                 case "VOTE": trackChangeBeviator = Vote_Track_Change.VOTE; break;
                 case "STATIC": trackChangeBeviator = Vote_Track_Change.NO_CHANGE; break;
                 case "AUTO": trackChangeBeviator = Vote_Track_Change.AUTO; break;
+                case "SEQUENCE": trackChangeBeviator = Vote_Track_Change.SEQUENCE; break;              
                 default: Log.error("Vote System config Error, unknown Value for Vote." + ((IRace)this).ISession.GetSessionName() + ".TrackChange = " + Config.GetStringValue("Vote", ((IRace)this).ISession.GetSessionName(), "TrackChange") + "\r\n"); break;
             }
             raceMapEntry = (ushort)Config.GetIntValue("Vote", ((IRace)this).ISession.GetSessionName(), "RaceMap");
@@ -110,6 +112,7 @@ namespace Drive_LFSS.Game_
         protected ushort raceMapEntry = 0;
 
         protected List<ushort> raceMap = new List<ushort>();
+        protected int raceMapStaticItr = 0;
         private Dictionary<ushort, byte> voteOptions = new Dictionary<ushort, byte>();
         private byte voteCount = 0;
         protected bool voteInProgress = false; //used to freeze System, no Change will be made when YES

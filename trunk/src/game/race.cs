@@ -189,9 +189,9 @@ namespace Drive_LFSS.Game_
         }
         public void ProcessVoteAction(Vote_Action voteAction)
         {
-#if DEBUG
+            #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
-#endif
+            #endif
 
             if (!CanVote())
             {
@@ -247,7 +247,7 @@ namespace Drive_LFSS.Game_
                             SendVoteCancel();
                             if (raceMap.Count == 0)
                             {
-                                Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can initiate a vote\r\n");
+                                Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can't initiate a vote\r\n");
                                 break;
                             }
                             StartNextTrackVote();
@@ -257,7 +257,7 @@ namespace Drive_LFSS.Game_
                             SendVoteCancel();
                             if (raceMap.Count == 0)
                             {
-                                Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can auto select a track\r\n");
+                                Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can't auto select a track\r\n");
                                 break;
                             }
                             Random randomItr = new Random();
@@ -266,6 +266,21 @@ namespace Drive_LFSS.Game_
                             List<ushort> _raceMap = GetSmartRaceMap();
                             PrepareNextTrack(_raceMap[randomItr.Next(_raceMap.Count)]);
 
+                        } break;
+                        case Vote_Track_Change.SEQUENCE:
+                        {
+                            SendVoteCancel();
+                            if (raceMap.Count == 0)
+                            {
+                                Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can't auto select a track\r\n");
+                                break;
+                            }
+                            voteInProgress = true;
+
+                            if(raceMapStaticItr < raceMap.Count)
+                                PrepareNextTrack(raceMap[raceMapStaticItr++]);
+                            else
+                                PrepareNextTrack(raceMap[(raceMapStaticItr=0)]); 
                         } break;
                     }
                 } break;
