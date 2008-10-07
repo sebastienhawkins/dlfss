@@ -291,6 +291,7 @@ namespace Drive_LFSS
             {switch (what){
                 case "all":
                     {
+                        Program.dlfssDatabase.Lock();
                         Program.trackTemplate.Load(true);
                         Log.commandHelp("  track_template reloaded.\r\n");
                         Program.carTemplate.Load(true);
@@ -303,7 +304,7 @@ namespace Drive_LFSS
                         Log.commandHelp("  race_template reloaded.\r\n");
                         Program.driverBan.Load(false);
                         Log.commandHelp("  driver_ban reloaded.\r\n");
-
+                        Program.dlfssDatabase.Unlock();
 
                         Log.normal("Initializing DLFSS client...\r\n");
                         Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
@@ -325,35 +326,51 @@ namespace Drive_LFSS
                     } break;
                 case "track_template":
                     {
+                        Program.dlfssDatabase.Lock();
                         Program.trackTemplate.Load(true);
+                        Program.dlfssDatabase.Unlock();
                         Log.commandHelp("  track_template reloaded.\r\n");
                     } break;
                 case "car_template":
                     {
+                        Program.dlfssDatabase.Lock();
                         Program.carTemplate.Load(true);
+                        Program.dlfssDatabase.Unlock();
                         Log.commandHelp("  car_template reloaded.\r\n");
                     } break;
                 case "button_template":
                     {
+                        Program.dlfssDatabase.Lock();
                         Program.buttonTemplate.Load(true);
+                        Program.dlfssDatabase.Unlock();
                         Log.commandHelp("  button_template reloaded.\r\n");
                     } break;
                 case "race_template":
                     {
+                        Program.dlfssDatabase.Lock();
                         Program.raceTemplate.Load(false);
-                        for (int itr = 0; itr < SessionList.GetSessions().Length; itr++)
-                            SessionList.GetSessions()[itr].ConfigApply(true);
+                        Program.dlfssDatabase.Unlock();
                         Log.commandHelp("  race_template reloaded.\r\n");
                     } break;
                 case "driver_ban":
                     {
+                        Program.dlfssDatabase.Lock();
                         Program.driverBan.Load(false);
+                        Program.dlfssDatabase.Unlock();
                         Log.commandHelp("  driver_ban reloaded.\r\n");
                     } break;
                 case "gui_template":
                     {
+                        Program.dlfssDatabase.Lock();
                         Program.guiTemplate.Load(true);
+                        Program.dlfssDatabase.Unlock();
                         Log.commandHelp("  gui_template reloaded.\r\n");
+                    } break;
+                case "race_map":
+                    {
+                        for (int itr = 0; itr < SessionList.GetSessions().Length; itr++)
+                            SessionList.GetSessions()[itr].ConfigApply(true);
+                        Log.commandHelp("  race_map reloaded.\r\n");
                     } break;
                 case "config":
                     {

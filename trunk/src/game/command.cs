@@ -107,54 +107,61 @@ namespace Drive_LFSS.Server_
             {
                 case "all":
                     {
-                        lock (Program.dlfssDatabase) { Program.Reload("all"); }
+                        Program.Reload("all");
                         driver.AddMessageMiddle("^7Completed reloading, ^3everything", 4500);
                     } break;
                 case "track":
                 case "track_template":
                     {
-                        lock (Program.dlfssDatabase) { Program.Reload("track_template"); }
+                        Program.Reload("track_template");
                         driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "car":
                 case "car_template":
                     {
-                        lock (Program.dlfssDatabase) { Program.Reload("car_template"); }
+                        Program.Reload("car_template");
                         driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "button":
                 case "button_template":
                     {
-                        lock (Program.dlfssDatabase) { Program.Reload("button_template"); }
+                        Program.Reload("button_template");
                         driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                     } break;
                 case "race":
+                {
+                    Program.Reload("race_template");
+                    Program.Reload("race_map");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3race_template & race_map", 4500);
+                } break;
                 case "race_template":
-                    {
-                        lock (Program.dlfssDatabase) { Program.Reload("race_template"); }
-                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
-                    } break;
+                {
+                    Program.Reload("race_template");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                } break;
+                case "race_map":
+                {
+                    Program.Reload("race_map");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                } break;
                 case "ban":
                 case "driver_ban":
-                    {
-                        lock (Program.dlfssDatabase) { Program.Reload("driver_ban"); }
-                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
-                    } break;
+                {
+                    Program.Reload("driver_ban");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                } break;
                 case "gui":
                 case "gui_template":
-                    {
-                        lock (Program.dlfssDatabase) { Program.Reload("gui_template"); }
-                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
-                    } break;
+                {
+                    Program.Reload("gui_template");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                } break;
                 case "config":
-                    {
-                        Program.Reload("config");
-                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
-                    } break;
-                default:
-                    {
-                        driver.AddMessageMiddle("^7Unknown tableName, ^3" + args[1], 4500);
-                    } break;
+                {
+                    Program.Reload("config");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                } break;
+                default:driver.AddMessageMiddle("^7Unknown tableName, ^3" + args[1], 4500);break;
 
                     Log.command("Command.Reload(), User: " + driver.LicenceName + ", reloaded: " + args[1] + "\r\n");
             }

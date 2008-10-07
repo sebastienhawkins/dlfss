@@ -56,10 +56,12 @@ namespace Drive_LFSS.Game_
             raceMap.Clear();
             if(raceMapEntry > 0)
             {
+                Program.dlfssDatabase.Lock();
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT * FROM `race_map` WHERE `entry`="+raceMapEntry);
                 while (reader.Read())
                     raceMap.Add((ushort)reader.GetInt16(1));
                 reader.Dispose();
+                Program.dlfssDatabase.Unlock();
             }
         }
         public void ProcessVoteNotification(Vote_Action voteAction, byte connectionId)

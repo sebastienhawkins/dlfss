@@ -157,44 +157,25 @@ namespace Drive_LFSS.CommandConsole_
             }
             switch (args[1])
             {
-                case "all": 
-                {
-                    lock (Program.dlfssDatabase) { Program.Reload("all"); }
-                } break;
+                case "all":Program.Reload("all");break;
                 case "track":
-                case "track_template":
-                {
-                    lock (Program.dlfssDatabase) { Program.Reload("track_template"); }
-                } break;
+                case "track_template":Program.Reload("track_template");break;
                 case "car":
-                case "car_template":
-                {
-                     lock (Program.dlfssDatabase) { Program.Reload("car_template");}
-                } break;
+                case "car_template":Program.Reload("car_template");break;
                 case "button":
-                case "button_template":
-                {
-                     lock (Program.dlfssDatabase) { Program.Reload("button_template");}
-                } break;
+                case "button_template":Program.Reload("button_template");break;
                 case "race":
-                case "race_template":
                 {
-                     lock (Program.dlfssDatabase) { Program.Reload("race_template");}
-                } break;
+                    Program.Reload("race_template");
+                    Program.Reload("race_map");
+                }break;
+                case "race_template":Program.Reload("race_template");break;
+                case "race_map":Program.Reload("race_map");break;
                 case "ban":
-                case "driver_ban":
-                {
-                     lock (Program.dlfssDatabase) { Program.Reload("driver_ban");}
-                } break;
+                case "driver_ban":Program.Reload("driver_ban");break;
                 case "gui":
-                case "gui_template":
-                {
-                     lock (Program.dlfssDatabase) { Program.Reload("gui_template");}
-                } break;
-                case "config":
-                {
-                     lock (Program.dlfssDatabase) { Program.Reload("config");}
-                } break;
+                case "gui_template":Program.Reload("gui_template");break;
+                case "config":Program.Reload("config");break;
                 default:
                 {
                     Log.commandHelp("Command - reload, unknown tableName: "+args[1]+".\r\n");
