@@ -201,7 +201,7 @@ namespace Drive_LFSS.Packet_
         // Race start information
         protected virtual void processPacket(PacketRST _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " RST_RaceStart(), RST -> Track=" + _packet.trackName + ", Finish=" + _packet.nodeFinishIndex + ", NumP=" + _packet.carCount + ", NumNodes=" + _packet.nodeCount + ", Flags=" + _packet.raceFeatureMask + ", QualMins=" + _packet.qualificationMinute + ", RaceLaps=" + _packet.raceLaps + ", Spare=" + _packet.Spare + ", Weather=" + _packet.weatherStatus + ", Wind=" + _packet.windStatus + ", Split1=" + _packet.nodeSplit1Index + ", Split2=" + _packet.nodeSplit2Index + ", Split3=" + _packet.nodeSplit3Index + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " RST_RaceStart(), RST -> Track=" + _packet.trackPrefix + ", Finish=" + _packet.nodeFinishIndex + ", NumP=" + _packet.carCount + ", NumNodes=" + _packet.nodeCount + ", Flags=" + _packet.raceFeatureMask + ", QualMins=" + _packet.qualificationMinute + ", RaceLaps=" + _packet.raceLaps + ", Spare=" + _packet.Spare + ", Weather=" + _packet.weatherStatus + ", Wind=" + _packet.windStatus + ", Split1=" + _packet.nodeSplit1Index + ", Split2=" + _packet.nodeSplit2Index + ", Split3=" + _packet.nodeSplit3Index + "\r\n");
         }
         // Qualify or confirmed finish
         protected virtual void processPacket(PacketRES _packet)

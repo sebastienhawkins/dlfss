@@ -28,14 +28,15 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Game_;
     using Drive_LFSS.Config_;
 
-    public sealed class Race : IRace
+    public sealed class Race : Vote, IRace
 	{
         private const int MIN_FORCED_FINISH_TIME = 40000;
         private const int MAX_FORCED_FINISH_TIME = 120000;
         private const int GTH_TIME_DIFF_FROM_GREEN_LIGHT = 16000;
         
-        public Race(Session _session): base()
+        public Race(Session _session)
         {
+            
             iSession = _session;
         }
         ~Race()
@@ -44,6 +45,8 @@ namespace Drive_LFSS.Game_
         }
         public void ConfigApply()
         {
+            base.ConfigApply();
+
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "RaceSave");
             RESTART_RACE_INTERVAL = (uint)Config.GetIntValue("Race",iSession.GetSessionName() ,"AutoRestart");
             grid.ConfigApply();
@@ -54,7 +57,6 @@ namespace Drive_LFSS.Game_
             EndRestart(); //feature auto restart
             driverGuidRESPos.Clear();
             carFinishAndLeaveTrackCount = 0;
-
             gridOrder = "";
             carCount = _packet.carCount;
             uint driverGuid;
@@ -83,7 +85,9 @@ namespace Drive_LFSS.Game_
             finalResultCount = 0;
             finishOrder = "";
 
-            trackPrefix = _packet.trackName;
+            if (trackPrefix != _packet.trackPrefix)
+                finishCount = 0;
+            trackPrefix = _packet.trackPrefix;
             carCount = _packet.carCount;
             nodeCount = _packet.nodeCount;
             nodeFinishIndex = _packet.nodeFinishIndex;
@@ -183,8 +187,98 @@ namespace Drive_LFSS.Game_
         {
             AddToGrid(car);
         }
+        public void ProcessVoteAction(Vote_Action voteAction)
+        {
+#if DEBUG
+            Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
+#endif
+
+            if (!CanVote())
+            {
+                SendVoteCancel();
+                return;
+            }
+            switch (voteAction)
+            {
+                case Vote_Action.VOTE_RESTART:
+                {
+                    switch (trackChangeBeviator)
+                    {
+                        case Vote_Track_Change.USER:
+                        case Vote_Track_Change.NO_CHANGE:
+                        case Vote_Track_Change.VOTE:
+                        case Vote_Track_Change.AUTO:
+                        {
+                            if (raceInfo.maximunFinishCount > 0 && finishCount >= raceInfo.maximunFinishCount)
+                            {
+                                SendVoteCancel();
+                                iSession.SendMSTMessage("/end");
+                            }
+                        }break;
+                    }
+                } break;
+                case Vote_Action.VOTE_QUALIFY:
+                {
+                    switch (trackChangeBeviator)
+                    {
+                        case Vote_Track_Change.USER:
+                        case Vote_Track_Change.NO_CHANGE:
+                        case Vote_Track_Change.VOTE:
+                        case Vote_Track_Change.AUTO: break;
+                    }
+                } break;
+                case Vote_Action.VOTE_END:
+                {
+                    finishCount = 0;
+
+                    if (doEnd == true)
+                        return;
+
+                    switch (trackChangeBeviator)
+                    {
+                        case Vote_Track_Change.USER: break;
+                        case Vote_Track_Change.NO_CHANGE:
+                        {
+                            SendVoteCancel();
+                            iSession.SendMSTMessage("/clear");
+                        } break;
+                        case Vote_Track_Change.VOTE:
+                        {
+                            SendVoteCancel();
+                            if (raceMap.Count == 0)
+                            {
+                                Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can initiate a vote\r\n");
+                                break;
+                            }
+                            StartNextTrackVote();
+                        } break;
+                        case Vote_Track_Change.AUTO:
+                        {
+                            SendVoteCancel();
+                            if (raceMap.Count == 0)
+                            {
+                                Log.error(iSession.GetSessionNameForLog() + " Vote system Error, race_map.entry=" + raceMapEntry + " is Empty, we can auto select a track\r\n");
+                                break;
+                            }
+                            Random randomItr = new Random();
+                            voteInProgress = true;
+
+                            List<ushort> _raceMap = GetSmartRaceMap();
+                            PrepareNextTrack(_raceMap[randomItr.Next(_raceMap.Count)]);
+
+                        } break;
+                    }
+                } break;
+                default:
+                {
+
+                } break;
+            }
+        }
         public void ProcessRaceEnd()
         {
+            base.ProcessRaceEnd(); 
+
             guid = 0;
             qualifyRaceGuid = 0;
             EndRestart();
@@ -231,6 +325,7 @@ namespace Drive_LFSS.Game_
         private Wind_Status windStatus = Wind_Status.WIND_NONE;
         private string gridOrder = "";
         private string finishOrder = "";
+        private ushort finishCount = 0;
         private byte carFinishAndLeaveTrackCount = 0;
         //
         private uint timeTotal = 0;
@@ -258,6 +353,7 @@ namespace Drive_LFSS.Game_
 
         public void update(uint diff)
         {
+            base.update(diff);
 
             if (raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE)
             {
@@ -339,9 +435,13 @@ namespace Drive_LFSS.Game_
             Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + raceLaps + ", saved to database.\r\n");
         }
         
+        public ISession ISession
+        {
+            get {return iSession;}
+        }
         public bool CanVote()
         {
-            return (timeTotalFromFirstRES == 0);
+            return (timeTotalFromFirstRES == 0 && !IsVoteInProgress());
         }
         private void AddToGrid(CarMotion car)
         {
@@ -390,6 +490,8 @@ namespace Drive_LFSS.Game_
             Program.dlfssDatabase.Unlock();
             if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 qualifyRaceGuid = guid;
+            else
+                finishCount++;
             guid = 0;
             
             if (iSession.Script.RaceCompleted(gridOrder,finishOrder))

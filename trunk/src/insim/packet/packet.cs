@@ -638,7 +638,7 @@ namespace Drive_LFSS.Packet_
         internal byte qualificationMinute;
         internal byte carCount;
         internal byte Spare;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=6)]internal string trackName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=6)]internal string trackPrefix;
         internal Weather_Status weatherStatus;
         internal Wind_Status windStatus;
         internal Race_Feature_Flag raceFeatureMask;

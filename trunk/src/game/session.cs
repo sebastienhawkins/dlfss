@@ -36,7 +36,6 @@ namespace Drive_LFSS.Game_
             sessionName = _serverName;
             commandPrefix = _inSimSetting.commandPrefix;
             race = new Race(this);
-            vote = new Vote(this);
             driverList = new List<Driver>();
             driverList.Capacity = 255;
             //driverList.Add(new Driver((ISession)this)); //put Default Driver 0, will save some If.
@@ -59,12 +58,11 @@ namespace Drive_LFSS.Game_
         {
             if (onlyVoteSystem)
             {
-                vote.ConfigApply();
+                race.ConfigApply();
                 return;
             }
-            
+
             base.ConfigApply();
-            vote.ConfigApply();
             race.ConfigApply();
             Driver.ConfigApply();
         }
@@ -113,7 +111,6 @@ namespace Drive_LFSS.Game_
         }
         private CommandInGame command;
         private Race race;
-        private Vote vote;
         private List<Driver> driverList;
         
         public bool IsFreezeMotdSend()
@@ -197,7 +194,7 @@ namespace Drive_LFSS.Game_
         }
         public bool CanVote()
         {
-            return race.CanVote() && !vote.IsVoteInProgress();
+            return race.CanVote();
         }
         
         private const uint TIMER_PING_PONG = 8000;
@@ -215,7 +212,6 @@ namespace Drive_LFSS.Game_
             }
 
 
-            vote.update(diff);
             for (byte itr = 1; itr < driverList.Count; ++itr)
                 driverList[itr].update(diff);
             race.update(diff);
@@ -476,9 +472,8 @@ namespace Drive_LFSS.Game_
                     #endif
 
                     race.ProcessRaceEnd(); 
-                    vote.ProcessRaceEnd(); 
                 }break; //Return Setup Screen(RaceEND)
-                case Tiny_Type.TINY_VTC: vote.ProcessVoteCancel(); break;
+                case Tiny_Type.TINY_VTC: race.ProcessVoteCancel(); break;
                 case Tiny_Type.TINY_CLR:
                 {
                     byte itr = 0;
@@ -502,7 +497,7 @@ namespace Drive_LFSS.Game_
             {
                 case Small_Type.SMALL_VTA_VOTE_ACTION:
                 {
-                    vote.ProcessVoteAction((Vote_Action)_packet.uintValue);
+                    race.ProcessVoteAction((Vote_Action)_packet.uintValue);
                 } break;
                 case Small_Type.SMALL_RTP_RACE_TIME:
                 {
@@ -663,12 +658,12 @@ namespace Drive_LFSS.Game_
                     driver.SendRankCurrent(0);
                 } break;
 
-                case Button_Entry.VOTE_OPTION_1: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_2: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_3: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_4: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_5: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_6: vote.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_1: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_2: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_3: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_4: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_5: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_6: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.connectionId); break;
                 default:
                 {
                     Log.error("We received a button ClickId from an unknown source, licenceName: " + driver.LicenceName + "\r\n");
@@ -757,7 +752,7 @@ namespace Drive_LFSS.Game_
             #if DEBUG
             base.processPacket(_packet); //Keep the Log
             #endif
-            vote.ProcessVoteNotification(_packet.voteAction,_packet.connectionId);
+            race.ProcessVoteNotification(_packet.voteAction, _packet.connectionId);
         }      //Vote Notification
         protected sealed override void processPacket(PacketPLP _packet)         //Car enter garage
         {
