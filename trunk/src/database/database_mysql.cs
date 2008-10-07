@@ -81,16 +81,30 @@ namespace Drive_LFSS.Database_
             int _return;
             command = connection.CreateCommand();
             command.CommandText = _command;
-            _return = command.ExecuteNonQuery();
             ResetTimerKeepAlive();
+            try{_return = command.ExecuteNonQuery(/*CommandBehavior.SequentialAccess*/);}
+            catch(Exception exception)
+            { 
+                Log.error("MySQL Error with query: "+_command+". Exception was:"+exception.Message+"\r\n");
+                return 0;
+            }
+            
+            
             return _return;
         }
         public IDataReader ExecuteQuery(string _command)
         {
+            
             command = connection.CreateCommand();
             command.CommandText = _command;
-            dataReader = command.ExecuteReader(/*CommandBehavior.SequentialAccess*/);
             ResetTimerKeepAlive();
+            try{dataReader = command.ExecuteReader(/*CommandBehavior.SequentialAccess*/);}
+            catch(Exception exception)
+            { 
+                Log.error("MySQL Error with query: "+_command+". Exception was:"+exception.Message+"\r\n");
+                return new NullDataReader();
+            }
+
             return dataReader;
         }
 
