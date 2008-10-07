@@ -33,11 +33,6 @@ namespace Drive_LFSS.Game_
         private const byte BUTTON_MAX_COUNT = 240;
         internal Button() 
         {
-            //maybe a simple buttonList.Initialize(), will be ok
-            for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
-            {
-                buttonList[itr] = 0;
-            }
         }
         ~Button() 
         {

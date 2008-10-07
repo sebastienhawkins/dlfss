@@ -61,7 +61,7 @@ namespace Drive_LFSS.Game_
             //Only a Host will trigger a NCN as a Bot, real AI Bot trigger only a NPL
             if (IsBot()) 
                 return;
-
+            ProcessBFNClearAll();
             SendBanner();
             SendTrackPrefix();
 
