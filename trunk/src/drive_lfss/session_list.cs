@@ -30,8 +30,8 @@ namespace Drive_LFSS
 
     public class SessionList //Must become compatible with all Session type: ServerInSim, ClientOutGauge, ... Im not aware of all....
     {
-        public static Dictionary<string, Session> sessionList = new Dictionary<string, Session>();
-
+        private static Dictionary<string, Session> sessionList = new Dictionary<string, Session>();
+        
         public static void ConfigApply()
         {
             List<string> lfsServer = Config.GetIdentifierList("LFSServer");
@@ -68,7 +68,7 @@ namespace Drive_LFSS
                     else //New Session
                     {
                         Session session = new Session(itr.Current, inSimSetting);
-                        session.ConfigApply();
+                        session.ConfigApply(false);
                         sessionList.Add(itr.Current, session);
                     }
                 }
@@ -76,7 +76,7 @@ namespace Drive_LFSS
         }
 
         private static uint TimerReconnection = 30000;
-        public static void update(uint diff)
+        internal static void update(uint diff)
         {
             if (TimerReconnection < diff)
                 TimerReconnection = 30000;
@@ -94,8 +94,21 @@ namespace Drive_LFSS
                 keyPair.Value.update(diff);
             }
         }
-        //Move this to Drive_LFSS.Exit(bool)
-        public static void DisconnectAll()
+        internal static Session[] GetSessions()
+        {
+            Session[] sessions = new Session[sessionList.Count];
+            int index = 0;
+            foreach (KeyValuePair<string, Session> kvp in sessionList)
+            {
+                sessions[index++] = kvp.Value;
+            }
+            return sessions;
+        }
+        internal static Dictionary<string, Session> Sessions
+        {
+            get { return sessionList; }
+        }
+        internal static void DisconnectAll()
         {
             foreach (KeyValuePair<string, Session> keyPair in sessionList)
             {

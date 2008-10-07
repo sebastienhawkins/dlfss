@@ -50,8 +50,6 @@ namespace Drive_LFSS.Definition_
         AUTO_KICK_KICK = 128,
         AUTO_KICK_BAN = 256,
         AUTO_KICK_SPEC = 512,
-
-        
     }
     public enum Racing_Flag : byte
     {

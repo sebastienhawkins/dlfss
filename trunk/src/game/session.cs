@@ -55,10 +55,15 @@ namespace Drive_LFSS.Game_
             base.SetInSimSetting(_inSimSetting);
             ConfigApply();
         }
-        new internal void ConfigApply()
+        new internal void ConfigApply(bool onlyVoteSystem)
         {
+            if (onlyVoteSystem)
+            {
+                vote.ConfigApply();
+                return;
+            }
+            
             base.ConfigApply();
-
             vote.ConfigApply();
             race.ConfigApply();
             Driver.ConfigApply();

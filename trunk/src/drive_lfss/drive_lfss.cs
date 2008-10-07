@@ -81,33 +81,16 @@ namespace Drive_LFSS
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnHandleException);
 
             //Put static working folder.
-            processPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            processPath = processPath.Substring(0, processPath.LastIndexOf(System.IO.Path.DirectorySeparatorChar));
+            InitProcessPath();
 
             //Write Startup Banner
             WriteBanner();
 
             //Configuration
-            if (!Config.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg"))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Can't initialize the config, will now QUIT!\r\n\r\n");
-                System.Threading.Thread.Sleep(10000);
-                CommandConsole.Exec("exit");
-                return;
-            } Log.normal("Config initialized...\r\n\r\n");
-            Program.ConfigApply();
+            InitConfig();
 
             //Logging
-            if (!Log.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.log"))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Can't initialize the log system, will now QUIT!\r\n\r\n");
-                System.Threading.Thread.Sleep(10000);
-                CommandConsole.Exec("exit");
-                return;
-            } Log.normal("Log system initialized...\r\n\r\n");
-
+            InitLoging();
            
             //Console System, Purpose for MultiThreading the Console Input
             Log.normal("Initializing console command...\r\n\r\n");
@@ -115,54 +98,17 @@ namespace Drive_LFSS
             threadCaptureConsoleCommand.Start();
 
             //Database Initialization
-            Log.normal("Initializing database...\r\n");
-
-            List<string> databaseChoices = Config.GetIdentifierList("Database");
-            if (databaseChoices.Contains("MySQL"))
-            {
-                string[] infos = Config.GetStringValue("Database","MySQL","ConnectionInfo").Split(';');
-                if (infos.Length != 6)
-                    throw new Exception("Configuration error, invalid value count for: Database.MySQL.ConnectionInfo");
-
-                Log.commandHelp("  Using MySQL database.\r\n");
-                dlfssDatabase = new DatabaseMySQL("Database=" + infos[4] + ";Data Source=" + infos[0] + ";Port=" + infos[1] + ";User Id=" + infos[2] + ";Password=" + infos[3] + ";Use Compression=" + infos[5] + ";Pooling=false");
-            }
-            else
-            {
-                Log.commandHelp("  Using SQLite database.\r\n");
-                dlfssDatabase = new DatabaseSQLite(Config.GetStringValue("Database", "SQLite", "ConnectionInfo"));
-            }
-            Log.normal("Completed initializing database...\r\n\r\n");
+            InitDatabase();
 
             //Initialize Storage
-            Log.normal("Initializing storage...\r\n");
-            trackTemplate.Load(true);
-            carTemplate.Load(true);
-            buttonTemplate.Load(true);
-            guiTemplate.Load(true);
-            raceTemplate.Load(false);
-            driverBan.Load(false);
-            Log.normal("Completed initializing storage.\r\n\r\n");
+            InitStorage();
 
             //Irc Client
-            Log.normal("Initializing mIRC client...\r\n");
-            string isActivated = Config.GetStringValue("mIRC", "Activate").ToLowerInvariant();
-            if (isActivated == "yes" || isActivated == "1" || isActivated == "true" || isActivated == "on" || isActivated == "activate")
-            {
-                ircClient.ConfigApply();
-                ircClient.Connect();
-            }
-            else
-                Log.commandHelp("  mIRC client is disabled.\r\n");
-            Log.normal("Completed initializing mIRC client.\r\n\r\n");
+            InitMircClient();
+            
 
             //Ranking Initialization
-            Log.normal("Initializing Ranking...\r\n");
-            if(!Ranking.Initialize())
-                Log.commandHelp("  Ranking system disable.\r\n");
-            else
-                Ranking.ConfigApply();
-            Log.normal("Completed initializing Ranking.\r\n\r\n");
+            InitRanking();
             
             //PubStats Initialization
             Log.normal("Initializing PubStats...\r\n");
@@ -173,15 +119,9 @@ namespace Drive_LFSS
             Log.normal("Initializing server(s) config(s)...\r\n\r\n");
             SessionList.ConfigApply( );
             
-            //Session.InitializeServerList();
-            Log.normal("START|");
-            for (float itr = 200; (itr /= 1.1f) > 1;)
-            {
-                Log.progress(".");
-                System.Threading.Thread.Sleep((int)itr);
-            }
-            Log.normal("|FINISH\r\n\r\n");
-
+            //Just for fun...
+            InitJustForFun();
+            
             if(Config.GetIntValue("CPU","Priority") > 0)
                 System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
            
@@ -216,7 +156,98 @@ namespace Drive_LFSS
             }
             #endregion
 		}
+		private static void InitRanking()
+		{
+            Log.normal("Initializing Ranking...\r\n");
+            if (!Ranking.Initialize())
+                Log.commandHelp("  Ranking system disable.\r\n");
+            else
+                Ranking.ConfigApply();
+            Log.normal("Completed initializing Ranking.\r\n\r\n");
+		}
+		private static void InitJustForFun()
+		{
+            Log.normal("START|");
+            for (float itr = 200; (itr /= 1.1f) > 1; )
+            {
+                Log.progress(".");
+                System.Threading.Thread.Sleep((int)itr);
+            }
+            Log.normal("|FINISH\r\n\r\n");
+		}
+		private static void InitMircClient()
+		{
+		    Log.normal("Initializing mIRC client...\r\n");
+            string isActivated = Config.GetStringValue("mIRC", "Activate").ToLowerInvariant();
+            if (isActivated == "yes" || isActivated == "1" || isActivated == "true" || isActivated == "on" || isActivated == "activate")
+            {
+                ircClient.ConfigApply();
+                ircClient.Connect();
+            }
+            else
+                Log.commandHelp("  mIRC client is disabled.\r\n");
+            Log.normal("Completed initializing mIRC client.\r\n\r\n");
+		}
+		private static void InitStorage()
+		{
+            Log.normal("Initializing storage...\r\n");
+            trackTemplate.Load(true);
+            carTemplate.Load(true);
+            buttonTemplate.Load(true);
+            guiTemplate.Load(true);
+            raceTemplate.Load(false);
+            driverBan.Load(false);
+            Log.normal("Completed initializing storage.\r\n\r\n");
+		}
+		private static void InitDatabase()
+		{            
+		    Log.normal("Initializing database...\r\n");
 
+            List<string> databaseChoices = Config.GetIdentifierList("Database");
+            if (databaseChoices.Contains("MySQL"))
+            {
+                string[] infos = Config.GetStringValue("Database","MySQL","ConnectionInfo").Split(';');
+                if (infos.Length != 6)
+                    throw new Exception("Configuration error, invalid value count for: Database.MySQL.ConnectionInfo");
+
+                Log.commandHelp("  Using MySQL database.\r\n");
+                dlfssDatabase = new DatabaseMySQL("Database=" + infos[4] + ";Data Source=" + infos[0] + ";Port=" + infos[1] + ";User Id=" + infos[2] + ";Password=" + infos[3] + ";Use Compression=" + infos[5] + ";Pooling=false");
+            }
+            else
+            {
+                Log.commandHelp("  Using SQLite database.\r\n");
+                dlfssDatabase = new DatabaseSQLite(Config.GetStringValue("Database", "SQLite", "ConnectionInfo"));
+            }
+            Log.normal("Completed initializing database...\r\n\r\n");
+        }
+        private static void InitLoging()
+        {
+            if (!Log.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.log"))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Can't initialize the log system, will now QUIT!\r\n\r\n");
+                System.Threading.Thread.Sleep(10000);
+                CommandConsole.Exec("exit");
+                return;
+            } Log.normal("Log system initialized...\r\n\r\n");
+        }
+        private static void InitConfig()
+        {
+            if (!Config.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg"))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Can't initialize the config, will now QUIT!\r\n\r\n");
+                System.Threading.Thread.Sleep(10000);
+                CommandConsole.Exec("exit");
+                return;
+            } Log.normal("Config initialized...\r\n\r\n");
+            ConfigApply(); 
+        }
+        private static void InitProcessPath()
+        {
+            processPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            processPath = processPath.Substring(0, processPath.LastIndexOf(System.IO.Path.DirectorySeparatorChar)); 
+        }
         private static void WriteBanner()
         {
             //Opening Banner
@@ -295,32 +326,34 @@ namespace Drive_LFSS
                 case "track_template":
                     {
                         Program.trackTemplate.Load(true);
-                        Log.commandHelp("track_template reloaded.\r\n");
+                        Log.commandHelp("  track_template reloaded.\r\n");
                     } break;
                 case "car_template":
                     {
                         Program.carTemplate.Load(true);
-                        Log.commandHelp("car_template reloaded.\r\n");
+                        Log.commandHelp("  car_template reloaded.\r\n");
                     } break;
                 case "button_template":
                     {
                         Program.buttonTemplate.Load(true);
-                        Log.commandHelp("button_template reloaded.\r\n");
+                        Log.commandHelp("  button_template reloaded.\r\n");
                     } break;
                 case "race_template":
                     {
                         Program.raceTemplate.Load(false);
-                        Log.commandHelp("race_template reloaded.\r\n");
+                        for (int itr = 0; itr < SessionList.GetSessions().Length; itr++)
+                            SessionList.GetSessions()[itr].ConfigApply(true);
+                        Log.commandHelp("  race_template reloaded.\r\n");
                     } break;
                 case "driver_ban":
                     {
                         Program.driverBan.Load(false);
-                        Log.commandHelp("driver_ban reloaded.\r\n");
+                        Log.commandHelp("  driver_ban reloaded.\r\n");
                     } break;
                 case "gui_template":
                     {
                         Program.guiTemplate.Load(true);
-                        Log.commandHelp("gui_template reloaded.\r\n");
+                        Log.commandHelp("  gui_template reloaded.\r\n");
                     } break;
                 case "config":
                     {
@@ -345,6 +378,7 @@ namespace Drive_LFSS
             } }
             Log.command("Completed reloading of " + what + ".\r\n");
         }
+
         public static void Exit()
         {
             Exit(true);

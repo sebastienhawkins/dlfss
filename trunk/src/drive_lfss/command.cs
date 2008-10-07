@@ -62,7 +62,7 @@ namespace Drive_LFSS.CommandConsole_
             if (args[1] == "all")
             {
                 //Maybe you Real Iterator<Session>
-                Dictionary<string,Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
+                Dictionary<string,Session>.Enumerator itr = SessionList.Sessions.GetEnumerator();
                 while(itr.MoveNext())
                 {
                     if (itr.Current.Value.IsConnected())
@@ -75,9 +75,9 @@ namespace Drive_LFSS.CommandConsole_
             {
                 string serverName = args[1];
 
-                if (SessionList.sessionList.ContainsKey(serverName))
+                if (SessionList.Sessions.ContainsKey(serverName))
                 {
-                    Session session = SessionList.sessionList[serverName];
+                    Session session = SessionList.Sessions[serverName];
 
                     if (session.IsConnected())
                         Log.normal("ServerName: " + serverName + ", Status: online, ReactionTime: " + session.GetLatency() + "ms" + ", DriversCount: " + session.GetNbrOfDrivers() + "\r\n");
@@ -100,7 +100,7 @@ namespace Drive_LFSS.CommandConsole_
 
             if (args[1] == "all")
             {
-               Dictionary<string, Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
+                Dictionary<string, Session>.Enumerator itr = SessionList.Sessions.GetEnumerator();
                while(itr.MoveNext())
                    itr.Current.Value.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
             }
@@ -112,8 +112,8 @@ namespace Drive_LFSS.CommandConsole_
             {
                 string serverName = args[1];
 
-                if (SessionList.sessionList.ContainsKey(serverName))
-                    SessionList.sessionList[serverName].AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
+                if (SessionList.Sessions.ContainsKey(serverName))
+                    SessionList.Sessions[serverName].AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
                 else
                     Log.command("Command - announce, serverName Not Found: " + args[1] + "\r\n");
             }

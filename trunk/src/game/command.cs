@@ -179,7 +179,7 @@ namespace Drive_LFSS.Server_
             if (args[1] == "all")
             {
                 //Maybe you Real Iterator<Session>
-                Dictionary<string, Session>.Enumerator itr = SessionList.sessionList.GetEnumerator();
+                Dictionary<string, Session>.Enumerator itr = SessionList.Sessions.GetEnumerator();
                 string textToSend = "Status for all Server\r\n";
                 while (itr.MoveNext())
                 {
@@ -207,10 +207,10 @@ namespace Drive_LFSS.Server_
                 string serverName = args[1];
                 if(serverName == "current")
                     serverName = session.GetSessionName();
-                
-                if (SessionList.sessionList.ContainsKey(serverName))
+
+                if (SessionList.Sessions.ContainsKey(serverName))
                 {
-                    Session _session = SessionList.sessionList[serverName];
+                    Session _session = SessionList.Sessions[serverName];
 
                     if (_session.IsConnected())
                     {
