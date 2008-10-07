@@ -79,15 +79,18 @@ namespace Drive_LFSS.Log_
 
             streamWriter = System.IO.File.AppendText(logPath);
             
-            List<string>.Enumerator itr = stringWriter.GetEnumerator();
-            
-            while (itr.MoveNext())
-                streamWriter.Write(itr.Current);
+            lock(streamWriter)
+            {
+                List<string>.Enumerator itr = stringWriter.GetEnumerator();
+                
+                while (itr.MoveNext())
+                    streamWriter.Write(itr.Current);
 
-            streamWriter.Flush();
-            streamWriter.Dispose();
+                streamWriter.Flush();
+                streamWriter.Dispose();
 
-            lock (stringWriter){stringWriter.Clear();}
+                stringWriter.Clear();
+            }
         }
 
         public static void error(string msg)
