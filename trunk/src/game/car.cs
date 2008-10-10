@@ -29,37 +29,9 @@ namespace Drive_LFSS.Game_
     using PubStats_;
     using Ranking_;
 
-    public abstract class Car : Button, ICar, CarMotion
+    internal partial class Driver
     {
-        internal Car() : base()
-        {
-        }
-        ~Car()
-        {
-            if (true == false) { }
-        }
-        new protected void Init(PacketNPL _packet)
-        {
-            bool firstTime = false;
-            if (carId != _packet.carId || carPrefix != _packet.carPrefix)
-                firstTime = true;
-
-            carPrefix = _packet.carPrefix;
-            carId = _packet.carId;
-            carPlate = _packet.carPlate;
-            carSkin = _packet.skinName;
-            addedIntakeRestriction = _packet.addedIntakeRestriction;
-            addedMass = _packet.addedMass;
-            passenger = _packet.passenger;
-            tyreFrontLeft = _packet.tyreFrontLeft;
-            tyreFrontRight = _packet.tyreFrontRight;
-            tyreRearLeft = _packet.tyreRearLeft;
-            tyreRearRight =_packet.tyreRearRight;
-
-            EnterTrack(firstTime);
-
-        }  //When joining Race
-        internal void ProcessCarInformation(CarInformation _carInformation)
+        internal protected void ProcessCarInformation(CarInformation _carInformation)
         {
             node = _carInformation.nodeTrack;
             lapCompleted = _carInformation.lapNumber;
@@ -84,20 +56,6 @@ namespace Drive_LFSS.Game_
             featureDriftScore.Update((CarMotion)this);
 
             //base.Init(_packet);
-        }
-        internal void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
-        {
-            carId = 0;
-            LeaveTrack();
-        }
-        internal void ProcessEnterGarage()                //When a car enter garage.
-        {
-            LeaveTrack();
-        }
-        protected void ProcessCPR(PacketCPR _packet)
-        {
-            if(carPlate != _packet.carPlate)
-                carPlate = _packet.carPlate;
         }
 
         private byte carId = 0;
@@ -126,7 +84,6 @@ namespace Drive_LFSS.Game_
         private ushort orientation = 0;
         private short orientationSpeed = 0;
         private bool isOnTrack = false;
-        private uint collisionTimer = 0;
         private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
         private FeatureDriftScore featureDriftScore = new FeatureDriftScore();
 
@@ -331,8 +288,8 @@ namespace Drive_LFSS.Game_
                 packetReceive = 0;
                 if(((Driver)car).IsAdmin)
                 {
-                    ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
-                    ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
+                    ((Driver)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
+                    ((Driver)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
                 }
             }
             private void End(CarMotion car)
@@ -341,7 +298,7 @@ namespace Drive_LFSS.Game_
                 started = false;
                 if(((Driver)car).IsAdmin)
                 {
-                    ((Car)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
+                    ((Driver)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
                 }
             }
             private void Sucess(CarMotion car)
@@ -417,30 +374,7 @@ namespace Drive_LFSS.Game_
             ((Driver)this).SetConfigValue(Config_User.DRIFT_SCORE_ON, (isOn ? "1" : "0"));
         }
 
-        new protected virtual void update(uint diff)
-        {
-            if ( collisionTimer > 0 )
-            {
-                if (collisionTimer > diff)
-                    collisionTimer -= diff;
-                else
-                {
-                    collisionTimer = 0;
-                    ((Button)this).RemoveButton((ushort)Button_Entry.COLLISION_WARNING);
-                }
-            }
-            base.update(diff);
-        }
 
-        public bool HasCollisionWarning()
-        {
-            return (collisionTimer > 0);
-        }
-        public void SendCollisionWarning(string text)
-        {
-            collisionTimer = 2000;
-            ((Button)this).SendUpdateButton((ushort)Button_Entry.COLLISION_WARNING, text);
-        }
         /*public void FinishRace() //this serve nothing, was to make a script call when car finish a race
         {
             if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
@@ -516,6 +450,7 @@ namespace Drive_LFSS.Game_
             get { return lapCompleted; }
         }
 
+        
         public ushort GetNode()
         {
             return node;

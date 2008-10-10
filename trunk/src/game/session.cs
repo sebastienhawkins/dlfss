@@ -29,7 +29,7 @@ namespace Drive_LFSS.Game_
     using Log_;
     using PubStats_;
 
-    public sealed class Session : InSimClient, ISession
+    internal class Session : InSimClient, ISession
     {
         internal Session(string _serverName, InSimSetting _inSimSetting): base( _inSimSetting)
         {
@@ -49,12 +49,12 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        internal void ConfigApply(InSimSetting _inSimSetting)
+        internal protected void ConfigApply(InSimSetting _inSimSetting)
         {
             base.SetInSimSetting(_inSimSetting);
             ConfigApply();
         }
-        new internal void ConfigApply(bool onlyVoteSystem)
+        new internal protected void ConfigApply(bool onlyVoteSystem)
         {
             if (onlyVoteSystem)
             {
@@ -99,7 +99,7 @@ namespace Drive_LFSS.Game_
         private Ping ping;
         private string sessionName;
         private char commandPrefix;
-        internal bool connectionRequest;
+        internal protected bool connectionRequest;
         private byte clientConnectionCount = 0;
         private uint freezeMotdSend = 7000;
 
@@ -152,7 +152,7 @@ namespace Drive_LFSS.Game_
         {
             return race.GetTrackPrefix();
         }
-        public List<Driver> GetDriverList()
+        internal List<Driver> GetDriverList()
         {
             return driverList;
         }
@@ -352,7 +352,7 @@ namespace Drive_LFSS.Game_
             }
 
             //Do we delete the entire Driver on a Bot Leave Race???
-            ((Car)driverList[itr]).ProcessLeaveRace(_packet);
+            ((Driver)driverList[itr]).ProcessLeaveRace(_packet);
             race.ProcessCarLeaveRace(((CarMotion)driverList[itr]));
         }      // Delete Car leave (spectate - loses slot)
         protected sealed override void processPacket(PacketMCI _packet)
@@ -379,7 +379,7 @@ namespace Drive_LFSS.Game_
                 if (driverList[carIndex].ConnectionId == 0) // This Bypass the Host CAR.
                     continue;
 
-                ((Car)driverList[carIndex]).ProcessCarInformation(carInformation[itr]);
+                driverList[carIndex].ProcessCarInformation(carInformation[itr]);
                 race.ProcessCarInformation(((CarMotion)driverList[carIndex]));
             }
         }      // Multiple Car Information
@@ -677,7 +677,7 @@ namespace Drive_LFSS.Game_
             #endif
 
             byte driverIndex = GetLicenceIndexNotBot(_packet.connectionId);
-            Car car = driverList[driverIndex];
+            Driver car = driverList[driverIndex];
             switch((Button_Entry)car.GetButtonEntry(_packet.buttonId))
             {
                 case Button_Entry.CONFIG_USER_ACC_START:
@@ -742,7 +742,7 @@ namespace Drive_LFSS.Game_
             switch (_packet.buttonFunction)
             {
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
-                    driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNClearAll(); break;
+                    driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNClearAll(false); break;
                 case Button_Function.BUTTON_FUNCTION_REQUEST:
                     driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNRequest(); break;
             }
@@ -769,7 +769,19 @@ namespace Drive_LFSS.Game_
 
             driverList[index].ProcessEnterGarage();
         }
-
+        protected sealed override void processPacket(PacketFLG _packet)
+        {
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
+            byte index = GetCarIndex(_packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketFLG), we can find any driver with this car.\r\n");
+                return;
+            }
+            driverList[index].ProcessFLGPacket(_packet);
+        }
         private byte GetCarIndex(byte _carId)
         {
             int count = driverList.Count;

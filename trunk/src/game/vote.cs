@@ -29,7 +29,7 @@ namespace Drive_LFSS.Game_
     using Game_;
     using Config_;
 
-    public enum Vote_Track_Change : byte
+    internal enum Vote_Track_Change : byte
     {
         USER = 0,
         VOTE = 1,
@@ -37,7 +37,7 @@ namespace Drive_LFSS.Game_
         AUTO = 4,
         SEQUENCE = 5,
     }
-    public abstract class Vote : IVote
+    internal abstract class Vote : IVote
     {
         protected virtual void ConfigApply()
         {
@@ -62,7 +62,7 @@ namespace Drive_LFSS.Game_
                 Program.dlfssDatabase.Unlock();
             }
         }
-        public void ProcessVoteNotification(Vote_Action voteAction, byte connectionId)
+        internal protected void ProcessVoteNotification(Vote_Action voteAction, byte connectionId)
         {
             #if DEBUG
             Log.debug(((IRace)this).ISession.GetSessionNameForLog() + " Vote notification was:" + voteAction + "\r\n");
@@ -92,14 +92,13 @@ namespace Drive_LFSS.Game_
                 ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, connectionId);
             }
         }
-
-        public void ProcessVoteCancel()
+        internal protected void ProcessVoteCancel()
         {
             #if DEBUG
             Log.debug(((IRace)this).ISession.GetSessionNameForLog() + " A VOTE was CANCEL.\r\n");
             #endif
         }
-        public virtual void ProcessRaceEnd()
+        internal protected void ProcessRaceEnd()
         {
             if (doEnd)
             {
@@ -128,7 +127,7 @@ namespace Drive_LFSS.Game_
         {
             return voteInProgress;
         }
-        public virtual void update(uint diff)
+        internal protected virtual void update(uint diff)
         {
             if (voteTimer != 0)
             {
@@ -165,7 +164,7 @@ namespace Drive_LFSS.Game_
                     nextRaceTimer -= diff;
             }
         }
-        public List<ushort> GetSmartRaceMap()
+        internal protected List<ushort> GetSmartRaceMap()
         {
             List<ushort> _raceMap = new List<ushort>(raceMap);
             if (raceMap.Count > 2)

@@ -56,6 +56,7 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_BFN_BUTTON_TRIGGER_AND_REMOVE: processPacket((PacketBFN)_packet);break;
                 case Packet_Type.PACKET_PLP_ENTER_GARAGE:              processPacket((PacketPLP)_packet);break;
                 case Packet_Type.PACKET_CPR_LICENCE_DRIVER_RENAME:     processPacket((PacketCPR)_packet);break;
+                case Packet_Type.PACKET_FLG_DRIVER_BLUE_YELLOW_FLAG:   processPacket((PacketFLG)_packet); break;
 
                 default: Log.missingDefinition("ProcessPacket(), No existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
@@ -159,7 +160,7 @@ namespace Drive_LFSS.Packet_
         // Yellow or blue flag changed
         protected virtual void processPacket(PacketFLG _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " FLG_FlagChanged(), FLG -> PLID=" + _packet.PLID + ", Flag=" + _packet.Flag + ", OffOn=" + _packet.OffOn + ", CarBehind=" + _packet.CarBehind + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " FLG_FlagChanged(), FLG -> PLID=" + _packet.carId + ", Flag=" + _packet.blueOrYellow + ", OffOn=" + _packet.OffOn + ", CarBehind=" + _packet.carIdBehind + "\r\n");
         }
         // A player entered or left the pitlane
         protected virtual void processPacket(PacketPLA _packet)

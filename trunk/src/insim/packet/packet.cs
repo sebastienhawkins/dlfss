@@ -270,12 +270,12 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        internal byte ReqI;
-        internal byte PLID;
+        internal byte requestId;
+        internal byte carId;
         internal byte OffOn;
-        internal Racing_Flag Flag;
-        internal byte CarBehind;
-        internal byte Sp3;
+        internal Racing_Flag blueOrYellow;
+        internal byte carIdBehind;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketIII
     {

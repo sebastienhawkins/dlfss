@@ -28,13 +28,13 @@ namespace Drive_LFSS.Game_
     using Drive_LFSS.Game_;
     using Drive_LFSS.Config_;
 
-    public sealed class Race : Vote, IRace
+    internal class Race : Vote, IRace
 	{
         private const int MIN_FORCED_FINISH_TIME = 40000;
         private const int MAX_FORCED_FINISH_TIME = 120000;
         private const int GTH_TIME_DIFF_FROM_GREEN_LIGHT = 16000;
-        
-        public Race(Session _session)
+
+        internal protected Race(Session _session)
         {
             
             iSession = _session;
@@ -43,7 +43,7 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        public void ConfigApply()
+        internal protected void ConfigApply()
         {
             base.ConfigApply();
 
@@ -52,7 +52,7 @@ namespace Drive_LFSS.Game_
             grid.ConfigApply();
         }
 
-        public void Init(PacketREO _packet)
+        internal protected void Init(PacketREO _packet)
         {
             EndRestart(); //feature auto restart
             driverGuidRESPos.Clear();
@@ -78,7 +78,7 @@ namespace Drive_LFSS.Game_
 
             stateHasChange = true;
         } //Is the first Race/qual START Procedure
-        public void Init(PacketRST _packet)
+        internal protected void Init(PacketRST _packet)
         {
             timeStart = (uint)(System.DateTime.Now.Ticks / Program.tickPerMs);
             requestedFinalResultDone = false;
@@ -106,7 +106,7 @@ namespace Drive_LFSS.Game_
             if (!SetNewGuid())
                 Log.error("Error when creating a new GUID for race.\r\n");
         }
-        public void Init(PacketSTA _packet)
+        internal protected void Init(PacketSTA _packet)
         {
             if(connectionCount != _packet.connectionCount || 
                 finishedCount != _packet.finishedCount ||
@@ -144,11 +144,11 @@ namespace Drive_LFSS.Game_
             if (guid != 0 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING && HasAllResult())
                 FinishRace();
         }
-        public void ProcessCarInformation(CarMotion car)
+        internal protected void ProcessCarInformation(CarMotion car)
         {
             grid.ProcessCarInformation(car);
         }
-        public void ProcessResult(PacketRES _packet)
+        internal protected void ProcessResult(PacketRES _packet)
         {
             if(guid == 0) //No race, no result process
                 return;
@@ -176,18 +176,18 @@ namespace Drive_LFSS.Game_
                     FinishRace();
             }
         }
-        public void ProcessCarLeaveRace(CarMotion car)
+        internal protected void ProcessCarLeaveRace(CarMotion car)
         {
             if( driverGuidRESPos.ContainsKey( ((IDriver)car).GetGuid() ) )
                 carFinishAndLeaveTrackCount++;
             
             RemoveFromGrid(car);
         }
-        public void ProcessCarJoinRace(CarMotion car)
+        internal protected void ProcessCarJoinRace(CarMotion car)
         {
             AddToGrid(car);
         }
-        public void ProcessVoteAction(Vote_Action voteAction)
+        internal protected void ProcessVoteAction(Vote_Action voteAction)
         {
             #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " Vote Action was:" + voteAction + "\r\n");
@@ -290,7 +290,7 @@ namespace Drive_LFSS.Game_
                 } break;
             }
         }
-        public void ProcessRaceEnd()
+        internal protected void ProcessRaceEnd()
         {
             base.ProcessRaceEnd(); 
 
@@ -298,7 +298,7 @@ namespace Drive_LFSS.Game_
             qualifyRaceGuid = 0;
             EndRestart();
         }
-        public void ProcessGTH(uint time)
+        internal protected void ProcessGTH(uint time)
         {
             timeTotal = time;
 
@@ -466,7 +466,7 @@ namespace Drive_LFSS.Game_
         {
             grid.Remove(car);
         }
-        public uint GetGuid()
+        internal protected uint GetGuid()
         {
             return guid;
         }

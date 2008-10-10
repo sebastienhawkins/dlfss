@@ -37,6 +37,15 @@ namespace Drive_LFSS.Definition_
         TIMEDIFF_SPLIT = 5,
         END = 6,
     }
+    public enum Warning_Driving_Type : byte
+    {
+        NONE = 0,
+        VISITOR = 1,
+        VICTIM = 2,
+        YELLOW_FLAG = 3,
+        BAD_DRIVING = 4,
+        
+    }
     [Flags]public enum Rank_Change_Mask : uint
     {
 		NONE = 0,
@@ -142,6 +151,9 @@ namespace Drive_LFSS.Definition_
         RANK_SEARCH_BUTTON_TRACK = 65,
         RANK_SEARCH_BUTTON_CAR = 66,
         RANK_SEARCH_BUTTON_LICENCE = 67,
+        CANCEL_WARNING_DRIVING_1 = 68,
+        CANCEL_WARNING_DRIVING_2 = 69,
+        CANCEL_WARNING_DRIVING_3 = 70,       
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
