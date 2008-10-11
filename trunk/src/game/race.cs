@@ -20,13 +20,14 @@ using System.Data;
 using System;
 namespace Drive_LFSS.Game_
 {
-    using Drive_LFSS.Packet_;
-    using Drive_LFSS.Definition_;
-    using Drive_LFSS.Database_;
-    using Drive_LFSS.Log_;
-    using Drive_LFSS.Script_;
-    using Drive_LFSS.Game_;
-    using Drive_LFSS.Config_;
+    using Packet_;
+    using Definition_;
+    using Database_;
+    using Log_;
+    using Script_;
+    using Game_;
+    using Config_;
+    using PubStats_;
 
     internal class Race : Vote, IRace
 	{
@@ -93,7 +94,7 @@ namespace Drive_LFSS.Game_
             nodeFinishIndex = _packet.nodeFinishIndex;
             raceFeatureMask = _packet.raceFeatureMask;
             qualificationMinute = _packet.qualificationMinute;
-            raceLaps = _packet.raceLaps;
+            lapCount = _packet.raceLaps;
             weatherStatus = _packet.weatherStatus;
             windStatus = _packet.windStatus;
             nodeSplit1Index = _packet.nodeSplit1Index;
@@ -113,7 +114,7 @@ namespace Drive_LFSS.Game_
                 carCount != _packet.carCount ||
                 qualificationMinute != _packet.qualificationMinute ||
                 raceInProgressStatus != (Race_In_Progress_Status)_packet.raceInProgressStatus ||
-                raceLaps != _packet.raceLaps ||
+                lapCount != _packet.raceLaps ||
                 trackPrefix != _packet.trackPrefix ||
                 weatherStatus != (Weather_Status)_packet.weatherStatus ||
                 windStatus != (Wind_Status)_packet.windStatus)
@@ -124,7 +125,7 @@ namespace Drive_LFSS.Game_
             carCount = _packet.carCount;
             qualificationMinute = _packet.qualificationMinute;
             raceInProgressStatus = (Race_In_Progress_Status)_packet.raceInProgressStatus;
-            raceLaps = _packet.raceLaps;
+            lapCount = _packet.raceLaps;
             trackPrefix = _packet.trackPrefix;
             weatherStatus = (Weather_Status)_packet.weatherStatus;
             windStatus = (Wind_Status)_packet.windStatus;
@@ -331,7 +332,7 @@ namespace Drive_LFSS.Game_
         private byte carCount = 0;
         private byte qualificationMinute = 0;
         private Race_In_Progress_Status raceInProgressStatus = Race_In_Progress_Status.RACE_PROGRESS_NONE;
-        private byte raceLaps = 0;
+        private byte lapCount = 0;
         private ushort nodeSplit1Index = 0;
         private ushort nodeSplit2Index = 0;
         private ushort nodeSplit3Index = 0;
@@ -442,12 +443,12 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `race` WHERE `guid`=" + guid);
             string query = "INSERT INTO `race` (`guid`,`qualify_race_guid`,`track_prefix`,`start_timestamp`,`end_timestamp`,`grid_order`,`finish_order`,`race_laps`,`race_status`,`race_feature`,`qualification_minute`,`weather_status`,`wind_status`)";
-            query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / (Program.tickPerMs * 1000)) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + raceLaps + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
+            query += "VALUES(" + guid + "," + qualifyRaceGuid + ", '" + trackPrefix + "'," + (System.DateTime.Now.Ticks / (Program.tickPerMs * 1000)) + ", " + 0 + ", '" + gridOrder + "', '" + finishOrder + "'," + lapCount + ", " + (byte)raceInProgressStatus + "," + (byte)raceFeatureMask + "," + qualificationMinute + "," + (byte)weatherStatus + "," + (byte)windStatus + ")";
             //Since this is GUID creation, important 1 at time is created.
             Program.dlfssDatabase.ExecuteNonQuery(query);
             raceSaveInterval = 0;
             stateHasChange = false;
-            Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + raceLaps + ", saved to database.\r\n");
+            Log.database(iSession.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + lapCount + ", saved to database.\r\n");
         }
         
         public ISession ISession
@@ -481,10 +482,12 @@ namespace Drive_LFSS.Game_
         private void FinishRace()
         {
             timeTotalFromFirstRES = 0;
-
+            uint averageLapTime = timeTotal / lapCount;
+           
             Log.debug("Race: " + guid + ", was finished successfully.\r\n");
 
             Dictionary<uint,byte>.Enumerator enu = driverGuidRESPos.GetEnumerator();
+            Dictionary<string, int> scoringResultTextDisplay = new Dictionary<string, int>();
             for(byte itr = 0; itr < 255; itr++)
             {
                 while(enu.MoveNext())
@@ -493,11 +496,28 @@ namespace Drive_LFSS.Game_
                     {
 
                         finishOrder += (enu.Current.Key >= (uint)Bot_GUI.FIRST ? 0 : enu.Current.Key) + " ";
+                        double winScore = 0.0d;
+                        IDriver driver = iSession.GetDriverWithGuid(enu.Current.Key);
+                        if(driver != null)
+                        {
+                            uint bestEver = driver.GetCurrentWRTime();
+                            winScore = (100.0d - ((((averageLapTime - bestEver) / bestEver * 100.0d) - ((averageLapTime - bestEver) / 1000.0d)) * (16.0d - driverGuidRESPos.Count))) / 50.0d;
+                            if(winScore < 0.0d)
+                                winScore = 0.0d;
+                            
+                            scoringResultTextDisplay.Add("^7"+(itr+1).ToString() + "^2-^7 "+driver.DriverName,(int)Math.Round(winScore,0));
+                        }
+                        else
+                            scoringResultTextDisplay.Add((itr + 1).ToString() + "- ^1Driver Leaved", 0);
                         break;
                     }
                 }
                 enu = driverGuidRESPos.GetEnumerator();
             }
+            iSession.SendResultGuiToAll(scoringResultTextDisplay);
+            //                                      carCount
+            //$winK = (100-(((($averageLapTime - $bestEver)/$bestEver*100) - (($averageLapTime - $bestEver)/1000)) * (16-$driverCount)))/50;
+            
             Program.dlfssDatabase.Lock();
             {
                 SaveToDB();

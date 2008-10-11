@@ -169,6 +169,11 @@ namespace Drive_LFSS.Game_
             for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].SendUpdateButton(buttonEntry, text);
         }
+        public void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+                driverList[itr].SendResultGui(scoringResultTextDisplay);
+        }
         public void AddMessageTopToAll(string text, uint duration)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
@@ -657,7 +662,17 @@ namespace Drive_LFSS.Game_
                 {
                     driver.SendRankCurrent(0);
                 } break;
-
+                case Button_Entry.CANCEL_WARNING_DRIVING_1:
+                case Button_Entry.CANCEL_WARNING_DRIVING_2:
+                case Button_Entry.CANCEL_WARNING_DRIVING_3:
+                {
+                    //driver;
+                } break;
+                case Button_Entry.RESULT_CLOSE_BUTTON:
+                {
+                    driver.RemoveResultGui();
+                } break;
+                
                 case Button_Entry.VOTE_OPTION_1: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
                 case Button_Entry.VOTE_OPTION_2: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;
                 case Button_Entry.VOTE_OPTION_3: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.connectionId); break;
@@ -851,7 +866,16 @@ namespace Drive_LFSS.Game_
                 return driverList[carIndex];
             return null;
         }
-
+        public IDriver GetDriverWithGuid(uint guid)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if( driverList[itr].GetGuid() == guid )
+                    return driverList[itr];
+            }
+            return null;
+        }
         public byte GetNbrOfDrivers()
         {
             return (byte)(driverList.Count - 1); // -1 remove the Host but... maybe not good idea removing it from here.

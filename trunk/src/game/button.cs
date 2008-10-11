@@ -828,6 +828,37 @@ namespace Drive_LFSS.Game_
             rankGuiCurrentDisplay = Button_Entry.NONE;
             RemoveGui((ushort)Gui_Entry.RANK);
         }
+        internal protected void SendResultGui(Dictionary<string, int> scoringResultTextDisplay)
+        {
+            SendGui((ushort)Gui_Entry.RESULT);
+            Dictionary<string, int>.Enumerator itr =  scoringResultTextDisplay.GetEnumerator();
+            ButtonTemplateInfo buttonName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_NAME_DISPLAY);
+            ButtonTemplateInfo buttonScore = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_SCORE_DISPLAY);
+            ButtonTemplateInfo buttonInfoCopy;
+            
+            byte count = 0;
+            while(itr.MoveNext())
+            {
+                buttonInfoCopy = (ButtonTemplateInfo)buttonName.Clone();
+                buttonInfoCopy.Top = (byte)(((count) * buttonName.Height) + buttonName.Top + 1);
+                buttonInfoCopy.Text = itr.Current.Key;
+                SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
+
+                buttonInfoCopy = (ButtonTemplateInfo)buttonScore.Clone();
+                buttonInfoCopy.Top = (byte)(((count) * buttonScore.Height) + buttonScore.Top + 1);
+                buttonInfoCopy.Text = "^7" + itr.Current.Value.ToString() + "^2pt";
+                SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
+                count++;
+            }
+        }
+        internal protected void RemoveResultGui()
+        {
+            rankGuiCurrentDisplay = Button_Entry.NONE;
+            RemoveButton(Button_Entry.RESULT_NAME_DISPLAY);
+            RemoveButton(Button_Entry.RESULT_SCORE_DISPLAY);
+            RemoveGui((ushort)Gui_Entry.RESULT);
+            
+        }
         
         private byte GetButtonId(ushort buttonEntry)
         {

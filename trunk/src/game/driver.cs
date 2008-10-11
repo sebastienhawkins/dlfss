@@ -779,5 +779,11 @@ namespace Drive_LFSS.Game_
        
             Log.progress("Sending MTC packet to: " + CarId + ", with ConnectionId: " + ConnectionId + "\r\n");
         }
+        public uint GetCurrentWRTime()
+        {
+            if(wr == null || wr.LapTime == 0)
+                return 0;
+            return wr.LapTime;
+        }
     }
 }

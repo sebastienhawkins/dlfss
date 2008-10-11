@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+using System.Collections.Generic;
 
 namespace Drive_LFSS.Script_
 {
@@ -38,6 +39,8 @@ namespace Drive_LFSS.Script_
         void AddMessageTopToAll(string text, uint duration);
         void AddMessageMiddleToAll(string text, uint duration);
         bool CanVote();
+        void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay);
+        IDriver GetDriverWithGuid(uint guid);
         IDriver GetDriverWith(byte carId);
         Script Script
         {

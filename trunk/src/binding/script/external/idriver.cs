@@ -27,5 +27,6 @@ namespace Drive_LFSS.Script_
         uint GetGuid();
         bool IsBot();
         void SendMTCMessage(string message);
+        uint GetCurrentWRTime();
     }
 }

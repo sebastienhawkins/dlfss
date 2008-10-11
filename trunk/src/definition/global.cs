@@ -153,7 +153,10 @@ namespace Drive_LFSS.Definition_
         RANK_SEARCH_BUTTON_LICENCE = 67,
         CANCEL_WARNING_DRIVING_1 = 68,
         CANCEL_WARNING_DRIVING_2 = 69,
-        CANCEL_WARNING_DRIVING_3 = 70,       
+        CANCEL_WARNING_DRIVING_3 = 70,
+        RESULT_CLOSE_BUTTON =  71,
+        RESULT_NAME_DISPLAY = 74,
+        RESULT_SCORE_DISPLAY = 75, 
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
@@ -174,6 +177,7 @@ namespace Drive_LFSS.Definition_
         HELP = 3,
         TEXT = 4,
         RANK = 5,
+        RESULT = 6,
     }
     public enum Button_Safe_Coord_Range
     {

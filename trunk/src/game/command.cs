@@ -246,7 +246,7 @@ namespace Drive_LFSS.Server_
         }
         private void Test(Driver driver, string[] args)
         {
-            driver.SendCancelWarningDriving();
+            driver.SendResultGui(new Dictionary<string, int>() { { "1- greenseed", 5000 }, { "mekac", 5000 }, { "maxdoel", 5000 } });
         }
         #endregion
     }
