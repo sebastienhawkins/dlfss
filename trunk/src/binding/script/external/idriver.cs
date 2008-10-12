@@ -28,5 +28,8 @@ namespace Drive_LFSS.Script_
         bool IsBot();
         void SendMTCMessage(string message);
         uint GetCurrentWRTime();
+        uint LapCountTotalLastRace{ get; }
+        uint TimeTotalLastRace{get;}
+        uint TimeFastestLapLastRace{get;}
     }
 }

@@ -482,42 +482,48 @@ namespace Drive_LFSS.Game_
         private void FinishRace()
         {
             timeTotalFromFirstRES = 0;
-            uint averageLapTime = timeTotal / lapCount;
-           
+
             Log.debug("Race: " + guid + ", was finished successfully.\r\n");
 
-            Dictionary<uint,byte>.Enumerator enu = driverGuidRESPos.GetEnumerator();
-            Dictionary<string, int> scoringResultTextDisplay = new Dictionary<string, int>();
-            for(byte itr = 0; itr < 255; itr++)
-            {
-                while(enu.MoveNext())
+             {//Win Scoring
+                Dictionary<uint,byte>.Enumerator enu = driverGuidRESPos.GetEnumerator();
+                Dictionary<string, int> scoringResultTextDisplay = new Dictionary<string, int>();
+                int driverCount = gridOrder.Split(new char[]{' '}).Length-1;
+                bool goodResult = false;
+                for(byte itr = 0; itr < 255; itr++)
                 {
-                    if(enu.Current.Value == itr)
+                    while(enu.MoveNext())
                     {
-
-                        finishOrder += (enu.Current.Key >= (uint)Bot_GUI.FIRST ? 0 : enu.Current.Key) + " ";
-                        double winScore = 0.0d;
-                        IDriver driver = iSession.GetDriverWithGuid(enu.Current.Key);
-                        if(driver != null)
+                        if(enu.Current.Value == itr)
                         {
-                            uint bestEver = driver.GetCurrentWRTime();
-                            winScore = (100.0d - ((((averageLapTime - bestEver) / bestEver * 100.0d) - ((averageLapTime - bestEver) / 1000.0d)) * (16.0d - driverGuidRESPos.Count))) / 50.0d;
-                            if(winScore < 0.0d)
-                                winScore = 0.0d;
-                            
-                            scoringResultTextDisplay.Add("^7"+(itr+1).ToString() + "^2-^7 "+driver.DriverName,(int)Math.Round(winScore,0));
+                            finishOrder += (enu.Current.Key >= (uint)Bot_GUI.FIRST ? 0 : enu.Current.Key) + " ";
+                            double winScore = 0.0d;
+                            IDriver driver = iSession.GetDriverWithGuid(enu.Current.Key);
+                            if (driver != null && driver.GetCurrentWRTime() != 0)
+                            {
+                                //int posScore = (driverCount / 2) - itr + 1;//+1 is position 0 become 1 ...
+                                int averageLapTime = (int)(driver.TimeTotalLastRace / driver.LapCountTotalLastRace);
+                                int bestEver = (int)driver.GetCurrentWRTime();
+
+				                winScore = driverCount + ((bestEver-averageLapTime)/bestEver*100.0d)-5; // -5 , is the min factor
+					            winScore += driverCount-itr+1;
+                                if (winScore < 0)
+                                    winScore = 0;
+					            //if(driverCount > 1 && itr==0)
+						        //   winScore = winScore+1;
+                                goodResult = true;
+                                scoringResultTextDisplay.Add("^7"+(itr+1).ToString() + "^2-^7 "+driver.DriverName,(int)Math.Round(winScore,0));
+                            }
+                            else
+                                scoringResultTextDisplay.Add((itr + 1).ToString() + "- ^1Driver Leaved", 0);
+                            break;
                         }
-                        else
-                            scoringResultTextDisplay.Add((itr + 1).ToString() + "- ^1Driver Leaved", 0);
-                        break;
                     }
+                    enu = driverGuidRESPos.GetEnumerator();
                 }
-                enu = driverGuidRESPos.GetEnumerator();
+                if(goodResult)
+                    iSession.SendResultGuiToAll(scoringResultTextDisplay);
             }
-            iSession.SendResultGuiToAll(scoringResultTextDisplay);
-            //                                      carCount
-            //$winK = (100-(((($averageLapTime - $bestEver)/$bestEver*100) - (($averageLapTime - $bestEver)/1000)) * (16-$driverCount)))/50;
-            
             Program.dlfssDatabase.Lock();
             {
                 SaveToDB();

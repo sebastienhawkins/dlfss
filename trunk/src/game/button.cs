@@ -114,7 +114,7 @@ namespace Drive_LFSS.Game_
         }
         private Queue<ButtonMessage> buttonMessageTop = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
         private Queue<ButtonMessage> buttonMessageMiddle = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
-        private ushort currentGui = (ushort)0;
+        private Gui_Entry currentGui = Gui_Entry.NONE;
         private const uint FREEZE_BUTTON_CLEAR = 1000;
         private const uint FREEZE_BUTTON = 1000;
         private uint freezeButtonClear = 0;
@@ -254,10 +254,14 @@ namespace Drive_LFSS.Game_
         }
         public void RemoveGui(ushort guiEntry)
         {
+            RemoveGui((Gui_Entry)guiEntry);
+        }
+        public void RemoveGui(Gui_Entry guiEntry)
+        {
             if (((Driver)this).IsBot())
                 return;
 
-            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry(guiEntry);
+            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
 
             System.Collections.IEnumerator itr = buttonEntrys.GetEnumerator();
@@ -375,14 +379,14 @@ namespace Drive_LFSS.Game_
                 buttonInfo.Text = text;
             SendUpdateButton(buttonInfo);
         }
-        public void SendButton(Button_Entry buttonEntry)
-        {
-            SendButton((ushort)buttonEntry);
-        }
         public void SendButton(ushort buttonEntry)
         {
+            SendButton((Button_Entry)buttonEntry);
+        }
+        public void SendButton(Button_Entry buttonEntry)
+        {
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
-            SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
+            SendButton(newButtonId(buttonInfo.Entry), buttonInfo);
         }
         internal protected void SendButton(byte buttonId, ButtonTemplateInfo buttonInfo)
         {
@@ -447,7 +451,7 @@ namespace Drive_LFSS.Game_
         }
         internal protected void RemoveConfigGui()
         {
-            RemoveGui((ushort)Gui_Entry.CONFIG_USER);
+            RemoveGui(Gui_Entry.CONFIG_USER);
         }
         internal protected void SendHelpGui()
         {
@@ -455,7 +459,7 @@ namespace Drive_LFSS.Game_
         }
         internal protected void RemoveHelpGui()
         {
-            RemoveGui((ushort)Gui_Entry.HELP);
+            RemoveGui(Gui_Entry.HELP);
         }
         internal protected void SendRankGui(Button_Entry startWith)
         {
@@ -631,9 +635,9 @@ namespace Drive_LFSS.Game_
             SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
             SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^7Search");
             SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
-            SendButton((ushort)Button_Entry.RANK_SEARCH_BUTTON_TRACK);
-            SendButton((ushort)Button_Entry.RANK_SEARCH_BUTTON_CAR);
-            SendButton((ushort)Button_Entry.RANK_SEARCH_BUTTON_LICENCE);
+            SendButton(Button_Entry.RANK_SEARCH_BUTTON_TRACK);
+            SendButton(Button_Entry.RANK_SEARCH_BUTTON_CAR);
+            SendButton(Button_Entry.RANK_SEARCH_BUTTON_LICENCE);
             uint rankedCount = Ranking.GetRankedCount(rankSearchTrackPrefix,rankSearchCarPrefix);
             SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7"+rankSearchCarPrefix+", ^2Track:^7 "+rankSearchTrackPrefix+", ^2Count: ^7"+rankedCount);
             SendButton(Button_Entry.RANK_NAME);
@@ -826,38 +830,41 @@ namespace Drive_LFSS.Game_
             freezeButtonClear = 0;
             freezeButton = 0;
             rankGuiCurrentDisplay = Button_Entry.NONE;
-            RemoveGui((ushort)Gui_Entry.RANK);
+            RemoveGui(Gui_Entry.RANK);
         }
         internal protected void SendResultGui(Dictionary<string, int> scoringResultTextDisplay)
         {
-            SendGui((ushort)Gui_Entry.RESULT);
-            Dictionary<string, int>.Enumerator itr =  scoringResultTextDisplay.GetEnumerator();
-            ButtonTemplateInfo buttonName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_NAME_DISPLAY);
-            ButtonTemplateInfo buttonScore = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_SCORE_DISPLAY);
-            ButtonTemplateInfo buttonInfoCopy;
-            
-            byte count = 0;
-            while(itr.MoveNext())
-            {
-                buttonInfoCopy = (ButtonTemplateInfo)buttonName.Clone();
-                buttonInfoCopy.Top = (byte)(((count) * buttonName.Height) + buttonName.Top + 1);
-                buttonInfoCopy.Text = itr.Current.Key;
-                SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
+            if(currentGui == Gui_Entry.RESULT)
+                RemoveResultGui();
 
-                buttonInfoCopy = (ButtonTemplateInfo)buttonScore.Clone();
-                buttonInfoCopy.Top = (byte)(((count) * buttonScore.Height) + buttonScore.Top + 1);
-                buttonInfoCopy.Text = "^7" + itr.Current.Value.ToString() + "^2pt";
-                SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
-                count++;
+            SendGui((ushort)Gui_Entry.RESULT);
+            {
+                Dictionary<string, int>.Enumerator itr =  scoringResultTextDisplay.GetEnumerator();
+                ButtonTemplateInfo buttonName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_NAME_DISPLAY);
+                ButtonTemplateInfo buttonScore = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_SCORE_DISPLAY);
+                ButtonTemplateInfo buttonInfoCopy;
+                
+                byte count = 0;
+                while(itr.MoveNext())
+                {
+                    buttonInfoCopy = (ButtonTemplateInfo)buttonName.Clone();
+                    buttonInfoCopy.Top = (byte)(((count) * buttonName.Height) + buttonName.Top + 1);
+                    buttonInfoCopy.Text = itr.Current.Key;
+                    SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
+
+                    buttonInfoCopy = (ButtonTemplateInfo)buttonScore.Clone();
+                    buttonInfoCopy.Top = (byte)(((count) * buttonScore.Height) + buttonScore.Top + 1);
+                    buttonInfoCopy.Text = "^7" + itr.Current.Value.ToString() + "^2pt";
+                    SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
+                    count++;
+                }
             }
         }
         internal protected void RemoveResultGui()
         {
-            rankGuiCurrentDisplay = Button_Entry.NONE;
             RemoveButton(Button_Entry.RESULT_NAME_DISPLAY);
             RemoveButton(Button_Entry.RESULT_SCORE_DISPLAY);
-            RemoveGui((ushort)Gui_Entry.RESULT);
-            
+            RemoveGui(Gui_Entry.RESULT);
         }
         
         private byte GetButtonId(ushort buttonEntry)

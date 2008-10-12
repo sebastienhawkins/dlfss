@@ -69,7 +69,7 @@ namespace Drive_LFSS.Game_
             if (!ISession.IsFreezeMotdSend())
             {
                 for (byte itr = 0; ++itr < 5; )
-                    SendButton((ushort)Button_Entry.MOTD_BACKGROUND);
+                    SendButton(Button_Entry.MOTD_BACKGROUND);
 
                 SendGui((ushort)Gui_Entry.MOTD);
             }
@@ -269,6 +269,12 @@ namespace Drive_LFSS.Game_
                     AddMessageMiddle("^2Split " + ConvertX.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
             }
         }
+        internal protected void ProcessRESPacket(PacketRES _packet)
+        {
+            timeTotalLastRace = _packet.totalTime;
+            timeFastestLapLastRace = _packet.fastestLapTime;
+            lapCountTotalLastRace = _packet.lapCount;
+        }
         internal protected void ProcessRaceStart()
         {
             wr = Program.pubStats.GetWR("");
@@ -348,15 +354,15 @@ namespace Drive_LFSS.Game_
         private byte unkFlag = 0;
         private string driverName = "";
         private byte driverModel = 0;
-
+        private uint timeTotalLastRace = 0;
+        private uint timeFastestLapLastRace = 0;
+        private uint lapCountTotalLastRace = 0;
         private bool yellowFlagActive = false;
         private bool blueFlagActive = false;
-
         private uint warningDrivingCancelTimer = 0;
         private uint warningDrivingTimerCheck = 0;
         private byte warningDrivingReferenceCarId = 0;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
-
         internal protected Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
         private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
@@ -729,6 +735,10 @@ namespace Drive_LFSS.Game_
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_1);
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_2);
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_3);
+            Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
+            if (_driver == null)
+                return;
+            AddMessageMiddle("^2Removed Warning Driving for "+_driver.driverName,4500);
         }
         public bool IsYellowFlagActive()
         {
@@ -784,6 +794,18 @@ namespace Drive_LFSS.Game_
             if(wr == null || wr.LapTime == 0)
                 return 0;
             return wr.LapTime;
+        }
+        public uint TimeTotalLastRace
+        {
+            get { return timeTotalLastRace; }
+        }
+        public uint TimeFastestLapLastRace
+        {
+            get { return timeFastestLapLastRace; }
+        }
+        public uint LapCountTotalLastRace
+        {
+            get { return lapCountTotalLastRace; }
         }
     }
 }

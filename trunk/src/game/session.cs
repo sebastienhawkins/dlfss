@@ -542,6 +542,14 @@ namespace Drive_LFSS.Game_
             #if DEBUG
             base.processPacket(_packet); //Keep the Log
             #endif
+            byte index = GetCarIndex(_packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketRES), we can find any driver with this car.\r\n");
+                return;
+            }
+            driverList[index].ProcessRESPacket(_packet);
+
             race.ProcessResult(_packet);
         }      // Result, "Confimation" is only working for a race not qualify
         protected sealed override void processPacket(PacketFIN _packet)
@@ -562,16 +570,16 @@ namespace Drive_LFSS.Game_
             {
                 case Button_Entry.MOTD_BUTTON_DRIVE:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.MOTD);
+                    driver.RemoveGui(Gui_Entry.MOTD);
                 } break;
                 case Button_Entry.MOTD_BUTTON_HELP:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.MOTD);
+                    driver.RemoveGui(Gui_Entry.MOTD);
                     driver.SendHelpGui();
                 } break;
                 case Button_Entry.MOTD_BUTTON_CONFIG:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.MOTD);
+                    driver.RemoveGui(Gui_Entry.MOTD);
                     driver.SendConfigGui();
                 } break;
                 case Button_Entry.CONFIG_USER_ACC_ON:
@@ -630,21 +638,21 @@ namespace Drive_LFSS.Game_
                 } break;
                 case Button_Entry.CONFIG_USER_CLOSE:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.CONFIG_USER);
+                    driver.RemoveGui(Gui_Entry.CONFIG_USER);
                 } break;
                 
                 case Button_Entry.HELP_BUTTON_CONFIG:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.HELP);
+                    driver.RemoveGui(Gui_Entry.HELP);
                     driver.SendConfigGui();
                 } break;
                 case Button_Entry.HELP_BUTTON_DRIVE:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.HELP);
+                    driver.RemoveGui(Gui_Entry.HELP);
                 } break;
                 case Button_Entry.TEXT_BUTTON_DRIVE:
                 {
-                    driver.RemoveGui((ushort)Gui_Entry.TEXT);
+                    driver.RemoveGui(Gui_Entry.TEXT);
                 } break;
                 case Button_Entry.RANK_BUTTON_CLOSE:
                 {
@@ -666,7 +674,7 @@ namespace Drive_LFSS.Game_
                 case Button_Entry.CANCEL_WARNING_DRIVING_2:
                 case Button_Entry.CANCEL_WARNING_DRIVING_3:
                 {
-                    //driver;
+                    driver.RemoveCancelWarningDriving();
                 } break;
                 case Button_Entry.RESULT_CLOSE_BUTTON:
                 {
