@@ -602,39 +602,47 @@ namespace Drive_LFSS.Game_
                 } break;
                 case Button_Entry.CONFIG_USER_TIMEDIFF_ALL:
                 {
-                    if (driver.IsTimeDiffLap)
+                    if (driver.IsTimeDiffLapDisplay)
                     {
-                        driver.IsTimeDiffLap = false;
-                        driver.IsTimeDiffSplit = false;
+                        driver.IsTimeDiffLapDisplay = false;
+                        driver.IsTimeDiffSplitDisplay = false;
                     }
                     else
                     {
-                        driver.IsTimeDiffLap = true;
-                        driver.IsTimeDiffSplit = true;
+                        driver.IsTimeDiffLapDisplay = true;
+                        driver.IsTimeDiffSplitDisplay = true;
                     }
-                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplit && driver.IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
-                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (driver.IsTimeDiffLap ? "^7" : "^8") + " PB vs lap");
-                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (driver.IsTimeDiffSplit ? "^7" : "^8") + " PB vs Split");
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplitDisplay && driver.IsTimeDiffLapDisplay) ? "^7" : "^8") + " Time Diff");
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (driver.IsTimeDiffLapDisplay ? "^7" : "^8") + " PB vs lap");
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (driver.IsTimeDiffSplitDisplay ? "^7" : "^8") + " PB vs Split");
                 } break;
                 case Button_Entry.CONFIG_USER_TIMEDIFF_LAP:
                 {
-                    if (driver.IsTimeDiffLap)
-                        driver.IsTimeDiffLap = false;
+                    if (driver.IsTimeDiffLapDisplay)
+                        driver.IsTimeDiffLapDisplay = false;
                     else
-                        driver.IsTimeDiffLap = true;
+                        driver.IsTimeDiffLapDisplay = true;
 
-                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplit && driver.IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
-                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (driver.IsTimeDiffLap ? "^7" : "^8") + " PB vs lap");
+                    driver.SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplitDisplay && driver.IsTimeDiffLapDisplay) ? "^7" : "^8") + " Time Diff");
+                    driver.SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (driver.IsTimeDiffLapDisplay ? "^7" : "^8") + " PB vs lap");
                 } break;
                 case Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT:
                 {
-                    if (driver.IsTimeDiffSplit)
-                        driver.IsTimeDiffSplit = false;
+                    if (driver.IsTimeDiffSplitDisplay)
+                        driver.IsTimeDiffSplitDisplay = false;
                     else
-                        driver.IsTimeDiffSplit = true;
+                        driver.IsTimeDiffSplitDisplay = true;
 
-                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplit && driver.IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
-                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (driver.IsTimeDiffSplit ? "^7" : "^8") + " PB vs Split");
+                    driver.SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplitDisplay && driver.IsTimeDiffLapDisplay) ? "^7" : "^8") + " Time Diff");
+                    driver.SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (driver.IsTimeDiffSplitDisplay ? "^7" : "^8") + " PB vs Split");
+                } break;
+                case Button_Entry.CONFIG_USER_MAX_SPEED_ON:
+                {
+                    if(driver.IsMaxSpeedDisplay)
+                        driver.IsMaxSpeedDisplay = false;
+                    else
+                        driver.IsMaxSpeedDisplay = true;
+                    driver.SendUpdateButton(Button_Entry.CONFIG_USER_MAX_SPEED_ON, (driver.IsMaxSpeedDisplay ? "^7" : "^8") + " Max Speed");
                 } break;
                 case Button_Entry.CONFIG_USER_CLOSE:
                 {
@@ -765,7 +773,11 @@ namespace Drive_LFSS.Game_
             switch (_packet.buttonFunction)
             {
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
-                    driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNClearAll(false); break;
+                {
+                    Driver driver = driverList[GetLicenceIndexNotBot(_packet.connectionId)];
+                    
+                    driver.ProcessBFNClearAll(driver.HasGuiDisplay() ? false : true); break;
+                }
                 case Button_Function.BUTTON_FUNCTION_REQUEST:
                     driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNRequest(); break;
             }

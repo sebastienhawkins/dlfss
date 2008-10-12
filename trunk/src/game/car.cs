@@ -80,6 +80,7 @@ namespace Drive_LFSS.Game_
         private double z = 0.0d;
         private double speedMs = 0.0d;
         private double speedKmh = 0.0d;
+        private double speedMph = 0.0d;
         private ushort tracjectory = 0;
         private ushort orientation = 0;
         private short orientationSpeed = 0;
@@ -314,7 +315,7 @@ namespace Drive_LFSS.Game_
                 {
                     ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
                 }
-
+                ((Driver)car).driftScoreByTime += (uint)score;
                 if (((Driver)car).ISession.Script.CarDriftScoring((ICar)car, (uint)score))
                     return;
             }

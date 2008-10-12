@@ -441,13 +441,14 @@ namespace Drive_LFSS.Game_
         {
             SendGui((ushort)Gui_Entry.CONFIG_USER);
             
-            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + ((Driver)this).GetAccelerationStartSpeed() + "^2-^7" + ((Driver)this).GetAccelerationEndSpeed() + " ^2Kmh");
-            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_ON, (((Driver)this).IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
-            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_DRIFT_ON, (((Driver)this).IsDriftScoreOn() ? "^7" : "^8") + " Drift Score");
+            SendUpdateButton(Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + ((Driver)this).GetAccelerationStartSpeed() + "^2-^7" + ((Driver)this).GetAccelerationEndSpeed() + " ^2Kmh");
+            SendUpdateButton(Button_Entry.CONFIG_USER_ACC_ON, (((Driver)this).IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
+            SendUpdateButton(Button_Entry.CONFIG_USER_DRIFT_ON, (((Driver)this).IsDriftScoreOn() ? "^7" : "^8") + " Drift Score");
+            SendUpdateButton(Button_Entry.CONFIG_USER_MAX_SPEED_ON, (((Driver)this).IsMaxSpeedDisplay ? "^7" : "^8") + " Max Speed");
 
-            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((((Driver)this).IsTimeDiffSplit && ((Driver)this).IsTimeDiffLap) ? "^7" : "^8") + " Time Diff");
-            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (((Driver)this).IsTimeDiffLap ? "^7" : "^8") + " PB vs lap");
-            SendUpdateButton((ushort)Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (((Driver)this).IsTimeDiffSplit ? "^7" : "^8") + " PB vs Split");
+            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((((Driver)this).IsTimeDiffSplitDisplay && ((Driver)this).IsTimeDiffLapDisplay) ? "^7" : "^8") + " Time Diff");
+            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (((Driver)this).IsTimeDiffLapDisplay ? "^7" : "^8") + " PB vs lap");
+            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (((Driver)this).IsTimeDiffSplitDisplay ? "^7" : "^8") + " PB vs Split");
         }
         internal protected void RemoveConfigGui()
         {
@@ -867,6 +868,10 @@ namespace Drive_LFSS.Game_
             RemoveGui(Gui_Entry.RESULT);
         }
         
+        internal protected bool HasGuiDisplay()
+        {
+            return currentGui != Gui_Entry.NONE;
+        }
         private byte GetButtonId(ushort buttonEntry)
         {
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)

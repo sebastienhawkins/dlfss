@@ -73,10 +73,9 @@ namespace Drive_LFSS.Game_
 
                 SendGui((ushort)Gui_Entry.MOTD);
             }
-            configData = new string[(int)Config_User.END];
-            for (byte itr = 0; itr < (byte)Config_User.END; itr++)
-                configData[itr] = "0";
 
+            SetConfigData("");
+            
             LoadFromDB();
             if (guid == 0)
             {
@@ -226,7 +225,8 @@ namespace Drive_LFSS.Game_
                 }
             }
             
-            AddMessageMiddle("^2MS ^7" + Math.Round((decimal)ConvertX.MSToKhm(maxSpeedMs), 2) + " ^7Kmh", 6000);
+            if(isMaxSpeedDisplay)
+                AddMessageMiddle("^2MS ^7" + Math.Round((decimal)ConvertX.MSToKhm(maxSpeedMs), 2) + " ^7Kmh", 6000);
             maxSpeedMs = 0.0d; 
 
             laps.Add(new Lap());
@@ -348,6 +348,8 @@ namespace Drive_LFSS.Game_
 
         private bool isTimeDiffLap = true;
         private bool isTimeDiffSplit = true;
+        private bool isMaxSpeedDisplay = true;
+        private bool isMaxSpeedKmhDisplay = true;
         private bool isAdmin = false;
         private string licenceName = "";
         private byte connectionId = 0;
@@ -362,6 +364,9 @@ namespace Drive_LFSS.Game_
         private uint warningDrivingCancelTimer = 0;
         private uint warningDrivingTimerCheck = 0;
         private byte warningDrivingReferenceCarId = 0;
+        private uint driftScoreByTime = 0;
+        private uint driftScoreTimer = 0;
+        private const uint DRIFT_SCORE_TIMER = 40000;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
         internal protected Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
@@ -494,6 +499,16 @@ namespace Drive_LFSS.Game_
         private uint driverSaveInterval = 0;
         new internal protected void update(uint diff) 
         {
+            if (driftScoreByTime > 0)
+            {
+                if((driftScoreTimer += diff) > DRIFT_SCORE_TIMER)
+                {
+                    driftScoreTimer = 0;
+                    AddMessageMiddle("^2Your driftScore for the last ^7"+(DRIFT_SCORE_TIMER/1000)+"^2sec is ^7"+driftScoreByTime.ToString(), 7000);
+                    driftScoreByTime = 0;
+                }
+            }
+
             driverSaveInterval += diff;
             if (SAVE_INTERVAL < driverSaveInterval  ) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
             {
@@ -547,7 +562,7 @@ namespace Drive_LFSS.Game_
                 else
                 {
                     Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
-                    if(_driver != null)
+                    if(_driver != null && laps.Count > 0)
                         _driver.laps[laps.Count-1].BadDrivingCount++;
                     _driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
                     RemoveCancelWarningDriving();
@@ -631,29 +646,36 @@ namespace Drive_LFSS.Game_
                 SetDriftScoreOn(false);
 
            if (GetConfigUint16(Config_User.TIMEDIFF_LAP) > 0)
-               IsTimeDiffLap = true;
+               IsTimeDiffLapDisplay = true;
            else
-               IsTimeDiffLap = false;
+               IsTimeDiffLapDisplay = false;
 
            if (GetConfigUint16(Config_User.TIMEDIFF_SPLIT) > 0)
-               IsTimeDiffSplit = true;
+               IsTimeDiffSplitDisplay = true;
            else
-               IsTimeDiffSplit = false;
+               IsTimeDiffSplitDisplay = false;
+
+           if (GetConfigUint16(Config_User.MAX_SPEED_ON) > 0)
+               IsMaxSpeedDisplay = true;
+           else
+               IsMaxSpeedDisplay = false;   
         }
         private void SetConfigData(string configString)
         {
             string[] configStrings = configString.Split(new char[]{' '},StringSplitOptions.RemoveEmptyEntries);
             if(configStrings.Length != (int)Config_User.END)
             {
+                configData = new string[(int)Config_User.END];
                 for(byte itr = 0 ; itr < (byte)Config_User.END;itr++)
                     configData[itr] = "0";
 
                 configData[(int)Config_User.ACCELERATION_ON] = "1";
                 configData[(int)Config_User.ACCELERATION_START] = "0";
                 configData[(int)Config_User.ACCELERATION_STOP] = "100";
-                configData[(int)Config_User.DRIFT_SCORE_ON] = "1";
+                configData[(int)Config_User.DRIFT_SCORE_ON] = "0";
                 configData[(int)Config_User.TIMEDIFF_LAP] = "1";
                 configData[(int)Config_User.TIMEDIFF_SPLIT] = "1";
+                configData[(int)Config_User.MAX_SPEED_ON] = "1";
                 return;
             }
             configStrings.CopyTo(configData,0);
@@ -687,7 +709,7 @@ namespace Drive_LFSS.Game_
                 return null;
         }
 
-        internal protected bool IsTimeDiffLap
+        internal protected bool IsTimeDiffLapDisplay
         {
             get { return isTimeDiffLap; }
             set
@@ -696,13 +718,22 @@ namespace Drive_LFSS.Game_
                 SetConfigValue(Config_User.TIMEDIFF_LAP, (isTimeDiffLap ? "1" : "0"));
             }
         }
-        internal protected bool IsTimeDiffSplit
+        internal protected bool IsTimeDiffSplitDisplay
         {
             get { return isTimeDiffSplit; }
             set
             {
                 isTimeDiffSplit = value;
                 SetConfigValue(Config_User.TIMEDIFF_SPLIT, (isTimeDiffSplit ? "1" : "0"));
+            }
+        }
+        internal protected bool IsMaxSpeedDisplay
+        {
+            get { return isMaxSpeedDisplay; }
+            set
+            {
+                isMaxSpeedDisplay = value;
+                SetConfigValue(Config_User.MAX_SPEED_ON, (isMaxSpeedDisplay ? "1" : "0"));
             }
         }
         

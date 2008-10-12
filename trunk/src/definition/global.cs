@@ -35,7 +35,8 @@ namespace Drive_LFSS.Definition_
         DRIFT_SCORE_ON = 3,
         TIMEDIFF_LAP = 4,
         TIMEDIFF_SPLIT = 5,
-        END = 6,
+        MAX_SPEED_ON = 7,
+        END = 8,
     }
     public enum Warning_Driving_Type : byte
     {
@@ -157,6 +158,7 @@ namespace Drive_LFSS.Definition_
         RESULT_CLOSE_BUTTON =  71,
         RESULT_NAME_DISPLAY = 74,
         RESULT_SCORE_DISPLAY = 75, 
+        CONFIG_USER_MAX_SPEED_ON = 77,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {
