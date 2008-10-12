@@ -363,8 +363,9 @@ namespace Drive_LFSS.Storage_
         {
             entry = (Gui_Entry)Convert.ToUInt16(rowInfos[0]);
             buttonEntry = (string)rowInfos[1];
-            textButtonEntry = Convert.ToUInt16(rowInfos[2]);
-            text = (string)rowInfos[3];
+            buttonEntryExt = (string)rowInfos[2];
+            textButtonEntry = Convert.ToUInt16(rowInfos[3]);
+            text = (string)rowInfos[4];
         }
         ~GuiTemplateInfo()
         {
@@ -372,6 +373,7 @@ namespace Drive_LFSS.Storage_
         }
         private Gui_Entry entry;
         private string buttonEntry;
+        private string buttonEntryExt;
         private ushort textButtonEntry;
         private string text;
 
@@ -382,12 +384,14 @@ namespace Drive_LFSS.Storage_
         public string ButtonEntry
         {
             get { return buttonEntry; }
-            set { buttonEntry = value; }
+        }
+        public string ButtonEntryExt
+        {
+            get { return buttonEntryExt; }
         }
         public ushort TextButtonEntry
         {
             get { return textButtonEntry; }
-            set { textButtonEntry = value; }
         }
         public string Text
         {

@@ -56,7 +56,7 @@ namespace Drive_LFSS
 
         //Storage, All Storage FMT need a 'p' value, this is representing is Unique Index into the Array, the value must be a uint32
         public static readonly ButtonTemplate buttonTemplate = new ButtonTemplate(new string[2] { "button_template", "pxuuuuuuuss" });
-        public static readonly GuiTemplate guiTemplate = new GuiTemplate(new string[2] { "gui_template", "pxsus" });
+        public static readonly GuiTemplate guiTemplate = new GuiTemplate(new string[2] { "gui_template", "pxssus" });
         public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "psssuuuuu" });
         public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssuu" });
         public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psusuuuuuu" });

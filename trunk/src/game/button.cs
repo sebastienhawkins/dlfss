@@ -262,8 +262,7 @@ namespace Drive_LFSS.Game_
                 return;
 
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
-            string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
-
+            string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' },StringSplitOptions.RemoveEmptyEntries);
             System.Collections.IEnumerator itr = buttonEntrys.GetEnumerator();
             ushort buttonEntry;
             while (itr.MoveNext())
@@ -271,11 +270,19 @@ namespace Drive_LFSS.Game_
                 buttonEntry = System.Convert.ToUInt16(itr.Current);
                 RemoveButton(buttonEntry);
             }
+            string[] buttonEntryExts = guiInfo.ButtonEntryExt.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            itr = buttonEntryExts.GetEnumerator();
+            while (itr.MoveNext())
+            {
+                buttonEntry = System.Convert.ToUInt16(itr.Current);
+                RemoveButton(buttonEntry);
+            }
+
             if (guiInfo.TextButtonEntry > 0 /*&& guiInfo.Text.Length > 0*/)
             {
                 RemoveButton(guiInfo.TextButtonEntry);
             }
-            currentGui = (ushort)0;
+            currentGui = Gui_Entry.NONE;
         }
         internal protected byte RemoveButton(Button_Entry buttonEntry)
         {
@@ -827,7 +834,6 @@ namespace Drive_LFSS.Game_
         }
         internal protected void RemoveRankGui()
         {
-            ClearRankDisplay(false);
             freezeButtonClear = 0;
             freezeButton = 0;
             rankGuiCurrentDisplay = Button_Entry.NONE;
@@ -842,8 +848,6 @@ namespace Drive_LFSS.Game_
                 SendButton(Button_Entry.RESULT_BG);
                 
             SendGui((ushort)Gui_Entry.RESULT);
-            RemoveButton(Button_Entry.RESULT_NAME_DISPLAY);
-            RemoveButton(Button_Entry.RESULT_SCORE_DISPLAY);
             {
                 Dictionary<string, int>.Enumerator itr =  scoringResultTextDisplay.GetEnumerator();
                 ButtonTemplateInfo buttonName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_NAME_DISPLAY);

@@ -126,14 +126,14 @@ namespace Drive_LFSS.Game_
                      && HasCollisionPath(carAround, car) )
                 {
 
-                    if (((Driver)carAround).IsAdmin)
+                    /*if (((Driver)carAround).IsAdmin)
                     {
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_1, "^3CD " + (-speedDiff / 100.0d * carBrakeValue[carAround.CarPrefix]));
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3D ^7" + dist);
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_5, "^3Z ^7" + GetDistanceZ(car, carAround));
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SD ^7" + -speedDiff);
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3B ^7" + carBrakeValue[carAround.CarPrefix]);
-                    }
+                    }*/
 
                     if (car.IsBlueFlagActive() && !carAround.IsYellowFlagActive() && !carAround.IsBlueFlagActive())
                     {
