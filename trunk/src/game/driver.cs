@@ -179,6 +179,11 @@ namespace Drive_LFSS.Game_
         }
         internal protected void ProcessLapInformation(PacketLAP _packet)
         {
+            if(laps.Count < 1)
+            {
+                Log.error("Driver.ProcessLapInformation(), laps array was empty, HACKFIX DONE, DriverName:"+driverName);
+                laps.Add(new Lap());
+            }
             Lap lap = laps[laps.Count - 1];
             lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
 
