@@ -144,6 +144,10 @@ namespace Drive_LFSS.Game_
         {
             return sessionName;
         }
+        internal protected Dictionary<string,int> GetRaceLastResult()
+        {
+            return race.GetLastResultString();
+        }
         public uint GetRaceGuid()
         {
             return race.GetGuid();

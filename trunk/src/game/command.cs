@@ -41,6 +41,7 @@ namespace Drive_LFSS.Server_
            command["top10"] = new CommandName(0, new CommandDelegate(Rank));
            command["top20"] = new CommandName(0, new CommandDelegate(Rank));
            command["test"] = new CommandName(1, new CommandDelegate(Test));
+           command["result"] = new CommandName(0, new CommandDelegate(Result));
         }
         ~CommandInGame()
         {
@@ -247,6 +248,10 @@ namespace Drive_LFSS.Server_
         private void Test(Driver driver, string[] args)
         {
             driver.SendResultGui(new Dictionary<string, int>() { { "1- greenseed", 5000 }, { "mekac", 5000 }, { "maxdoel", 5000 } });
+        }
+        private void Result(Driver driver, string[] args)
+        {
+            driver.SendResultGui(session.GetRaceLastResult());
         }
         #endregion
     }

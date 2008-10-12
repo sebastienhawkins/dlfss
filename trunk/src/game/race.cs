@@ -343,6 +343,7 @@ namespace Drive_LFSS.Game_
         private string finishOrder = "";
         private ushort finishCount = 0;
         private byte carFinishAndLeaveTrackCount = 0;
+        Dictionary<string, int> scoringResultTextDisplay = new Dictionary<string,int>();
         //
         private uint timeTotal = 0;
         private Grid grid = new Grid();
@@ -487,7 +488,7 @@ namespace Drive_LFSS.Game_
 
              {//Win Scoring
                 Dictionary<uint,byte>.Enumerator enu = driverGuidRESPos.GetEnumerator();
-                Dictionary<string, int> scoringResultTextDisplay = new Dictionary<string, int>();
+                scoringResultTextDisplay.Clear();
                 int driverCount = gridOrder.Split(new char[]{' '}).Length-1;
                 bool goodResult = false;
                 for(byte itr = 0; itr < 255; itr++)
@@ -571,7 +572,10 @@ namespace Drive_LFSS.Game_
 
             return pcDiff;
         }
-
+        internal protected Dictionary<string,int> GetLastResultString()
+        {
+            return scoringResultTextDisplay;
+        }
         //Feature auto restart
         private void StartRestart()
         {

@@ -159,6 +159,7 @@ namespace Drive_LFSS.Definition_
         RESULT_NAME_DISPLAY = 74,
         RESULT_SCORE_DISPLAY = 75, 
         CONFIG_USER_MAX_SPEED_ON = 77,
+        RESULT_BG = 78,
     }
     [Flags]public enum Button_Styles_Flag : byte
     {

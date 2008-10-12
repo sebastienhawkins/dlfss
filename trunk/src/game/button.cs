@@ -838,7 +838,12 @@ namespace Drive_LFSS.Game_
             if(currentGui == Gui_Entry.RESULT)
                 RemoveResultGui();
 
+            for (byte itr = 0; ++itr < 3; )
+                SendButton(Button_Entry.RESULT_BG);
+                
             SendGui((ushort)Gui_Entry.RESULT);
+            RemoveButton(Button_Entry.RESULT_NAME_DISPLAY);
+            RemoveButton(Button_Entry.RESULT_SCORE_DISPLAY);
             {
                 Dictionary<string, int>.Enumerator itr =  scoringResultTextDisplay.GetEnumerator();
                 ButtonTemplateInfo buttonName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_NAME_DISPLAY);
@@ -863,8 +868,6 @@ namespace Drive_LFSS.Game_
         }
         internal protected void RemoveResultGui()
         {
-            RemoveButton(Button_Entry.RESULT_NAME_DISPLAY);
-            RemoveButton(Button_Entry.RESULT_SCORE_DISPLAY);
             RemoveGui(Gui_Entry.RESULT);
         }
         
