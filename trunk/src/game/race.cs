@@ -309,7 +309,7 @@ namespace Drive_LFSS.Game_
             //This will bypass FinalQualifyResult.... This is Finishing a Race What Ever.
             if( timeTotalFromFirstRES > 0 )
             {
-                uint pcDiff = GetFirstRESTimePc(5);
+                uint pcDiff = GetFirstRESTimePc(8);
                 pcDiff += GTH_TIME_DIFF_FROM_GREEN_LIGHT; //+12000 is GTH time start before Green light.
                 if((timeTotalFromFirstRES+pcDiff) <= timeTotal*10)
                 {

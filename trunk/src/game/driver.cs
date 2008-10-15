@@ -136,9 +136,10 @@ namespace Drive_LFSS.Game_
 
             
             bool firstTime = false;
-            if (carId != _packet.carId || carPrefix != _packet.carPrefix)
+            if (carPrefix != _packet.carPrefix || trackPrefix != iSession.GetRaceTrackPrefix())
                 firstTime = true;
 
+            trackPrefix = iSession.GetRaceTrackPrefix();
             carPrefix = _packet.carPrefix;
             carId = _packet.carId;
             carPlate = _packet.carPlate;
@@ -369,6 +370,7 @@ namespace Drive_LFSS.Game_
         private uint warningDrivingCancelTimer = 0;
         private uint warningDrivingTimerCheck = 0;
         private byte warningDrivingReferenceCarId = 0;
+        private uint badDrivingCount = 0;
         private uint driftScoreByTime = 0;
         private uint driftScoreTimer = 0;
         private const uint DRIFT_SCORE_TIMER = 40000;
@@ -419,7 +421,6 @@ namespace Drive_LFSS.Game_
             private uint[] splitTime = new uint[4] { 0, 0, 0, 0 };
             private ushort yellowFlagCount = 0;
             private ushort blueFlagCount = 0;
-            private uint badDrivingCount = 0;
             private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
             private byte pitStopTotal = 0;      //current race total pitstop.
             private byte pitStopTotalCount = 0; //To help make PitStop by lap and not by race.
@@ -478,11 +479,6 @@ namespace Drive_LFSS.Game_
             internal protected byte PitStopCount
             {
                 get { return pitStopCount; }
-            }
-            internal protected uint BadDrivingCount
-            {
-                set{badDrivingCount = value;}
-                get{return badDrivingCount;}
             }
 
             private void SetPitStopCount(byte _pitStopTotal)
@@ -567,8 +563,8 @@ namespace Drive_LFSS.Game_
                 else
                 {
                     Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
-                    if(_driver != null && laps.Count > 0)
-                        _driver.laps[laps.Count-1].BadDrivingCount++;
+                    if(_driver != null)
+                        _driver.BadDrivingCount++;
                     _driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
                     RemoveCancelWarningDriving();
                 }
@@ -592,26 +588,27 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.Lock();
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(LicenceName) + "' AND `driver_name`LIKE'" + ConvertX.SQLString(driverName) + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(LicenceName) + "' AND `driver_name`LIKE'" + ConvertX.SQLString(driverName) + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
                     SetConfigData(reader.GetString(1));
+                    badDrivingCount = (uint)reader.GetInt32(2);
                 }
             }
             Program.dlfssDatabase.Unlock();
         }
         private void SaveLapsToDB(Lap lap)
         {
-            string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`max_speed_ms`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`,`bad_driving_count`)";
-            query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + ","+ lap.MaxSpeedMs +","+ (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount+"," + lap.BadDrivingCount + ")";
+            string query = "INSERT INTO `driver_lap` (`guid_race`,`guid_driver`,`car_prefix`,`track_prefix`,`driver_mask`,`split_time_1`,`split_time_2`,`split_time_3`,`lap_time`,`total_time`,`lap_completed`,`max_speed_ms`,`current_penalty`,`pit_stop_count`,`yellow_flag_count`,`blue_flag_count`)";
+            query += "VALUES (" + lap.RaceGuid + "," + guid + ",'" + lap.CarPrefix + "','" + iSession.GetRaceTrackPrefix() + "'," + (byte)lap.DriverMask + "," + lap.SplitTime[1] + "," + lap.SplitTime[2] + "," + lap.SplitTime[3] + "," + lap.LapTime + "," + lap.TotalTime + "," + lap.LapCompleted + ","+ lap.MaxSpeedMs +","+ (byte)lap.CurrentPenality + "," + lap.PitStopCount + "," + lap.YellowFlagCount + "," + lap.BlueFlagCount+")";
             Program.dlfssDatabase.ExecuteNonQuery(query);
 
         }
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`last_connection_time`) VALUES (" + guid + ", '" + LicenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "','" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "', '" + String.Join(" ", configData) + "', " + (System.DateTime.Now.Ticks / 10000000) + ")");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`warning_driving_count`,`last_connection_time`) VALUES (" + guid + ", '" + LicenceName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "','" + driverName.Replace(@"\", @"\\").Replace(@"'", @"\'") + "', '" + String.Join(" ", configData) + "',"+badDrivingCount+", " + (System.DateTime.Now.Ticks / 10000000) + ")");
             driverSaveInterval = 0;
         }
         private bool SetNewGuid()
@@ -842,6 +839,11 @@ namespace Drive_LFSS.Game_
         public uint LapCountTotalLastRace
         {
             get { return lapCountTotalLastRace; }
+        }
+        internal protected uint BadDrivingCount
+        {
+            get{return badDrivingCount;}
+            set{badDrivingCount = value;}
         }
     }
 }

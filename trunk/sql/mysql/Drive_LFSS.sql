@@ -50,7 +50,7 @@ INSERT INTO `button_template` VALUES (6,'message bar top',0,0,0,25,27,150,12,'^1
 INSERT INTO `button_template` VALUES (7,'message bar middle',0,0,0,25,52,150,12,'^1Message bar Middle','');
 INSERT INTO `button_template` VALUES (8,'Collision Warning',2,0,0,25,68,150,8,'^1CollisionWarning','');
 INSERT INTO `button_template` VALUES (9,'vote title',146,0,0,2,65,50,8,'vote title','');
-INSERT INTO `button_template` VALUES (4,'motd text line',98,1,0,50,67,100,8,'','');
+INSERT INTO `button_template` VALUES (4,'motd text line',98,1,0,50,67,100,7,'','');
 INSERT INTO `button_template` VALUES (12,'vote option 3',106,0,0,2,87,45,6,'vote option 3','');
 INSERT INTO `button_template` VALUES (13,'vote option 4',106,0,0,2,94,45,6,'vote option 4','');
 INSERT INTO `button_template` VALUES (14,'vote option 5',106,0,0,2,101,45,6,'vote option 5','');
@@ -62,8 +62,8 @@ INSERT INTO `button_template` VALUES (19,'info 3',80,0,0,180,97,20,5,'info 3',''
 INSERT INTO `button_template` VALUES (20,'info 4',80,0,0,180,103,20,5,'info 4','');
 INSERT INTO `button_template` VALUES (21,'info 5',80,0,0,180,109,20,5,'info 5','');
 INSERT INTO `button_template` VALUES (22,'config bg',32,0,0,0,0,200,200,'','');
-INSERT INTO `button_template` VALUES (23,'config title and close',40,0,0,75,0,50,13,'^3User Config','');
-INSERT INTO `button_template` VALUES (24,'config text close',0,0,0,115,8,8,5,'^2 Close','');
+INSERT INTO `button_template` VALUES (23,'config title and close',40,0,0,75,0,50,13,'^2CLOSE','');
+INSERT INTO `button_template` VALUES (24,'config text close',0,0,0,113,8,10,5,'^3UserConfig','');
 INSERT INTO `button_template` VALUES (25,'config acceleration bg',32,0,0,1,30,22,24,'','');
 INSERT INTO `button_template` VALUES (26,'config acceleration title',8,0,0,2,31,20,7,'^7Acceleration','');
 INSERT INTO `button_template` VALUES (27,'config acceleration start',40,0,131,2,39,9,6,'^2start','^3Start Kmh Speed ex: 0');
@@ -84,30 +84,41 @@ INSERT INTO `button_template` VALUES (43,'config timediff pb->split',8,0,0,50,46
 INSERT INTO `button_template` VALUES (42,'config timediff pb->lap',8,0,0,50,39,20,6,'^7PB vs Lap','');
 INSERT INTO `button_template` VALUES (40,'config timediff bg',32,0,0,49,30,22,24,'','');
 INSERT INTO `button_template` VALUES (41,'config timediff title',8,0,0,50,31,20,7,'^7Time Diff','');
-INSERT INTO `button_template` VALUES (44,'text line',32,0,0,1,45,110,6,'','');
-INSERT INTO `button_template` VALUES (45,'text title and close',40,0,0,30,32,50,12,'^3Text Display','');
 INSERT INTO `button_template` VALUES (46,'text close button',0,0,0,71,39,8,4,'^2close','');
-INSERT INTO `button_template` VALUES (64,'rank info',16,0,0,1,37,79,5,'^2Car: ^7FBM, ^2Track:^7 BL1R, ^2Count: ^7154356','');
-INSERT INTO `button_template` VALUES (63,'rank text close',0,0,0,115,8,8,5,'^2 Close','');
-INSERT INTO `button_template` VALUES (62,'rank tittle and close',40,0,0,75,0,50,13,'^3Ranking','');
-INSERT INTO `button_template` VALUES (61,'rank current button',40,0,0,53,158,26,10,'^2Current','');
-INSERT INTO `button_template` VALUES (67,'rank search button add',40,0,32,53,151,26,7,'^2Add','Licence Name');
-INSERT INTO `button_template` VALUES (60,'rank search button',40,0,0,27,158,26,10,'^2Search','');
-INSERT INTO `button_template` VALUES (58,'rank next update',64,0,0,24,31,20,5,'^6Next ^72008^2/^7Oct^2/^706','');
-INSERT INTO `button_template` VALUES (57,'rank last update',64,0,0,1,31,20,5,'^0Last ^72008^2/^7Oct^2/^704','');
-INSERT INTO `button_template` VALUES (56,'rank position',144,0,0,69,42,11,5,'^8position','');
-INSERT INTO `button_template` VALUES (55,'rank total',16,0,0,60,42,9,5,'^8total','');
-INSERT INTO `button_template` VALUES (54,'rank win',16,0,0,52,42,8,5,'^8win','');
-INSERT INTO `button_template` VALUES (53,'rank sta',16,0,0,44,42,8,5,'^8stabi','');
-INSERT INTO `button_template` VALUES (52,'rank average',16,0,0,36,42,8,5,'^8avera','');
-INSERT INTO `button_template` VALUES (51,'rank pb',16,0,0,28,42,8,5,'^8best','');
+INSERT INTO `button_template` VALUES (45,'text title and close',40,0,0,30,32,50,12,'^3Text Display','');
+INSERT INTO `button_template` VALUES (44,'text line',32,0,0,1,45,110,6,'','');
+INSERT INTO `button_template` VALUES (47,'rank bg',32,0,0,0,30,81,141,'','');
+INSERT INTO `button_template` VALUES (48,'rank title',144,0,0,1,31,79,5,'^7A^3leajecta ^7Ranking','');
 INSERT INTO `button_template` VALUES (49,'rank text help',32,0,0,82,108,75,7,'','');
 INSERT INTO `button_template` VALUES (50,'rank name',16,0,0,1,42,27,5,'^8name','');
-INSERT INTO `button_template` VALUES (47,'rank bg',32,0,0,0,30,81,141,'','');
-INSERT INTO `button_template` VALUES (48,'rank title',144,0,0,1,31,79,5,'^7A^3leajecta Ranking','');
+INSERT INTO `button_template` VALUES (51,'rank pb',16,0,0,28,42,8,5,'^8best','');
+INSERT INTO `button_template` VALUES (52,'rank average',16,0,0,36,42,8,5,'^8avera','');
+INSERT INTO `button_template` VALUES (53,'rank sta',16,0,0,44,42,8,5,'^8stabi','');
+INSERT INTO `button_template` VALUES (54,'rank win',16,0,0,52,42,8,5,'^8win','');
+INSERT INTO `button_template` VALUES (55,'rank total',16,0,0,60,42,9,5,'^8total','');
+INSERT INTO `button_template` VALUES (56,'rank position',144,0,0,69,42,11,5,'^8position','');
+INSERT INTO `button_template` VALUES (57,'rank last update',64,0,0,1,31,20,5,'^0Last ^72008^2/^7Oct^2/^705','');
+INSERT INTO `button_template` VALUES (58,'rank next update',64,0,0,24,31,20,5,'','');
+INSERT INTO `button_template` VALUES (67,'rank search button add',40,0,32,53,151,26,7,'^2Add','Licence Name');
+INSERT INTO `button_template` VALUES (60,'rank search button',40,0,0,27,158,26,10,'^2Search','');
+INSERT INTO `button_template` VALUES (61,'rank current button',40,0,0,53,158,26,10,'^2Current','');
+INSERT INTO `button_template` VALUES (62,'rank tittle and close',40,0,0,75,0,50,13,'^2CLOSE','');
+INSERT INTO `button_template` VALUES (63,'rank text close',0,0,0,115,8,8,5,'^3Ranking','');
+INSERT INTO `button_template` VALUES (64,'rank info',16,0,0,1,37,79,5,'^2Car: ^7FBM, ^2Track:^7 BL1R, ^2Count: ^7154356','');
 INSERT INTO `button_template` VALUES (66,'rank search button car',40,0,3,27,151,26,7,'^2Car','Car Prefix');
 INSERT INTO `button_template` VALUES (65,'rank search button track',40,0,4,1,151,26,7,'^2Track','Track Prefix');
 INSERT INTO `button_template` VALUES (59,'rank top10 button',40,0,0,1,158,26,10,'^2Top20','');
+INSERT INTO `button_template` VALUES (68,'precollision cancel button1/3',40,0,0,1,140,56,10,'^7Click HERE To ^1CANCEL','');
+INSERT INTO `button_template` VALUES (69,'precollision cancel button2/3',40,0,0,1,150,56,10,'^7Bad driving for driver','');
+INSERT INTO `button_template` VALUES (70,'precollision cancel button3/3',40,0,0,1,160,56,10,'','');
+INSERT INTO `button_template` VALUES (71,'result title and close',40,0,0,75,0,50,13,'^2CLOSE','');
+INSERT INTO `button_template` VALUES (72,'precollision text close',0,0,0,115,8,8,5,'^3Result','');
+INSERT INTO `button_template` VALUES (73,'result title',160,0,0,1,56,27,4,'^7A^3leajecta ^7Race Result','');
+INSERT INTO `button_template` VALUES (74,'result name display',96,0,0,1,59,20,3,'greenseed','');
+INSERT INTO `button_template` VALUES (75,'result score display',160,0,0,21,59,7,3,'^224^7pt','');
+INSERT INTO `button_template` VALUES (76,'result help text',32,0,0,80,76,25,5,'','');
+INSERT INTO `button_template` VALUES (77,'config maxspeed title',8,0,0,26,39,20,7,'^7Max Speed','');
+INSERT INTO `button_template` VALUES (78,'result bg',16,0,0,0,30,77,121,'','');
 /*!40000 ALTER TABLE `button_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -164,6 +175,8 @@ CREATE TABLE `driver` (
   `licence_name` varchar(24) NOT NULL,
   `driver_name` varchar(24) NOT NULL,
   `config_data` blob,
+  `warning_driving_count` int(8) unsigned NOT NULL default '0',
+  `warning_chat_count` int(8) unsigned NOT NULL default '0',
   `last_connection_time` bigint(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
   UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
@@ -209,7 +222,6 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `driver_lap`;
 CREATE TABLE `driver_lap` (
-  `guid` int(11) unsigned NOT NULL auto_increment,
   `guid_race` int(11) unsigned NOT NULL default '0',
   `guid_driver` int(11) unsigned NOT NULL,
   `car_prefix` varchar(3) NOT NULL,
@@ -226,7 +238,8 @@ CREATE TABLE `driver_lap` (
   `pit_stop_count` tinyint(3) unsigned NOT NULL,
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guid`)
+  KEY `car_prefix` (`car_prefix`),
+  KEY `track_prefix` (`track_prefix`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -247,6 +260,7 @@ CREATE TABLE `gui_template` (
   `entry` int(11) unsigned NOT NULL,
   `description` varchar(255) NOT NULL default '',
   `button_entry` varchar(255) NOT NULL default '' COMMENT 'space separated value',
+  `button_entry_ext` varchar(255) NOT NULL default '',
   `text_button_entry` mediumint(5) unsigned NOT NULL default '0',
   `text` blob NOT NULL,
   PRIMARY KEY  (`entry`)
@@ -258,11 +272,12 @@ CREATE TABLE `gui_template` (
 
 LOCK TABLES `gui_template` WRITE;
 /*!40000 ALTER TABLE `gui_template` DISABLE KEYS */;
-INSERT INTO `gui_template` VALUES (1,'motd','2 3 5 30 36',4,'^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7Our Server Are Currentely Under Developement\r\n^7We Implemente Drive_LFSS a InSim Addons. \r\n^7\r\n^7To know more about this Visit www.lfsforum.net\r\n^7 Your Host A^3leajecta^7.');
-INSERT INTO `gui_template` VALUES (2,'user config','22 23 24 25 26 27 28 29 37 38 40 41 42 43',39,'^8Config Help\r\n^7Title ^3 will enable or disable the feature\r\n^3Green ^2button ^3will trigger a action for this feature.');
-INSERT INTO `gui_template` VALUES (3,'help','31 32 33 34 35',33,'^7A^3leajecta ^7is powered by Drive_LFSS 0.2 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^2!rank^7, ^2!status^7, ^5!kick^7, ^5!exit^7, ^5!reload\r\n^7\r\n^7Did you know \"SHIFT-i\" will reset button and make Config screen appear.\r\n^7\r\n^5Greenseed^7.');
-INSERT INTO `gui_template` VALUES (4,'text','45 46',44,'');
-INSERT INTO `gui_template` VALUES (5,'rank','47 48 57 58 59 60 61 62 63 64',49,'^7Top20 ^2is the 20 Best Driver for this Track/Car.\r\n^7Search ^2search for a Track/Car/Driver rank.\r\n^7Current ^2show rank for all online driver by Track/Car.');
+INSERT INTO `gui_template` VALUES (1,'motd','2 3 5 30 36','',4,'^7Welcome To A^3leajecta ^7Live For Speed Server\r\n^7\r\n^7!Rank System ^2Online, ^3Global\r\n^7!Result System ^2Online \r\n^7DriftScoring System ^2Online, ^3NoRank\r\n^7Bad Driving Check ^2Online\r\n^7\r\n^7To know more about this Visit www.aleajecta.com\r\n^7\r\n^7 Your Host A^3leajecta^7.');
+INSERT INTO `gui_template` VALUES (2,'user config','22 23 24 25 26 27 28 29 37 38 40 41 42 43 77','',39,'^8Config Help\r\n^7Title ^3 will enable or disable the feature\r\n^3Green ^2button ^3will trigger a action for this feature.');
+INSERT INTO `gui_template` VALUES (3,'help','31 32 33 34 35','',33,'^7A^3leajecta ^7is powered by Drive_LFSS 0.3 Alpha\r\n^7\r\n^7This is a alpha stage of the developement\r\n^7there is a lot more to come, please be patien.\r\n^7\r\n^7List Of Commands:\r\n^2!help^7, ^2!config^7, ^2!rank^7, ^2!result^7, ^2!status^7\r\n^5!kick^7, ^5!exit^7, ^5!reload\r\n^7\r\n^7Did you know \"SHIFT-i\" will reset button and make Config screen appear.\r\n^7\r\n^5Greenseed^7.');
+INSERT INTO `gui_template` VALUES (4,'text','45 46','',44,'');
+INSERT INTO `gui_template` VALUES (5,'rank','47 48 57 58 59 60 61 62 63 64','50 51 52 53 54 55 56 65 66 67',49,'^7Top20 ^2is the 20 Best Driver for this Track/Car.\r\n^7Search ^2search for a Track/Car/Driver rank.\r\n^7Current ^2show rank for all online driver by Track/Car.\r\n^6Blue mean worst^2, ^3Yellow mean Better^2, ^7White mean event\r\n^2\r\n^2When button become ^1red ^2mean clearing for flood protection ');
+INSERT INTO `gui_template` VALUES (6,'result guid','71 72 73','74 75',76,'');
 /*!40000 ALTER TABLE `gui_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -370,7 +385,7 @@ CREATE TABLE `race_template` (
   `wind` tinyint(2) unsigned NOT NULL default '0',
   `lap_count` tinyint(3) unsigned NOT NULL default '0',
   `qualify_minute` tinyint(3) unsigned NOT NULL default '0',
-  `grid_start_beviator` tinyint(3) unsigned NOT NULL default '0',
+  `maximun_race_finish` tinyint(3) unsigned NOT NULL default '0',
   `race_template_mask` smallint(5) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -402,14 +417,14 @@ INSERT INTO `race_template` VALUES (18,'Blackwood Rallycross Rev, LX6',4,'5',2,0
 INSERT INTO `race_template` VALUES (19,'Fern Bay Club, MRT',18,'2 3',0,0,11,5,0,1);
 INSERT INTO `race_template` VALUES (20,'Fern Bay Club Rev, F GTR',19,'11 12',0,0,14,5,0,1);
 INSERT INTO `race_template` VALUES (30,'Blackwood Rally, RB4',3,'6',0,0,9,0,0,1);
-INSERT INTO `race_template` VALUES (29,'Fernbay Green Rev, FOX',21,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (29,'Fernbay Green Rev, FOX',21,'18',0,0,5,0,0,1);
 INSERT INTO `race_template` VALUES (28,'Southcity Town Rev, UFR/XFR',15,'11 12',0,0,7,0,0,1);
 INSERT INTO `race_template` VALUES (27,'Southcity Chicane Rev, UFR/XFR',17,'11 12',0,0,7,0,0,1);
 INSERT INTO `race_template` VALUES (26,'Southcity Sprint2 Rev, FXO/XRT',11,'7 8',0,0,14,0,0,1);
 INSERT INTO `race_template` VALUES (25,'Southcity Classic, FXO/XRT',6,'7 8',0,0,7,0,0,1);
 INSERT INTO `race_template` VALUES (24,'Southcity Town, FXO/XRT',14,'7 8',0,0,7,0,0,1);
 INSERT INTO `race_template` VALUES (23,'Aston Club Rev, FOX',45,'18',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (22,'Fernbay Gold Rev, FOX',23,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (22,'Fernbay Gold Rev, FOX',23,'18',0,0,5,0,0,1);
 INSERT INTO `race_template` VALUES (37,'Aston Cadet Rev, FBM',43,'17',0,0,8,0,0,1);
 INSERT INTO `race_template` VALUES (36,'Southcity Classic, FBM',6,'17',0,0,8,0,0,1);
 INSERT INTO `race_template` VALUES (33,'Fernbay Club Rev, XFG/XRG',19,'2 3',0,0,12,0,0,1);
@@ -438,6 +453,7 @@ CREATE TABLE `stats_rank_driver` (
   `race_win_rank` mediumint(8) unsigned NOT NULL default '0',
   `total_rank` mediumint(8) unsigned NOT NULL default '0',
   `position` int(8) unsigned NOT NULL default '0',
+  `change_mask` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`licence_name`,`track_prefix`,`car_prefix`),
   KEY `prefix` (`track_prefix`,`car_prefix`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -449,6 +465,28 @@ CREATE TABLE `stats_rank_driver` (
 LOCK TABLES `stats_rank_driver` WRITE;
 /*!40000 ALTER TABLE `stats_rank_driver` DISABLE KEYS */;
 /*!40000 ALTER TABLE `stats_rank_driver` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stats_warning_driver`
+--
+
+DROP TABLE IF EXISTS `stats_warning_driver`;
+CREATE TABLE `stats_warning_driver` (
+  `guid_driver` int(11) unsigned NOT NULL default '0',
+  `yellow_flag_count` int(8) unsigned NOT NULL default '0',
+  `blue_flag_count` int(8) unsigned NOT NULL default '0',
+  `warning_count` int(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`guid_driver`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `stats_warning_driver`
+--
+
+LOCK TABLES `stats_warning_driver` WRITE;
+/*!40000 ALTER TABLE `stats_warning_driver` DISABLE KEYS */;
+/*!40000 ALTER TABLE `stats_warning_driver` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -543,4 +581,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-10-07  8:29:53
+-- Dump completed on 2008-10-15  4:40:19

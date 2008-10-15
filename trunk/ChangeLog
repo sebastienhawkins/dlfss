@@ -1,3 +1,23 @@
+DLFSS 0.3    (2008) svn://svn.aleajecta.com/dlfss/0.3
+
+DLFSS 0.3  - Codename "Refraction" - Optimize current Feature and 
+make Ranking system Racing/Drift/Drag/Overall 
+
+ ==== Core Features ====
+ * Ranking System
+ * Race Scoring System
+ * Bad Driving System
+ 
+ ==== Game Features ====
+ * Configurable MaxSpeed Display
+ * Victim cancel bad Driving
+ 
+ ==== Statistics ====
+ * Total number of changes: 40
+
+
+==========================================================================
+
 DLFSS 0.2    (2008) svn://svn.aleajecta.com/dlfss/0.2
 
 DLFSS 0.2  - Codename "Sunrise" - Optimize current Core and Game Feature,

@@ -60,6 +60,7 @@ namespace Drive_LFSS.Game_
 
         private byte carId = 0;
         private string carPrefix = "";
+        private string trackPrefix = "";
         private string carPlate = "";
         private string carSkin = "";
         private byte addedMass = 0;
@@ -392,37 +393,40 @@ namespace Drive_LFSS.Game_
             RemoveTrackPrefix();
             RemoveBanner();
             
-            EnterTrackFirstTime();
+            if(firstTime)
+                EnterTrackFirstTime();
         }
         //should be into driver
         private void EnterTrackFirstTime()
         {
-            ((Driver)this).wr = Program.pubStats.GetWR(carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
-            if (((Driver)this).wr != null)
+            wr = Program.pubStats.GetWR(carPrefix + ISession.GetRaceTrackPrefix());
+            if (wr != null)
             {
                 //lapTime = lapTime.Insert();
-                AddMessageMiddle("^2WR " + ConvertX.MSToString(((Driver)this).wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + ((Driver)this).wr.LicenceName, 6000);
+                AddMessageMiddle("^2WR " + ConvertX.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + wr.LicenceName, 6000);
             }
 
-            ((Driver)this).pb = Program.pubStats.GetPB(((IDriver)this).LicenceName, carPrefix + ((Driver)this).ISession.GetRaceTrackPrefix());
-            if (((Driver)this).pb != null && ((Driver)this).wr != null)
+            pb = Program.pubStats.GetPB(licenceName, carPrefix + ISession.GetRaceTrackPrefix());
+            if (pb != null && wr != null)
             {
-                AddMessageMiddle("^2PB " + ConvertX.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + ConvertX.MSToString(((Driver)this).pb.LapTime - ((Driver)this).wr.LapTime, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
+                AddMessageMiddle("^2PB " + ConvertX.MSToString(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + ConvertX.MSToString(pb.LapTime - wr.LapTime, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
             }
-            else if (((Driver)this).pb != null)
+            else if (pb != null)
             {
-                AddMessageMiddle("^2PB " + ConvertX.MSToString(((Driver)this).pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
+                AddMessageMiddle("^2PB " + ConvertX.MSToString(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
             }
 
-            Rank _rank = ((Driver)this).GetRank(((Driver)this).ISession.GetRaceTrackPrefix(),CarPrefix);
+            Rank _rank = GetRank(ISession.GetRaceTrackPrefix(),CarPrefix);
             if(_rank != null)
             {
-                ((Driver)this).ISession.SendMSXMessage(((IDriver)this).DriverName+"^2, is a grade '^7"+_rank.GetGrade()+"^2' driver.");
+                ISession.SendMSXMessage(driverName + "^2 " + _rank.GetGradeComment() + "^2 on ^7" + ISession.GetRaceTrackPrefix() + "^2 with ^7" + carPrefix + "^2.");
                 //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
             }
             else
-                ((Driver)this).ISession.SendMSXMessage(((IDriver)this).DriverName+"^2, is a '^3unknow^2' grade driver.");
+                ISession.SendMSXMessage(driverName + "^2 is ^7new^2 on ^7" + ISession.GetRaceTrackPrefix() + "^2 with ^7" + carPrefix +"^2.");
                 //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
+
+            ISession.SendMSXMessage(driverName + "^2, has '^7"+badDrivingCount+"^2' driving ^1warning^2.^3DEBUG");
         }
         internal void LeaveTrack()
         {

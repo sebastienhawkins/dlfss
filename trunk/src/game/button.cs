@@ -844,8 +844,8 @@ namespace Drive_LFSS.Game_
             if(currentGui == Gui_Entry.RESULT)
                 RemoveResultGui();
 
-            for (byte itr = 0; ++itr < 3; )
-                SendButton(Button_Entry.RESULT_BG);
+            //for (byte itr = 0; ++itr < 3; )
+                //SendButton(Button_Entry.RESULT_BG);
                 
             SendGui((ushort)Gui_Entry.RESULT);
             {

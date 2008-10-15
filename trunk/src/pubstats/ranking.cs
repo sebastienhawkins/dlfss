@@ -125,26 +125,49 @@ namespace Drive_LFSS.Ranking_
         }
         public string GetGrade()
         {
-            if (total > 17500)   // 17125 x
+            if (total > 20000)   // 17125 x
                 return "x";
-            if (total > 15700)   // 15700 a+
+            if (total > 18200)   // 15700 a+
                 return "a+";
-            if (total > 14713)   // 14713 a
+            if (total > 17213)   // 14713 a
                 return "a";
-            if (total > 13999)   // 14113 a-
+            if (total > 16499)   // 14113 a-
                 return "a-";
-            if (total > 13456)   // 13456 b+
+            if (total > 15956)   // 13456 b+
                 return "b+";
-            if (total > 12874)  // 12874 b
+            if (total > 15374)  // 12874 b
                 return "b";
-            if (total > 12017)  // 12017 b-
+            if (total > 14517)  // 12017 b-
                 return "b-";
-            if (total > 11500)  // 11500 c+
+            if (total > 14000)  // 11500 c+
                 return "c+";
-            if(total > 11000)    // 10000 c
+            if(total > 13500)    // 10000 c
                 return "c";
 
             return "c-";
+        }
+        public string GetGradeComment()
+        {
+            if (total > 20000)   // 17125 x
+                return "is a \"^7incredible^2\" driver";
+            if (total > 18200)   // 15700 a+
+                return "is a \"^7impressive^2\" driver";
+            if (total > 17213)   // 14713 a
+                return "is a \"^7superior^2\" driver";
+            if (total > 16499)   // 14113 a-
+                return "is a \"^7excellent^2\" driver";
+            if (total > 15956)   // 13456 b+
+                return "is a \"^7fine\"^2 driver";
+            if (total > 15374)  // 12874 b
+                return "is a \"^7classic^2\" driver";
+            if (total > 14517)  // 12017 b-
+                return "is a \"^7slow^2\" driver";
+            if (total > 14000)  // 11500 c+
+                return "a \"^7very slow^2\" driver";
+            if (total > 13500)    // 10000 c
+                return "a \"^7bad^2\" driver";
+
+            return "\"^1not\"^2 a driver :(";
         }
         public string[] GetRankGuiString
         {
