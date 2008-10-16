@@ -1,10 +1,10 @@
 -- Table "bad_word" DDL
-DROP TABLE `bad_word` IF EXISTS;
+DROP TABLE IF EXISTS `bad_word`;
 CREATE TABLE `bad_word` (
   `word` varchar(16) character set latin1 collate latin1_general_ci NOT NULL default '',
   `mask` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`word`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Value
 INSERT IGNORE INTO bad_word
