@@ -26,7 +26,7 @@ namespace Drive_LFSS.Server_
 
     sealed class CommandInGame
     {
-        public CommandInGame(Session _session)
+        internal CommandInGame(Session _session)
         {
             session = _session;
             //       CommandName                CommandLevel                    CommandReference
@@ -82,6 +82,7 @@ namespace Drive_LFSS.Server_
 
             command[args[0]].cmd(driver, args);
         }
+
         #region Commands
         private void Exit(Driver driver, string[] args)
         {
@@ -146,6 +147,12 @@ namespace Drive_LFSS.Server_
                     Program.Reload("race_map");
                     driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
                 } break;
+                case "bad":
+                case "bad_word":
+                {
+                    Program.Reload("bad_word");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                }break;
                 case "ban":
                 case "driver_ban":
                 {

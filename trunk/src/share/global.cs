@@ -20,13 +20,6 @@ using System;
 using System.Runtime.InteropServices;
 namespace Drive_LFSS.Definition_
 { 
-    public struct Msg
-    {
-         public const string COLOR_DIFF_LOWER = "^3";
-         public const string COLOR_DIFF_EVENT = "^8";
-         public const string COLOR_DIFF_HIGHER = "^6";
-         public const string COLOR_DIFF_TOP = "^7";
-    }
     public enum Config_User : byte
     {
         ACCELERATION_START = 0,
@@ -235,10 +228,10 @@ namespace Drive_LFSS.Definition_
         SOUND_CONSOLE_ERROR = 4,
         SOUND_CONSOLE_MAX = 5,
     }
-    public enum Chat_User_Type : byte
+    public enum Chat_Type : byte
     {
-        CHAT_USER_TYPE_SYSTEM = 0,
-        CHAT_USER_TYPE_USER = 1,
+        SYSTEM = 0,
+        USER = 1,
         CHAT_USER_TYPE_PREFIX = 2,
         CHAT_USER_TYPE_O = 3,
         CHAT_USER_TYPE_MAX = 4,

@@ -60,14 +60,17 @@ namespace Drive_LFSS.InSim_
         }
     }
 
-    public abstract class InSimClient : PacketHandler
+    abstract class InSimClient : PacketHandler
     {
         internal InSimClient(InSimSetting _inSimSetting)
         {
             threadSocketSendReceive = new Thread(new ThreadStart(SocketSendReceive));
+            threadSocketSendReceive.Priority = ThreadPriority.Highest;
             threadSocketSendReceive.Name = inSimSetting.serverName + " Network Thread";
             
             threadConnectionProcess = new Thread(new ThreadStart(Connect));
+            threadConnectionProcess.SetApartmentState(ApartmentState.STA);
+            threadConnectionProcess.Priority = ThreadPriority.BelowNormal;
             //No need to name here, she named into DoConnect().
 
             inSimSetting = _inSimSetting;
@@ -185,7 +188,11 @@ namespace Drive_LFSS.InSim_
         internal void DoConnect()
         {
             if (threadConnectionProcess.ThreadState != ThreadState.Unstarted)
+            {
                 threadConnectionProcess = new Thread(new ThreadStart(Connect));
+                threadConnectionProcess.SetApartmentState(ApartmentState.STA);
+                threadConnectionProcess.Priority = ThreadPriority.BelowNormal;
+            }
 
             threadConnectionProcess.Name = inSimSetting.serverName + " Connection Thread";
             threadConnectionProcess.Start();

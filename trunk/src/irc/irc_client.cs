@@ -30,16 +30,16 @@ namespace Drive_LFSS.Irc_
     using Drive_LFSS.Config_;
     using Drive_LFSS.Log_;
 
-    public sealed class IrcClient
+    sealed class IrcClient
     {
-        public IrcClient()
+        internal IrcClient()
         {
         }
         ~IrcClient()
         {
             if (true == false) { }
         }
-        public void ConfigApply()
+        internal void ConfigApply()
         {
             string[] confvalue = Config.GetStringValue("mIRC", "ConnectionInfo").Split(new char[]{';'});
             if (confvalue.Length != 7)
@@ -56,8 +56,8 @@ namespace Drive_LFSS.Irc_
         private Thread threadMircClient;
         private bool registrationSend = false;
         private bool completedRegistration = false;
-        
-        public bool IsConnected
+
+        internal bool IsConnected
         {
             get { return (socket != null && socket.Connected); }
         } 
@@ -79,6 +79,8 @@ namespace Drive_LFSS.Irc_
             }
 
             threadMircClient = new Thread(new ThreadStart(ReceiveServerData));
+            threadMircClient.SetApartmentState(ApartmentState.STA);
+            threadMircClient.Priority = ThreadPriority.BelowNormal;
             threadMircClient.Name = "mIRC Client Thread";
             threadMircClient.Start();
         }

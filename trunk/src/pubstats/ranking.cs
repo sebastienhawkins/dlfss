@@ -174,7 +174,7 @@ namespace Drive_LFSS.Ranking_
             get{return rankGuiString;}
         }
     } 
-    public sealed class Ranking
+    sealed class Ranking
     {
         public Ranking()
         {
@@ -184,11 +184,7 @@ namespace Drive_LFSS.Ranking_
         {
             if (true == false) { }
         }
-        public static void ConfigApply()
-        {
-            
-        }
-        public static bool Initialize()
+        internal static bool Initialize()
         {
             if(!LoadDriverRankedCount())
                 return false;

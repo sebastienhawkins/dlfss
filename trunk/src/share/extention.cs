@@ -21,7 +21,7 @@ using System;
 namespace Drive_LFSS
 {
     //Real extention required .net 3.0 , since we don't need .net 3.0 for the rest , i prefer stay .net 2.0
-    public static class ConvertX
+    sealed class ConvertX
     {
         public static string MSToString(uint msTime, string negativeColor, string positiveColor)
         {
@@ -68,6 +68,26 @@ namespace Drive_LFSS
         public static string SQLString(string value)
         {
             return value.Replace(@"\", @"\\").Replace(@"'", @"\'").Replace(" ", "%");
+        }
+        public static string RemoveColorCode(string value)
+        {
+            return value.Replace("^0","").Replace("^1", "").Replace("^2", "").
+            Replace("^3", "").Replace("^4", "").Replace("^5", "").Replace("^6", "").
+            Replace("^7", "").Replace("^8", "").Replace("^9", "");
+        }
+        public static string RemoveSpecialChar(string value)
+        {
+            char[] values = value.ToCharArray();
+            string newValue = "";
+            int maxItr = values.Length;
+            for(int itr = 0; itr < maxItr; itr++)
+            {
+                byte charCode = (byte)values[itr];
+                if( (charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123) ||  charCode == 32 )
+                    newValue += values[itr];
+                
+            }
+            return newValue;
         }
     }
 }

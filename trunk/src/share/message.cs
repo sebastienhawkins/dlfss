@@ -16,16 +16,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-namespace Drive_LFSS.Script_
-{
-    public interface IButton
+using System;
+using System.Runtime.InteropServices;
+namespace Drive_LFSS.Definition_
+{ 
+    struct Msg
     {
-        void AddMessageTop(string text, uint duration);
-        void AddMessageMiddle(string text, uint duration);
-        void SendButton(ushort buttonEntry);
-        void SendUpdateButton(ushort buttonEntry, string text);
-        byte RemoveButton(ushort buttonEntry);
-        void SendGui(ushort guiEntry);
-        void RemoveGui(ushort guiEntry);
+        public const string COLOR_DIFF_LOWER = "^3";
+        public const string COLOR_DIFF_EVENT = "^8";
+        public const string COLOR_DIFF_HIGHER = "^6";
+        public const string COLOR_DIFF_TOP = "^7";
     }
 }

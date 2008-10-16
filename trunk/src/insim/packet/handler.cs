@@ -21,7 +21,7 @@ namespace Drive_LFSS.Packet_
     using Drive_LFSS.Game_;
     using Drive_LFSS.Log_;
 
-    public abstract class PacketHandler : Store
+    abstract class PacketHandler : Store
     {
         protected PacketHandler()
         {

@@ -117,6 +117,8 @@ namespace Drive_LFSS.PubStats_
         public PubStats()
         {
             threadRequest = new Thread(new ThreadStart(ExecRequest));
+            threadRequest.SetApartmentState(ApartmentState.STA);
+            threadRequest.Priority = ThreadPriority.BelowNormal;
             threadRequest.Name = "PubStats Request";
             //webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
         }

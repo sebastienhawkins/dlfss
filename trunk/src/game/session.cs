@@ -28,8 +28,9 @@ namespace Drive_LFSS.Game_
     using Script_;
     using Log_;
     using PubStats_;
+    using ChatModo_;
 
-    internal class Session : InSimClient, ISession
+    class Session : InSimClient, ISession
     {
         internal Session(string _serverName, InSimSetting _inSimSetting): base( _inSimSetting)
         {
@@ -43,18 +44,19 @@ namespace Drive_LFSS.Game_
             script = new Script(this);
             ping = new Ping();
             command = new CommandInGame(this);
+            chatModo = new ChatModo(this);
             connectionRequest = true;
         }
         ~Session()
         {
             if (true == false) { }
         }
-        internal protected void ConfigApply(InSimSetting _inSimSetting)
+        internal void ConfigApply(InSimSetting _inSimSetting)
         {
             base.SetInSimSetting(_inSimSetting);
             ConfigApply();
         }
-        new internal protected void ConfigApply(bool onlyVoteSystem)
+        new internal void ConfigApply(bool onlyVoteSystem)
         {
             if (onlyVoteSystem)
             {
@@ -99,19 +101,16 @@ namespace Drive_LFSS.Game_
         private Ping ping;
         private string sessionName;
         private char commandPrefix;
-        internal protected bool connectionRequest;
+        internal bool connectionRequest;
         private byte clientConnectionCount = 0;
         private uint freezeMotdSend = 7000;
 
         //Object
         private Script script;
-        public Script Script
-        {
-            get { return script; }
-        }
         private CommandInGame command;
         private Race race;
         private List<Driver> driverList;
+        private ChatModo chatModo;
         
         public bool IsFreezeMotdSend()
         {
@@ -144,7 +143,7 @@ namespace Drive_LFSS.Game_
         {
             return sessionName;
         }
-        internal protected Dictionary<string,int> GetRaceLastResult()
+        internal Dictionary<string,int> GetRaceLastResult()
         {
             return race.GetLastResultString();
         }
@@ -205,7 +204,98 @@ namespace Drive_LFSS.Game_
         {
             return race.CanVote();
         }
-        
+        public Script Script
+        {
+            get { return script; }
+        }
+        private byte GetCarIndex(byte _carId)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (((ICar)driverList[itr]).CarId == _carId)
+                    return itr;
+            }
+            return 255;
+        }
+        private List<byte> GetLicenceIndexs(byte connectionId)
+        {
+            List<byte> _return = new List<byte>();
+
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
+                    _return.Add(itr);
+            }
+            return _return;
+        }
+        private byte GetLicenceIndexWithName(byte connectionId, string _driverName)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId && ((IDriver)driverList[itr]).DriverName == _driverName)
+                    return itr;
+            }
+            return 255;
+        }
+        private byte GetLicenceIndexNotBot(byte connectionId)
+        {
+            int count = driverList.Count;
+            for (byte itr = 1; itr < count; itr++)
+            {
+                if (driverList[itr].ConnectionId == connectionId && !driverList[itr].IsBot())
+                    return itr;
+            }
+            return 255;
+        }
+        private byte GetFirstLicenceIndex(byte connectionId)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
+                    return itr;
+            }
+            return 255;
+        }
+        private bool IsExistconnectionId(byte connectionId)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
+                    return true;
+            }
+            return false;
+        }
+        public IDriver GetDriverWith(byte carId)
+        {
+            byte carIndex = GetCarIndex(carId);
+            if (carIndex != 255)
+                return driverList[carIndex];
+            return null;
+        }
+        public IDriver GetDriverWithGuid(uint guid)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (driverList[itr].GetGuid() == guid)
+                    return driverList[itr];
+            }
+            return null;
+        }
+        public byte GetNbrOfDrivers()
+        {
+            return (byte)(driverList.Count - 1); // -1 remove the Host but... maybe not good idea removing it from here.
+        }
+        public byte GetNbrOfConnection()
+        {
+            return (byte)(clientConnectionCount - 1); //Remove The Host
+        }
+
         private const uint TIMER_PING_PONG = 8000;
         private uint TimerPingPong = 7000;
         internal void update(uint diff)
@@ -254,6 +344,7 @@ namespace Drive_LFSS.Game_
             if (_nextUdpPacket != null)
                 ProcessPacket((Packet_Type)_nextUdpPacket[0], _nextUdpPacket[1]);
         }
+
         protected sealed override void processPacket(PacketNCN _packet)
         {
             #if DEBUG
@@ -412,17 +503,18 @@ namespace Drive_LFSS.Game_
                 #endif
                 CommandExec(_driver, _packet.message.Substring(_packet.textStart));
             }
-            else if (_packet.chatUserType == Chat_User_Type.CHAT_USER_TYPE_SYSTEM) //Host chat
+            else if (_packet.chatUserType == Chat_Type.SYSTEM) //Host chat
             {
                 Program.ircClient.SendToChannel(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
                 Log.chat(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
             
             }
-            else  //Player Chat
+            else if (_packet.chatUserType == Chat_Type.USER)  //Player Chat
             {
+                if(_driver.GetGuid() != 0)
+                    chatModo.AddNewLine(_driver.DriverName,_packet.message );
                 Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + _driver.DriverName.Replace("^", "\x03") + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
                 Log.chat(GetSessionNameForLog() + " " + _driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
-            
             }
         }      // message out
         protected sealed override void processPacket(PacketREO _packet)
@@ -686,7 +778,7 @@ namespace Drive_LFSS.Game_
                 case Button_Entry.CANCEL_WARNING_DRIVING_2:
                 case Button_Entry.CANCEL_WARNING_DRIVING_3:
                 {
-                    driver.RemoveCancelWarningDriving();
+                    driver.RemoveCancelWarningDriving(true);
                 } break;
                 case Button_Entry.RESULT_CLOSE_BUTTON:
                 {
@@ -820,93 +912,6 @@ namespace Drive_LFSS.Game_
                 return;
             }
             driverList[index].ProcessFLGPacket(_packet);
-        }
-        private byte GetCarIndex(byte _carId)
-        {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
-            {
-                if (((ICar)driverList[itr]).CarId == _carId)
-                    return itr;
-            }
-            return 255;
-        }
-        private List<byte> GetLicenceIndexs(byte connectionId)
-        {
-            List<byte> _return = new List<byte>();
-
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
-            {
-                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
-                    _return.Add(itr);
-            }
-            return _return;
-        }
-        private byte GetLicenceIndexWithName(byte connectionId, string _driverName)
-        {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
-            {
-                if (((IDriver)driverList[itr]).ConnectionId == connectionId && ((IDriver)driverList[itr]).DriverName == _driverName)
-                    return itr;
-            }
-            return 255;
-        }
-        private byte GetLicenceIndexNotBot(byte connectionId)
-        {
-            int count = driverList.Count;
-            for (byte itr = 1; itr < count; itr++)
-            {
-                if (driverList[itr].ConnectionId == connectionId && !driverList[itr].IsBot())
-                    return itr;
-            }
-            return 255;
-        }
-        private byte GetFirstLicenceIndex(byte connectionId)
-        {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
-            {
-                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
-                    return itr;
-            }
-            return 255;
-        }
-        private bool IsExistconnectionId(byte connectionId)
-        {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
-            {
-                if (((IDriver)driverList[itr]).ConnectionId == connectionId)
-                    return true;
-            }
-            return false;
-        }
-        public IDriver GetDriverWith(byte carId)
-        {
-            byte carIndex = GetCarIndex(carId);
-            if(carIndex != 255)
-                return driverList[carIndex];
-            return null;
-        }
-        public IDriver GetDriverWithGuid(uint guid)
-        {
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
-            {
-                if( driverList[itr].GetGuid() == guid )
-                    return driverList[itr];
-            }
-            return null;
-        }
-        public byte GetNbrOfDrivers()
-        {
-            return (byte)(driverList.Count - 1); // -1 remove the Host but... maybe not good idea removing it from here.
-        }
-        public byte GetNbrOfConnection()
-        {
-            return (byte)(clientConnectionCount - 1); //Remove The Host
         }
     }
 }

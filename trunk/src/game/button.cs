@@ -123,9 +123,34 @@ namespace Drive_LFSS.Game_
         private byte rankSearchDisplayCount = 0;
         private string rankSearchTrackPrefix = "";
         private string rankSearchCarPrefix = "";
+        private Queue<Packet> bufferButtonPacket = new Queue<Packet>();
+        private uint timerBufferedButton = 0;
+        private const uint MAX_BUTTON_BY_CYCLE = 10;
         
         new protected virtual void update(uint diff)
         {
+            lock(bufferButtonPacket)
+            {
+                int buttonBufferCount = bufferButtonPacket.Count;
+                if(timerBufferedButton < diff)
+                {
+                    timerBufferedButton = 0;
+                    for(byte count = 0; count < buttonBufferCount ; count++)
+                    {
+                        ((Session)((Driver)this).ISession).AddToTcpSendingQueud(bufferButtonPacket.Dequeue());
+                        if(count >= MAX_BUTTON_BY_CYCLE)
+                        {
+                            timerBufferedButton = 100;
+                            break;
+                        }
+                    }
+                    
+                }
+                else
+                   timerBufferedButton -= diff; 
+            }
+
+            
             if(freezeButtonClear > 0)
             {
                 if(freezeButtonClear < diff)
@@ -215,7 +240,7 @@ namespace Drive_LFSS.Game_
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             SendGui(guiInfo);
         }
-        internal protected void SendGui(GuiTemplateInfo guiInfo)
+        private void SendGui(GuiTemplateInfo guiInfo)
         {
             if (((Driver)this).IsBot())
                 return;
@@ -256,7 +281,7 @@ namespace Drive_LFSS.Game_
         {
             RemoveGui((Gui_Entry)guiEntry);
         }
-        public void RemoveGui(Gui_Entry guiEntry)
+        internal void RemoveGui(Gui_Entry guiEntry)
         {
             if (((Driver)this).IsBot())
                 return;
@@ -305,7 +330,7 @@ namespace Drive_LFSS.Game_
         }
         private void SendRemoveButton(byte buttonId)
         {
-            ((Session)((Driver)this).ISession).AddToTcpSendingQueud
+            AddNextBufferedButton
             (
                 new Packet
                 (
@@ -334,11 +359,11 @@ namespace Drive_LFSS.Game_
                 buttonMessageMiddle.Enqueue(new ButtonMessage(text, duration));
             }
         }
-        public void AddTimedButton(ushort buttonEntry, uint time)
+        private void AddTimedButton(ushort buttonEntry, uint time)
         {
             AddTimedButton(time, Program.buttonTemplate.GetEntry(buttonEntry));
         }
-        internal protected void AddTimedButton(uint time, ButtonTemplateInfo buttonInfo)
+        private void AddTimedButton(uint time, ButtonTemplateInfo buttonInfo)
         {
             lock (buttonTimedList) 
             {
@@ -347,17 +372,17 @@ namespace Drive_LFSS.Game_
             //SendButton(newButtonId(buttonInfo.Entry),buttonInfo);
             SendUpdateButton(buttonInfo);
         }
-        internal protected void SendUniqueButton(ushort buttonEntry)
+        private void SendUniqueButton(ushort buttonEntry)
         {
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
             SendUniqueButton(buttonInfo);
         }
-        internal protected void SendUniqueButton(ButtonTemplateInfo buttonInfo)
+        private void SendUniqueButton(ButtonTemplateInfo buttonInfo)
         {
             if (GetButtonId(buttonInfo.Entry) == 0xFF)
                 SendButton(newButtonId(buttonInfo.Entry), buttonInfo);
         }
-        internal protected void SendUpdateButton(ButtonTemplateInfo buttonInfo)
+        private void SendUpdateButton(ButtonTemplateInfo buttonInfo)
         {
             byte buttonId = GetButtonId(buttonInfo.Entry);
             if (buttonId != 0xFF)
@@ -371,11 +396,11 @@ namespace Drive_LFSS.Game_
                 SendButton(buttonId,buttonInfo);
             }
         }
-        public void SendUpdateButton(Button_Entry buttonEntry)
+        protected void SendUpdateButton(Button_Entry buttonEntry)
         {
             SendUpdateButton((ushort)buttonEntry, "");
         }
-        public void SendUpdateButton(Button_Entry buttonEntry, string text)
+        internal void SendUpdateButton(Button_Entry buttonEntry, string text)
         {
             SendUpdateButton((ushort)buttonEntry,text);
         }
@@ -390,16 +415,16 @@ namespace Drive_LFSS.Game_
         {
             SendButton((Button_Entry)buttonEntry);
         }
-        public void SendButton(Button_Entry buttonEntry)
+        protected void SendButton(Button_Entry buttonEntry)
         {
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
             SendButton(newButtonId(buttonInfo.Entry), buttonInfo);
         }
-        internal protected void SendButton(byte buttonId, ButtonTemplateInfo buttonInfo)
+        private void SendButton(byte buttonId, ButtonTemplateInfo buttonInfo)
         {
             SendButton(buttonId, buttonInfo.Entry, (byte)buttonInfo.StyleMask, buttonInfo.IsAllwaysVisible, buttonInfo.MaxInputChar, buttonInfo.Left, buttonInfo.Top, buttonInfo.Width, buttonInfo.Height, buttonInfo.Text, buttonInfo.TextCaption);
         }
-        public void SendButton(byte buttonId, ushort buttonEntry, byte buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text, string textCaption)
+        private void SendButton(byte buttonId, ushort buttonEntry, byte buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text, string textCaption)
         {
             if (((Driver)this).IsBot())
                 return;
@@ -414,7 +439,7 @@ namespace Drive_LFSS.Game_
             {
                 text = ((char)0).ToString() + textCaption + ((char)0).ToString() + text + ((char)0).ToString();
             }
-            ((Session)((Driver)this).ISession).AddToTcpSendingQueud
+            AddNextBufferedButton
             (
                 new Packet
                 (
@@ -425,26 +450,31 @@ namespace Drive_LFSS.Game_
             );
         }
 
-        internal protected void SendBanner()
+        private void AddNextBufferedButton(Packet _packet)
+        {
+            bufferButtonPacket.Enqueue(_packet);
+        }
+
+        internal void SendBanner()
         {
             //Send Banner
             SendUniqueButton((ushort)Button_Entry.BANNER);
         }
-        internal protected void RemoveBanner()
+        internal void RemoveBanner()
         {
             RemoveButton((ushort)Button_Entry.BANNER);
         }
-        internal protected void SendTrackPrefix()
+        internal void SendTrackPrefix()
         {
             ButtonTemplateInfo button = Program.buttonTemplate.GetEntry((uint)Button_Entry.TRACK_PREFIX);
             button.Text += button.Text + ((Driver)this).ISession.GetRaceTrackPrefix();
             SendUpdateButton(button);
         }
-        internal protected void RemoveTrackPrefix()
+        internal void RemoveTrackPrefix()
         {
             RemoveButton((ushort)Button_Entry.TRACK_PREFIX);
         }
-        internal protected void SendConfigGui()
+        internal void SendConfigGui()
         {
             SendGui((ushort)Gui_Entry.CONFIG_USER);
             
@@ -457,19 +487,19 @@ namespace Drive_LFSS.Game_
             SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (((Driver)this).IsTimeDiffLapDisplay ? "^7" : "^8") + " PB vs lap");
             SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (((Driver)this).IsTimeDiffSplitDisplay ? "^7" : "^8") + " PB vs Split");
         }
-        internal protected void RemoveConfigGui()
+        internal void RemoveConfigGui()
         {
             RemoveGui(Gui_Entry.CONFIG_USER);
         }
-        internal protected void SendHelpGui()
+        internal void SendHelpGui()
         {
             SendGui((ushort)Gui_Entry.HELP);
         }
-        internal protected void RemoveHelpGui()
+        internal void RemoveHelpGui()
         {
             RemoveGui(Gui_Entry.HELP);
         }
-        internal protected void SendRankGui(Button_Entry startWith)
+        internal void SendRankGui(Button_Entry startWith)
         {
             SendGui((ushort)Gui_Entry.RANK);
             switch(startWith)
@@ -483,8 +513,6 @@ namespace Drive_LFSS.Game_
         }
         private void ClearRankDisplay(bool searchDisplay)
         {
-            freezeButtonClear = FREEZE_BUTTON_CLEAR;
-            freezeButton = FREEZE_BUTTON;
             SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^1Top20");
             SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^1Search");
             SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^1Current");
@@ -508,24 +536,12 @@ namespace Drive_LFSS.Game_
             RemoveButton(Button_Entry.RANK_POSITION);
             SendUpdateButton(Button_Entry.RANK_INFO,"^1Cleared");
         }
-        internal protected void SendRankCurrent(byte witchPage)
+        internal void SendRankCurrent(byte witchPage)
         {
-            if(freezeButton != 0)
-                return;
-
             if(rankGuiCurrentDisplay != Button_Entry.NONE)
-            {
-                if(freezeButtonClear != 0)
-                    return;
+                 ClearRankDisplay(false);
 
-                SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
-                SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
-                SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
-                ClearRankDisplay(false);
-                return;
-            }
             rankGuiCurrentDisplay = Button_Entry.RANK_BUTTON_CURRENT;
-            freezeButton = FREEZE_BUTTON;
             SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
             SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
             SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^7Current");
@@ -621,24 +637,12 @@ namespace Drive_LFSS.Game_
             }
             
         }
-        internal protected void SendRankSearch()
+        internal void SendRankSearch()
         {
-            if(freezeButton != 0)
-                return;
-
             if(rankGuiCurrentDisplay != Button_Entry.NONE)
-            {
-                if(freezeButtonClear != 0)
-                    return;
-
-                SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
-                SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
-                SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
                 ClearRankDisplay(false);
-                return;
-            }
+
             rankGuiCurrentDisplay = Button_Entry.RANK_BUTTON_SEARCH;
-            freezeButton = FREEZE_BUTTON;
             rankSearchDisplayCount = 0;
             SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
             SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^7Search");
@@ -656,10 +660,11 @@ namespace Drive_LFSS.Game_
             SendButton(Button_Entry.RANK_TOTAL);
             SendButton(Button_Entry.RANK_POSITION);
         }
-        internal protected void RankSearchTrack(string trackPrefix)
+        internal void RankSearchTrack(string trackPrefix)
         {
             if(trackPrefix != rankSearchTrackPrefix)
             {
+                rankSearchDisplayCount = 0;
                 rankSearchTrackPrefix = trackPrefix;
                 uint rankedCount = Ranking.GetRankedCount(rankSearchTrackPrefix,rankSearchCarPrefix);
                 ClearRankDisplay(true);
@@ -673,10 +678,11 @@ namespace Drive_LFSS.Game_
                 SendButton(Button_Entry.RANK_POSITION);
             }
         }
-        internal protected void RankSearchCar(string carPrefix)
+        internal void RankSearchCar(string carPrefix)
         {
             if(carPrefix != rankSearchCarPrefix)
             {
+                rankSearchDisplayCount = 0;
                 rankSearchCarPrefix = carPrefix;
                 uint rankedCount = Ranking.GetRankedCount(rankSearchTrackPrefix,rankSearchCarPrefix);
                 ClearRankDisplay(true);
@@ -690,7 +696,7 @@ namespace Drive_LFSS.Game_
                 SendButton(Button_Entry.RANK_POSITION);
             }
         }
-        internal protected void RankSearchAdd(string _licenceName)
+        internal void RankSearchAdd(string _licenceName)
         {
             if(rankSearchDisplayCount > 19)
             {
@@ -752,27 +758,18 @@ namespace Drive_LFSS.Game_
             rankSearchDisplayCount++;
 
         }
-        internal protected void SendRankTop20()
+        internal void SendRankTop20()
         {
-            if(freezeButton != 0)
-                return;
+           //if(freezeButton != 0)
+            //    return;
 
             if(rankGuiCurrentDisplay != Button_Entry.NONE)
-            {
-                if(freezeButtonClear != 0)
-                    return;
-                SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
-                SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
-                SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
                 ClearRankDisplay(false);
-                return;
-            }
+
             rankGuiCurrentDisplay = Button_Entry.RANK_BUTTON_TOP20;
-            freezeButton = FREEZE_BUTTON;
             SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^7Top20");
             SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
             SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
-            
 
             string trackPrefix = ((Driver)this).ISession.GetRaceTrackPrefix();
             string carPrefix = ((ICar)this).CarPrefix;
@@ -832,14 +829,12 @@ namespace Drive_LFSS.Game_
                SendButton(newButtonId(Button_Entry.RANK_POSITION), bPosition);
             }
         }
-        internal protected void RemoveRankGui()
+        internal void RemoveRankGui()
         {
-            freezeButtonClear = 0;
-            freezeButton = 0;
             rankGuiCurrentDisplay = Button_Entry.NONE;
             RemoveGui(Gui_Entry.RANK);
         }
-        internal protected void SendResultGui(Dictionary<string, int> scoringResultTextDisplay)
+        internal void SendResultGui(Dictionary<string, int> scoringResultTextDisplay)
         {
             if(currentGui == Gui_Entry.RESULT)
                 RemoveResultGui();
@@ -870,12 +865,12 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
-        internal protected void RemoveResultGui()
+        internal void RemoveResultGui()
         {
             RemoveGui(Gui_Entry.RESULT);
         }
         
-        internal protected bool HasGuiDisplay()
+        internal bool HasGuiDisplay()
         {
             return currentGui != Gui_Entry.NONE;
         }
@@ -918,7 +913,7 @@ namespace Drive_LFSS.Game_
             }
             return 0xFF;
         }
-        internal protected ushort GetButtonEntry(byte buttonId)
+        internal ushort GetButtonEntry(byte buttonId)
         {
             return buttonList[buttonId];
         }

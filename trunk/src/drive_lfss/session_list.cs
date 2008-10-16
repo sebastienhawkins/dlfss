@@ -28,11 +28,11 @@ namespace Drive_LFSS
     using Drive_LFSS.Log_;
     using Drive_LFSS.Game_;
 
-    public class SessionList //Must become compatible with all Session type: ServerInSim, ClientOutGauge, ... Im not aware of all....
+    sealed class SessionList //Must become compatible with all Session type: ServerInSim, ClientOutGauge, ... Im not aware of all....
     {
         private static Dictionary<string, Session> sessionList = new Dictionary<string, Session>();
-        
-        public static void ConfigApply()
+
+        internal static void ConfigApply()
         {
             List<string> lfsServer = Config.GetIdentifierList("LFSServer");
 

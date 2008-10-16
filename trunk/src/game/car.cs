@@ -29,9 +29,9 @@ namespace Drive_LFSS.Game_
     using PubStats_;
     using Ranking_;
 
-    internal partial class Driver
+    partial class Driver
     {
-        internal protected void ProcessCarInformation(CarInformation _carInformation)
+        internal void ProcessCarInformation(CarInformation _carInformation)
         {
             node = _carInformation.nodeTrack;
             lapCompleted = _carInformation.lapNumber;
@@ -57,7 +57,6 @@ namespace Drive_LFSS.Game_
 
             //base.Init(_packet);
         }
-
         private byte carId = 0;
         private string carPrefix = "";
         private string trackPrefix = "";
@@ -190,7 +189,7 @@ namespace Drive_LFSS.Game_
             ((Driver)this).SetConfigValue(Config_User.ACCELERATION_ON, (isOn ? "1" : "0"));
         }
 
-        private sealed class FeatureDriftScore
+        sealed class FeatureDriftScore
         {
             private const double MIN_SPEED = 30.0d; //CONFIG, speed lower then this will cancel a drift score and will never trigger a drift start.
             private const double START_ANGLE = 13.5d; //angle at witch we start calculating drift.

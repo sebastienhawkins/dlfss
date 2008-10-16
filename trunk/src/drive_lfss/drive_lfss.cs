@@ -34,8 +34,9 @@ namespace Drive_LFSS
     using Irc_.Data_;
     using PubStats_;
     using Ranking_;
+    using ChatModo_;
 
-    public sealed class Program
+    sealed class Program
     {
         public static int sleep = 50; // Speed of Operation
         public static long tickPerMs = TimeSpan.TicksPerMillisecond;
@@ -109,7 +110,10 @@ namespace Drive_LFSS
 
             //Ranking Initialization
             InitRanking();
-            
+
+            //ChatModo Initialization
+            InitChatModo();
+
             //PubStats Initialization
             Log.normal("Initializing PubStats...\r\n");
             pubStats.ConfigApply();
@@ -156,13 +160,18 @@ namespace Drive_LFSS
             }
             #endregion
 		}
+        private static void InitChatModo()
+        {
+            Log.normal("Initializing ChatModo...\r\n");
+            if (!ChatModo.Initialize())
+                Log.commandHelp("  ChatModo system disable.\r\n");
+            Log.normal("Completed initializing ChatModo.\r\n\r\n");
+        }
 		private static void InitRanking()
 		{
             Log.normal("Initializing Ranking...\r\n");
             if (!Ranking.Initialize())
                 Log.commandHelp("  Ranking system disable.\r\n");
-            else
-                Ranking.ConfigApply();
             Log.normal("Completed initializing Ranking.\r\n\r\n");
 		}
 		private static void InitJustForFun()
@@ -256,7 +265,7 @@ namespace Drive_LFSS
             Log.normal("          ---/----/---)__-------------__-------/------/__-------\\-----\r\n");
             Log.normal("            /    /   /   ) /   | /  /___)     /      /           \\    \r\n");
             Log.normal("          _/____/___/_____/____|/__(___ _____/____/_/________(____/___\r\n");
-            Log.normal("                                                              v0.3.164\r\n");
+            Log.normal("                                                              v0.4.188\r\n");
             //sLog.normal("                                                                      \r\n");       
             Log.normal("                    _______________________________________\r\n");
             Log.normal("                          __                               \r\n");
@@ -304,8 +313,10 @@ namespace Drive_LFSS
                         Log.commandHelp("  race_template reloaded.\r\n");
                         Program.driverBan.Load(false);
                         Log.commandHelp("  driver_ban reloaded.\r\n");
+                        ChatModo.LoadBadWordTable();
+                        Log.commandHelp("  bad_word reloaded.\r\n");
                         Program.dlfssDatabase.Unlock();
-
+                        
                         Log.normal("Initializing DLFSS client...\r\n");
                         Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                         Program.ConfigApply();
@@ -325,73 +336,80 @@ namespace Drive_LFSS
                         Log.normal("Completed initializing server(s) config(s).\r\n\r\n");
                     } break;
                 case "track_template":
-                    {
-                        Program.dlfssDatabase.Lock();
-                        Program.trackTemplate.Load(true);
-                        Program.dlfssDatabase.Unlock();
-                        Log.commandHelp("  track_template reloaded.\r\n");
-                    } break;
+                {
+                    Program.dlfssDatabase.Lock();
+                    Program.trackTemplate.Load(true);
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  track_template reloaded.\r\n");
+                } break;
                 case "car_template":
-                    {
-                        Program.dlfssDatabase.Lock();
-                        Program.carTemplate.Load(true);
-                        Program.dlfssDatabase.Unlock();
-                        Log.commandHelp("  car_template reloaded.\r\n");
-                    } break;
+                {
+                    Program.dlfssDatabase.Lock();
+                    Program.carTemplate.Load(true);
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  car_template reloaded.\r\n");
+                } break;
                 case "button_template":
-                    {
-                        Program.dlfssDatabase.Lock();
-                        Program.buttonTemplate.Load(true);
-                        Program.dlfssDatabase.Unlock();
-                        Log.commandHelp("  button_template reloaded.\r\n");
-                    } break;
+                {
+                    Program.dlfssDatabase.Lock();
+                    Program.buttonTemplate.Load(true);
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  button_template reloaded.\r\n");
+                } break;
                 case "race_template":
-                    {
-                        Program.dlfssDatabase.Lock();
-                        Program.raceTemplate.Load(false);
-                        Program.dlfssDatabase.Unlock();
-                        Log.commandHelp("  race_template reloaded.\r\n");
-                    } break;
+                {
+                    Program.dlfssDatabase.Lock();
+                    Program.raceTemplate.Load(false);
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  race_template reloaded.\r\n");
+                } break;
                 case "driver_ban":
-                    {
-                        Program.dlfssDatabase.Lock();
-                        Program.driverBan.Load(false);
-                        Program.dlfssDatabase.Unlock();
-                        Log.commandHelp("  driver_ban reloaded.\r\n");
-                    } break;
+                {
+                    Program.dlfssDatabase.Lock();
+                    Program.driverBan.Load(false);
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  driver_ban reloaded.\r\n");
+                } break;
                 case "gui_template":
-                    {
-                        Program.dlfssDatabase.Lock();
-                        Program.guiTemplate.Load(true);
-                        Program.dlfssDatabase.Unlock();
-                        Log.commandHelp("  gui_template reloaded.\r\n");
-                    } break;
+                {
+                    Program.dlfssDatabase.Lock();
+                    Program.guiTemplate.Load(true);
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  gui_template reloaded.\r\n");
+                } break;
                 case "race_map":
-                    {
-                        for (int itr = 0; itr < SessionList.GetSessions().Length; itr++)
-                            SessionList.GetSessions()[itr].ConfigApply(true);
-                        Log.commandHelp("  race_map reloaded.\r\n");
-                    } break;
+                {
+                    for (int itr = 0; itr < SessionList.GetSessions().Length; itr++)
+                        SessionList.GetSessions()[itr].ConfigApply(true);
+                    Log.commandHelp("  race_map reloaded.\r\n");
+                } break;
+                case "bad_word":
+                {
+                    Program.dlfssDatabase.Lock();
+                    ChatModo.LoadBadWordTable();
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  bad_word reloaded.\r\n");
+                } break;
                 case "config":
-                    {
-                        Log.normal("Initializing DLFSS Client...\r\n");
-                        Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
-                        Program.ConfigApply();
-                        Log.ConfigApply();
-                        Log.normal("Completed initializing DLFSS client.\r\n\r\n");
+                {
+                    Log.normal("Initializing DLFSS Client...\r\n");
+                    Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
+                    Program.ConfigApply();
+                    Log.ConfigApply();
+                    Log.normal("Completed initializing DLFSS client.\r\n\r\n");
 
-                        Log.normal("Initializing mIRC client...\r\n");
-                        Program.ircClient.ConfigApply();
-                        Log.normal("Completed initializing mIRC client.\r\n\r\n");
+                    Log.normal("Initializing mIRC client...\r\n");
+                    Program.ircClient.ConfigApply();
+                    Log.normal("Completed initializing mIRC client.\r\n\r\n");
 
-                        Log.normal("Initializing PubStats...\r\n");
-                        Program.pubStats.ConfigApply();
-                        Log.normal("Completed initializing PubStats.\r\n\r\n");
+                    Log.normal("Initializing PubStats...\r\n");
+                    Program.pubStats.ConfigApply();
+                    Log.normal("Completed initializing PubStats.\r\n\r\n");
 
-                        Log.normal("Initializing server(s) config(s)...\r\n\r\n");
-                        SessionList.ConfigApply();
-                        Log.normal("Completed initializing server(s) config(s).\r\n\r\n");
-                    } break;
+                    Log.normal("Initializing server(s) config(s)...\r\n\r\n");
+                    SessionList.ConfigApply();
+                    Log.normal("Completed initializing server(s) config(s).\r\n\r\n");
+                } break;
             } }
             Log.command("Completed reloading of " + what + ".\r\n");
         }

@@ -30,10 +30,10 @@ namespace Drive_LFSS.Game_
     using PubStats_;
     using Ranking_;
 
-    internal partial class Driver : Button, IDriver, ICar, CarMotion, IButton
+    partial class Driver : Button, IDriver, ICar, CarMotion, IButton
     {
         private static bool[] botGuid = new bool[128];
-        internal protected Driver(ISession _session): base()
+        internal Driver(ISession _session): base()
         {
             iSession = _session;
         }
@@ -41,11 +41,11 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        internal protected static void ConfigApply()
+        internal static void ConfigApply()
         {
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "DriverSave");
         }
-        internal protected void Init(PacketNCN _packet)
+        internal void Init(PacketNCN _packet)
         {
             isAdmin = _packet.adminStatus > 0 ? true : false;
             driverName = _packet.driverName;
@@ -85,7 +85,7 @@ namespace Drive_LFSS.Game_
             pb = Program.pubStats.GetPB(LicenceName, "");
             rank = Ranking.GetDriverRanks(LicenceName);
         }
-        internal protected void ProcessCPR(PacketCPR _packet)
+        internal void ProcessCPR(PacketCPR _packet)
         {
             if (carPlate != _packet.carPlate)
                 carPlate = _packet.carPlate;
@@ -102,7 +102,7 @@ namespace Drive_LFSS.Game_
                 SetConfigData("");
             }
         }
-        internal protected void Init(PacketNPL _packet)
+        internal void Init(PacketNPL _packet)
         {
             if(LicenceName == "" && !IsBot()) //What the ???
             {
@@ -178,7 +178,7 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
-        internal protected void ProcessLapInformation(PacketLAP _packet)
+        internal void ProcessLapInformation(PacketLAP _packet)
         {
             if(laps.Count < 1)
             {
@@ -237,7 +237,7 @@ namespace Drive_LFSS.Game_
 
             laps.Add(new Lap());
         }
-        internal protected void ProcessSplitInformation(PacketSPX _packet)
+        internal void ProcessSplitInformation(PacketSPX _packet)
         {
             //Internal Lap
             if (laps.Count == 0)
@@ -275,22 +275,22 @@ namespace Drive_LFSS.Game_
                     AddMessageMiddle("^2Split " + ConvertX.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
             }
         }
-        internal protected void ProcessRESPacket(PacketRES _packet)
+        internal void ProcessRESPacket(PacketRES _packet)
         {
             timeTotalLastRace = _packet.totalTime;
             timeFastestLapLastRace = _packet.fastestLapTime;
             lapCountTotalLastRace = _packet.lapCount;
         }
-        internal protected void ProcessRaceStart()
+        internal void ProcessRaceStart()
         {
             wr = Program.pubStats.GetWR("");
             laps.Add(new Lap());
             maxSpeedMs = 0.0d;
         }
-        internal protected void ProcessRaceEnd()
+        internal void ProcessRaceEnd()
         {
         }
-        internal protected void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
+        internal void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
         {
             carId = 0;
             LeaveTrack();
@@ -301,7 +301,7 @@ namespace Drive_LFSS.Game_
                 guid = 0;
             }
         }
-        internal protected void ProcessCNLPacket(PacketCNL _packet) //Disconnect
+        internal void ProcessCNLPacket(PacketCNL _packet) //Disconnect
         {
             quitReason = _packet.quitReason;
             
@@ -315,7 +315,7 @@ namespace Drive_LFSS.Game_
             }
             Program.dlfssDatabase.Unlock();
         }
-        internal protected void ProcessFLGPacket(PacketFLG _packet)
+        internal void ProcessFLGPacket(PacketFLG _packet)
         {
             if(_packet.OffOn > 0)
             {
@@ -347,7 +347,7 @@ namespace Drive_LFSS.Game_
             }
             
         }
-        internal protected void ProcessEnterGarage()                //When a car enter garage.
+        internal void ProcessEnterGarage()                //When a car enter garage.
         {
             LeaveTrack();
         }
@@ -375,7 +375,7 @@ namespace Drive_LFSS.Game_
         private uint driftScoreTimer = 0;
         private const uint DRIFT_SCORE_TIMER = 40000;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
-        internal protected Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
+        internal Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
         private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
         private ISession iSession;
@@ -492,13 +492,13 @@ namespace Drive_LFSS.Game_
             }
         }
         private List<Lap> laps = new List<Lap>();
-        internal protected PB pb = null;
-        internal protected WR wr = null;
+        internal PB pb = null;
+        internal WR wr = null;
         private Dictionary<string,Dictionary<string,Rank>> rank = null;
         
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
-        new internal protected void update(uint diff) 
+        new internal void update(uint diff) 
         {
             if (driftScoreByTime > 0)
             {
@@ -511,7 +511,7 @@ namespace Drive_LFSS.Game_
             }
 
             driverSaveInterval += diff;
-            if (SAVE_INTERVAL < driverSaveInterval  ) //Into Server.update() i use different approch for Timer Solution, so just see both and take the one you love more.
+            if (SAVE_INTERVAL < driverSaveInterval  )
             {
                 if (!IsBot())
                 {
@@ -521,14 +521,13 @@ namespace Drive_LFSS.Game_
                         SaveToDB();
                     }
                     Program.dlfssDatabase.Unlock();
-                    if (laps.Count > 0)
+                    lock (laps)
                     {
-                        lock (laps)
+                        if (laps.Count > 0)
                         {
                             Lap currentLap = laps[laps.Count - 1];
                             List<Lap>.Enumerator itr = laps.GetEnumerator();
 
-                            
                             while (itr.MoveNext())
                             {
                                 Lap lap = itr.Current;
@@ -564,9 +563,11 @@ namespace Drive_LFSS.Game_
                 {
                     Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
                     if(_driver != null)
+                    {
                         _driver.BadDrivingCount++;
-                    _driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
-                    RemoveCancelWarningDriving();
+                        _driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
+                    }
+                    RemoveCancelWarningDriving(true);
                 }
             }
 
@@ -683,27 +684,27 @@ namespace Drive_LFSS.Game_
             configStrings.CopyTo(configData,0);
             ApplyConfigData();
         }
-        internal protected ushort GetConfigUint16(Config_User index)
+        internal ushort GetConfigUint16(Config_User index)
         {
             return  Convert.ToUInt16(configData[(int)index]);
         }
-        internal protected uint GetConfigUint32(Config_User index)
+        internal uint GetConfigUint32(Config_User index)
         {
             return Convert.ToUInt32(configData[(int)index]);
         }
-        internal protected string GetConfigString(Config_User index)
+        internal string GetConfigString(Config_User index)
         {
             return configData[(int)index];
         }
-        internal protected void SetConfigValue(Config_User index, string value)
+        internal void SetConfigValue(Config_User index, string value)
         {
             configData[(int)index] = value;
         }
-        internal protected ISession ISession
+        internal ISession ISession
         {
             get { return iSession; }
         }
-        internal protected Rank GetRank(string trackPrefix, string carPrefix)
+        internal Rank GetRank(string trackPrefix, string carPrefix)
         {
             if( rank != null && rank.ContainsKey(trackPrefix) && rank[trackPrefix].ContainsKey(carPrefix))
                 return rank[trackPrefix][carPrefix];
@@ -711,7 +712,7 @@ namespace Drive_LFSS.Game_
                 return null;
         }
 
-        internal protected bool IsTimeDiffLapDisplay
+        internal bool IsTimeDiffLapDisplay
         {
             get { return isTimeDiffLap; }
             set
@@ -720,7 +721,7 @@ namespace Drive_LFSS.Game_
                 SetConfigValue(Config_User.TIMEDIFF_LAP, (isTimeDiffLap ? "1" : "0"));
             }
         }
-        internal protected bool IsTimeDiffSplitDisplay
+        internal bool IsTimeDiffSplitDisplay
         {
             get { return isTimeDiffSplit; }
             set
@@ -729,7 +730,7 @@ namespace Drive_LFSS.Game_
                 SetConfigValue(Config_User.TIMEDIFF_SPLIT, (isTimeDiffSplit ? "1" : "0"));
             }
         }
-        internal protected bool IsMaxSpeedDisplay
+        internal bool IsMaxSpeedDisplay
         {
             get { return isMaxSpeedDisplay; }
             set
@@ -749,7 +750,6 @@ namespace Drive_LFSS.Game_
             warningDrivingTimerCheck = 5800;
             warningDrivingReferenceCarId = referenceCarId;
         }
-        
         public void SendCancelWarningDriving()
         {
             Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
@@ -762,17 +762,21 @@ namespace Drive_LFSS.Game_
             SendUpdateButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_3, _driver.driverName);
  
         }
-        public void RemoveCancelWarningDriving()
+        public void RemoveCancelWarningDriving(bool isCancelClick)
         {
             warningDrivingCancelTimer = warningDrivingTimerCheck = 0;
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_1);
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_2);
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_3);
+
             Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
             if (_driver == null)
                 return;
-            AddMessageMiddle("^2Removed Warning Driving for "+_driver.driverName,4500);
+
+            if(isCancelClick)
+                AddMessageMiddle("^2Removed Warning Driving for "+_driver.driverName,4500);
         }
+ 
         public bool IsYellowFlagActive()
         {
             return yellowFlagActive;
@@ -840,7 +844,7 @@ namespace Drive_LFSS.Game_
         {
             get { return lapCountTotalLastRace; }
         }
-        internal protected uint BadDrivingCount
+        internal uint BadDrivingCount
         {
             get{return badDrivingCount;}
             set{badDrivingCount = value;}

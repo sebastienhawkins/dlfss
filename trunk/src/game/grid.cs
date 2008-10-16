@@ -1,4 +1,22 @@
-﻿using System;
+﻿/* 
+ * Copyright (C) 2008 DLFSS <http://www.lfsforum.net/when the post is created change ME>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,20 +28,20 @@ namespace Drive_LFSS.Game_
     using Script_;
     using Definition_;
 
-    internal class Grid
+    class Grid
     {
-        internal protected Grid()
+        internal Grid()
         {
         }
         ~Grid()
         {
             if (true == false) { }
         }
-        internal protected void Init(ushort _nodeCount)
+        internal void Init(ushort _nodeCount)
         {
             nodeCount = _nodeCount;
         }
-        internal protected void ConfigApply()
+        internal void ConfigApply()
         {
             //TODO:This is not reloaded , if we reload only table... have to fix this
             carBrakeValue.Clear();
@@ -40,11 +58,11 @@ namespace Drive_LFSS.Game_
         private Dictionary<CarMotion, ushort> carContainer  = new Dictionary<CarMotion, ushort>();
         private Dictionary<string, ushort> carBrakeValue = new Dictionary<string,ushort>();
 
-        internal protected void Add(CarMotion car)
+        internal void Add(CarMotion car)
         {
             carContainer[car] = car.GetNode();
         }
-        internal protected void ProcessCarInformation(CarMotion car)
+        internal void ProcessCarInformation(CarMotion car)
         {
            // if (car.GetSpeedMs() < 0.1) //About 0.01 m seconde
                // return;
@@ -54,7 +72,7 @@ namespace Drive_LFSS.Game_
             //if(((IDriver)car).IsAdmin)
                 //((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3Z ^7" + car.GetPosZ());
         }
-        internal protected void Remove(CarMotion car)
+        internal void Remove(CarMotion car)
         {
             carContainer.Remove(car);
         }

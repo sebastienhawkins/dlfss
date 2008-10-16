@@ -29,7 +29,7 @@ namespace Drive_LFSS.Game_
     using Game_;
     using Config_;
 
-    internal enum Vote_Track_Change : byte
+    enum Vote_Track_Change : byte
     {
         USER = 0,
         VOTE = 1,
@@ -37,7 +37,7 @@ namespace Drive_LFSS.Game_
         AUTO = 4,
         SEQUENCE = 5,
     }
-    internal abstract class Vote : IVote
+    abstract class Vote : IVote
     {
         protected virtual void ConfigApply()
         {
@@ -62,7 +62,7 @@ namespace Drive_LFSS.Game_
                 Program.dlfssDatabase.Unlock();
             }
         }
-        internal protected void ProcessVoteNotification(Vote_Action voteAction, byte connectionId)
+        internal void ProcessVoteNotification(Vote_Action voteAction, byte connectionId)
         {
             #if DEBUG
             Log.debug(((IRace)this).ISession.GetSessionNameForLog() + " Vote notification was:" + voteAction + "\r\n");
@@ -92,13 +92,13 @@ namespace Drive_LFSS.Game_
                 ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, connectionId);
             }
         }
-        internal protected void ProcessVoteCancel()
+        internal void ProcessVoteCancel()
         {
             #if DEBUG
             Log.debug(((IRace)this).ISession.GetSessionNameForLog() + " A VOTE was CANCEL.\r\n");
             #endif
         }
-        internal protected void ProcessRaceEnd()
+        internal void ProcessRaceEnd()
         {
             if (doEnd)
             {
@@ -127,7 +127,7 @@ namespace Drive_LFSS.Game_
         {
             return voteInProgress;
         }
-        internal protected virtual void update(uint diff)
+        internal virtual void update(uint diff)
         {
             if (voteTimer != 0)
             {
@@ -164,7 +164,7 @@ namespace Drive_LFSS.Game_
                     nextRaceTimer -= diff;
             }
         }
-        internal protected List<ushort> GetSmartRaceMap()
+        internal List<ushort> GetSmartRaceMap()
         {
             List<ushort> _raceMap = new List<ushort>(raceMap);
             if (raceMap.Count > 2)

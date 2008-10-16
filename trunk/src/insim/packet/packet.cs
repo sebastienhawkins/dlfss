@@ -396,7 +396,7 @@ namespace Drive_LFSS.Packet_
         internal byte Zero;
         internal byte connectionId;
         internal byte PLID;
-        internal Chat_User_Type chatUserType;
+        internal Chat_Type chatUserType;
         internal byte textStart;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)]internal string message;
     }
