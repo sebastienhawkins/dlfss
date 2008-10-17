@@ -40,7 +40,7 @@ namespace Drive_LFSS.Definition_
         BAD_DRIVING = 4,
         
     }
-    [Flags]public enum Rank_Change_Mask : uint
+    public enum Rank_Change_Mask : uint
     {
 		NONE = 0,
 		PB_LOW = 1,
@@ -56,7 +56,7 @@ namespace Drive_LFSS.Definition_
 		POSITION_LOW = 1024,
 		POSITION_HIGH = 2048
     }
-    [Flags]public enum Race_Template_Flag : ushort
+    public enum Race_Template_Flag : ushort
     {
         NONE = 0,
         MID_RACE_JOIN = 1,
@@ -75,7 +75,7 @@ namespace Drive_LFSS.Definition_
         RACE_BLUE_FLAG = 1,
         RACE_YELLOW_FLAG = 2
     }
-    [Flags]public enum Race_Feature_Flag : ushort
+    public enum Race_Feature_Flag : ushort
     {
         RACE_FLAG_NONE = 0,
         RACE_FLAG_CAN_VOTE = 1,
@@ -88,7 +88,6 @@ namespace Drive_LFSS.Definition_
         RACE_FLAG_CAN_RESET = 128,
         RACE_FLAG_FORCE_COKPIT_VIEW = 256
     }
-
     public enum Button_Entry : ushort
     {
         NONE = 0,
@@ -154,7 +153,7 @@ namespace Drive_LFSS.Definition_
         CONFIG_USER_MAX_SPEED_ON = 77,
         RESULT_BG = 78,
     }
-    [Flags]public enum Button_Styles_Flag : byte
+    public enum Button_Styles_Flag : byte
     {
         ISB_C1 = 1,         // you can choose a standard
         ISB_C2 = 2,         // interface colour using
@@ -189,7 +188,6 @@ namespace Drive_LFSS.Definition_
         BUTTON_FUNCTION_USER_CLEAR = 2,
         BUTTON_FUNCTION_REQUEST = 3,
     }
-
     public enum Ctrl_Types : ushort
     {
         CTRL_C_EVENT = 0,
@@ -208,7 +206,6 @@ namespace Drive_LFSS.Definition_
         PROTO_UDP,
         PROTO_TCP
     }
-    
     public enum Licence_Camera_Mode : byte
     {
         CAMERA_MODE_FOLLOW = 0,
@@ -218,7 +215,6 @@ namespace Drive_LFSS.Definition_
         CAMERA_MODE_CUSTOM = 4,
         CAMERA_MODE_ANOTHER = 255
     }
-
     public enum Message_Sound : byte
     {
         SOUND_CONSOLE_SILENT = 0,
@@ -326,14 +322,14 @@ namespace Drive_LFSS.Definition_
     {
         GRID_START_BEVIATOR_NONE = 0,
     }
-    [Flags]public enum Car_Multiple_Flag : uint
+    public enum Car_Multiple_Flag : uint
     {
         CAR_TRACTION_NONE = 0,
         CAR_TRACTION_FRONT = 1,
         CAR_TRACTION_REAR = 2,
         CAR_TRACTION_4x4 = 1+2,
     }
-    [Flags]public enum Confirm_Flag : byte
+    public enum Confirm_Flag : byte
     {
         CONFIRM_NONE = 0,
         CONFIRM_MENTIONED = 1,
@@ -346,21 +342,21 @@ namespace Drive_LFSS.Definition_
         CONFIRM_DISQ = 4+8+64,
         CONFIRM_TIME = 16+32
     }
-    [Flags]public enum Driver_Type_Flag : byte
+    public enum Driver_Type_Flag : byte
     {
         DRIVER_TYPE_NONE = 0,
         DRIVER_TYPE_FEMALE = 1,
         DRIVER_TYPE_AI = 2,
         DRIVER_TYPE_REMOTE = 4
     }
-    [Flags]public enum Button_Click_Flag : byte
+    public enum Button_Click_Flag : byte
     {
         ISB_CTRL = 4,
         ISB_LMB = 1,
         ISB_RMB = 2,
         ISB_SHIFT = 8
     }
-    [Flags]public enum Car_Racing_Flag : byte
+    public enum Car_Racing_Flag : byte
     {
         CAR_RACING_FLAG_NONE = 0,
         CAR_RACING_FLAG_BLUE = 1,
@@ -369,7 +365,7 @@ namespace Drive_LFSS.Definition_
         CAR_RACING_FLAG_FIRST = 64,
         CAR_RACING_FLAG_LAST = 128,
     }
-    [Flags]public enum InSim_Flag : byte
+    public enum InSim_Flag : byte
     {
         INSIM_FLAG_SPARE_0 = 1,
         INSIM_FLAG_SPARE_1 = 2,
@@ -378,7 +374,7 @@ namespace Drive_LFSS.Definition_
         INSIM_FLAG_RECEIVE_NLP = 16,
         INSIM_FLAG_RECEIVE_MCI = 32
     }
-    [Flags]public enum Pit_Work_Flag : uint
+    public enum Pit_Work_Flag : uint
     {
         PSE_BODY_MAJOR = 0x8000,
         PSE_BODY_MINOR = 0x4000,
@@ -399,7 +395,7 @@ namespace Drive_LFSS.Definition_
         PSE_SETUP = 0x10000,
         PSE_STOP = 2
     }
-    [Flags]public enum Driver_Flag : ushort
+    public enum Driver_Flag : ushort
     {
         DRIVER_FLAG_NONE = 0,
         DRIVER_FLAG_SWAPSIDE = 1,
@@ -418,13 +414,13 @@ namespace Drive_LFSS.Definition_
         DRIVER_FLAG_CUSTOM_VIEW = 8192
     }
 
-    [Flags]public enum Single_Char_Flag : byte
+    public enum Single_Char_Flag : byte
     {
         KEY_CONTROL = 2,
         KEY_NONE = 0,
         KEY_SHIFT = 1
     }
-    [Flags]public enum Licence_View_Flag : ushort
+    public enum Licence_View_Flag : ushort
     {
         ISS_FRONT_END = 0x100,
         ISS_GAME = 1,
@@ -442,7 +438,7 @@ namespace Drive_LFSS.Definition_
         ISS_VISIBLE = 0x4000,
         ISS_WINDOWED = 0x800
     }
-    [Flags]public enum Out_Gauge_Flag : ushort
+    public enum Out_Gauge_Flag : ushort
     {
         OUTGAUGE_1 = 0x400,
         OUTGAUGE_2 = 0x800,

@@ -40,6 +40,7 @@ namespace Drive_LFSS.Game_
         }
         internal void ProcessBFNClearAll(bool sendConfig)
         {
+            lock (bufferButtonPacket){bufferButtonPacket.Clear();}
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
             {
                 buttonList[itr] = 0;
@@ -124,9 +125,9 @@ namespace Drive_LFSS.Game_
         private string rankSearchTrackPrefix = "";
         private string rankSearchCarPrefix = "";
         private Queue<Packet> bufferButtonPacket = new Queue<Packet>();
+
         private uint timerBufferedButton = 0;
         private const uint MAX_BUTTON_BY_CYCLE = 10;
-        
         new protected virtual void update(uint diff)
         {
             lock(bufferButtonPacket)

@@ -130,7 +130,7 @@ namespace Drive_LFSS.Game_
             carArounds = getCarAround(car, 3, 3);
             for (byte itr = 0; itr < carArounds.Length; itr++ )
             {
-                if (carArounds[itr].CarId == car.CarId || carArounds[itr].HasWarningDrivingCheck()) //Remove Self
+                if (carArounds[itr].CarId == car.CarId || car.HasWarningDrivingCheck() ||carArounds[itr].HasWarningDrivingCheck()) //Remove Self
                     continue;
                 
                 CarMotion carAround = carArounds[itr];

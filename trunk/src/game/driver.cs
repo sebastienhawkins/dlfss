@@ -29,7 +29,7 @@ namespace Drive_LFSS.Game_
     using Game_;
     using PubStats_;
     using Ranking_;
-
+    
     partial class Driver : Button, IDriver, ICar, CarMotion, IButton
     {
         private static bool[] botGuid = new bool[128];
@@ -104,14 +104,7 @@ namespace Drive_LFSS.Game_
         }
         internal void Init(PacketNPL _packet)
         {
-            if(LicenceName == "" && !IsBot()) //What the ???
-            {
-                Log.error("Driver \""+driverName+"\", has no licence name and was Kicked, something weird happen.\r\n");
-                iSession.SendMSTMessage("/msg ^1driver ^7" + driverName+" ^1will be kicked for wrong licence.");
-                iSession.SendMSTMessage("/kick "+driverName);
-                
-                return;
-            }
+
             if (driverName != _packet.driverName)    //I think should be a check != null && != then Error... like custom cheater packet
                 driverName = _packet.driverName;
 
@@ -119,6 +112,14 @@ namespace Drive_LFSS.Game_
 
             if (driverTypeMask != _packet.driverTypeMask)
                 driverTypeMask = _packet.driverTypeMask;
+            if (LicenceName == "" && !IsBot()) //What the ???
+            {
+                Log.error("Driver \"" + driverName + "\", has no licence name and was Kicked, something weird happen.\r\n");
+                iSession.SendMSTMessage("/msg ^1driver ^7" + driverName + " ^1will be kicked for wrong licence.");
+                iSession.SendMSTMessage("/kick " + driverName);
+
+                return;
+            }
 
             driverMask = _packet.driverMask;
 
@@ -126,8 +127,7 @@ namespace Drive_LFSS.Game_
             //_packet.numberInRaceCar_NSURE // What is That???
             if (connectionId != _packet.connectionId)
             {
-                if(connectionId != 0)
-                    Log.error("Licence.Init(PacketNPL _packet), current connectionId("+connectionId+") was not same as packet connectionId("+_packet.connectionId+"), LicenceName: "+licenceName+".\r\n");
+                Log.error("Licence.Init(PacketNPL _packet), current connectionId("+connectionId+") was not same as packet connectionId("+_packet.connectionId+"), LicenceName: "+licenceName+".\r\n");
                 connectionId = _packet.connectionId;
             }
 
@@ -368,7 +368,7 @@ namespace Drive_LFSS.Game_
         private bool yellowFlagActive = false;
         private bool blueFlagActive = false;
         private uint warningDrivingCancelTimer = 0;
-        private uint warningDrivingTimerCheck = 0;
+        private uint warningDrivingTypeTimer = 0;
         private byte warningDrivingReferenceCarId = 0;
         private uint badDrivingCount = 0;
         private uint driftScoreByTime = 0;
@@ -495,7 +495,8 @@ namespace Drive_LFSS.Game_
         internal PB pb = null;
         internal WR wr = null;
         private Dictionary<string,Dictionary<string,Rank>> rank = null;
-        
+
+        private static uint WARNING_DRIVING_CHECK = 5800;
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
         new internal void update(uint diff) 
@@ -561,24 +562,25 @@ namespace Drive_LFSS.Game_
                     warningDrivingCancelTimer -= diff;
                 else
                 {
+                    warningDrivingCancelTimer = 0;
                     Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
                     if(_driver != null)
                     {
                         _driver.BadDrivingCount++;
                         _driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
                     }
-                    RemoveCancelWarningDriving(true);
+                    RemoveCancelWarningDriving(false);
                 }
             }
 
             if (warningDrivingType != Warning_Driving_Type.NONE)
             {
-                if (warningDrivingTimerCheck > diff)
-                    warningDrivingTimerCheck -= diff;
+                if (warningDrivingTypeTimer > diff)
+                    warningDrivingTypeTimer -= diff;
                 else
                 {
                     warningDrivingType = Warning_Driving_Type.NONE;
-                    warningDrivingTimerCheck = 0;
+                    warningDrivingTypeTimer = 0;
                 }
             }
 
@@ -747,8 +749,8 @@ namespace Drive_LFSS.Game_
         public void SetWarningDrivingCheck(Warning_Driving_Type _warningDrivingType, byte referenceCarId)
         {
             warningDrivingType = _warningDrivingType;
-            warningDrivingTimerCheck = 5800;
-            warningDrivingReferenceCarId = referenceCarId;
+            warningDrivingTypeTimer = WARNING_DRIVING_CHECK;
+            warningDrivingReferenceCarId = referenceCarId; //TODO: licenceName hihi :) this can become not funny!
         }
         public void SendCancelWarningDriving()
         {
@@ -756,7 +758,7 @@ namespace Drive_LFSS.Game_
             if (_driver == null)
                 return;
 
-            warningDrivingTimerCheck = warningDrivingCancelTimer = 8000;
+            warningDrivingTypeTimer = warningDrivingCancelTimer = 8000;
             SendUpdateButton(Button_Entry.CANCEL_WARNING_DRIVING_1);
             SendUpdateButton(Button_Entry.CANCEL_WARNING_DRIVING_2);
             SendUpdateButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_3, _driver.driverName);
@@ -764,7 +766,7 @@ namespace Drive_LFSS.Game_
         }
         public void RemoveCancelWarningDriving(bool isCancelClick)
         {
-            warningDrivingCancelTimer = warningDrivingTimerCheck = 0;
+            warningDrivingCancelTimer = warningDrivingTypeTimer = 0;
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_1);
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_2);
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_3);
@@ -809,7 +811,7 @@ namespace Drive_LFSS.Game_
         }
         public bool IsBot()
         {
-            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI || ConnectionId == 0);
+            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI);
         }
         public void SendMTCMessage(string message)
         {

@@ -131,15 +131,19 @@ namespace Drive_LFSS
            
             #region MainThread update
 
-            long ticks = DateTime.Now.Ticks;
+            DateTime ticks = DateTime.Now;
+            //long ticks = DateTime.Now.Ticks;
             uint diff = 0;
-            
             uint TimerLogFlush = 0;
             while (MainRun)
             {
                 //Timer Thing, Really have to test .net fastest solution.
-                diff = (uint)((DateTime.Now.Ticks - ticks) / tickPerMs); //Diff in MS
-                ticks = DateTime.Now.Ticks;
+                TimeSpan diffSpan = (DateTime.Now - ticks);
+                diff = (uint)diffSpan.TotalMilliseconds;
+                ticks = DateTime.Now;
+                
+                //diff = (uint)((DateTime.Now.Ticks - ticks) / tickPerMs); //Diff in MS
+                //ticks = DateTime.Now.Ticks;
 
                 TimerLogFlush += diff;
                 if (TimerLogFlush > 30000)

@@ -224,13 +224,12 @@ namespace Drive_LFSS.InSim_
         {
             while(Program.MainRun)
             {
-                while (IsConnected())
+                if(IsConnected())
                 {
                     TcpReceive();
                     UdpReceive();
                     TcpSend();
                     UdpSend();
-                    System.Threading.Thread.Sleep(networkThreadSleep);
                 }
                 System.Threading.Thread.Sleep(networkThreadSleep);
             }

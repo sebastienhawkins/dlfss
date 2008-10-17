@@ -119,14 +119,10 @@ namespace Drive_LFSS.ChatModo_
         }
         private void update()
         {
-            uint diff;
-            long ticks = DateTime.Now.Ticks;
             while (Program.MainRun)
             {
-                diff = (uint)((DateTime.Now.Ticks - ticks) / Program.tickPerMs);
-                ticks = DateTime.Now.Ticks;
                 AnalyseNextLine();
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(300);
             }
         }
         

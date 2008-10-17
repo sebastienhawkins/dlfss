@@ -25,7 +25,7 @@ namespace Drive_LFSS.Storage_
     using Drive_LFSS.Definition_;
     using Drive_LFSS.Log_;
 
-    public abstract class Storage
+    abstract class Storage
     {
         protected Storage(string[] tableFmt)
         {
@@ -240,7 +240,7 @@ namespace Drive_LFSS.Storage_
 
     //Normaly they should not have a "public sealed class ButtonTemplate : Storage"
     //I tryed with Storage<T> and Storage<ButtonTemplate>, but Template into c# are fucking limited
-    public sealed class ButtonTemplate : Storage
+    sealed class ButtonTemplate : Storage
     {
         public ButtonTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
         ~ButtonTemplate()
@@ -256,7 +256,7 @@ namespace Drive_LFSS.Storage_
                 return null;
         }
     }
-    public sealed class ButtonTemplateInfo : ICloneable
+    sealed class ButtonTemplateInfo : ICloneable
     {
         public ButtonTemplateInfo(object[] rowInfos)
         {
@@ -341,7 +341,7 @@ namespace Drive_LFSS.Storage_
 
     }
 
-    public sealed class GuiTemplate : Storage
+    sealed class GuiTemplate : Storage
     {
         public GuiTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
         ~GuiTemplate()
@@ -357,7 +357,7 @@ namespace Drive_LFSS.Storage_
                 return null;
         }
     }
-    public sealed class GuiTemplateInfo
+    sealed class GuiTemplateInfo
     {
         public GuiTemplateInfo(object[] rowInfos)
         {
@@ -400,7 +400,7 @@ namespace Drive_LFSS.Storage_
         }
     }
 
-    public sealed class TrackTemplate : Storage
+    sealed class TrackTemplate : Storage
     {
         public TrackTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
         ~TrackTemplate()
@@ -416,7 +416,7 @@ namespace Drive_LFSS.Storage_
                 return null;
         }
     }
-    public sealed class TrackTemplateInfo
+    sealed class TrackTemplateInfo
     {
         public TrackTemplateInfo(object[] rowInfos)
         {
@@ -472,7 +472,7 @@ namespace Drive_LFSS.Storage_
         }
     }
 
-    public sealed class CarTemplate : Storage
+    sealed class CarTemplate : Storage
     {
         public CarTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
         ~CarTemplate()
@@ -496,7 +496,7 @@ namespace Drive_LFSS.Storage_
             return null;
         }
     }
-    public sealed class CarTemplateInfo
+    sealed class CarTemplateInfo
     {
         public CarTemplateInfo(object[] rowInfos)
         {
@@ -534,7 +534,7 @@ namespace Drive_LFSS.Storage_
         }
     }
 
-    public sealed class RaceTemplate : Storage
+    sealed class RaceTemplate : Storage
     {
         public RaceTemplate(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
         ~RaceTemplate()
@@ -550,7 +550,7 @@ namespace Drive_LFSS.Storage_
                 return null;
         }
     }
-    public sealed class RaceTemplateInfo
+    sealed class RaceTemplateInfo
     {
         public RaceTemplateInfo()
         {
@@ -626,7 +626,7 @@ namespace Drive_LFSS.Storage_
         }
     }
 
-    public sealed class DriverBan : Storage
+    sealed class DriverBan : Storage
     {
         public DriverBan(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
         ~DriverBan()
@@ -642,7 +642,7 @@ namespace Drive_LFSS.Storage_
                 return null;
         }
     }
-    public sealed class DriverBanInfo
+    sealed class DriverBanInfo
     {
         public DriverBanInfo(object[] rowInfos)
         {

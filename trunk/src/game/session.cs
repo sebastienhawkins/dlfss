@@ -72,32 +72,28 @@ namespace Drive_LFSS.Game_
         {
             public Ping()
             {
-                pingTime = DateTime.Now.Ticks;
-                sessionLatency = 0;
-                diff = 0;
             }
-            private long pingTime;
-            private long sessionLatency;
-            private uint diff;
-            public void Sending(uint _diff)
+            private DateTime pingTime;
+            private TimeSpan sessionLatency;
+            uint diff = 0;
+            public void Sending(uint diff)
             {
-                pingTime = DateTime.Now.Ticks;
-                diff = _diff;
-
+                pingTime = DateTime.Now;
             }
-            public long Received()
+            public double Received()
             {
-                return (sessionLatency = (DateTime.Now.Ticks - pingTime) / Program.tickPerMs);
+                return (sessionLatency = (DateTime.Now - pingTime)).TotalMilliseconds;
             }
-            public long SessionLatency
+            public int GetLatency()
             {
-                get{return sessionLatency;}
+                return (int)sessionLatency.TotalMilliseconds;
             }
-            public long GetReactionTime()
+            public int GetReactionTime()
             {
-                return sessionLatency - diff;
+                return (int)(sessionLatency.TotalMilliseconds - diff);
             }
         }
+
         private Ping ping;
         private string sessionName;
         private char commandPrefix;
@@ -122,16 +118,16 @@ namespace Drive_LFSS.Game_
         }
         private void PingReceived()
         {
-            long msTime = ping.Received();
+            double msTime = ping.Received();
             #if DEBUG
             Log.network(GetSessionNameForLog() + " Pong! " +  msTime + "ms\r\n");
             #endif
         }
-        public long GetLatency()
+        public int GetLatency()
         {
-            return ping.SessionLatency;
+            return ping.GetLatency();
         }
-        public long GetReactionTime()
+        public int GetReactionTime()
         {
             return ping.GetReactionTime();
         }
@@ -243,7 +239,7 @@ namespace Drive_LFSS.Game_
         private byte GetLicenceIndexNotBot(byte connectionId)
         {
             int count = driverList.Count;
-            for (byte itr = 1; itr < count; itr++)
+            for (byte itr = 0; itr < count; itr++)
             {
                 if (driverList[itr].ConnectionId == connectionId && !driverList[itr].IsBot())
                     return itr;
@@ -296,6 +292,23 @@ namespace Drive_LFSS.Game_
             return (byte)(clientConnectionCount - 1); //Remove The Host
         }
 
+        //Incomplete System RCM, this is not usefull, and i hate the way it work.
+        //TODO very later, complete it, juste because there is shadow under the text with this function ;)
+        /*private static Queue<string[]> rcMessageList = new Queue<string[]>();
+        public void SetRCMessage(string message,string toLicenceName)
+        {
+            rcMessageList.Enqueue(new string[2]{message,toLicenceName});
+        }
+        public string[] GetRCMessage()
+        {
+            return rcMessageList.Dequeue();
+        }
+        public void ClearRCMessage()
+        {
+            lock(rcMessageList){rcMessageList.Clear();}
+        }*/
+        
+                
         private const uint TIMER_PING_PONG = 8000;
         private uint TimerPingPong = 7000;
         internal void update(uint diff)
@@ -356,12 +369,12 @@ namespace Drive_LFSS.Game_
             //will have to rethink this later, that is looking like a HackFix, suck CPU for nothing.
             if (IsExistconnectionId(_packet.connectionId))
             {
-                if (_packet.connectionId == 0)
+                /*if (_packet.connectionId == 0)
                 {
                     driverList[0].Init(_packet);
                     return;
                 }
-                else
+                else*/
                 {
                     Log.error(GetSessionNameForLog() + " New licence connection, but overrides an already existing connectionId, what to do if that happens?");
                     return;
@@ -865,17 +878,21 @@ namespace Drive_LFSS.Game_
             #if DEBUG
             base.processPacket(_packet); //Keep the Log
             #endif
-
+            int index = GetLicenceIndexNotBot(_packet.connectionId);
+            if(index == 255)
+            {
+                Log.error("processPacket(PacketBFN), received a Not Found Driver ID.\r\n");
+                return;
+            }
             switch (_packet.buttonFunction)
             {
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
                 {
-                    Driver driver = driverList[GetLicenceIndexNotBot(_packet.connectionId)];
-                    
-                    driver.ProcessBFNClearAll(driver.HasGuiDisplay() ? false : true); break;
-                }
+                    Driver driver = driverList[index];
+                    driver.ProcessBFNClearAll(driver.HasGuiDisplay() ? false : true);
+                } break;
                 case Button_Function.BUTTON_FUNCTION_REQUEST:
-                    driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessBFNRequest(); break;
+                    driverList[index].ProcessBFNRequest(); break;
             }
         }      //Delete All Button or request Button.
         protected sealed override void processPacket(PacketVTN _packet)
