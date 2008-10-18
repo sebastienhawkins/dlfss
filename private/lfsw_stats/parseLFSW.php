@@ -23,12 +23,17 @@ $maxGuid = $maxGuid[0];
 
 //$maxGuid = 3037911;
 
+
 $start = $maxGuid+1;
 $end = $maxGuid+100400;
-
 echo $maxGuid."\n";
 
-passthru ('SuckRaces.exe '.$start." ".$end );
+
+//RacesData_3069316-3169715.txt
+$start = 3069316;
+$end = 3169715;
+
+//passthru ('SuckRaces.exe '.$start." ".$end ); 
 
 //$raceOut = "guid|serverName|time|trackname\r\n";
 //$lapOut = "guid|position|licence_name|car_prefix|lap_count|timetotal|penality|time_best_lap|best_lap_number|pit_stop|takeover|laps\r\n";
@@ -190,12 +195,12 @@ if(($fh = fopen(".\Races\RacesData_$start-$end.txt","r"))!== FALSE )
 	}
 	fclose($fh);
 	
-	$fro = fopen(".\Races\RaceData.csv","a");
+	//$fro = fopen(".\Races\RaceData.csv","a");
 	//fwrite($fro,//$raceOut);
 	//$raceOut = "";
 	//fclose($fro);
 
-	$flo = fopen(".\Races\LapData.csv","a");
+	//$flo = fopen(".\Races\LapData.csv","a");
 	//fwrite($flo,//$lapOut);
 	//$lapOut = "";
 	//fclose($flo);
@@ -203,7 +208,7 @@ if(($fh = fopen(".\Races\RacesData_$start-$end.txt","r"))!== FALSE )
 
 	//exit;
 }
-mysql_query("UPDATE `lap_data` SET `time_best_lap` = '0' WHERE `time_best_lap`<'5000'" ,$link);
+mysql_query("UPDATE `lap_data` SET `time_best_lap` = '0' WHERE `time_best_lap`<'7000'" ,$link);
 mysql_close($link);
 include('ranking_x.php');
 

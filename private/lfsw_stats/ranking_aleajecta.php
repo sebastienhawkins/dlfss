@@ -33,45 +33,28 @@ $trackNames = array();
 while ($row = mysql_fetch_array($result)) 
 	array_push($trackNames,$row[0]);
 
-$result = mysql_query("SELECT DISTINCT `licence_name` FROM `lfsw_raw`.`lap_data`",$link);
+$result = mysql_query("SELECT DISTINCT `licence_name` FROM `driver`",$link);
 if (!$result) {die(mysql_error());}
+$licenceGuids = array();
 $licenceNames = array();
-while ($row = mysql_fetch_array($result)) 
-	array_push($licenceNames,$row[0]);
-
-//var_dump($trackName);
-
-if (!mysql_select_db('lfsw_raw')){die(mysql_error());}
-
-$query = "SELECT DISTINCT `guid`,COUNT(`guid`) FROM `lap_data` GROUP BY `guid`";
-$result = mysql_query($query ,$link);
-if (!$result) {die(mysql_error());}
-$driverCount = array();
 while ($row = mysql_fetch_array($result))
-	$driverCount[$row[0]] = $row[1];
-
+{
+	array_push($licenceNames,$row[0]);
+}
+mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Oct^2/^714' WHERE `entry`IN(57)",$link);
 
 
 foreach($licenceNames as $licenceName)
 {
-	echo "$licenceName\n";
-	
-	//Guids
-	/*$guids = "";
-	$query = "SELECT DISTINCT `lap_data`.`guid`
-	FROM `lap_data`
-	WHERE `licence_name`='$licenceName'";
-	
-	$result = mysql_query($query ,$link);
+	echo "Driver_Guid: $licenceName\n";
+	$driverGuids = "";
+	$result = mysql_query("SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName'" ,$link);
 	if (!$result) {die(mysql_error());}
-	while(($row = mysql_fetch_array($result)))
-		$guids .= $row[0].",";
-	
-	if(substr($guids,strlen($guids)-1) == ",")
-		$guids = substr($guids,0,strlen($guids)-1);
-	
-	//echo "Guids: $guids\n";*/
-	
+	while( ($row = mysql_fetch_array($result)) )
+	{
+		$driverGuids .= $row[0]." ";
+	}
+	$driverGuids = " ".$driverGuids;
 	foreach($trackNames as $trackName)
 	{
 		if(strstr($trackName,"AU") ) //later do this for Drag rank...
@@ -79,12 +62,6 @@ foreach($licenceNames as $licenceName)
 			
 		foreach($carPrefixs as $carPrefix)
 		{
-			/*if(	$carPrefix != "FBM" && $carPrefix != "XFG" && 
-				$carPrefix != "XRG" && $carPrefix != "MRT" && 
-				$carPrefix != "F08" && $carPrefix != "FOX") 
-				continue;*/
-				
-			//echo "Track: $trackName, Car: $carPrefix\n";
 			
 			if(!isset($wr[$trackName][$carPrefix]))
 			{
@@ -92,84 +69,79 @@ foreach($licenceNames as $licenceName)
 				continue;
 			}
 			$bestEver = $wr[$trackName][$carPrefix];
-			//echo "BestEver: $bestEver \n";
-			
-			//Average
-			$query = "SELECT AVG(`lap_data`.`time_best_lap`)
-			FROM `lap_data`,`race_data`
-			WHERE `lap_data`.`car_prefix`='$carPrefix'
-			AND `lap_data`.`guid`=`race_data`.`guid`
-			AND `race_data`.`track_name`='$trackName'
-			AND `lap_data`.`time_best_lap` < ".($bestEver *2)."
-			AND `lap_data`.`time_best_lap` >= ".($bestEver );
+			//echo "$trackName, $carPrefix BestEver: $bestEver \n";
 
+			//Average
+			$average = 0;
+			$query = "SELECT AVG(`lap_time`)
+			FROM `driver_lap`
+			WHERE `driver_lap`.`track_prefix`='$trackName'
+			AND `driver_lap`.`car_prefix`='$carPrefix'
+			AND `driver_lap`.`lap_time` < ".($bestEver *2)."
+			AND `driver_lap`.`lap_time` >= ".($bestEver );
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
-			$row = mysql_fetch_array($result);
-			$average = $row[0];
+			if ($result)
+			{
+				$row = mysql_fetch_array($result);
+				$average = ($row[0] == "" ? 0 : $row[0]);
+			}
 			//echo "Average: $average\n";
 
-
 			$rank = 0;
-			//echo "Driver: $licenceName\n";
-
-			//if($licenceName != "Greenseed")continue;
 			//Driver RaceCount
-			$query = "SELECT COUNT(`lap_data`.`guid`)
-			FROM `lap_data`,`race_data`
-			WHERE `lap_data`.`licence_name`LIKE'$licenceName'
-			AND `lap_data`.`car_prefix`='$carPrefix'
-			AND `lap_data`.`guid`=`race_data`.`guid`
-			AND `race_data`.`track_name`='$trackName'
-			AND `lap_data`.`time_best_lap` >= ".($bestEver )."
-			AND `lap_data`.`time_best_lap` < ".($bestEver *2);
+			$query = "SELECT COUNT(`guid_driver`)
+			FROM `driver_lap`
+			WHERE `driver_lap`.`track_prefix`='$trackName'
+			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
+			AND `driver_lap`.`car_prefix`='$carPrefix'
+			AND `driver_lap`.`lap_time` >= ".($bestEver )."
+			AND `driver_lap`.`lap_time` < ".($bestEver *2);
 
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
 			$row = mysql_fetch_array($result);
 			//var_dump($row);
 			$driverRaceCount = $row[0];
-			if($driverRaceCount < 3)
+			//echo "RaceCount: $driverRaceCount\n";
+			if($driverRaceCount < 1)
 				continue;
-			
-			//echo "Track: $trackName, Car: $carPrefix\n";
-			//echo "BestEver: $bestEver \n";
-			//echo "Average: $average\n";
-			//echo "$licenceName RaceCount: ".$driverRaceCount."\n";
-
-			
 
 			//Driver Best
-			$query =   "SELECT `lap_data`.`time_best_lap`
-			FROM `lap_data`,`race_data`
-			WHERE `lap_data`.`licence_name`LIKE'$licenceName'
-			AND `lap_data`.`car_prefix`='$carPrefix'
-			AND `lap_data`.`guid`=`race_data`.`guid`
-			AND `race_data`.`track_name`='$trackName'
-			AND `lap_data`.`time_best_lap` >= ".($bestEver )."
-			ORDER BY `lap_data`.`time_best_lap` LIMIT 1";
+			$query =   "SELECT `lap_time`
+			FROM `driver_lap`
+			WHERE `driver_lap`.`track_prefix`='$trackName'
+			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
+			AND `driver_lap`.`car_prefix`='$carPrefix'
+			AND `driver_lap`.`lap_time` >= ".($bestEver )."
+			ORDER BY `driver_lap`.`lap_time` LIMIT 1";
 
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
 			$row = mysql_fetch_array($result);
 			//var_dump($row);
-			$driverBest = $row[0]; 
-			$driverBestS = ($bestEver / $driverBest * 9999 );
-			$driverBestS = $driverBestS-(((9999)-$driverBestS)*2);
-			$driverBestS = $driverBestS * 5000 / 9999;
-			$driverBestS = (int)$driverBestS ;
-			//echo "$licenceName Best | Score : ".$driverBest." | ".$driverBestS."\n";
-			
+			$driverBest = $row[0];
+			if($driverBest != "" && $driverBest != 0)
+			{
+				$driverBestS = ($bestEver / $driverBest * 9999 );
+				$driverBestS = $driverBestS-(((9999)-$driverBestS)*2);
+				$driverBestS = $driverBestS * 5000 / 9999;
+				$driverBestS = (int)$driverBestS ;
+			}
+			else
+			{
+				$driverBestS = $driverBest = 0;
+			}
+			//echo "Best | Score : $driverBest | $driverBestS\n";
 
 			//Driver Average
-			$query = "SELECT AVG(`lap_data`.`time_best_lap`)
-			FROM `lap_data`,`race_data`
-			WHERE `lap_data`.`licence_name`LIKE'$licenceName'
-			AND `lap_data`.`car_prefix`='$carPrefix'
-			AND `lap_data`.`guid`=`race_data`.`guid`
-			AND `race_data`.`track_name`='$trackName'
-			AND `lap_data`.`time_best_lap` >= ".($bestEver )."
-			AND `lap_data`.`time_best_lap` < ".($bestEver *2);
+			$query = "SELECT AVG(`lap_time`)
+			FROM `driver_lap`
+			WHERE `driver_lap`.`track_prefix`='$trackName'
+			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
+			AND `driver_lap`.`car_prefix`='$carPrefix'
+			AND `driver_lap`.`lap_time` >= ".($bestEver )."
+			AND `driver_lap`.`lap_time` < ".($bestEver *2);
 
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
@@ -177,55 +149,64 @@ foreach($licenceNames as $licenceName)
 			//var_dump($row);
 			$driverAverage = $row[0];
 			
-			$driverAverageS = ( $average/$driverAverage*9999);
-			$driverAverageS = $driverAverageS-(((9999)-$driverAverageS)*2);
-			$driverAverageS = $driverAverageS * 5000 / 9999 /2;
-			$driverAverageS = (int)$driverAverageS ;
-			//echo "$licenceName Average | Score: ".$driverAverage." | ".$driverAverageS."\n";
-			$driverStabilityS = ($driverBest / $driverAverage *9999);
-			$driverStabilityS = $driverStabilityS-(((9999)-$driverStabilityS)*2);
-			$driverStabilityS = $driverStabilityS * 5000 / 9999;
-			$driverStabilityS = (int)$driverStabilityS ;
-			//echo "$licenceName Stability Score: ".$driverStabilityS."\n";
-			
+			if($driverAverage != "" && $driverAverage != 0)
+			{
+				$driverAverageS = ( $average/$driverAverage*9999);
+				$driverAverageS = $driverAverageS-(((9999)-$driverAverageS)*2);
+				$driverAverageS = $driverAverageS * 5000 / 9999;
+				$driverAverageS = (int)$driverAverageS ;
+
+				$driverStabilityS = ($driverBest / $driverAverage *9999);
+				$driverStabilityS = $driverStabilityS-(((9949)-$driverStabilityS)*2); //Gave +50 point for sure
+				$driverStabilityS = $driverStabilityS * 5000 / 9999;
+				$driverStabilityS = (int)$driverStabilityS ;
+			}
+			else
+				$driverAverage = $driverAverageS = $driverStabilityS = 0;
+			//echo "Average $average | Score: $driverAverage | $driverAverageS\n";
+			//echo "Stability Score: $driverStabilityS\n";
+
 			//Driver Win
-			$driverWin = 0;
-			$query = "SELECT `lap_data`.`guid`,`lap_data`.`position`
-			FROM `lap_data`,`race_data`
-			WHERE `lap_data`.`licence_name`LIKE'$licenceName'
-			AND `lap_data`.`car_prefix`='$carPrefix'
-			AND `lap_data`.`position` > 0
-			AND `lap_data`.`position` < 4
-			AND `lap_data`.`guid`=`race_data`.`guid`
-			AND `race_data`.`track_name`='$trackName'
-			AND `lap_data`.`time_best_lap` >= ".($bestEver )."
-			AND `lap_data`.`time_best_lap` < ".($bestEver *2);
+			$query = "SELECT `race`.`finish_order`,`race`.`race_laps`,`driver_lap`.`total_time`
+			FROM `driver_lap`,`race`
+			WHERE `race`.`finish_order` != ''
+			AND `race`.`track_prefix`='$trackName'
+			AND `race`.`guid`=`driver_lap`.`guid_race`
+			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
+			AND `driver_lap`.`car_prefix`='$carPrefix'
+			AND `driver_lap`.`lap_completed`=`race`.`race_laps`";
 
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
+			$driverWinS = 0;
+			$winK = 0;
+			$averageLapTime = 0;
 			while($row = mysql_fetch_array($result))
 			{
-				if($driverCount[$row[0]] > 2)
+				$datas = split(" ",$row[0]);
+				$driverCount = count($datas);
+				$averageLapTime = $row[2]/$row[1];
+				$winK = $driverCount + (($bestEver-$averageLapTime)/$bestEver*100) - 5;
+//				- (($averageLapTime - $bestEver)/1000)) * (16-$driverCount)))/50;
+				$itr = 0;
+				foreach($datas as $itr => $value)
 				{
-					for($pos = 1; $pos < 33 ;$pos++)
+					$itr++;
+					if($value != "" && strstr($driverGuids," ".$value." "))
 					{
-						if($row[1] == $pos)
-						{
-							
-							$driverWin += ($driverCount[$row[0]]-$pos)/2;
-							//echo "$pos | $driverWin\n";
-						}
+						$driverWinS = $winK + $driverCount-$itr + 1;
+						echo "$winK | $averageLapTime | $bestEver | $driverCount position: $itr | $driverWinS\n";
+						break;
 					}
 				}
 			}
-			$driverWinS = 0;
-			if($driverWin > 0 )
-				$driverWinS = (int)(($driverWin));
-			//echo "$licenceName Win | Score: ".$driverWin." | ".$driverWinS."\n";
+			if($driverWinS < 0)
+				$driverWinS = 0;
 			
+
 			$rank = (int)(($driverBestS + ($driverBestS/2)) + ($driverAverageS+($driverAverageS/5))+ $driverStabilityS + $driverWinS);
-			$driverWinS = (int)$driverWinS;
-			
+			if($rank < 0)
+				$rank = 0;
 			
 			$PB_LOW = 1;
 			$PB_HIGH = 2;
@@ -239,7 +220,7 @@ foreach($licenceNames as $licenceName)
 			$TOTAL_HIGH = 512;
 			$POSITION_LOW = 1024;
 			$POSITION_HIGH = 2048;
-			
+
 			$changeMask = 0;
 			$result = mysql_query("SELECT * FROM `drive_lfss`.`stats_rank_driver` WHERE `licence_name`LIKE'$licenceName' AND `track_prefix`='$trackName' AND `car_prefix`='$carPrefix'",$link);
 			if ($result) 
@@ -276,9 +257,9 @@ foreach($licenceNames as $licenceName)
 				else if($row[8] < $driverBestS)
 					$changeMask += $POSITION_LOW;*/
 			}
+			//continue;
 			
-			
-			
+			//echo "$licenceName Global Ranking Score: $rank\n";
 			$result = mysql_query("DELETE FROM `drive_lfss`.`stats_rank_driver` WHERE `licence_name`LIKE'$licenceName' AND `track_prefix`='$trackName' AND `car_prefix`='$carPrefix'",$link);
 			if (!$result) {die(mysql_error());}
 			
@@ -288,13 +269,13 @@ foreach($licenceNames as $licenceName)
 			if (!$result) {die(mysql_error());}
 			
 
-			//echo "$licenceName Global Ranking Score: $rank\n";
+			
 		}
 	}
 }
 
 mysql_close($link);
-include("ranking_position.php");
+include("ranking_position_aleajecta.php");
 
 function LFSWTrackToTrackPrefix(&$lfswTrack)
 {

@@ -16,7 +16,7 @@ $trackNames = array();
 while ($row = mysql_fetch_array($result)) 
 	array_push($trackNames,$row[0]);
 
-$result = mysql_query("SELECT DISTINCT `licence_name` FROM `drive_lfss`.`driver`",$link);
+$result = mysql_query("SELECT DISTINCT `licence_name` FROM `driver`",$link);
 if (!$result) {die(mysql_error());}
 $licenceNames = array();
 while ($row = mysql_fetch_array($result)) 
@@ -51,7 +51,7 @@ foreach($licenceNames as $licenceName)
 					else if($row2[0] < $row[1])
 						$changeMask += 1024;
 				}
-				mysql_query("UPDATE `drive_lfss`.`stats_rank_driver` SET `position`='".$row[1]."', `change_mask`=`change_mask`|$changeMask  WHERE `licence_name`LIKE'$licenceName' AND `track_prefix`='$trackName' AND `car_prefix`LIKE'$carPrefix'",$link);
+				mysql_query("UPDATE `drive_lfss`.`stats_rank_driver` SET `position`='".($row[1]+1)."', `change_mask`=`change_mask`|$changeMask  WHERE `licence_name`LIKE'$licenceName' AND `track_prefix`='$trackName' AND `car_prefix`LIKE'$carPrefix'",$link);
 			}
 		}
 	}
