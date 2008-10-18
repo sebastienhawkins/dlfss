@@ -105,7 +105,7 @@ namespace Drive_LFSS.Game_
             {
                 if(!isOn)
                     return;
-                if (started && (!driver.IsMoving() || driver.GetSpeedKmh() < startSpeed))
+                if (started && driver.GetSpeedKmh() < startSpeed)
                     End();
                 else if (!started && driver.GetSpeedKmh() >= startSpeed)
                     Start(driver);
@@ -299,19 +299,19 @@ namespace Drive_LFSS.Game_
                 scoreTick = 0;
                 counterCorrection = 0;
                 packetReceive = 0;
-                if(driver.IsAdmin)
+                /*if(driver.IsAdmin)
                 {
-                   driver.SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
+                    driver.SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
                     driver.SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
-                }
+                }*/
             }
             private void End(Driver driver)
             {
                 started = false;
-                if(driver.IsAdmin)
+                /*if(driver.IsAdmin)
                 {
                     driver.SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
-                }
+                }*/
             }
             private void Sucess(Driver driver)
             {
@@ -322,10 +322,10 @@ namespace Drive_LFSS.Game_
                 End(driver);
                 
                 //Debug think
-                if(((Driver)driver).IsAdmin)
+                /*if(((Driver)driver).IsAdmin)
                 {
                     ((IButton)driver).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
-                }
+                }*/
                 ((Driver)driver).driftScoreByTime += (uint)score;
                 if (((Driver)driver).ISession.Script.CarDriftScoring((ICar)driver, (uint)score))
                     return;

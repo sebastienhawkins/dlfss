@@ -575,8 +575,6 @@ namespace Drive_LFSS.Game_
                         if(isMoving)
                         {
                             isMoving = false;
-                            lock(featureAcceleration){featureAcceleration.Update(this);}
-                            lock (featureDriftScore){featureDriftScore.Update(this);}
                         }
                     }
                     else
