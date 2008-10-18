@@ -1,0 +1,11 @@
+bin\Release\ScriptMgr.dll
+bin\Release\ScriptMgr.pdb
+obj\Release\ResolveAssemblyReference.cache
+..\..\bin\Release\DLFSSScript.dll
+..\..\bin\Release\DLFSSScript.pdb
+obj\Release\DLFSSScript.dll
+obj\Release\DLFSSScript.pdb
+..\..\bin\Release\sqlite3.6.0.so
+..\..\bin\Release\sqlite3.dll
+..\..\bin\Release\dlfss.db
+..\..\bin\Release\dlfss.cfg

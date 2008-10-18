@@ -1,0 +1,3 @@
+mysql -h127.0.0.1 -uroot -pdexxa -e "DELETE FROM `driver`;DELETE FROM `driver_ban`;DELETE FROM `race`;DELETE FROM `driver_lap`;DELETE FROM `stats_rank_driver`;DELETE FROM `stats_warning_driver`" drive_lfss 
+mysql -h127.0.0.1 -uroot -pdexxa -e "ALTER TABLE `driver` AUTO_INCREMENT = 1;ALTER TABLE `driver_ban` AUTO_INCREMENT = 1;ALTER TABLE `driver_lap` AUTO_INCREMENT = 1;ALTER TABLE `race` AUTO_INCREMENT = 1;" drive_lfss 
+mysqldump --lock-tables=false --comments=true --add-drop-table --extended-insert=false -h127.0.0.1 -uroot -pdexxa drive_lfss -r c:\inwork\dlfss\trunk\sql\mysql\Drive_LFSS.sql
