@@ -157,6 +157,7 @@ namespace Drive_LFSS.Game_
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING,carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
+                        Log.commandHelp("Warning Driving Part 1 Detected\r\n");
                         return;
                     }
 
@@ -164,6 +165,7 @@ namespace Drive_LFSS.Game_
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
+                        Log.commandHelp("Warning Driving Part 1 Detected\r\n");
                         return;
                     }
 
@@ -171,6 +173,7 @@ namespace Drive_LFSS.Game_
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, car.CarId);
+                        Log.commandHelp("Warning Driving Part 1 Detected\r\n");
                         return;
                     }
                 } 

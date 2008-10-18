@@ -115,7 +115,7 @@ namespace Drive_LFSS.Game_
         }
         private Queue<ButtonMessage> buttonMessageTop = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
         private Queue<ButtonMessage> buttonMessageMiddle = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
-        private Gui_Entry currentGui = Gui_Entry.NONE;
+        protected Gui_Entry currentGui = Gui_Entry.NONE;
         private const uint FREEZE_BUTTON_CLEAR = 1000;
         private const uint FREEZE_BUTTON = 1000;
         private uint freezeButtonClear = 0;
@@ -230,13 +230,13 @@ namespace Drive_LFSS.Game_
             }
         }
 
-        internal protected void SendGui(ushort guiEntry, string text)
+        public void SendGui(ushort guiEntry, string text)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             guiInfo.Text = text;
             SendGui(guiInfo);
         }
-        public void SendGui(ushort guiEntry)
+        protected void SendGui(Gui_Entry guiEntry)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             SendGui(guiInfo);
@@ -477,7 +477,7 @@ namespace Drive_LFSS.Game_
         }
         internal void SendConfigGui()
         {
-            SendGui((ushort)Gui_Entry.CONFIG_USER);
+            SendGui(Gui_Entry.CONFIG_USER);
             
             SendUpdateButton(Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + ((Driver)this).GetAccelerationStartSpeed() + "^2-^7" + ((Driver)this).GetAccelerationEndSpeed() + " ^2Kmh");
             SendUpdateButton(Button_Entry.CONFIG_USER_ACC_ON, (((Driver)this).IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
@@ -494,7 +494,7 @@ namespace Drive_LFSS.Game_
         }
         internal void SendHelpGui()
         {
-            SendGui((ushort)Gui_Entry.HELP);
+            SendGui(Gui_Entry.HELP);
         }
         internal void RemoveHelpGui()
         {
@@ -502,7 +502,7 @@ namespace Drive_LFSS.Game_
         }
         internal void SendRankGui(Button_Entry startWith)
         {
-            SendGui((ushort)Gui_Entry.RANK);
+            SendGui(Gui_Entry.RANK);
             switch(startWith)
             {
                 case Button_Entry.RANK_BUTTON_TOP20:
@@ -843,7 +843,7 @@ namespace Drive_LFSS.Game_
             //for (byte itr = 0; ++itr < 3; )
                 //SendButton(Button_Entry.RESULT_BG);
                 
-            SendGui((ushort)Gui_Entry.RESULT);
+            SendGui(Gui_Entry.RESULT);
             {
                 Dictionary<string, int>.Enumerator itr =  scoringResultTextDisplay.GetEnumerator();
                 ButtonTemplateInfo buttonName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RESULT_NAME_DISPLAY);

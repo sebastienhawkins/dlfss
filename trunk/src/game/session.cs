@@ -450,7 +450,7 @@ namespace Drive_LFSS.Game_
                 driver = driverList[index];
             }
             race.ProcessCarJoinRace(driver);
-        }      // New Car Join Race
+        }      // Car Join Race
         protected sealed override void processPacket(PacketPLL _packet)
         {
             #if DEBUG
@@ -507,27 +507,27 @@ namespace Drive_LFSS.Game_
             if (!IsExistconnectionId(_packet.connectionId))
                 return;
 
-            Driver _driver = driverList[GetFirstLicenceIndex(_packet.connectionId)];
+            Driver driver = driverList[GetFirstLicenceIndex(_packet.connectionId)];
 
             if (_packet.message[_packet.textStart] == commandPrefix) //Ingame Command
             {
                 #if DEBUG
-                Log.debug(GetSessionNameForLog() + " Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + _driver.LicenceName + "\r\n");
+                Log.debug(GetSessionNameForLog() + " Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + driver.LicenceName + "\r\n");
                 #endif
-                CommandExec(_driver, _packet.message.Substring(_packet.textStart));
+                CommandExec(driver, _packet.message.Substring(_packet.textStart));
             }
-            else if (_packet.chatUserType == Chat_Type.SYSTEM) //Host chat
+            else if (_packet.chatUserType == Chat_Type.SYSTEM || driver.IsBot()) //Host chat
             {
                 Program.ircClient.SendToChannel(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
                 Log.chat(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
             
             }
-            else if (_packet.chatUserType == Chat_Type.USER)  //Player Chat
+            else if (_packet.chatUserType == Chat_Type.USER && !driver.IsBot())  //Player Chat
             {
-                if(_driver.GetGuid() != 0)
-                    chatModo.AddNewLine(_driver.DriverName,_packet.message );
-                Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + _driver.DriverName.Replace("^", "\x03") + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
-                Log.chat(GetSessionNameForLog() + " " + _driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
+                if(driver.GetGuid() != 0)
+                    chatModo.AddNewLine(driver.DriverName,_packet.message );
+                Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + driver.DriverName.Replace("^", "\x03") + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
+                Log.chat(GetSessionNameForLog() + " " + driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
             }
         }      // message out
         protected sealed override void processPacket(PacketREO _packet)
@@ -916,6 +916,7 @@ namespace Drive_LFSS.Game_
             }
 
             driverList[index].ProcessEnterGarage();
+            race.ProcessCarLeaveRace(((CarMotion)driverList[index]));
         }
         protected sealed override void processPacket(PacketFLG _packet)
         {

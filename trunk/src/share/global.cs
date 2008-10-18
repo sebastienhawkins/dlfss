@@ -88,6 +88,7 @@ namespace Drive_LFSS.Definition_
         RACE_FLAG_CAN_RESET = 128,
         RACE_FLAG_FORCE_COKPIT_VIEW = 256
     }
+    
     public enum Button_Entry : ushort
     {
         NONE = 0,
@@ -173,7 +174,20 @@ namespace Drive_LFSS.Definition_
         TEXT = 4,
         RANK = 5,
         RESULT = 6,
+        GREEN_FLAG = 7,
+        PIT_CLOSE_FLAG = 8,
+        YELLOW_FLAG_LOCAL = 9,
+        YELLOW_FLAG_GLOBAL = 10,
+        REG_FLAG_STOP_RACE = 11,
+        BLACK_FLAG_PENALITY = 12,
+        BLUE_FLAG_SLOW_CAR = 13,
+        WHITE_FLAG_FINAL_LAP = 14,
+        BLACK_FLAG_CAR_PROBLEM = 15,
+        BLACK_FLAG_NO_SCORE = 16,
+        FLAG_RACE_END = 17,
+        
     }
+    
     public enum Button_Safe_Coord_Range
     {
         BUTTON_COORD_X_MIN = 0,

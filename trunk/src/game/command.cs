@@ -42,6 +42,7 @@ namespace Drive_LFSS.Server_
            command["top20"] = new CommandName(0, new CommandDelegate(Rank));
            command["test"] = new CommandName(1, new CommandDelegate(Test));
            command["result"] = new CommandName(0, new CommandDelegate(Result));
+           command["say"] = new CommandName(1, new CommandDelegate(Say));
         }
         ~CommandInGame()
         {
@@ -60,7 +61,8 @@ namespace Drive_LFSS.Server_
         private delegate void CommandDelegate(Driver driver, string[] args);
         private Dictionary<string, CommandName> command = new Dictionary<string, CommandName>();
         private readonly Session session;
-
+        private const uint DISPLAY_TIME = 4500;
+        
         public void Exec(Driver driver, string _commandText)
         {
             string[] args = _commandText.Split(' ');                 //Can Be little faster... since we need only left to first white space
@@ -92,18 +94,51 @@ namespace Drive_LFSS.Server_
         {
             if (args.Length != 2)
             {
-                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!kick ^3username",4500);
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!kick ^3username", DISPLAY_TIME);
                 return;
             }
-            driver.AddMessageMiddle("^7You kicked username: ^3" + args[1]+".",4500);
+            driver.AddMessageMiddle("^7You kicked username: ^3" + args[1] + ".", DISPLAY_TIME);
             Log.command("Command.Kick(), User: " + driver.LicenceName + ", Kicked User: " + args[1] + "\r\n");
             driver.ISession.SendMSTMessage("/kick " + args[1]);
+        }
+        private void Say(Driver driver, string[] args)
+        {
+            if (args.Length < 3)
+            {
+                driver.AddMessageMiddle("^2Invalid parameter count, Usage: ^5!say ^3serverName^2/^3all^2/^3irc commandText", DISPLAY_TIME);
+                return;
+            }
+
+            string message = String.Join(" ", args, 2, args.Length - 2);
+
+            if (args[1] == "all")
+            {
+                Dictionary<string, Session>.Enumerator itr = SessionList.Sessions.GetEnumerator();
+                while (itr.MoveNext())
+                    itr.Current.Value.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
+            }
+            else if (args[1] == "irc")
+            {
+                if(!Program.ircClient.IsConnected)
+                    driver.AddMessageMiddle("^2Command ^5say ^2to ^7irc^2, mIRC is ^1disable^2.", DISPLAY_TIME);
+                else
+                    Program.ircClient.SendToChannel(message);
+            }
+            else
+            {
+                string serverName = args[1];
+
+                if (SessionList.Sessions.ContainsKey(serverName))
+                    session.AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MST, Packet_Type.PACKET_MST_SEND_NORMAL_CHAT, new PacketMST(message)));
+                else
+                    driver.AddMessageMiddle("^2Command ^5say^2 serverName Not Found: ^7" + args[1] + "^2.", DISPLAY_TIME);
+            }
         }
         private void Reload(Driver driver, string[] args)
         {
             if (args.Length != 2)
             {
-                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!reload ^3tableName", 4500);
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!reload ^3tableName", DISPLAY_TIME);
                 return;
             }
             switch (args[1])
@@ -111,66 +146,66 @@ namespace Drive_LFSS.Server_
                 case "all":
                     {
                         Program.Reload("all");
-                        driver.AddMessageMiddle("^7Completed reloading, ^3everything", 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3everything", DISPLAY_TIME);
                     } break;
                 case "track":
                 case "track_template":
                     {
                         Program.Reload("track_template");
-                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                     } break;
                 case "car":
                 case "car_template":
                     {
                         Program.Reload("car_template");
-                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                     } break;
                 case "button":
                 case "button_template":
                     {
                         Program.Reload("button_template");
-                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                        driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                     } break;
                 case "race":
                 {
                     Program.Reload("race_template");
                     Program.Reload("race_map");
-                    driver.AddMessageMiddle("^7Completed reloading, ^3race_template & race_map", 4500);
+                    driver.AddMessageMiddle("^7Completed reloading, ^3race_template & race_map", DISPLAY_TIME);
                 } break;
                 case "race_template":
                 {
                     Program.Reload("race_template");
-                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
                 case "race_map":
                 {
                     Program.Reload("race_map");
-                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
                 case "bad":
                 case "bad_word":
                 {
                     Program.Reload("bad_word");
-                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 }break;
                 case "ban":
                 case "driver_ban":
                 {
                     Program.Reload("driver_ban");
-                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
                 case "gui":
                 case "gui_template":
                 {
                     Program.Reload("gui_template");
-                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
                 case "config":
                 {
                     Program.Reload("config");
-                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], 4500);
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
-                default:driver.AddMessageMiddle("^7Unknown tableName, ^3" + args[1], 4500);break;
+                default: driver.AddMessageMiddle("^7Unknown tableName, ^3" + args[1], DISPLAY_TIME); break;
 
                     Log.command("Command.Reload(), User: " + driver.LicenceName + ", reloaded: " + args[1] + "\r\n");
             }
@@ -188,7 +223,7 @@ namespace Drive_LFSS.Server_
         {
             if (args.Length != 2)
             {
-                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!status ^3serverName^7/^3all^7/^3current", 7000);
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!status ^3serverName^7/^3all^7/^3current", DISPLAY_TIME);
                 return;
             }
 
@@ -254,7 +289,8 @@ namespace Drive_LFSS.Server_
         }
         private void Test(Driver driver, string[] args)
         {
-            driver.SendResultGui(new Dictionary<string, int>() { { "1- greenseed", 5000 }, { "mekac", 5000 }, { "maxdoel", 5000 } });
+            //driver.SendResultGui(new Dictionary<string, int>() { { "1- greenseed", 5000 }, { "mekac", 5000 }, { "maxdoel", 5000 } });
+            driver.SendGui((ushort)Gui_Entry.GREEN_FLAG, "");
         }
         private void Result(Driver driver, string[] args)
         {

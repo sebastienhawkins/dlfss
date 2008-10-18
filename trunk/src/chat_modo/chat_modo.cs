@@ -135,6 +135,7 @@ namespace Drive_LFSS.ChatModo_
             string lineOftext;
             string licenceName;
             string pmLicenceName = "";
+            string badWordFound = "";
             Word_Flag sentenceMask = Word_Flag.NONE;
             lock(licenceNameTextList){lineOftext = licenceNameTextList.Dequeue();}
             licenceName = lineOftext.Split((char)0)[0];
@@ -162,7 +163,12 @@ namespace Drive_LFSS.ChatModo_
                 while (jtr.MoveNext())
                 {
                     if(words[itr].IndexOf(jtr.Current.Key,StringComparison.InvariantCultureIgnoreCase) > -1)
+                    {
+                        #if DEBUG
+                        iSession.SendMSTMessage("/msg ^7C^3hatModo^51 ^7:^2 " + words[itr] + "^7->^2" + jtr.Current.Key);
+                        #endif
                         sentenceMask |= (Word_Flag)jtr.Current.Value;
+                    }
                 }
 
                 if ((sentenceMask & Word_Flag.IS_BAD) == Word_Flag.IS_BAD)
@@ -175,18 +181,23 @@ namespace Drive_LFSS.ChatModo_
                 {
                     int levenScore = 32;
                     int _levenScore;
+                    Word_Flag wordMask = Word_Flag.NONE;
                     jtr = wordScoreList.GetEnumerator();
                     while (jtr.MoveNext())
                     {
+                        wordMask = Word_Flag.NONE;
                         _levenScore = levenstein(words[itr].ToLowerInvariant(), jtr.Current.Key);
                         if (_levenScore < 5 && _levenScore < jtr.Current.Key.Length / 2 && levenScore > _levenScore)
                         {
+                            #if DEBUG
+                            iSession.SendMSTMessage("/msg ^7C^3hatModo^52 ^7:^2 " + words[itr] + "^7->^2" + jtr.Current.Key);
+                            #endif
                             levenScore = _levenScore;
-                            sentenceMask |= (Word_Flag)jtr.Current.Value;
+                            wordMask = (Word_Flag)jtr.Current.Value;
                         }
                         //Log.commandHelp("that word(" + words[itr] + ") again that word(" + jtr.Current.Key + ") return(" + levenScore + ")\r\n");
                     }
-
+                    sentenceMask |= wordMask;
                     if ((sentenceMask & Word_Flag.IS_BAD) == Word_Flag.IS_BAD)
                         break;
                 }
@@ -199,17 +210,22 @@ namespace Drive_LFSS.ChatModo_
                 while (jtr.MoveNext())
                 {
                     if (lineOftext.Replace(" ", "").IndexOf(ConvertX.RemoveSpecialChar(jtr.Current.Key), StringComparison.InvariantCultureIgnoreCase) > -1)
+                    {
+                        #if DEBUG
+                        iSession.SendMSTMessage("/msg ^7C^3hatModo^53 ^7:^2 CompleteLine ^7->^2" + jtr.Current.Key);
+                        #endif
                         sentenceMask |= (Word_Flag)jtr.Current.Value;
+                    }
                 }
             }
 
             if ((sentenceMask & Word_Flag.IS_BAD) == Word_Flag.IS_BAD)
             {
-                iSession.SendMSTMessage(licenceName+" ^1UNDESIRABLE ^7chat detected.^3DEBUG");
+                iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1UNDESIRABLE ^7chat detected.^3DEBUG");
             }
             else if ((sentenceMask & Word_Flag.IF_DESIGNATION) == Word_Flag.IF_DESIGNATION)
             {
-                iSession.SendMSTMessage(licenceName + " ^3PLEASE ^7correct your language.^3DEBUG");
+                iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^3PLEASE ^7correct your language.^3DEBUG");
             }
             
             //Log.commandHelp("that line(" + lineOftext + ") scored (" + sentenceMask + ")\r\n");

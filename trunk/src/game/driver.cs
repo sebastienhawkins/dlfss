@@ -53,6 +53,8 @@ namespace Drive_LFSS.Game_
             //_packet.total;// What is Total????
 
             licenceName = _packet.licenceName;
+            if (licenceName == "") //LFS Server Driver
+                licenceName = "AI";
             connectionId = _packet.connectionId;
            
             if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
@@ -71,7 +73,7 @@ namespace Drive_LFSS.Game_
                 for (byte itr = 0; ++itr < 5; )
                     SendButton(Button_Entry.MOTD_BACKGROUND);
 
-                SendGui((ushort)Gui_Entry.MOTD);
+                SendGui(Gui_Entry.MOTD);
             }
 
             SetConfigData("");
@@ -127,7 +129,8 @@ namespace Drive_LFSS.Game_
             //_packet.numberInRaceCar_NSURE // What is That???
             if (connectionId != _packet.connectionId)
             {
-                Log.error("Licence.Init(PacketNPL _packet), current connectionId("+connectionId+") was not same as packet connectionId("+_packet.connectionId+"), LicenceName: "+licenceName+".\r\n");
+                if(!IsBot())
+                    Log.error("Licence.Init(PacketNPL _packet), current connectionId("+connectionId+") was not same as packet connectionId("+_packet.connectionId+"), LicenceName: "+licenceName+".\r\n");
                 connectionId = _packet.connectionId;
             }
 
@@ -286,6 +289,9 @@ namespace Drive_LFSS.Game_
             wr = Program.pubStats.GetWR("");
             laps.Add(new Lap());
             maxSpeedMs = 0.0d;
+            
+            if(IsOnTrack() && currentGui == Gui_Entry.RESULT)
+                RemoveGui(Gui_Entry.RESULT);
         }
         internal void ProcessRaceEnd()
         {
@@ -496,21 +502,15 @@ namespace Drive_LFSS.Game_
         internal WR wr = null;
         private Dictionary<string,Dictionary<string,Rank>> rank = null;
 
-        private static uint WARNING_DRIVING_CHECK = 5800;
+        private static uint TIMER_WARNING_DRIVING_CHECK = 3000;
+        
+        private static uint TIMER_MOVING_CHECK = 300;
+        private uint timerMovingCheck = 0;
+        
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
         new internal void update(uint diff) 
         {
-            if (driftScoreByTime > 0)
-            {
-                if((driftScoreTimer += diff) > DRIFT_SCORE_TIMER)
-                {
-                    driftScoreTimer = 0;
-                    AddMessageMiddle("^2Your driftScore for the last ^7"+(DRIFT_SCORE_TIMER/1000)+"^2sec is ^7"+driftScoreByTime.ToString(), 7000);
-                    driftScoreByTime = 0;
-                }
-            }
-
             driverSaveInterval += diff;
             if (SAVE_INTERVAL < driverSaveInterval  )
             {
@@ -555,6 +555,46 @@ namespace Drive_LFSS.Game_
                     laps.Add(new Lap());
                 }
             }
+            if (driftScoreByTime > 0)
+            {
+                if ((driftScoreTimer += diff) > DRIFT_SCORE_TIMER)
+                {
+                    driftScoreTimer = 0;
+                    AddMessageMiddle("^2Your driftScore for the last ^7" + (DRIFT_SCORE_TIMER / 1000) + "^2sec is ^7" + driftScoreByTime.ToString(), 7000);
+                    driftScoreByTime = 0;
+                }
+            }
+            
+            if (IsOnTrack())
+            {
+                if(timerMovingCheck < diff)
+                { 
+                    timerMovingCheck = TIMER_MOVING_CHECK;
+                    if(x == xOld && y == yOld)
+                    {
+                        if(isMoving)
+                        {
+                            isMoving = false;
+                            lock(featureAcceleration){featureAcceleration.Update(this);}
+                            lock (featureDriftScore){featureDriftScore.Update(this);}
+                        }
+                    }
+                    else
+                    {
+                        isMoving = true;
+                        timeIldeOnTrack = 0;
+                    }
+                    
+                    xOld = x;
+                    yOld = y;
+                }
+                else
+                    timerMovingCheck -= diff;
+
+                if (!isMoving)
+                    timeIldeOnTrack += diff;
+            }
+
 
             if (warningDrivingCancelTimer > 0)
             {
@@ -749,7 +789,7 @@ namespace Drive_LFSS.Game_
         public void SetWarningDrivingCheck(Warning_Driving_Type _warningDrivingType, byte referenceCarId)
         {
             warningDrivingType = _warningDrivingType;
-            warningDrivingTypeTimer = WARNING_DRIVING_CHECK;
+            warningDrivingTypeTimer = TIMER_WARNING_DRIVING_CHECK;
             warningDrivingReferenceCarId = referenceCarId; //TODO: licenceName hihi :) this can become not funny!
         }
         public void SendCancelWarningDriving()
@@ -811,7 +851,7 @@ namespace Drive_LFSS.Game_
         }
         public bool IsBot()
         {
-            return ((Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI);
+            return (licenceName == "AI" || (Driver_Type_Flag.DRIVER_TYPE_AI & driverTypeMask) == Driver_Type_Flag.DRIVER_TYPE_AI);
         }
         public void SendMTCMessage(string message)
         {

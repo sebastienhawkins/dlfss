@@ -37,9 +37,15 @@ namespace Drive_LFSS.Game_
             lapCompleted = _carInformation.lapNumber;
             racePosition = _carInformation.position;
             carFlag = _carInformation.carFlag;
+            
+
             x = _carInformation.posX / 65536.0d;
             y = _carInformation.posY / 65536.0d;
             z = _carInformation.posZ / 65536.0d;
+            tracjectory = _carInformation.direction;
+            orientation = _carInformation.heading;
+            orientationSpeed = _carInformation.angleVelocity;
+
 
             speedMs = _carInformation.speed / 327.68d;
             if (maxSpeedMs < speedMs)
@@ -47,15 +53,8 @@ namespace Drive_LFSS.Game_
 
             speedKmh = ConvertX.MSToKhm(speedMs);
 
-
-            tracjectory = _carInformation.direction;
-            orientation = _carInformation.heading;
-            orientationSpeed = _carInformation.angleVelocity;
-
-            featureAcceleration.Update((CarMotion)this);
-            featureDriftScore.Update((CarMotion)this);
-
-            //base.Init(_packet);
+            featureAcceleration.Update(this);
+            featureDriftScore.Update(this);
         }
         private byte carId = 0;
         private string carPrefix = "";
@@ -78,6 +77,8 @@ namespace Drive_LFSS.Game_
         private double x = 0.0d;
         private double y = 0.0d;
         private double z = 0.0d;
+        private double xOld = 0.0d;
+        private double yOld = 0.0d;
         private double speedMs = 0.0d;
         private double speedKmh = 0.0d;
         private double speedMph = 0.0d;
@@ -85,52 +86,63 @@ namespace Drive_LFSS.Game_
         private ushort orientation = 0;
         private short orientationSpeed = 0;
         private bool isOnTrack = false;
+        private bool isMoving = false;
+        private uint timeIldeOnTrack = 0;
         private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
         private FeatureDriftScore featureDriftScore = new FeatureDriftScore();
 
         private sealed class FeatureAcceleration
         {
             private bool started = false;
+            private double effectiveStartSpeed = 0.0d;
+            private bool finish = false;
             private DateTime startTime = DateTime.Now;
-            private double startSpeed = 0.5;
+            private double startSpeed = 0.9;
             private double endSpeed = 100.0;
             private bool isOn = true;
 
-            internal void Update(CarMotion car)
+            internal void Update(Driver driver)
             {
                 if(!isOn)
                     return;
-
-                if (started && car.GetSpeedKmh() <= startSpeed)
+                if (started && (!driver.IsMoving() || driver.GetSpeedKmh() < startSpeed))
                     End();
-                else if (!started && car.GetSpeedKmh() > startSpeed && car.GetSpeedKmh() < startSpeed + 5.0d)
-                    Start();
-                else if (started && car.GetSpeedKmh() >= endSpeed) //About 100Kmh
-                    Sucess(car);
+                else if (!started && driver.GetSpeedKmh() >= startSpeed)
+                    Start(driver);
+                else if (!finish && started && driver.GetSpeedKmh() >= endSpeed)
+                    Sucess(driver);
             }
-            private void Start()
+            private void Start(Driver driver)
             {
+                effectiveStartSpeed = driver.GetSpeedKmh();
                 startTime = DateTime.Now;
                 started = true;
             }
             private void End()
             {
+                finish = false;
                 started = false;
             }
-            private void Sucess(CarMotion car)
+            private void Sucess(Driver driver)
             {
+                finish = true;
                 TimeSpan timeElapsed = DateTime.Now - startTime;
-                Log.feature(((IDriver)car).DriverName + ", Done  "+(ushort)startSpeed+"-"+(ushort)endSpeed+" Km/h In: " + (decimal)timeElapsed.TotalSeconds + "sec.\r\n");
-                End();
+
+                effectiveStartSpeed = endSpeed - effectiveStartSpeed;
+                double _temp = endSpeed - startSpeed;
+                _temp = timeElapsed.TotalSeconds / effectiveStartSpeed * _temp;
+
+
+                Log.feature(driver.DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + (decimal)_temp + "sec.\r\n");
 
                 //This must be removed when we find why some Accelariont become pretty fast.
                 if (timeElapsed.TotalSeconds < 1.0d)
                 {
-                    Log.error(((IDriver)car).DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + timeElapsed.TotalSeconds + "sec, TOO FAST TOO FAST!\r\n");
+                    Log.error(driver.DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + _temp + "sec, TOO FAST TOO FAST!\r\n");
                     return;
                 }
 
-                if (((Driver)car).ISession.Script.CarAccelerationSucess((ICar)car, (ushort)startSpeed, (ushort)endSpeed, timeElapsed.TotalSeconds))
+                if (driver.ISession.Script.CarAccelerationSucess((ICar)driver, (ushort)startSpeed, (ushort)endSpeed, _temp))
                     return;
             }
             internal double StartSpeed
@@ -176,17 +188,17 @@ namespace Drive_LFSS.Game_
         internal void SetAccelerationStartSpeed(ushort startKmh)
         {
             featureAcceleration.StartSpeed = (startKmh > 0 ? (double)startKmh : 0.9d);
-            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_START, startKmh.ToString());
+            SetConfigValue(Config_User.ACCELERATION_START, startKmh.ToString());
         }
         internal void SetAccelerationEndSpeed(ushort endKmh)
         {
             featureAcceleration.EndSpeed = (double)endKmh;
-            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_STOP, endKmh.ToString());
+            SetConfigValue(Config_User.ACCELERATION_STOP, endKmh.ToString());
         }
         internal void SetAccelerationOn(bool isOn)
         {
             featureAcceleration.SetOnOff(isOn);
-            ((Driver)this).SetConfigValue(Config_User.ACCELERATION_ON, (isOn ? "1" : "0"));
+            SetConfigValue(Config_User.ACCELERATION_ON, (isOn ? "1" : "0"));
         }
 
         sealed class FeatureDriftScore
@@ -217,7 +229,7 @@ namespace Drive_LFSS.Game_
             private uint counterCorrection = 0;
             private uint packetReceive = 0; //To make correction calculation from a % of receive packet with correction inside.
 
-            internal void Update(CarMotion car)
+            internal void Update(Driver car)
             {
                 if(!isOn)
                     return;
@@ -274,51 +286,51 @@ namespace Drive_LFSS.Game_
                     }
                 }
             }
-            private void Start(CarMotion car)
+            private void Start(Driver driver)
             {
                 started = true;
                 startTime = DateTime.Now;
-                clockWise = (car.GetOrientationSpeed() > 0 ? true : false);
+                clockWise = (driver.GetOrientationSpeed() > 0 ? true : false);
                 maxAngleDiff = 0.0d;
                 scoreAngle = 0.0d;
-                startSpeed = car.GetSpeedKmh();
+                startSpeed = driver.GetSpeedKmh();
                 scoreSpeed = 0;
                 score = 0;
                 scoreTick = 0;
                 counterCorrection = 0;
                 packetReceive = 0;
-                if(((Driver)car).IsAdmin)
+                if(driver.IsAdmin)
                 {
-                    ((Driver)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
-                    ((Driver)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
+                   driver.SendUpdateButton((ushort)Button_Entry.INFO_1, "^2Drift Start "+(clockWise?"":"^7-"));
+                    driver.SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^3" + score);
                 }
             }
-            private void End(CarMotion car)
+            private void End(Driver driver)
             {
                 started = false;
-                if(((Driver)car).IsAdmin)
+                if(driver.IsAdmin)
                 {
-                    ((Driver)car).SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
+                    driver.SendUpdateButton((ushort)Button_Entry.INFO_1, "^1Drift End");
                 }
             }
-            private void Sucess(CarMotion car)
+            private void Sucess(Driver driver)
             {
                 if (maxAngleDiff >= BONUS_ANGLE)
                     score *= BONUS_ANGLE_SCORE_RATIO;
 
-                Log.feature(((IDriver)car).DriverName + ", Done  Drift Score: " + (uint)score + ".\r\n");               
-                End(car);
+                Log.feature(((IDriver)driver).DriverName + ", Done  Drift Score: " + (uint)score + ".\r\n");               
+                End(driver);
                 
                 //Debug think
-                if(((Driver)car).IsAdmin)
+                if(((Driver)driver).IsAdmin)
                 {
-                    ((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
+                    ((IButton)driver).SendUpdateButton((ushort)Button_Entry.INFO_2, "^7Score ^2" + score);
                 }
-                ((Driver)car).driftScoreByTime += (uint)score;
-                if (((Driver)car).ISession.Script.CarDriftScoring((ICar)car, (uint)score))
+                ((Driver)driver).driftScoreByTime += (uint)score;
+                if (((Driver)driver).ISession.Script.CarDriftScoring((ICar)driver, (uint)score))
                     return;
             }
-            private void ComputeScore(CarMotion car)
+            private void ComputeScore(Driver driver)
             {
                 //Scoring calculation occur only at all SCORE_TICK_TIME_MS diff.
                 TimeSpan timeDiff = DateTime.Now - startTime;
@@ -332,11 +344,11 @@ namespace Drive_LFSS.Game_
                 double correctionRatio = (100.0d-(counterCorrection * 100.0d/packetReceive))/100.0d;
 
                 //Gave point for Angle
-                double angleToReach = car.GetAngleToReachTraj(clockWise);
+                double angleToReach = driver.GetAngleToReachTraj(clockWise);
                 scoreAngle += (360.0d - angleToReach) * SCORE_ANGLE_RATIO;
                 
                 //If player goes faster then start speed WOW, if not loose a little each time
-                double _scoreSpeed = ((car.GetSpeedKmh() * 100.0d / startSpeed) - 100.0d) * SCORE_SPEED_RATIO;
+                double _scoreSpeed = ((driver.GetSpeedKmh() * 100.0d / startSpeed) - 100.0d) * SCORE_SPEED_RATIO;
                 if(_scoreSpeed <0.0d)
                     _scoreSpeed += (startSpeed / 35.0d) * (double)scoreTick;
                 scoreSpeed += _scoreSpeed;
@@ -381,7 +393,6 @@ namespace Drive_LFSS.Game_
         }*/
         private void EnterPit()
         {
-
         }
         private void EnterTrack(bool firstTime)
         {
@@ -427,6 +438,7 @@ namespace Drive_LFSS.Game_
         }
         internal void LeaveTrack()
         {
+            isMoving = false;
             isOnTrack = false;
             SendBanner();
             SendTrackPrefix();
@@ -525,6 +537,11 @@ namespace Drive_LFSS.Game_
                 temp *= -1;
 
             return temp * 180.0d / 32768.0d;
+        }
+        
+        public bool IsMoving()
+        {
+            return isMoving;
         }
     }
 }

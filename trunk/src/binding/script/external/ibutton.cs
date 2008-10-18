@@ -25,7 +25,7 @@ namespace Drive_LFSS.Script_
         void SendButton(ushort buttonEntry);
         void SendUpdateButton(ushort buttonEntry, string text);
         byte RemoveButton(ushort buttonEntry);
-        void SendGui(ushort guiEntry);
+        void SendGui(ushort guiEntry, string text);
         void RemoveGui(ushort guiEntry);
     }
 }

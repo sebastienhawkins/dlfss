@@ -154,7 +154,7 @@ namespace Drive_LFSS.Game_
             if(guid == 0) //No race, no result process
                 return;
 
-            if ( (_packet.requestId == 2 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
+            if ( (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 || _packet.confirmMask != Confirm_Flag.CONFIRM_NONE)
             {
                 IDriver driver = iSession.GetDriverWith(_packet.carId);
@@ -167,13 +167,13 @@ namespace Drive_LFSS.Game_
 
                 if (timeTotalFromFirstRES == 0 && guid != 0)
                 {
-                    timeTotalFromFirstRES = _packet.totalTime;
+                    timeTotalFromFirstRES = _packet.totalTime+1;
                     
                     uint pcDiff = GetFirstRESTimePc(5);
                     iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1,"^1Finish in ^7" + (pcDiff / 1000));
                     //iSession.SendMSTMessage("/rstend " + (pcDiff / 1000));
                 }
-                if (HasAllResult())
+                if (HasAllResult() && raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                     FinishRace();
             }
         }
@@ -303,9 +303,14 @@ namespace Drive_LFSS.Game_
         {
             timeTotal = time;
 
-            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY && (timeTotal / 6000.0d) >= qualificationMinute && HasAllResult() && !requestedFinalResultDone)
+            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY && (timeTotal / 6000.0d) >= qualificationMinute && !requestedFinalResultDone)
                 RequestFinalQualResult();
-            
+            else if (requestedFinalResultDone && timeTotalFromFirstRES == 0 && guid != 0)
+            {    
+                timeTotalFromFirstRES = 1;
+                uint pcDiff = GetFirstRESTimePc(5);
+                iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1, "^1Finish in ^7" + (pcDiff / 1000));
+            }
             //This will bypass FinalQualifyResult.... This is Finishing a Race What Ever.
             if( timeTotalFromFirstRES > 0 )
             {
@@ -590,7 +595,10 @@ namespace Drive_LFSS.Game_
             #if DEBUG
             Log.debug(iSession.GetSessionNameForLog() + " ExecRestart(), Exec /restart.\r\n");
             #endif
-            iSession.SendMSTMessage("/restart");
+            if(raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_QUALIFY && (raceInfo.QualifyMinute > 0 || qualificationMinute > 0))
+                iSession.SendMSTMessage("/qualify");
+            else
+                iSession.SendMSTMessage("/restart");
         }
         private void EndRestart()
         {

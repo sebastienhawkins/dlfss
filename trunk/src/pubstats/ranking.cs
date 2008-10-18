@@ -163,11 +163,11 @@ namespace Drive_LFSS.Ranking_
             if (total > 14517)  // 12017 b-
                 return "is a \"^7slow^2\" driver";
             if (total > 14000)  // 11500 c+
-                return "a \"^7very slow^2\" driver";
+                return "is a \"^7very slow^2\" driver";
             if (total > 13500)    // 10000 c
-                return "a \"^7bad^2\" driver";
+                return "is a \"^7bad^2\" driver";
 
-            return "\"^1not\"^2 a driver :(";
+            return "is a\"^1very bad^2\" driver.";
         }
         public string[] GetRankGuiString
         {
