@@ -1,5 +1,0 @@
-C:\inwork\dlfss\trunk\bin\Release\DLFSSScript.dll
-C:\inwork\dlfss\trunk\bin\Release\DLFSSScript.pdb
-C:\inwork\dlfss\trunk\src\binding\script\obj\Release\ResolveAssemblyReference.cache
-C:\inwork\dlfss\trunk\src\binding\script\obj\Release\DLFSSScript.dll
-C:\inwork\dlfss\trunk\src\binding\script\obj\Release\DLFSSScript.pdb
