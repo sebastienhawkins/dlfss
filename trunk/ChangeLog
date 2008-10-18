@@ -1,0 +1,77 @@
+DLFSS 0.3    (2008) svn://svn.aleajecta.com/dlfss/0.3
+
+DLFSS 0.3  - Codename "Refraction" - Optimize current Feature and 
+make Ranking system Racing/Drift/Drag/Overall 
+
+ ==== Core Features ====
+ * Ranking System
+ * Race Scoring System
+ * Bad Driving System
+ 
+ ==== Game Features ====
+ * Configurable MaxSpeed Display
+ * Victim cancel bad Driving
+ 
+ ==== Statistics ====
+ * Total number of changes: 40
+
+
+==========================================================================
+
+DLFSS 0.2    (2008) svn://svn.aleajecta.com/dlfss/0.2
+
+DLFSS 0.2  - Codename "Sunrise" - Optimize current Core and Game Feature,
+Adding more output and Calculation on Statictique.
+
+ ==== Core Features ====
+ * SQL Static Storage
+ * LFSW PubStats Storage
+ 
+ ==== Game Features ====
+ * Timed Top/Middle Message Bar.
+ * Drifting Style Score(UserConfigurable).
+ * Max Speed Khm For each lap(UserConfigurable).
+ * WR / PB / Split, Diff Output(UserConfigurable).
+ * Limited finish time after First finish. 
+ * Auto restart race/qual on finish.
+ * User Config from GUI interface
+
+ ==== Statistics ====
+ * Total number of changes: 73
+
+
+==========================================================================
+
+
+DLFSS 0.1    (2008) svn://svn.aleajecta.com/dlfss/0.1
+
+DLFSS 0.1  - Codename "Event Horizon" - adds further improvements to the
+core as well as to the majority of game classes and the database.
+
+ ==== Core Features ====
+ * Multiple Server Connection.
+ * Log/Config for each Server.
+ * MultiThreading.
+ * Console Command.
+ * InGame Command.
+ * mIrc Client.
+ * Button/GUI Control.
+ * mIRC Client Relay.
+ * SQLite Data Collection.
+ * MySQL Data Collection.
+ * External C# Script.dll.
+ * Win / Linux.
+ * AI(Bot) Full Support.
+ * Next Track Vote System
+ * Grid/Coord System
+
+ ==== Game Features ====
+ * Site Banner, Welcome Message(motd), Custom Gui/Button
+ * Static Track Prefix Button.
+ * Acceleration 0-100(UserConfigurable)
+ * Pre Collision Detection from back
+ * NextTrack Control, User/Auto/Static/Vote
+ * mIrc Chat
+
+==== Statistics ====
+ * Total number of changes: 75

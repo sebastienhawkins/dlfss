@@ -1,0 +1,30 @@
+DLFSS 0.1    (2008) svn://svn.aleajecta.com/dlfss/0.1
+
+DLFSS 0.1  - Codename "Event Horizon" - adds further improvements to the
+core as well as to the majority of game classes and the database.
+
+ ==== Core Features ====
+* Multiple Server Connection.
+* Log/Config for each Server.
+* MultiThreading.
+* Console Command.
+* InGame Command.
+* mIrc Command.
+* Button/GUI Control.
+* mIRC Client Relay.
+* SQLite Data Collection.
+* MySQL Data Collection.
+* External C# Script.dll.
+* Win / Linux.
+* AI(Bot) Full Support.
+
+ ==== Game Features ====
+* Site Banner, Welcome Message(motd), Custom Gui/Button
+* Acceleration 0-100
+* Pre Collision Detection from back
+* NextTrack Control, User/Auto/Static/Vote
+* mIrc Chat
+
+==== Statistics ====
+ * Fixed Bugs: 0
+ * Total number of changes: 75

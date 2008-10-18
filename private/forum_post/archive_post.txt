@@ -1,0 +1,65 @@
+[CENTER][B]== Welcome to DLFSS ==
+[/B][/CENTER]
+[INDENT] DLFSS is an Open Source addons implementation for 
+a [URL="http://www.lfs.net/file_lfs.php?name=LFS_S2_DEDI_Z.zip"]Live For Speed server[/URL] system. 
+
+[SIZE=4][B]Project Overview[/B][/SIZE]
+Name: Drive Live For Speed Server (Drive_LFSS)
+version: 0.1
+language: c#, win/linux([URL="http://www.mono-project.com/Main_Page"]Mono[/URL]) Console.
+dependancy: [URL="http://www.mono-project.com/SQL_Lite"]Sqlite3[/URL] (Mono).
+
+[B]Core Feature:[/B]
+
+[LIST]
+[*] Multiple Server Connection.
+[*] Log/Config/Command/Security/Script for each Server.
+[*] Independant Thread System for Server Connection/Reconnection.
+[*] Console Command.
+[*] InGame Command.
+[*] Telnet Console(TODO).
+[*] [URL="http://www.sqlite.org/"]SQLite[/URL] Data Colection.
+[*] External Script Support.
+[*] Win / Linux.
+[/LIST]
+ [B]Game Feature:[/B]
+
+[LIST]
+[*] AI(Bot) Car In Race Support.
+[*] Most has to be done.
+[/LIST]
+ [B]Team[/B]
+Developer:
+
+[LIST]
+[*][URL="http://www.lfsforum.net/member.php?u=157481"]Greenseed[/URL],
+[*][URL="http://www.lfsforum.net/member.php?u=50940"]Gai-Luron[/URL]
+[/LIST]
+ WebManager:
+
+[LIST]
+[*]    To Be Filled
+[/LIST]
+Other:
+
+[B][URL="http://www.lfsforum.net/subversion.tigris.org"]SVN[/URL] Repository[/B], (Win user, easy Checkout with [URL="http://tortoisesvn.net/downloads"]TurtoiseSVN[/URL])
+       CheckOut Folder:  [U]svn://svn.aleajecta.com/dlfss/trunk[/U]
+       [SIZE="1"]Debug and Release, Binary, are Available into the /bin folder of the Repository.[/SIZE]
+
+[B]Project Documentation[/B]
+        TODO
+
+[B]DLFSS THANKS[/B]
+  Special thanks should go out to [B]Scawen Roberts[/B] for making first that great
+ simulator([URL="http://www.lfs.net/?page=downloads"]Live For Speed[/URL]), [B]Eric Bailey[/B] for is pencil, [B]Victor van Vlaardingen[/B] for great Stats
+ access.
+
+ Thanks to the [SIZE=3][URL="http://www.lfsforum.net/showthread.php?t=25756"]Lapper[/URL][/SIZE] project
+[B]MonkOnHotTinRoof [/B]for creating it,
+[URL="http://www.lfsforum.net/member.php?u=50940"]Gai-Luron[/URL], who keeped this Project alive and be the first joining DLFSS project :) and all other supporter.
+
+Thanks should also go out to [URL="http://www.lfsforum.net/member.php?u=8887"]T-RonX[/URL] the creator of "[SIZE=3][URL="http://www.lfsforum.net/showthread.php?t=30012"]Lfs_External.dll[/URL][/SIZE]", 
+ Is project helped me a lot understand how "[URL="http://www.lfs.net/file_lfs.php?name=LFS_S2_DEDI_Z.zip"]Live For Speed Server[/URL]" was acting.
+ (InSim Protocol).
+
+[/INDENT]

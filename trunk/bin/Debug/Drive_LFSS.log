@@ -1,0 +1,48 @@
+10/18/2008 9:55:03 AM NORMAL-:               _____                             _      _____      __  
+10/18/2008 9:55:03 AM NORMAL-:               /    )         ,                  /      /    '   /    )
+10/18/2008 9:55:03 AM NORMAL-:           ---/----/---)__-------------__-------/------/__-------\-----
+10/18/2008 9:55:03 AM NORMAL-:             /    /   /   ) /   | /  /___)     /      /           \    
+10/18/2008 9:55:03 AM NORMAL-:           _/____/___/_____/____|/__(___ _____/____/_/________(____/___
+10/18/2008 9:55:03 AM NORMAL-:                                                               v0.4.188
+10/18/2008 9:55:03 AM NORMAL-:                     _______________________________________
+10/18/2008 9:55:03 AM NORMAL-:                           __                               
+10/18/2008 9:55:03 AM NORMAL-:                         /    )                             
+10/18/2008 9:55:03 AM NORMAL-:                     ----\--------__---)__---------__---)__-
+10/18/2008 9:55:03 AM NORMAL-:                          \     /___) /   ) | /  /___) /   )
+10/18/2008 9:55:03 AM NORMAL-:                     _(____/___(___ _/______|/__(___ _/_____
+10/18/2008 9:55:03 AM NORMAL-: 
+10/18/2008 9:55:03 AM NORMAL-: 
+10/18/2008 9:55:03 AM NORMAL-: Config initialized...
+
+10/18/2008 9:55:03 AM NORMAL-: Log system initialized...
+
+10/18/2008 9:55:03 AM NORMAL-: Initializing console command...
+
+10/18/2008 9:55:03 AM NORMAL-: Initializing database...
+10/18/2008 9:55:03 AM NORMAL-: Completed initializing database...
+
+10/18/2008 9:55:03 AM NORMAL-: Initializing storage...
+10/18/2008 9:55:03 AM NORMAL-: Completed initializing storage.
+
+10/18/2008 9:55:03 AM NORMAL-: Initializing mIRC client...
+10/18/2008 9:55:03 AM NORMAL-: Completed initializing mIRC client.
+
+10/18/2008 9:55:03 AM NORMAL-: Initializing Ranking...
+10/18/2008 9:55:04 AM NORMAL-: Completed initializing Ranking.
+
+10/18/2008 9:55:04 AM NORMAL-: Initializing ChatModo...
+10/18/2008 9:55:04 AM NORMAL-: Completed initializing ChatModo.
+
+10/18/2008 9:55:04 AM NORMAL-: Initializing PubStats...
+10/18/2008 9:55:06 AM NORMAL-: Completed initializing PubStats.
+
+10/18/2008 9:55:06 AM NORMAL-: Initializing server(s) config(s)...
+
+10/18/2008 9:55:06 AM NORMAL-: START|10/18/2008 9:55:08 AM NORMAL-: |FINISH
+
+10/18/2008 9:55:08 AM NORMAL-: [AleajectaDLFSS1> InSim v4, Licence: S2.0.5Z
+10/18/2008 9:55:08 AM NORMAL-: [AleajectaDLFSS2> InSim v4, Licence: DEMO.0.5Z
+10/18/2008 9:55:36 AM MISSING: [AleajectaDLFSS1> TcpReceive(), No structure defined for this PacketType->PACKET_PLA_DRIVER_PIT_LANE_STATUS
+10/18/2008 9:55:36 AM MISSING: [AleajectaDLFSS1> TcpReceive(), No structure defined for this PacketType->PACKET_PLA_DRIVER_PIT_LANE_STATUS
+10/18/2008 9:55:45 AM MISSING: [AleajectaDLFSS1> TcpReceive(), No structure defined for this PacketType->PACKET_PLA_DRIVER_PIT_LANE_STATUS
+10/18/2008 9:55:51 AM MISSING: [AleajectaDLFSS1> TcpReceive(), No structure defined for this PacketType->PACKET_PLA_DRIVER_PIT_LANE_STATUS
