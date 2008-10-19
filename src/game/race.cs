@@ -505,20 +505,25 @@ namespace Drive_LFSS.Game_
                             finishOrder += (enu.Current.Key >= (uint)Bot_GUI.FIRST ? 0 : enu.Current.Key) + " ";
                             double winScore = 0.0d;
                             IDriver driver = iSession.GetDriverWithGuid(enu.Current.Key);
-                            if (driver != null && driver.GetCurrentWRTime() != 0)
+                            if (driver != null)
                             {
-                                //int posScore = (driverCount / 2) - itr + 1;//+1 is position 0 become 1 ...
-                                int averageLapTime = (int)(driver.TimeTotalLastRace / driver.LapCountTotalLastRace);
-                                int bestEver = (int)driver.GetCurrentWRTime();
+                                if(driver.GetCurrentWRTime() != 0 && driver.LapCountTotalLastRace > 0)
+                                {
+                                    //int posScore = (driverCount / 2) - itr + 1;//+1 is position 0 become 1 ...
+                                    int averageLapTime = (int)(driver.TimeTotalLastRace / driver.LapCountTotalLastRace);
+                                    int bestEver = (int)driver.GetCurrentWRTime();
 
-				                winScore = driverCount + ((bestEver-averageLapTime)/bestEver*100.0d)-5; // -5 , is the min factor
-					            winScore += driverCount-itr+1;
-                                if (winScore < 0)
-                                    winScore = 0;
-					            //if(driverCount > 1 && itr==0)
-						        //   winScore = winScore+1;
-                                goodResult = true;
-                                scoringResultTextDisplay.Add("^7"+(itr+1).ToString() + "^2-^7 "+driver.DriverName,(int)Math.Round(winScore,0));
+				                    winScore = driverCount + ((bestEver-averageLapTime)/bestEver*100.0d)-5; // -5 , is the min factor
+					                winScore += driverCount-itr+1;
+                                    if (winScore < 0)
+                                        winScore = 0;
+					                //if(driverCount > 1 && itr==0)
+						            //   winScore = winScore+1;
+                                    goodResult = true;
+                                    scoringResultTextDisplay.Add("^7"+(itr+1).ToString() + "^2-^7 "+driver.DriverName,(int)Math.Round(winScore,0));
+                                }
+                                else
+                                    scoringResultTextDisplay.Add("^7" + (itr + 1).ToString() + "^2-^7 " + driver.DriverName, 0);   
                             }
                             else
                                 scoringResultTextDisplay.Add((itr + 1).ToString() + "- ^1Driver Leaved", 0);
