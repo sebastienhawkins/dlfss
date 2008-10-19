@@ -33,6 +33,7 @@ namespace Drive_LFSS.Game_
 	{
         private const int MIN_FORCED_FINISH_TIME = 40000;
         private const int MAX_FORCED_FINISH_TIME = 120000;
+        private const int PCT_FORCED_FINISH_TIME = 8;
         private const int GTH_TIME_DIFF_FROM_GREEN_LIGHT = 16000;
 
         internal Race(Session _session)
@@ -168,8 +169,8 @@ namespace Drive_LFSS.Game_
                 if (timeTotalFromFirstRES == 0 && guid != 0)
                 {
                     timeTotalFromFirstRES = _packet.totalTime+1;
-                    
-                    uint pcDiff = GetFirstRESTimePc(5);
+
+                    uint pcDiff = GetFirstRESTimePc(PCT_FORCED_FINISH_TIME);
                     iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1,"^1Finish in ^7" + (pcDiff / 1000));
                     //iSession.SendMSTMessage("/rstend " + (pcDiff / 1000));
                 }
@@ -308,13 +309,13 @@ namespace Drive_LFSS.Game_
             else if (requestedFinalResultDone && timeTotalFromFirstRES == 0 && guid != 0)
             {    
                 timeTotalFromFirstRES = 1;
-                uint pcDiff = GetFirstRESTimePc(5);
+                uint pcDiff = GetFirstRESTimePc(PCT_FORCED_FINISH_TIME);
                 iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1, "^1Finish in ^7" + (pcDiff / 1000));
             }
             //This will bypass FinalQualifyResult.... This is Finishing a Race What Ever.
             if( timeTotalFromFirstRES > 0 )
             {
-                uint pcDiff = GetFirstRESTimePc(8);
+                uint pcDiff = GetFirstRESTimePc(PCT_FORCED_FINISH_TIME);
                 pcDiff += GTH_TIME_DIFF_FROM_GREEN_LIGHT; //+12000 is GTH time start before Green light.
                 if((timeTotalFromFirstRES+pcDiff) <= timeTotal*10)
                 {
