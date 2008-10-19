@@ -67,7 +67,7 @@ namespace Drive_LFSS
         }
         public static string SQLString(string value)
         {
-            return value.Replace(@"\", @"\\").Replace(@"'", @"\'").Replace(" ", "%");
+            return value.Replace(@"\", @"\\").Replace(@"'", @"\'");
         }
         public static string RemoveColorCode(string value)
         {

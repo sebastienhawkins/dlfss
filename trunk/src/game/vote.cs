@@ -55,7 +55,7 @@ namespace Drive_LFSS.Game_
             if(raceMapEntry > 0)
             {
                 Program.dlfssDatabase.Lock();
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT * FROM `race_map` WHERE `entry`="+raceMapEntry);
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT * FROM `race_map` WHERE `entry`='"+raceMapEntry+"'");
                 while (reader.Read())
                     raceMap.Add((ushort)reader.GetInt16(1));
                 reader.Dispose();
