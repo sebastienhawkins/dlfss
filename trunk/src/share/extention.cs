@@ -17,7 +17,7 @@
  */
 
 using System;
-
+using System.Globalization;
 namespace Drive_LFSS
 {
     //Real extention required .net 3.0 , since we don't need .net 3.0 for the rest , i prefer stay .net 2.0
@@ -88,6 +88,10 @@ namespace Drive_LFSS
                 
             }
             return newValue;
+        }
+        public static string DecimalInvariant<T>(T value)
+        {
+            return Convert.ToString(value,CultureInfo.InvariantCulture.NumberFormat);
         }
     }
 }
