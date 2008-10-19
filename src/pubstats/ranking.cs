@@ -313,7 +313,7 @@ namespace Drive_LFSS.Ranking_
         internal static Rank GetRank(string trackPrefix, string carPrefix, string licenceName)
         {
             Rank rank = null;
-            string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position`,`change_mask` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`LIKE'%"+ConvertX.SQLString(licenceName)+"%'";
+            string query = "SELECT `best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position`,`change_mask` FROM `stats_rank_driver` WHERE `car_prefix`='"+carPrefix+"' AND `track_prefix`='"+trackPrefix+"' AND `licence_name`LIKE'"+ConvertX.SQLString(licenceName)+"'";
             Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
