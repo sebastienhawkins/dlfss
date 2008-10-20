@@ -70,11 +70,30 @@ namespace Drive_LFSS.Game_
 
             ushort[] keys = new ushort[6] { 0, 0, 0, 0, 0, 0 };
             voteOptions.Keys.CopyTo(keys, 0);
-            switch (voteAction)
+            switch (voteAction) //Switch do , return and not break since we custom vote action at the end.
             {
                 case Vote_Action.VOTE_RESTART:
                 case Vote_Action.VOTE_QUALIFY:
-                case Vote_Action.VOTE_END:/*if (voteInProgress) SendVoteCancel();*/ return; //Not sure is good... During waiting RaceEnd 3 seconde, can happen and we will cancel our end.
+                case Vote_Action.VOTE_END:
+                {
+                    if (((Race)this).GetGuid() != 0)
+                    {
+                        IDriver driver = ((Race)this).ISession.GetDriverWithConnectionId(connectionId);
+                        if (driver == null)
+                        {
+                            Log.error("ProcessVoteNotification(), Vote restart from a null driver.\r\n");
+                            SendVoteCancel();
+                        }
+                        else
+                        {
+                            if (!((Race)this).StartGridHasDriverGuid(driver.GetGuid()))
+                            {
+                                ((IButton)driver).AddMessageMiddle("^7O^3nly StartGrid player can restart/end/qualify during a race",7000);
+                                SendVoteCancel();
+                            }
+                        }
+                    }
+                }return;
                 case Vote_Action.VOTE_CUSTOM_1: voteOptions[keys[0]]++; voteCount++; break;
                 case Vote_Action.VOTE_CUSTOM_2: voteOptions[keys[1]]++; voteCount++; break;
                 case Vote_Action.VOTE_CUSTOM_3: voteOptions[keys[2]]++; voteCount++; break;
