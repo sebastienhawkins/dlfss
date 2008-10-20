@@ -382,7 +382,7 @@ namespace Drive_LFSS.Game_
         private uint driftScoreTimer = 0;
         private const uint DRIFT_SCORE_TIMER = 40000;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
-        internal Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
+        internal Driver_Flag driverMask = Driver_Flag.NONE;
         private Driver_Type_Flag driverTypeMask = Driver_Type_Flag.DRIVER_TYPE_NONE;
         private Leave_Reason quitReason = Leave_Reason.LEAVE_REASON_DISCONNECTED;
         private ISession iSession;
@@ -420,7 +420,7 @@ namespace Drive_LFSS.Game_
             private uint raceGuid = 0;
             private string trackPrefix = "";
             private string carPrefix = "";
-            private Driver_Flag driverMask = Driver_Flag.DRIVER_FLAG_NONE;
+            private Driver_Flag driverMask = Driver_Flag.NONE;
             private uint lapTime = 0;
             private uint totalTime = 0;
             private ushort lapCompleted = 0;

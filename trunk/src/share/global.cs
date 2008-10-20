@@ -246,17 +246,17 @@ namespace Drive_LFSS.Definition_
         CHAT_USER_TYPE_O = 3,
         CHAT_USER_TYPE_MAX = 4,
     }
-    public enum Car_Tyres : byte
+    public enum Tyre_Compound : byte
     {
-        CAR_TYRE_R1 = 0,
-        CAR_TYRE_R2 = 1,
-        CAR_TYRE_R3 = 2,
-        CAR_TYRE_R4 = 3,
-        CAR_TYRE_ROAD_SUPER = 4,
-        CAR_TYRE_ROAD_NORMAL = 5,
-        CAR_TYRE_HYBRID = 6,
-        CAR_TYRE_KNOBBLY = 7,
-        CAR_TYRE_MAX = 8,
+        R1 = 0,
+        R2 = 1,
+        R3 = 2,
+        R4 = 3,
+        ROAD_SUPER = 4,
+        ROAD_NORMAL = 5,
+        HYBRID = 6,
+        KNOBBLY = 7,
+        MAX = 8,
         CAR_TYRE_NOTCHANGED = 255
     }
     public enum Penalty_Type : byte
@@ -269,6 +269,17 @@ namespace Drive_LFSS.Definition_
         PENALTY_TYPE_ADD_30_SEC = 5,
         PENALTY_TYPE_ADD_45_SEC = 6,
         PENALTY_TYPE_MAX = 7
+    }
+    public enum Penalty_Type_Ext : byte
+    {
+        NONE = 0,
+        DRIVE_THROUGH = 1,
+        PIT_STOP = 2,
+        ADD_30_SEC = 3,
+        ADD_45_SEC = 4,
+        SPEC = 5,
+        KICK = 6,
+        MAX = 7
     }
     public enum Penalty_Reason : byte
     {
@@ -390,44 +401,53 @@ namespace Drive_LFSS.Definition_
     }
     public enum Pit_Work_Flag : uint
     {
-        PSE_BODY_MAJOR = 0x8000,
-        PSE_BODY_MINOR = 0x4000,
-        PSE_FR_DAM = 4,
-        PSE_FR_WHL = 8,
-        PSE_LE_FR_DAM = 0x10,
-        PSE_LE_FR_WHL = 0x20,
-        PSE_LE_RE_DAM = 0x400,
-        PSE_LE_RE_WHL = 0x800,
-        PSE_NOTHING = 1,
-        PSE_RE_DAM = 0x100,
-        PSE_RE_WHL = 0x200,
-        PSE_REFUEL = 0x20000,
-        PSE_RI_FR_DAM = 0x40,
-        PSE_RI_FR_WHL = 0x80,
-        PSE_RI_RE_DAM = 0xffe,
-        PSE_RI_RE_WHL = 0x2000,
-        PSE_SETUP = 0x10000,
-        PSE_STOP = 2
+        NOTHING = 1,
+        STOP = 2,
+        FRONT_DMG = 4,
+        FRONT_WHEEL = 8,
+        LEFT_FRONT_DMG = 16,
+        LEFT_FRONT_WHEEL = 32,
+        RIGHT_FRONT_DMG = 64,
+        RIGHT_FRONT_WHEEL = 128,
+        REAR_DMG = 256,
+        REAR_WHEEL = 512,
+        LEFT_REAR_DMG = 1024,
+        LEFT_REAR_WHEEL = 2048,
+        RIGHT_REAR_DMG = 4096,
+        RIGHT_REAR_WHEEL = 8192,
+        BODY_MINOR = 16384,
+        BODY_MAJOR = 32768,
+        SETUP = 65536,
+        REFUEL = 131072,
+        MAX = 262144,
     }
     public enum Driver_Flag : ushort
     {
-        DRIVER_FLAG_NONE = 0,
-        DRIVER_FLAG_SWAPSIDE = 1,
-        DRIVER_FLAG_GC_CUT = 2,
-        DRIVER_FLAG_GC_BLIP = 4,
-        DRIVER_FLAG_AUTOGEARS = 8,
-        DRIVER_FLAG_SHIFTER = 16,
-        DRIVER_FLAG_RESERVED = 32,
-        DRIVER_FLAG_HELP_BRAKE = 64,
-        DRIVER_FLAG_AXIS_CLUTCH = 128,
-        DRIVER_FLAG_IS_IN_PITS = 256,
-        DRIVER_FLAG_AUTOCLUTCH = 512,
-        DRIVER_FLAG_MOUSE = 1024,
-        DRIVER_FLAG_KEYBOARD_NO_HELP = 2048,
-        DRIVER_FLAG_KEYBOARD_STABILISED = 4096,
-        DRIVER_FLAG_CUSTOM_VIEW = 8192
+        NONE = 0,
+        SWAPSIDE = 1,
+        RESERVER_2 = 2,
+        RESERVED_4 = 4,
+        AUTOGEARS = 8,
+        SHIFTER = 16,
+        RESERVED_32 = 32,
+        HELP_BRAKE = 64,
+        AXIS_CLUTCH = 128,
+        IS_IN_PITS = 256,
+        AUTOCLUTCH = 512,
+        MOUSE = 1024,
+        KEYBOARD_NO_HELP = 2048,
+        KEYBOARD_STABILISED = 4096,
+        CUSTOM_VIEW = 8192
     }
-
+    public enum Passenger_Flag : byte
+    {
+        FRONT_FEMALE = 1,
+        FRONT = 2,
+        LEFT_REAR_FEMALE = 4,
+        LEFT_REAR = 8,
+        RIGHT_REAR_FEMALE = 16,
+        RIGHT_REAR = 32,
+    }
     public enum Single_Char_Flag : byte
     {
         KEY_CONTROL = 2,
