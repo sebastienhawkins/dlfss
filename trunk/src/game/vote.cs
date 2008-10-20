@@ -88,7 +88,7 @@ namespace Drive_LFSS.Game_
                         {
                             if (!((Race)this).StartGridHasDriverGuid(driver.GetGuid()))
                             {
-                                ((IButton)driver).AddMessageMiddle("^7O^3nly StartGrid player can restart/end/qualify during a race",7000);
+                                ((IButton)driver).AddMessageMiddle("^7O^3nly ^2start grid ^3player can ^2restart^3/^2end^3/^2qualify ^3during a race",7000);
                                 SendVoteCancel();
                             }
                         }
