@@ -486,6 +486,12 @@ namespace Drive_LFSS.Game_
         {
             return (raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE);
         }
+        public bool StartGridHasDriverGuid(uint driverGuid)
+        {
+            if(gridOrder.IndexOf(driverGuid+" ") != -1)
+                return true;
+            return false;
+        }
         private void FinishRace()
         {
             timeTotalFromFirstRES = 0;

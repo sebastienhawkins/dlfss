@@ -283,6 +283,13 @@ namespace Drive_LFSS.Game_
             }
             return null;
         }
+        public IDriver GetDriverWithConnectionId(byte connectionId)
+        {
+            int index;
+            if( (index = GetLicenceIndexNotBot(connectionId)) != 255 )
+                return driverList[index];
+            return null;
+        }
         public byte GetNbrOfDrivers()
         {
             return (byte)(driverList.Count - 1); // -1 remove the Host but... maybe not good idea removing it from here.

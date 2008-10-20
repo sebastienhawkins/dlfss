@@ -42,6 +42,7 @@ namespace Drive_LFSS.Script_
         void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay);
         IDriver GetDriverWithGuid(uint guid);
         IDriver GetDriverWith(byte carId);
+        IDriver GetDriverWithConnectionId(byte connectionId);
         Script Script
         {
             get;
