@@ -184,6 +184,8 @@ namespace Drive_LFSS.Game_
         }
         internal void ProcessLapInformation(PacketLAP _packet)
         {
+            totalLapCount++;
+
             if(laps.Count < 1)
             {
                 Log.error("Driver.ProcessLapInformation(), laps array was empty, HACKFIX DONE, DriverName:"+driverName);
@@ -378,6 +380,7 @@ namespace Drive_LFSS.Game_
         private uint warningDrivingTypeTimer = 0;
         private byte warningDrivingReferenceCarId = 0;
         private uint badDrivingCount = 0;
+        private int totalLapCount = 0;
         private uint driftScoreByTime = 0;
         private uint driftScoreTimer = 0;
         private const uint DRIFT_SCORE_TIMER = 40000;
@@ -636,6 +639,10 @@ namespace Drive_LFSS.Game_
                     guid = (uint)reader.GetInt32(0);
                     SetConfigData(reader.GetString(1));
                     badDrivingCount = (uint)reader.GetInt32(2);
+                    reader.Close();reader.Dispose();
+                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='"+guid+"'");
+                    if(reader.Read())
+                        totalLapCount = reader.GetInt32(0);
                 }
             }
             Program.dlfssDatabase.Unlock();

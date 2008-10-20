@@ -431,10 +431,15 @@ namespace Drive_LFSS.Game_
                 //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
             }
             else
-                ISession.SendMSXMessage(driverName + "^2 is ^7new^2 on ^7" + ISession.GetRaceTrackPrefix() + "^2 with ^7" + carPrefix +"^2.");
+                ISession.SendMSXMessage(driverName + "^2 is "+( IsBot() ? "a ^7BOT" : "^7new")+"^2 on ^7" + ISession.GetRaceTrackPrefix() + "^2 with ^7" + carPrefix +"^2.");
                 //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
 
-            ISession.SendMSXMessage(driverName + "^2, has '^7"+badDrivingCount+"^2' driving ^1warning^2.^3DEBUG");
+            if(!IsBot())
+            {
+                float pctBad = badDrivingCount/(totalLapCount>0?totalLapCount:1);
+                pctBad *= 100.0f;
+                ISession.SendMSXMessage(driverName + "^2, has '^7" + (int)pctBad + "%^2' warning ratio.");
+            }
         }
         internal void LeaveTrack()
         {
