@@ -511,10 +511,10 @@ namespace Drive_LFSS.Packet_
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=8)]internal string carPlate;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=4)]internal string carPrefix;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst=16)]internal string skinName;
-        internal Car_Tyres tyreRearLeft;
-        internal Car_Tyres tyreRearRight;
-        internal Car_Tyres tyreFrontLeft;
-        internal Car_Tyres tyreFrontRight;
+        internal Tyre_Compound tyreRearLeft;
+        internal Tyre_Compound tyreRearRight;
+        internal Tyre_Compound tyreFrontLeft;
+        internal Tyre_Compound tyreFrontRight;
         internal byte addedMass;
         internal byte addedIntakeRestriction;
         internal byte driverModel;
@@ -557,10 +557,10 @@ namespace Drive_LFSS.Packet_
         internal byte Penalty;
         internal byte NumStops;
         internal byte Sp3;
-        internal Car_Tyres RL_Changed;
-        internal Car_Tyres RR_Changed;
-        internal Car_Tyres FL_Changed;
-        internal Car_Tyres FR_Changed;
+        internal Tyre_Compound RL_Changed;
+        internal Tyre_Compound RR_Changed;
+        internal Tyre_Compound FL_Changed;
+        internal Tyre_Compound FR_Changed;
         internal Pit_Work_Flag Work;
         internal uint Spare;
     }

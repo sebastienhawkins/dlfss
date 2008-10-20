@@ -64,10 +64,10 @@ namespace Drive_LFSS.Game_
         private byte addedMass = 0;
         private byte addedIntakeRestriction = 0;
         private byte passenger = 0;
-        private Car_Tyres tyreFrontLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
-        private Car_Tyres tyreFrontRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
-        private Car_Tyres tyreRearLeft = Car_Tyres.CAR_TYRE_NOTCHANGED;
-        private Car_Tyres tyreRearRight = Car_Tyres.CAR_TYRE_NOTCHANGED;
+        private Tyre_Compound tyreFrontLeft = Tyre_Compound.CAR_TYRE_NOTCHANGED;
+        private Tyre_Compound tyreFrontRight = Tyre_Compound.CAR_TYRE_NOTCHANGED;
+        private Tyre_Compound tyreRearLeft = Tyre_Compound.CAR_TYRE_NOTCHANGED;
+        private Tyre_Compound tyreRearRight = Tyre_Compound.CAR_TYRE_NOTCHANGED;
         private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
         protected double maxSpeedMs = 0.0d;
         private ushort lapCompleted = 0;
