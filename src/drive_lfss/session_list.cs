@@ -62,13 +62,12 @@ namespace Drive_LFSS
                 {
                     if (sessionList.ContainsKey(itr.Current)) //reloading config
                     {
-
                         sessionList[itr.Current].ConfigApply(inSimSetting);
                     }
                     else //New Session
                     {
                         Session session = new Session(itr.Current, inSimSetting);
-                        session.ConfigApply(false);
+                        session.ConfigApply(inSimSetting);
                         sessionList.Add(itr.Current, session);
                     }
                 }

@@ -45,7 +45,7 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        internal void ConfigApply()
+        new internal void ConfigApply()
         {
             base.ConfigApply();
 
@@ -84,7 +84,6 @@ namespace Drive_LFSS.Game_
         {
             timeStart = (uint)(System.DateTime.Now.Ticks / Program.tickPerMs);
             requestedFinalResultDone = false;
-            finalResultCount = 0;
             finishOrder = "";
 
             if (trackPrefix != _packet.trackPrefix)
@@ -155,7 +154,7 @@ namespace Drive_LFSS.Game_
             if(guid == 0) //No race, no result process
                 return;
 
-            if ( (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
+            if ( (_packet.requestId == 2 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 || _packet.confirmMask != Confirm_Flag.CONFIRM_NONE)
             {
                 IDriver driver = iSession.GetDriverWith(_packet.carId);
@@ -292,7 +291,7 @@ namespace Drive_LFSS.Game_
                 } break;
             }
         }
-        internal void ProcessRaceEnd()
+        new internal void ProcessRaceEnd()
         {
             base.ProcessRaceEnd(); 
 
@@ -354,7 +353,6 @@ namespace Drive_LFSS.Game_
         private uint timeTotal = 0;
         private Grid grid = new Grid();
         private bool requestedFinalResultDone = false;
-        private byte finalResultCount = 0;
         private bool stateHasChange = false;
         private bool hasToBeSavedIntoPPSTA = false;
         private uint guid = 0;
@@ -364,7 +362,6 @@ namespace Drive_LFSS.Game_
         //This is too keep pos of live value and not accurate
         //private byte[] positionToCarId = new byte[(int)PositionIndex.POSITION_LAST+1]; //index 0, mean nothing and index 193 mean Nothing too.
         private Dictionary<uint, byte> driverGuidRESPos = new Dictionary<uint, byte>(); //index 0, mean nothing and index 193 mean Nothing too.
-        private bool triggerRaceRestart = false; 
         private uint RESTART_RACE_INTERVAL = 0;
         private uint timerRaceRestart = 0;
 
@@ -374,7 +371,7 @@ namespace Drive_LFSS.Game_
         private uint advertRaceRestart = 0;
         private uint timeTotalFromFirstRES = 0;
 
-        public void update(uint diff)
+        new public void update(uint diff)
         {
             base.update(diff);
 
@@ -495,10 +492,11 @@ namespace Drive_LFSS.Game_
         private void FinishRace()
         {
             timeTotalFromFirstRES = 0;
-
+            iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
             Log.debug("Race: " + guid + ", was finished successfully.\r\n");
 
-             {//Win Scoring
+            if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING)
+            {//Win Scoring
                 Dictionary<uint,byte>.Enumerator enu = driverGuidRESPos.GetEnumerator();
                 scoringResultTextDisplay.Clear();
                 int driverCount = gridOrder.Split(new char[]{' '}).Length-1;

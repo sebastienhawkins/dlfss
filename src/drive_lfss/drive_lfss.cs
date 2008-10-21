@@ -253,8 +253,9 @@ namespace Drive_LFSS
                 System.Threading.Thread.Sleep(10000);
                 CommandConsole.Exec("exit");
                 return;
-            } Log.normal("Config initialized...\r\n\r\n");
+            }
             ConfigApply(); 
+            Log.normal("Config initialized...\r\n\r\n");
         }
         private static void InitProcessPath()
         {
@@ -304,6 +305,8 @@ namespace Drive_LFSS
             {switch (what){
                 case "all":
                     {
+                        InitConfig();
+
                         Program.dlfssDatabase.Lock();
                         Program.trackTemplate.Load(true);
                         Log.commandHelp("  track_template reloaded.\r\n");
@@ -384,7 +387,7 @@ namespace Drive_LFSS
                 case "race_map":
                 {
                     for (int itr = 0; itr < SessionList.GetSessions().Length; itr++)
-                        SessionList.GetSessions()[itr].ConfigApply(true);
+                        SessionList.GetSessions()[itr].ConfigApplyToVote();
                     Log.commandHelp("  race_map reloaded.\r\n");
                 } break;
                 case "bad_word":
@@ -396,6 +399,8 @@ namespace Drive_LFSS
                 } break;
                 case "config":
                 {
+                    InitConfig();
+
                     Log.normal("Initializing DLFSS Client...\r\n");
                     Config.Initialize(Program.processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.cfg");
                     Program.ConfigApply();

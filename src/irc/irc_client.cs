@@ -55,7 +55,6 @@ namespace Drive_LFSS.Irc_
         private IrcServerInfo ircServerInfo = null;
         private Thread threadMircClient;
         private bool registrationSend = false;
-        private bool completedRegistration = false;
 
         internal bool IsConnected
         {

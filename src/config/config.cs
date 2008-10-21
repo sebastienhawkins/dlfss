@@ -35,23 +35,17 @@ namespace Drive_LFSS.Config_
         }
         private static Dictionary<string, object> confValue = new Dictionary<string, object>();
         private static Regex rgxIdentifier = new Regex(@"^([a-z0-9]+){1}\.{0,1}([a-z0-9]+){0,1}\.{0,1}([a-z0-9]+){0,1}\.{0,1}([a-z0-9]+){0,1}\s*=\s*([^\s#\r\n]+[^#\r\n]*[^\s#\r\n]{1}|[^\s#\r\n]*){0,1}", RegexOptions.IgnoreCase);
-        private void ReadToArray(string confFile)
+        private static void ReadToArray(string confFile)
         {
+            confValue.Clear();
             // This is not garbage collected, if not into class compilant + good destructor call.
             // Important to call streamReader.Dispose() if not into a [assembly: ClSCompliant(true)]
             StreamReader streamReader = new StreamReader(confFile);
-
             string lineReaded = "";
-
             while (!streamReader.EndOfStream)
             {
                 lineReaded = streamReader.ReadLine();
-
                 Match match = rgxIdentifier.Match(lineReaded);
-
-                //sLog.debug(match.Groups[5] + "\r\n");
-                //continue;
-
                 if (match.Success)
                 {
                     if (match.Groups[4].Value != "")
@@ -225,10 +219,7 @@ namespace Drive_LFSS.Config_
                 Log.error("Unable to find the config file: " + confFile + "\r\n");
                 return false;
             }
-            //This is stupid desing, is there cause of the first design i tryed.
-            //Will have to get rid of this.
-            Config config = new Config();
-            config.ReadToArray(confFile);
+            Config.ReadToArray(confFile);
             return true;
         }
     }

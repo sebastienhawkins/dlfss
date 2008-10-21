@@ -86,7 +86,6 @@ namespace Drive_LFSS.InSim_
             if (true == false) { }
         }
         private InSimSetting inSimSetting;
-        private bool runThreadSocketReceive = false;
         private Thread threadSocketSendReceive;
         private Thread threadConnectionProcess;
         private int networkThreadSleep = 49;

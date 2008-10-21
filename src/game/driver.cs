@@ -364,11 +364,9 @@ namespace Drive_LFSS.Game_
         private bool isTimeDiffLap = true;
         private bool isTimeDiffSplit = true;
         private bool isMaxSpeedDisplay = true;
-        private bool isMaxSpeedKmhDisplay = true;
         private bool isAdmin = false;
         private string licenceName = "";
         private byte connectionId = 0;
-        private byte unkFlag = 0;
         private string driverName = "";
         private byte driverModel = 0;
         private uint timeTotalLastRace = 0;
@@ -559,6 +557,7 @@ namespace Drive_LFSS.Game_
                     laps.Add(new Lap());
                 }
             }
+
             if (driftScoreByTime > 0)
             {
                 if ((driftScoreTimer += diff) > DRIFT_SCORE_TIMER)
@@ -577,9 +576,7 @@ namespace Drive_LFSS.Game_
                     if(x == xOld && y == yOld)
                     {
                         if(isMoving)
-                        {
                             isMoving = false;
-                        }
                     }
                     else
                     {
