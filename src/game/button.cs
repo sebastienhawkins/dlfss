@@ -532,7 +532,7 @@ namespace Drive_LFSS.Game_
             string trackPrefix = ((Driver)this).ISession.GetRaceTrackPrefix();
             string carPrefix = ((ICar)this).CarPrefix;
             uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
-            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7"+carPrefix+", ^2Track:^7 "+trackPrefix+", ^2Count: ^7"+rankedCount);
+            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7all, ^2Track:^7 "+trackPrefix+", ^2Count: ^7"+rankedCount);
             if(rankedCount < 1)
                 return;
             List<Driver> driver = ((Session)((Driver)this).ISession).GetDriverList();
@@ -560,7 +560,7 @@ namespace Drive_LFSS.Game_
             {
                 if(driver[itr].IsBot())
                     continue;
-                Rank rank = driver[itr].GetRank(trackPrefix,carPrefix);
+                Rank rank = driver[itr].GetRank(trackPrefix, driver[itr].CarPrefix);
                 if(rank != null)
                 {
                    
