@@ -183,12 +183,11 @@ namespace Drive_LFSS.ChatModo_
                     jtr = wordScoreList.GetEnumerator();
                     while (jtr.MoveNext())
                     {
-                        wordMask = Word_Flag.NONE;
                         _levenScore = levenstein(words[itr].ToLowerInvariant(), jtr.Current.Key);
                         if (_levenScore < 5 && _levenScore < jtr.Current.Key.Length / 2 && levenScore > _levenScore)
                         {
                             #if DEBUG
-                            iSession.SendMSTMessage("/msg ^7C^3hatModo^52 ^7:^2 " + words[itr] + "^7->^2" + jtr.Current.Key);
+                            iSession.SendMSTMessage("/msg ^7C^3hatModo^52 ^7:^2 " + words[itr] + "^7->^2'" + jtr.Current.Key+"'");
                             #endif
                             levenScore = _levenScore;
                             wordMask = (Word_Flag)jtr.Current.Value;
