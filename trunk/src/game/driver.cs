@@ -379,6 +379,8 @@ namespace Drive_LFSS.Game_
         private byte warningDrivingReferenceCarId = 0;
         private uint badDrivingCount = 0;
         private int totalLapCount = 0;
+        private int totalRaceCount = 0;
+        private int totalRaceFinishCount = 0;
         private uint driftScoreByTime = 0;
         private uint driftScoreTimer = 0;
         private const uint DRIFT_SCORE_TIMER = 40000;
@@ -637,9 +639,22 @@ namespace Drive_LFSS.Game_
                     SetConfigData(reader.GetString(1));
                     badDrivingCount = (uint)reader.GetInt32(2);
                     reader.Close();reader.Dispose();
+                    
                     reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='"+guid+"'");
                     if(reader.Read())
                         totalLapCount = reader.GetInt32(0);
+                    reader.Close(); reader.Dispose();
+
+                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE LOCATE(' " + guid + "',`grid_order`) > 0 OR LOCATE('" + guid + " ',`grid_order`) > 0");
+                    if (reader.Read())
+                        totalRaceCount = reader.GetInt32(0);
+                    reader.Close(); reader.Dispose();
+
+                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE LOCATE(' " + guid + "',`finish_order`) > 0 OR LOCATE('" + guid + " ',`finish_order`) > 0");
+                    if (reader.Read())
+                        totalRaceFinishCount = reader.GetInt32(0);
+                    reader.Close(); reader.Dispose();
+
                 }
             }
             Program.dlfssDatabase.Unlock();

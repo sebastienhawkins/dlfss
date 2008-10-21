@@ -427,21 +427,23 @@ namespace Drive_LFSS.Game_
             Rank _rank = GetRank(ISession.GetRaceTrackPrefix(),CarPrefix);
             if(_rank != null)
             {
-                ISession.SendMSTMessage("/msg "+driverName+" ^2" + _rank.GetGradeComment() + "^2 for ^7" + ISession.GetRaceTrackPrefix() + "^2/^7" + carPrefix);
+                ISession.SendMSTMessage("/msg "+driverName+" ^2" + _rank.GetGradeComment() + "^2 with ^7" + carPrefix);
                 //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
             }
             else
             {
-                ISession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")+"^2 for ^7" + ISession.GetRaceTrackPrefix() + "^2/^7" + carPrefix);
+                ISession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")+"^2 with ^7" + carPrefix);
                 //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
             }
             
             if(!IsBot())
             {
-                float pctBad = badDrivingCount/(totalLapCount>0?totalLapCount:1);
+                float pctBad = ((float)badDrivingCount / (totalRaceFinishCount > 0 ? (float)totalRaceFinishCount : 1.0f));
                 pctBad *= 100.0f;
-                pctBad = 100.0f - pctBad;
-                ISession.SendMSTMessage("/msg ^2  and '^7" + (int)pctBad + "%^2' safe.");
+                pctBad = 101.0f - pctBad;
+                if(pctBad > 100.0f)
+                    pctBad = 100.0f;
+                ISession.SendMSTMessage("/msg ^2    and '^7" + Math.Round(pctBad,0) + "%^2' safe.");
             }
         }
         internal void LeaveTrack()
