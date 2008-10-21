@@ -54,9 +54,9 @@ namespace Drive_LFSS.Game_
         internal void ConfigApply(InSimSetting _inSimSetting)
         {
             base.SetInSimSetting(_inSimSetting);
-            ConfigApply();
+            ConfigApply(false);
         }
-        new internal void ConfigApply(bool onlyVoteSystem)
+        private void ConfigApply(bool onlyVoteSystem)
         {
             if (onlyVoteSystem)
             {
@@ -68,6 +68,11 @@ namespace Drive_LFSS.Game_
             race.ConfigApply();
             Driver.ConfigApply();
         }
+        internal void ConfigApplyToVote()
+        {
+            ConfigApply(true);        
+        }
+        
         private class Ping
         {
             public Ping()

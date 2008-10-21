@@ -79,12 +79,7 @@ namespace Drive_LFSS.Game_
                     if (((Race)this).GetGuid() != 0)
                     {
                         IDriver driver = ((Race)this).ISession.GetDriverWithConnectionId(connectionId);
-                        if (driver == null)
-                        {
-                            Log.error("ProcessVoteNotification(), Vote restart from a null driver.\r\n");
-                            SendVoteCancel();
-                        }
-                        else
+                        if (driver != null)
                         {
                             if (!((Race)this).StartGridHasDriverGuid(driver.GetGuid()))
                             {

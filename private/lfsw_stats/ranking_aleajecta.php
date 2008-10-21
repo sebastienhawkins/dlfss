@@ -17,7 +17,7 @@ foreach($wrt as &$value)
 	$wr[$trackt][$value[2]] = $value[6];
 }
 
-$link = mysql_connect('', 'root', 'dexxa');
+$link = mysql_connect('192.168.101.200:33306', 'www', 'dexxa');
 if (!$link) {die(mysql_error());}
 if (!mysql_select_db('drive_lfss')){die(mysql_error());}
 

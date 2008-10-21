@@ -116,10 +116,6 @@ namespace Drive_LFSS.Game_
         private Queue<ButtonMessage> buttonMessageTop = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
         private Queue<ButtonMessage> buttonMessageMiddle = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
         protected Gui_Entry currentGui = Gui_Entry.NONE;
-        private const uint FREEZE_BUTTON_CLEAR = 1000;
-        private const uint FREEZE_BUTTON = 1000;
-        private uint freezeButtonClear = 0;
-        private uint freezeButton = 0;
         private Button_Entry rankGuiCurrentDisplay = Button_Entry.NONE;
         private byte rankSearchDisplayCount = 0;
         private string rankSearchTrackPrefix = "";
@@ -127,107 +123,93 @@ namespace Drive_LFSS.Game_
         private Queue<Packet> bufferButtonPacket = new Queue<Packet>();
 
         private uint timerBufferedButton = 0;
+        private const uint TIMER_BUFFERED_BUTTON = 100;
         private const uint MAX_BUTTON_BY_CYCLE = 10;
-        new protected virtual void update(uint diff)
+        protected virtual void update(uint diff)
         {
-            lock(bufferButtonPacket)
+            
+            if(timerBufferedButton < diff)
             {
-                int buttonBufferCount = bufferButtonPacket.Count;
-                if(timerBufferedButton < diff)
+                timerBufferedButton = TIMER_BUFFERED_BUTTON;
+                lock(bufferButtonPacket)
                 {
-                    timerBufferedButton = 0;
+                    int buttonBufferCount = bufferButtonPacket.Count;
                     for(byte count = 0; count < buttonBufferCount ; count++)
                     {
                         ((Session)((Driver)this).ISession).AddToTcpSendingQueud(bufferButtonPacket.Dequeue());
                         if(count >= MAX_BUTTON_BY_CYCLE)
-                        {
-                            timerBufferedButton = 100;
                             break;
+                    }
+                }
+            }
+            else
+                timerBufferedButton -= diff; 
+            
+
+            lock(buttonTimedList)
+            {
+                if (buttonTimedList.Count > 0)
+                {
+                    for (byte itr = 0; itr < buttonTimedList.Count; itr++ )
+                    {
+                        if (buttonTimedList[itr].Time - diff > diff) //timer on button are maybe time to be rewrite, we have a dsync why this method, hack like.
+                            buttonTimedList[itr].Time -= diff;
+                        else
+                        {
+                            buttonTimedList[itr].Time = 0;
+                            RemoveButton(buttonTimedList[itr].ButtonEntry);
                         }
                     }
-                    
+                    List<ButtonTimed>.Enumerator clrItr = buttonTimedList.GetEnumerator();
+                    while (clrItr.MoveNext())
+                    {
+                        if (clrItr.Current.Time == 0)
+                        {
+                            buttonTimedList.Remove(clrItr.Current);
+                            clrItr = buttonTimedList.GetEnumerator();
+                        }
+                    }
                 }
-                else
-                   timerBufferedButton -= diff; 
             }
+            lock (buttonMessageTop)
+            {
+                if (buttonMessageTop.Count > 0)
+                {
+                    ButtonMessage currentButton = buttonMessageTop.Peek();
+                    if (currentButton.Text != "")
+                    {
+                        ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_TOP);
+                        newButton.Text = currentButton.Text;
+                        AddTimedButton(currentButton.Time, newButton);
+                        currentButton.Text = "";
+                    }
 
-            
-            if(freezeButtonClear > 0)
-            {
-                if(freezeButtonClear < diff)
-                {
-                    SendUpdateButton(Button_Entry.RANK_BUTTON_TOP20,"^2Top20");
-                    SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
-                    SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
-                    freezeButtonClear = 0;
-                }
-                else
-                    freezeButtonClear -= diff;
-            }
-            if(freezeButton > 0)
-            {
-                if(freezeButton < diff)
-                {
-                    freezeButton = 0;
-
-                }
-                else
-                    freezeButton -= diff; 
-            }
-            if (buttonTimedList.Count > 0)
-            {
-                for (byte itr = 0; itr < buttonTimedList.Count; itr++ )
-                {
-                    if (buttonTimedList[itr].Time - diff > diff) //timer on button are maybe time to be rewrite, we have a dsync why this method, hack like.
-                        buttonTimedList[itr].Time -= diff;
+                    if (currentButton.Time > diff)
+                        currentButton.Time -= diff;
                     else
-                    {
-                        buttonTimedList[itr].Time = 0;
-                        RemoveButton(buttonTimedList[itr].ButtonEntry);
-                    }
-                }
-                List<ButtonTimed>.Enumerator clrItr = buttonTimedList.GetEnumerator();
-                while (clrItr.MoveNext())
-                {
-                    if (clrItr.Current.Time == 0)
-                    {
-                        buttonTimedList.Remove(clrItr.Current);
-                        clrItr = buttonTimedList.GetEnumerator();
-                    }
+                        buttonMessageTop.Dequeue();
                 }
             }
-            if (buttonMessageTop.Count > 0)
+            lock (buttonMessageMiddle)
             {
-                ButtonMessage currentButton = buttonMessageTop.Peek();
-                if (currentButton.Text != "")
+                if (buttonMessageMiddle.Count > 0)
                 {
-                    ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_TOP);
-                    newButton.Text = currentButton.Text;
-                    AddTimedButton(currentButton.Time, newButton);
-                    currentButton.Text = "";
-                }
+                    ButtonMessage currentButton = buttonMessageMiddle.Peek();
+                    if (currentButton.Text != "")
+                    {
+                        ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_MIDDLE);
+                        newButton.Text = currentButton.Text;
+                        AddTimedButton(currentButton.Time, newButton); //Since time is not very important, use this way to be sure im sync with timedButton
+                        currentButton.Text = "";
+                    }
 
-                if (currentButton.Time > diff)
-                    currentButton.Time -= diff;
-                else
-                    buttonMessageTop.Dequeue();
-            }
-            if (buttonMessageMiddle.Count > 0)
-            {
-                ButtonMessage currentButton = buttonMessageMiddle.Peek();
-                if (currentButton.Text != "")
-                {
-                    ButtonTemplateInfo newButton = Program.buttonTemplate.GetEntry((uint)Button_Entry.MESSAGE_BAR_MIDDLE);
-                    newButton.Text = currentButton.Text;
-                    AddTimedButton(currentButton.Time, newButton); //Since time is not very important, use this way to be sure im sync with timedButton
-                    currentButton.Text = "";
+                    if (currentButton.Time > diff)
+                        currentButton.Time -= diff;
+                    else
+                        buttonMessageMiddle.Dequeue();
                 }
-
-                if (currentButton.Time > diff)
-                    currentButton.Time -= diff;
-                else
-                    buttonMessageMiddle.Dequeue();
             }
+
         }
 
         public void SendGui(ushort guiEntry, string text)

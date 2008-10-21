@@ -205,10 +205,10 @@ namespace Drive_LFSS.Server_
                     Program.Reload("config");
                     driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
-                default: driver.AddMessageMiddle("^7Unknown tableName, ^3" + args[1], DISPLAY_TIME); break;
-
-                    Log.command("Command.Reload(), User: " + driver.LicenceName + ", reloaded: " + args[1] + "\r\n");
+                default: 
+                    driver.AddMessageMiddle("^7Unknown tableName, ^3" + args[1], DISPLAY_TIME); break;
             }
+            Log.command("Command.Reload(), User: " + driver.LicenceName + ", reloaded: " + args[1] + "\r\n");
         }
         private void Help(Driver driver, string[] args)
         {
