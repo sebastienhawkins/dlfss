@@ -23,6 +23,7 @@ namespace Drive_LFSS.Server_
     using Packet_;
     using Game_;
     using Definition_;
+    using ChatModo_;
 
     sealed class CommandInGame
     {
@@ -43,6 +44,7 @@ namespace Drive_LFSS.Server_
            command["test"] = new CommandName(1, new CommandDelegate(Test));
            command["result"] = new CommandName(0, new CommandDelegate(Result));
            command["say"] = new CommandName(1, new CommandDelegate(Say));
+           command["badword"] = new CommandName(2, new CommandDelegate(BadWord));
         }
         ~CommandInGame()
         {
@@ -61,7 +63,7 @@ namespace Drive_LFSS.Server_
         private delegate void CommandDelegate(Driver driver, string[] args);
         private Dictionary<string, CommandName> command = new Dictionary<string, CommandName>();
         private readonly Session session;
-        private const uint DISPLAY_TIME = 4500;
+        private const uint DISPLAY_TIME = 5500;
         
         public void Exec(Driver driver, string _commandText)
         {
@@ -71,17 +73,21 @@ namespace Drive_LFSS.Server_
             
             if (args.Length < 1 || !command.ContainsKey(args[0]) ) 
             {
-                driver.AddMessageMiddle("^7Unknown command: ^3" + _commandText + ".", 4500);
+                driver.AddMessageMiddle("^7Unknown command: ^3" + _commandText + ".", DISPLAY_TIME);
                 Log.command("Command.Exec(), Invalid command from User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
-            if( command[args[0]].level > 0 && !driver.IsAdmin )
+            if( command[args[0]].level == 1 && !driver.IsAdmin )
             {
-                driver.AddMessageMiddle("^7Must be admin to execute command: ^3" + args[0]+".",4500);
+                driver.AddMessageMiddle("^7Must be admin to execute command: ^3" + args[0] + ".", DISPLAY_TIME);
                 Log.command("Command.Exec(), Illegal command from User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
-
+            if (command[args[0]].level == 2 && driver.LicenceName != "Greenseed")
+            {
+                driver.AddMessageMiddle("^2Must be ^7G^3reenseed ^2to ^1execute^2 that command: ^3" + args[0] + ".", DISPLAY_TIME);
+                return;
+            }
             command[args[0]].cmd(driver, args);
         }
 
@@ -200,6 +206,14 @@ namespace Drive_LFSS.Server_
                     Program.Reload("gui_template");
                     driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
+                case "top20":
+                case "rank":
+                case "ranking":
+                case "stats_rank_driver":
+                {
+                    Program.Reload("rank");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
+                } break;
                 case "config":
                 {
                     Program.Reload("config");
@@ -295,6 +309,22 @@ namespace Drive_LFSS.Server_
         private void Result(Driver driver, string[] args)
         {
             driver.SendResultGui(session.GetRaceLastResult());
+        }
+        private void BadWord(Driver driver, string[] args)
+        {
+            if (args.Length != 3)
+            {
+                driver.AddMessageMiddle("^2Usage: ^5!badword ^3word^7/^3flag^7=^30^2,^31^2,^32^2,^33 ^1SpaceChar^7=^3%", DISPLAY_TIME);
+                return;
+            }
+            Program.dlfssDatabase.Lock();
+            {
+                Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `bad_word` VALUES('"+args[1].Replace("%", " ")+"','"+args[2]+"') ON DUPLICATE KEY UPDATE `word`='"+args[1].Replace("%"," ")+"',`mask`='"+args[2]+"'");
+                ChatModo.Initialize();
+            }
+            Program.dlfssDatabase.Unlock();
+            
+            driver.AddMessageMiddle("^2Add^7/^2Update ^3badword ^7:^2 '^3"+args[1].Replace("%"," ")+"^2' with flag^7=^3"+args[2], DISPLAY_TIME);
         }
         #endregion
     }
