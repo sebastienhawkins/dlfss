@@ -54,6 +54,7 @@ namespace Drive_LFSS.ChatModo_
         }
         internal static bool Initialize()
         {
+            isActivated = false;
             LoadBadWordTable();
             wordScoreListCount = wordScoreList.Count;
             if (wordScoreListCount > 0)
@@ -66,18 +67,15 @@ namespace Drive_LFSS.ChatModo_
             {
                 wordScoreList.Clear();
                 string query = "SELECT * FROM `bad_word;";
-                Program.dlfssDatabase.Lock();
+                int count = 0;
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                while(reader.Read())
                 {
-                    int count = 0;
-                    IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
-                    while(reader.Read())
-                    {
-                        ++count;
-                        wordScoreList.Add(reader.GetString(0), reader.GetByte(1));
-                    }
-                    Log.commandHelp("  loaded "+count+" \"bad word\".\r\n");
+                    ++count;
+                    wordScoreList.Add(reader.GetString(0), reader.GetByte(1));
                 }
-                Program.dlfssDatabase.Unlock();
+                reader.Dispose();
+                Log.commandHelp("  loaded "+count+" \"bad word\".\r\n");
             }
         }
         private static bool isActivated = false;

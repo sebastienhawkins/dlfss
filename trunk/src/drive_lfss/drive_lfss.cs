@@ -320,8 +320,8 @@ namespace Drive_LFSS
                         Log.commandHelp("  race_template reloaded.\r\n");
                         Program.driverBan.Load(false);
                         Log.commandHelp("  driver_ban reloaded.\r\n");
-                        ChatModo.LoadBadWordTable();
-                        Log.commandHelp("  bad_word reloaded.\r\n");
+                        InitChatModo();
+                        InitRanking();
                         Program.dlfssDatabase.Unlock();
                         
                         Log.normal("Initializing DLFSS client...\r\n");
@@ -393,10 +393,15 @@ namespace Drive_LFSS
                 case "bad_word":
                 {
                     Program.dlfssDatabase.Lock();
-                    ChatModo.LoadBadWordTable();
+                    InitChatModo();
                     Program.dlfssDatabase.Unlock();
-                    Log.commandHelp("  bad_word reloaded.\r\n");
                 } break;
+                case "rank":
+                {
+                    Program.dlfssDatabase.Lock();
+                    InitRanking();
+                    Program.dlfssDatabase.Unlock();
+                }break;
                 case "config":
                 {
                     InitConfig();

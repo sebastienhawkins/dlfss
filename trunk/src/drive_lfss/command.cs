@@ -175,6 +175,10 @@ namespace Drive_LFSS.CommandConsole_
                 case "driver_ban":Program.Reload("driver_ban");break;
                 case "gui":
                 case "gui_template":Program.Reload("gui_template");break;
+                case "top20":
+                case "rank":
+                case "ranking":
+                case "stats_rank_driver":Program.Reload("rank");break;
                 case "bad":
                 case "bad_word": Program.Reload("bad_word"); break;
                 case "config":Program.Reload("config");break;

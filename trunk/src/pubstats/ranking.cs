@@ -186,6 +186,7 @@ namespace Drive_LFSS.Ranking_
         }
         internal static bool Initialize()
         {
+            isActived = false;
             if(!LoadDriverRankedCount())
                 return false;
 
@@ -244,7 +245,6 @@ namespace Drive_LFSS.Ranking_
             else
                 return false;
         }
-        
         private static bool LoadDriverRankedCount()
         {
             Log.commandHelp("  Start loading driver ranked count.\r\n");
