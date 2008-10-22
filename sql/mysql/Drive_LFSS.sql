@@ -525,6 +525,7 @@ DROP TABLE IF EXISTS `race_template`;
 CREATE TABLE `race_template` (
   `entry` mediumint(5) unsigned NOT NULL,
   `description` varchar(34) NOT NULL default '',
+  `entry_restriction` mediumint(5) unsigned NOT NULL default '0',
   `track_entry` tinyint(2) unsigned NOT NULL default '0',
   `car_entry_allowed` varchar(64) NOT NULL default '0',
   `weather` tinyint(2) unsigned NOT NULL default '0',
@@ -542,56 +543,45 @@ CREATE TABLE `race_template` (
 
 LOCK TABLES `race_template` WRITE;
 /*!40000 ALTER TABLE `race_template` DISABLE KEYS */;
-INSERT INTO `race_template` VALUES (1,'South City Classic, 115Hp',6,'2 3',0,0,11,5,0,1);
-INSERT INTO `race_template` VALUES (2,'South City Classic Rev,  115Hp',7,'2 3',1,1,12,5,0,1);
-INSERT INTO `race_template` VALUES (3,'South City Sprint 1, 115Hp',8,'2 3',2,2,13,5,0,1);
-INSERT INTO `race_template` VALUES (4,'South City Sprint 1 Rev, 115Hp',9,'2 3',3,3,14,5,0,1);
-INSERT INTO `race_template` VALUES (5,'South City Sprint 2, 115Hp',10,'2 3',1,1,16,5,0,1);
-INSERT INTO `race_template` VALUES (6,'South City Sprint 2 Rev, 115Hp',11,'2 3',2,1,15,5,0,1);
-INSERT INTO `race_template` VALUES (7,'Blackwood GP Track, F08',1,'19',0,0,25,8,0,1);
-INSERT INTO `race_template` VALUES (8,'Westhill, Turbo GTR',40,'13 14 15',0,0,10,8,0,1);
-INSERT INTO `race_template` VALUES (9,'Westhill Rev, GTR Turbo',41,'13 14 15',0,0,10,8,0,1);
-INSERT INTO `race_template` VALUES (10,'Aston Cadet Pratice, Formule',42,'16 17 18 19 20',0,0,0,0,0,5);
-INSERT INTO `race_template` VALUES (11,'Aston Cadet, FBM',42,'17',0,0,10,12,0,1);
-INSERT INTO `race_template` VALUES (12,'South City Sprint 1 Rev, FBM',9,'17',0,0,11,5,0,1);
-INSERT INTO `race_template` VALUES (13,'Fern Bay Black, FOX R1',24,'18',0,0,8,5,0,1);
-INSERT INTO `race_template` VALUES (14,'Fern Bay Black Rev, FOX R1',25,'18',0,0,8,0,0,1);
-INSERT INTO `race_template` VALUES (15,'Aston Club, Formule Pratice',44,'16 17 18 19',0,0,0,0,0,5);
-INSERT INTO `race_template` VALUES (16,'Aston Club Rev, Formule Pratice',45,'16 17 18 19',0,0,0,0,0,5);
-INSERT INTO `race_template` VALUES (17,'Blackwood Rallycross, LX6',3,'5',2,0,18,5,0,1);
-INSERT INTO `race_template` VALUES (18,'Blackwood Rallycross Rev, LX6',4,'5',2,0,18,5,0,1);
-INSERT INTO `race_template` VALUES (19,'Fern Bay Club, MRT',18,'2 3',0,0,11,5,0,1);
-INSERT INTO `race_template` VALUES (20,'Fern Bay Club Rev, F GTR',19,'11 12',0,0,14,5,0,1);
-INSERT INTO `race_template` VALUES (30,'Blackwood Rally, RB4',3,'6',0,0,9,0,0,1);
-INSERT INTO `race_template` VALUES (29,'Fernbay Green Rev, FOX',21,'18',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (28,'Southcity Town Rev, UFR/XFR',15,'11 12',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (27,'Southcity Chicane Rev, UFR/XFR',17,'11 12',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (26,'Southcity Sprint2 Rev, FXO/XRT',11,'7 8',0,0,14,0,0,1);
-INSERT INTO `race_template` VALUES (25,'Southcity Classic, FXO/XRT',6,'7 8',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (24,'Southcity Town, FXO/XRT',14,'7 8',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (23,'Aston Club Rev, FOX',45,'18',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (22,'Fernbay Gold Rev, FOX',23,'18',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (37,'Aston Cadet Rev, FBM',43,'17',0,0,8,0,0,1);
-INSERT INTO `race_template` VALUES (36,'Southcity Classic, FBM',6,'17',0,0,8,0,0,1);
-INSERT INTO `race_template` VALUES (33,'Fernbay Club Rev, XFG/XRG',19,'2 3',0,0,12,0,0,1);
-INSERT INTO `race_template` VALUES (35,'Southcity Classic Rev, XFG/XRG',7,'2 3',0,0,8,0,0,1);
-INSERT INTO `race_template` VALUES (34,'Fernbay Rally, XFG/XRG',28,'2 3',0,0,9,0,0,1);
-INSERT INTO `race_template` VALUES (21,'Fernbay Green Rev, FOX',21,'18',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (32,'Fernbay Club, XFG/XRG',18,'2 3',0,0,12,0,0,1);
-INSERT INTO `race_template` VALUES (31,'Southcity Sprint2 Rev, XFG/XRG',11,'2 3',0,0,10,0,0,1);
-INSERT INTO `race_template` VALUES (38,'Southcity Sprint1, FBM',9,'17',0,0,8,0,0,1);
-INSERT INTO `race_template` VALUES (39,'Blackwood GP, FBM',1,'17',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (40,'Aston Grand Prix, BF1',50,'20',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (41,'Western Hill, GTR',40,'13 14 15',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (42,'Kyoto GP, FO8',38,'19',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (43,'Blackwood Rally, LX6',2,'5',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (44,'Western Hill Rev, BF1',41,'20',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (45,'Aston Historic Rev, BF1',49,'20',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (46,'Fernbay Black Rev, FO8',25,'19',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (47,'Aston Club Rev, FO8',45,'20',0,0,5,0,0,1);
-INSERT INTO `race_template` VALUES (48,'Kyoto Ring, BF1',34,'20',0,0,7,0,0,1);
-INSERT INTO `race_template` VALUES (49,'Kyoto Ring, Nascar',34,'14 15',0,0,10,0,0,1);
-INSERT INTO `race_template` VALUES (50,'Kyoto Ring Rev, Nascar',35,'14 15',0,0,10,0,0,1);
+INSERT INTO `race_template` VALUES (1,'South City Classic, 115Hp',0,6,'2 3',0,0,11,5,0,1);
+INSERT INTO `race_template` VALUES (2,'South City Classic Rev,  115Hp',0,7,'2 3',1,1,12,5,0,1);
+INSERT INTO `race_template` VALUES (3,'South City Sprint 1, 115Hp',0,8,'2 3',2,2,13,5,0,1);
+INSERT INTO `race_template` VALUES (4,'South City Sprint 1 Rev, 115Hp',0,9,'2 3',3,3,14,5,0,1);
+INSERT INTO `race_template` VALUES (5,'South City Sprint 2, 115Hp',0,10,'2 3',1,1,16,5,0,1);
+INSERT INTO `race_template` VALUES (6,'South City Sprint 2 Rev, 115Hp',0,11,'2 3',2,1,15,5,0,1);
+INSERT INTO `race_template` VALUES (7,'Blackwood GP Track, F08',0,1,'19',0,0,25,8,0,1);
+INSERT INTO `race_template` VALUES (8,'Westhill, Turbo GTR',0,40,'13 14 15',0,0,10,8,0,1);
+INSERT INTO `race_template` VALUES (9,'Westhill Rev, GTR Turbo',0,41,'13 14 15',0,0,10,8,0,1);
+INSERT INTO `race_template` VALUES (10,'Aston Cadet Pratice, Formule',0,42,'16 17 18 19 20',0,0,0,0,0,5);
+INSERT INTO `race_template` VALUES (11,'Aston Cadet, FBM',0,42,'17',0,0,10,12,0,1);
+INSERT INTO `race_template` VALUES (12,'South City Sprint 1 Rev, FBM',0,9,'17',0,0,11,5,0,1);
+INSERT INTO `race_template` VALUES (13,'Fern Bay Black, FOX R1',0,24,'18',0,0,8,5,0,1);
+INSERT INTO `race_template` VALUES (14,'Fern Bay Black Rev, FOX R1',0,25,'18',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (15,'Aston Club, Formule Pratice',0,44,'16 17 18 19',0,0,0,0,0,5);
+INSERT INTO `race_template` VALUES (16,'Aston Club Rev, Formule Pratice',0,45,'16 17 18 19',0,0,0,0,0,5);
+INSERT INTO `race_template` VALUES (17,'Blackwood Rallycross, LX6',0,3,'5',2,0,18,5,0,1);
+INSERT INTO `race_template` VALUES (18,'Blackwood Rallycross Rev, LX6',0,4,'5',2,0,18,5,0,1);
+INSERT INTO `race_template` VALUES (19,'Fern Bay Club, MRT',0,18,'2 3',0,0,11,5,0,1);
+INSERT INTO `race_template` VALUES (20,'Fern Bay Club Rev, F GTR',0,19,'11 12',0,0,14,5,0,1);
+INSERT INTO `race_template` VALUES (30,'Blackwood Rally, RB4',0,3,'6',0,0,9,0,0,1);
+INSERT INTO `race_template` VALUES (29,'Fernbay Green Rev, FOX',0,21,'18',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (28,'Southcity Town Rev, UFR/XFR',0,15,'11 12',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (27,'Southcity Chicane Rev, UFR/XFR',0,17,'11 12',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (26,'Southcity Sprint2 Rev, FXO/XRT',0,11,'7 8',0,0,14,0,0,1);
+INSERT INTO `race_template` VALUES (25,'Southcity Classic, FXO/XRT',0,6,'7 8',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (24,'Southcity Town, FXO/XRT',0,14,'7 8',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (23,'Aston Club Rev, FOX',0,45,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (22,'Fernbay Gold Rev, FOX',0,23,'18',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (37,'Aston Cadet Rev, FBM',0,43,'17',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (36,'Southcity Classic, FBM',0,6,'17',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (33,'Fernbay Club Rev, XFG/XRG',0,19,'2 3',0,0,12,0,0,1);
+INSERT INTO `race_template` VALUES (35,'Southcity Classic Rev, XFG/XRG',0,7,'2 3',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (34,'Fernbay Rally, XFG/XRG',0,28,'2 3',0,0,9,0,0,1);
+INSERT INTO `race_template` VALUES (21,'Fernbay Green Rev, FOX',0,21,'18',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (32,'Fernbay Club, XFG/XRG',0,18,'2 3',0,0,12,0,0,1);
+INSERT INTO `race_template` VALUES (31,'Southcity Sprint2 Rev, XFG/XRG',0,11,'2 3',0,0,10,0,0,1);
+INSERT INTO `race_template` VALUES (38,'Southcity Sprint1, FBM',0,9,'17',0,0,8,0,0,1);
+INSERT INTO `race_template` VALUES (39,'Blackwood GP, FBM',0,1,'17',0,0,5,0,0,1);
 /*!40000 ALTER TABLE `race_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -607,9 +597,9 @@ CREATE TABLE `restriction_join` (
   `safe_driving_pct_kick` tinyint(1) unsigned NOT NULL default '0',
   `bad_language_pct` tinyint(3) unsigned NOT NULL default '0',
   `bad_language_pct_kick` tinyint(1) unsigned NOT NULL default '0',
-  `pb_wr_diff_min` int(12) unsigned NOT NULL default '0',
-  `pb_wr_diff_max` int(12) unsigned NOT NULL default '0',
-  `pb_wr_diff_kick` tinyint(1) unsigned NOT NULL default '0',
+  `pb_min` int(12) unsigned NOT NULL default '0',
+  `pb_max` int(12) unsigned NOT NULL default '0',
+  `pb_kick` tinyint(1) unsigned NOT NULL default '0',
   `skin_name` varchar(16) character set latin1 collate latin1_general_ci NOT NULL default '',
   `skin_name_kick` tinyint(1) unsigned NOT NULL default '0',
   `driver_name` varchar(16) NOT NULL default '',
@@ -645,9 +635,9 @@ DROP TABLE IF EXISTS `restriction_race`;
 CREATE TABLE `restriction_race` (
   `entry` int(8) unsigned NOT NULL,
   `description` varchar(100) NOT NULL default '',
-  `max_speed_ms` float(4,1) unsigned NOT NULL default '0.0',
-  `max_speed_ms_lap_number` varchar(20) NOT NULL default '0',
-  `max_speed_ms_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `speed_ms_max` float(4,1) unsigned NOT NULL default '0.0',
+  `speed_ms_max_lap_number` varchar(20) NOT NULL default '0',
+  `speed_ms_max_pen_type` tinyint(3) unsigned NOT NULL default '0',
   `tyre_fl` tinyint(3) unsigned NOT NULL default '0',
   `tyre_fr` tinyint(3) unsigned NOT NULL default '0',
   `tyre_rl` tinyint(3) unsigned NOT NULL default '0',
@@ -663,8 +653,8 @@ CREATE TABLE `restriction_race` (
   `added_mass_pen_type` tinyint(3) unsigned NOT NULL default '0',
   `intake_restriction` tinyint(3) unsigned NOT NULL default '0',
   `intake_restriction_pen_type` tinyint(3) unsigned NOT NULL default '0',
-  `penality` tinyint(3) unsigned NOT NULL default '0',
-  `penality_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `penality_reason` tinyint(3) unsigned NOT NULL default '0',
+  `penality_reason_pen_type` tinyint(3) unsigned NOT NULL default '0',
   `driver_mask` smallint(5) unsigned NOT NULL default '0',
   `driver_mask_pen_type` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
@@ -822,4 +812,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-10-22 15:28:26
+-- Dump completed on 2008-10-22 17:45:07
