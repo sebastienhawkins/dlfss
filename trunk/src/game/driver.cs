@@ -185,13 +185,16 @@ namespace Drive_LFSS.Game_
         internal void ProcessLapInformation(PacketLAP _packet)
         {
             totalLapCount++;
-
-            if(laps.Count < 1)
+            Lap lap = null;
+            lock(laps)
             {
-                Log.error("Driver.ProcessLapInformation(), laps array was empty, HACKFIX DONE, DriverName:"+driverName);
-                laps.Add(new Lap());
+                if(laps.Count < 1)
+                {
+                    Log.error("Driver.ProcessLapInformation(), laps array was empty, HACKFIX DONE, DriverName:"+driverName+", LicenceName:"+licenceName+"\r\n");
+                    laps.Add(new Lap());
+                }
+                lap = laps[laps.Count - 1];
             }
-            Lap lap = laps[laps.Count - 1];
             lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
 
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
@@ -246,16 +249,15 @@ namespace Drive_LFSS.Game_
         internal void ProcessSplitInformation(PacketSPX _packet)
         {
             //Internal Lap
-            if (laps.Count == 0)
+            Lap lap = null;
+            lock (laps)
             {
-                Log.error("ProcessSplitInformation(PacketSPX), Laps.Count is 0, Driver is " + driverName + "\r\n");
-                return;
-            }
-            Lap lap = laps[laps.Count -1];
-            if (lap == null)
-            {
-                Log.error("ProcessSplitInformation(PacketSPX), Lap is Null, Driver is "+driverName+"\r\n");
-                return;
+                if (laps.Count < 1)
+                {
+                    Log.error("Driver.ProcessSplitInformation(), laps array was empty, HACKFIX DONE, DriverName:" + driverName + ", LicenceName:" + licenceName + "\r\n");
+                    laps.Add(new Lap());
+                }
+                lap = laps[laps.Count - 1];
             }
             lap.ProcessPacketSplit(_packet);
             
@@ -501,6 +503,7 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
+        private Lap lap = new Lap();
         private List<Lap> laps = new List<Lap>();
         internal PB pb = null;
         internal WR wr = null;
