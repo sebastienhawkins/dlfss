@@ -42,78 +42,93 @@ namespace Drive_LFSS.PacketStore_
         private Queue<Packet> tcpReceivedQueud = new Queue<Packet>();     
         private Queue<Packet> tcpSendingQueud = new Queue<Packet>();   
 
-        protected void AddToUdpReceiveQueud(Packet _serverPacket)
+        protected void AddToUdpReceiveQueud(Packet _packet)
         {
             lock (udpReceivedQueud)
             {
-                udpReceivedQueud.Enqueue(_serverPacket);
+                udpReceivedQueud.Enqueue(_packet);
             }
         }
-        protected void AddToUdpSendingQueud(Packet _serverPacket)
+        protected void AddToUdpSendingQueud(Packet _packet)
         {
             lock (udpSendingQueud)
             {
-                udpSendingQueud.Enqueue(_serverPacket);
+                udpSendingQueud.Enqueue(_packet);
             }
         }
 
-        protected void AddToTcpReceiveQueud(Packet _serverPacket)
+        protected void AddToTcpReceiveQueud(Packet _packet)
         {
             lock (tcpReceivedQueud)
             {
-                tcpReceivedQueud.Enqueue(_serverPacket);
+                tcpReceivedQueud.Enqueue(_packet);
             }
         }
-        protected void AddToTcpSendingQueud(Packet _serverPacket)
+        protected void AddToTcpSendingQueud(Packet _packet)
         {
+            if ((int)_packet.packetType < 1)
+                Log.error("AddToUdpSendingQueud(Packet), packetType->" + _packet.packetType + ", packetSize->" + _packet.packetSize);
+
             if (!((InSimClient)this).IsConnected())
                 return;
             lock (tcpSendingQueud)
             {
-                tcpSendingQueud.Enqueue(_serverPacket);
+                tcpSendingQueud.Enqueue(_packet);
             }
         }
 
         protected byte[] NextUdpSendQueud()
         {
-            if (udpSendingQueud.Count < 1)
-                return null;
-
-            Packet packet = udpSendingQueud.Dequeue();
-            if (!struturedPacket.ContainsKey(packet.packetType))
+            Packet packet = null;
+            lock(udpSendingQueud)
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpSendQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
-                return null;
+                if (udpSendingQueud.Count > 0)
+                {
+                    packet = udpSendingQueud.Dequeue();
+                    if (!struturedPacket.ContainsKey(packet.packetType))
+                    {
+                        Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextUdpSendQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
+                        return null;
+                    }
+                }
             }
-            return packet.data;
+            if(packet != null)
+                return packet.data;
+            return null;
         }
         protected byte[] NextTcpSendQueud()
         {
-            if (tcpSendingQueud.Count < 1)
-                return null;
-
-            Packet packet = tcpSendingQueud.Dequeue();
-
-            //This is a patented fix for a Flooding probleme occuring...
-            if(packet == null)
+            Packet packet = null;
+            lock(tcpSendingQueud)
             {
-                Log.error("NextTcpSendQueud(), Strange Flooding of Null Packet Occur, Cleanup Engaged.\r\n");
-                while(tcpSendingQueud.Count > 0)
+                if (tcpSendingQueud.Count > 0)
                 {
                     packet = tcpSendingQueud.Dequeue();
-                    if(packet != null)
-                        break;
+                    //This is a patented fix for a Flooding probleme occuring...
+                    
+                    if(packet == null)
+                    {
+                        Log.error("NextTcpSendQueud(), Strange Flooding of Null Packet Occur, Cleanup Engaged.\r\n");
+                        while(tcpSendingQueud.Count > 0)
+                        {
+                            packet = tcpSendingQueud.Dequeue();
+                            if(packet != null)
+                                break;
+                        }
+                    }
                 }
             }
-            if(packet == null)
-                return null;
-            
-            if (!struturedPacket.ContainsKey(packet.packetType))
+
+            if (packet != null)
             {
-                Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpSendQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
-                return null;
+                if (!struturedPacket.ContainsKey(packet.packetType))
+                {
+                    Log.missingDefinition(((Session)this).GetSessionNameForLog() + " NextTcpSendQueud(), No structure defined for this PacketType->" + packet.packetType + "\r\n");
+                    return null;
+                }
+                return packet.data;
             }
-            return packet.data;
+            return null;
         }
 
         protected object[] NextUdpReceiveQueud(bool _returnStruct)
