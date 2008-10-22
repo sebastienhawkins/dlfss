@@ -46,19 +46,19 @@ namespace Drive_LFSS.Game_
         {
             SAVE_INTERVAL = (uint)Config.GetIntValue("Interval", "DriverSave");
         }
-        internal void Init(PacketNCN _packet)
+        internal void Init(PacketNCN packet)
         {
-            isAdmin = _packet.adminStatus > 0 ? true : false;
-            driverName = _packet.driverName;
-            driverTypeMask = _packet.driverTypeMask;
+            isAdmin = packet.adminStatus > 0 ? true : false;
+            driverName = packet.driverName;
+            driverTypeMask = packet.driverTypeMask;
             //_packet.total;// What is Total????
 
-            licenceName = _packet.licenceName;
+            licenceName = packet.licenceName;
             if (licenceName == "") //LFS Server Driver
                 licenceName = "AI";
-            connectionId = _packet.connectionId;
+            connectionId = packet.connectionId;
            
-            if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
+            if ((packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
                 licenceName = "AI";
 
             //Only a Host will trigger a NCN as a Bot, real AI Bot trigger only a NPL
@@ -88,33 +88,24 @@ namespace Drive_LFSS.Game_
             pb = Program.pubStats.GetPB(LicenceName, "");
             rank = Ranking.GetDriverRanks(LicenceName);
         }
-        internal void ProcessCPR(PacketCPR _packet)
+        internal void ProcessCPR(PacketCPR packet)
         {
-            if (carPlate != _packet.carPlate)
-                carPlate = _packet.carPlate;
+            if (carPlate != packet.carPlate)
+                carPlate = packet.carPlate;
 
-            if(_packet.driverName != driverName)
-            {
-                Program.dlfssDatabase.Lock();
-                {
-                    SaveToDB();
-                }
-                Program.dlfssDatabase.Unlock();
-                guid = 0;
-                driverName = _packet.driverName;
-                SetConfigData("");
-            }
+            if(packet.driverName != driverName)
+                driverName = packet.driverName;
         }
-        internal void Init(PacketNPL _packet)
+        internal void Init(PacketNPL packet)
         {
 
-            if (driverName != _packet.driverName)    //I think should be a check != null && != then Error... like custom cheater packet
-                driverName = _packet.driverName;
+            if (driverName != packet.driverName)    //I think should be a check != null && != then Error... like custom cheater packet
+                driverName = packet.driverName;
 
-            driverModel = _packet.driverModel;
+            driverModel = packet.driverModel;
 
-            if (driverTypeMask != _packet.driverTypeMask)
-                driverTypeMask = _packet.driverTypeMask;
+            if (driverTypeMask != packet.driverTypeMask)
+                driverTypeMask = packet.driverTypeMask;
             if (LicenceName == "" && !IsBot()) //What the ???
             {
                 Log.error("Driver \"" + driverName + "\", has no licence name and was Kicked, something weird happen.\r\n");
@@ -124,15 +115,15 @@ namespace Drive_LFSS.Game_
                 return;
             }
 
-            driverMask = _packet.driverMask;
+            driverMask = packet.driverMask;
 
             //_packet.SName; //What is that???
             //_packet.numberInRaceCar_NSURE // What is That???
-            if (connectionId != _packet.connectionId)
+            if (connectionId != packet.connectionId)
             {
                 if(!IsBot())
-                    Log.error("Licence.Init(PacketNPL _packet), current connectionId("+connectionId+") was not same as packet connectionId("+_packet.connectionId+"), LicenceName: "+licenceName+".\r\n");
-                connectionId = _packet.connectionId;
+                    Log.error("Licence.Init(PacketNPL _packet), current connectionId("+connectionId+") was not same as packet connectionId("+packet.connectionId+"), LicenceName: "+licenceName+".\r\n");
+                connectionId = packet.connectionId;
             }
 
             if ((driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) > 0)
@@ -140,21 +131,21 @@ namespace Drive_LFSS.Game_
 
             
             bool firstTime = false;
-            if (carPrefix != _packet.carPrefix || trackPrefix != iSession.GetRaceTrackPrefix())
+            if (carPrefix != packet.carPrefix || trackPrefix != iSession.GetRaceTrackPrefix())
                 firstTime = true;
 
             trackPrefix = iSession.GetRaceTrackPrefix();
-            carPrefix = _packet.carPrefix;
-            carId = _packet.carId;
-            carPlate = _packet.carPlate;
-            carSkin = _packet.skinName;
-            addedIntakeRestriction = _packet.addedIntakeRestriction;
-            addedMass = _packet.addedMass;
-            passenger = _packet.passenger;
-            tyreFrontLeft = _packet.tyreFrontLeft;
-            tyreFrontRight = _packet.tyreFrontRight;
-            tyreRearLeft = _packet.tyreRearLeft;
-            tyreRearRight = _packet.tyreRearRight;
+            carPrefix = packet.carPrefix;
+            carId = packet.carId;
+            carPlate = packet.carPlate;
+            carSkin = packet.skinName;
+            addedIntakeRestriction = packet.addedIntakeRestriction;
+            addedMass = packet.addedMass;
+            passenger = packet.passenger;
+            tyreFrontLeft = packet.tyreFrontLeft;
+            tyreFrontRight = packet.tyreFrontRight;
+            tyreRearLeft = packet.tyreRearLeft;
+            tyreRearRight = packet.tyreRearRight;
 
             EnterTrack(firstTime);
 
@@ -180,10 +171,10 @@ namespace Drive_LFSS.Game_
                 }
             }
         }
-        internal void ProcessLapInformation(PacketLAP _packet)
+        internal void ProcessLapInformation(PacketLAP packet)
         {
             totalLapCount++;
-            lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
+            lap.ProcessPacketLap(packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
 
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
@@ -235,10 +226,10 @@ namespace Drive_LFSS.Game_
             laps.Enqueue(lap);
             lap = new Lap();
         }
-        internal void ProcessSplitInformation(PacketSPX _packet)
+        internal void ProcessSplitInformation(PacketSPX packet)
         {
             //Internal Lap
-            lap.ProcessPacketSplit(_packet);
+            lap.ProcessPacketSplit(packet);
             
             //PubStats
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix+iSession.GetRaceTrackPrefix());
@@ -247,26 +238,26 @@ namespace Drive_LFSS.Game_
             splitDiff = splitWRDiff = 0;
             if (pb != null)
             {
-                if (pb.Splits[_packet.splitNode] > 0 && lap.SplitTime[_packet.splitNode] > 0)
-                    splitDiff = (int)lap.SplitTime[_packet.splitNode] - (int)pb.Splits[_packet.splitNode];
+                if (pb.Splits[packet.splitNode] > 0 && lap.SplitTime[packet.splitNode] > 0)
+                    splitDiff = (int)lap.SplitTime[packet.splitNode] - (int)pb.Splits[packet.splitNode];
             }
 
             if(isTimeDiffSplit)
             {
                 if (wr != null && pb != null)
                 {
-                    splitWRDiff = (int)lap.SplitTime[_packet.splitNode] - (int)wr.Splits[_packet.splitNode];
+                    splitWRDiff = (int)lap.SplitTime[packet.splitNode] - (int)wr.Splits[packet.splitNode];
                     AddMessageMiddle("^2Split " + ConvertX.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + ConvertX.MSToString(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
                 }
                 else if(pb != null)
                     AddMessageMiddle("^2Split " + ConvertX.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
             }
         }
-        internal void ProcessRESPacket(PacketRES _packet)
+        internal void ProcessRESPacket(PacketRES packet)
         {
-            timeTotalLastRace = _packet.totalTime;
-            timeFastestLapLastRace = _packet.fastestLapTime;
-            lapCountTotalLastRace = _packet.lapCount;
+            timeTotalLastRace = packet.totalTime;
+            timeFastestLapLastRace = packet.fastestLapTime;
+            lapCountTotalLastRace = packet.lapCount;
         }
         internal void ProcessRaceStart()
         {
@@ -280,7 +271,7 @@ namespace Drive_LFSS.Game_
         internal void ProcessRaceEnd()
         {
         }
-        internal void ProcessLeaveRace(PacketPLL _packet)  //to be called when a car is removed from a race
+        internal void ProcessLeaveRace(PacketPLL packet)  //to be called when a car is removed from a race
         {
             carId = 0;
             LeaveTrack();
@@ -291,9 +282,9 @@ namespace Drive_LFSS.Game_
                 guid = 0;
             }
         }
-        internal void ProcessCNLPacket(PacketCNL _packet) //Disconnect
+        internal void ProcessCNLPacket(PacketCNL packet) //Disconnect
         {
-            quitReason = _packet.quitReason;
+            quitReason = packet.quitReason;
             
             //Only a host will trigger this a real bot trigger only a Leave race.
             if(IsBot())
@@ -305,16 +296,16 @@ namespace Drive_LFSS.Game_
             }
             Program.dlfssDatabase.Unlock();
         }
-        internal void ProcessFLGPacket(PacketFLG _packet)
+        internal void ProcessFLGPacket(PacketFLG packet)
         {
-            if(_packet.OffOn > 0)
+            if(packet.OffOn > 0)
             {
-                if(_packet.blueOrYellow == Racing_Flag.RACE_BLUE_FLAG)
+                if(packet.blueOrYellow == Racing_Flag.RACE_BLUE_FLAG)
                 {
                     blueFlagActive = true;
                     lap.BlueFlagCount++;
                 }
-                else if(_packet.blueOrYellow == Racing_Flag.RACE_YELLOW_FLAG)
+                else if(packet.blueOrYellow == Racing_Flag.RACE_YELLOW_FLAG)
                 {
                     yellowFlagActive = true;
                     lap.YellowFlagCount++;
@@ -326,11 +317,11 @@ namespace Drive_LFSS.Game_
             }
             else
             {
-                if (_packet.blueOrYellow == Racing_Flag.RACE_BLUE_FLAG)
+                if (packet.blueOrYellow == Racing_Flag.RACE_BLUE_FLAG)
                 {
                     blueFlagActive = false;
                 }
-                else if (_packet.blueOrYellow == Racing_Flag.RACE_YELLOW_FLAG)
+                else if (packet.blueOrYellow == Racing_Flag.RACE_YELLOW_FLAG)
                 {
                     yellowFlagActive = false;
                 }
@@ -381,24 +372,24 @@ namespace Drive_LFSS.Game_
             {
                 if (true == false) { }
             }
-            internal protected void ProcessPacketLap(PacketLAP _packet, uint _raceGuid, string _carPrefix, string _trackPrefix, double _maxSpeedKmh)
+            internal protected void ProcessPacketLap(PacketLAP packet, uint _raceGuid, string _carPrefix, string _trackPrefix, double _maxSpeedKmh)
             {
-                lapTime = _packet.lapTime;
-                totalTime = _packet.totalTime;
-                SetPitStopCount(_packet.pitStopTotal);
+                lapTime = packet.lapTime;
+                totalTime = packet.totalTime;
+                SetPitStopCount(packet.pitStopTotal);
                 carPrefix = _carPrefix;
                 trackPrefix = _trackPrefix;
                 raceGuid = _raceGuid;
-                driverMask = _packet.driverMask;
-                currentPenality = _packet.currentPenality;
-                lapCompleted = _packet.lapCompleted;
+                driverMask = packet.driverMask;
+                currentPenality = packet.currentPenality;
+                lapCompleted = packet.lapCompleted;
                 maxSpeedKhm = _maxSpeedKmh;
             }
-            internal protected void ProcessPacketSplit(PacketSPX _packet)
+            internal protected void ProcessPacketSplit(PacketSPX packet)
             {
-                splitTime[_packet.splitNode] = _packet.splitTime;
-                totalTime = _packet.totalTime;
-                SetPitStopCount(_packet.pitStopTotal);
+                splitTime[packet.splitNode] = packet.splitTime;
+                totalTime = packet.totalTime;
+                SetPitStopCount(packet.pitStopTotal);
             }
 
             private uint raceGuid = 0;
@@ -706,7 +697,6 @@ namespace Drive_LFSS.Game_
                 configData[(int)Config_User.TIMEDIFF_LAP] = "1";
                 configData[(int)Config_User.TIMEDIFF_SPLIT] = "1";
                 configData[(int)Config_User.MAX_SPEED_ON] = "1";
-                return;
             }
             configStrings.CopyTo(configData,0);
             ApplyConfigData();
