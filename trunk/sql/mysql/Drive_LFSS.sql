@@ -62,25 +62,24 @@ INSERT INTO `bad_word` VALUES ('fucker',3);
 INSERT INTO `bad_word` VALUES ('cock',3);
 INSERT INTO `bad_word` VALUES ('slut',3);
 INSERT INTO `bad_word` VALUES ('pussy',2);
-INSERT INTO `bad_word` VALUES ('lick ',2);
+INSERT INTO `bad_word` VALUES ('lick',1);
 INSERT INTO `bad_word` VALUES ('retard',2);
 INSERT INTO `bad_word` VALUES ('fuckking',3);
 INSERT INTO `bad_word` VALUES ('fukka',3);
 INSERT INTO `bad_word` VALUES ('him',1);
 INSERT INTO `bad_word` VALUES ('suck',2);
-INSERT INTO `bad_word` VALUES ('ass ',2);
+INSERT INTO `bad_word` VALUES ('ass.',1);
 INSERT INTO `bad_word` VALUES ('nazi',3);
-INSERT INTO `bad_word` VALUES ('gay ',2);
+INSERT INTO `bad_word` VALUES ('gay',2);
 INSERT INTO `bad_word` VALUES ('class',0);
 INSERT INTO `bad_word` VALUES ('witch',0);
 INSERT INTO `bad_word` VALUES ('cunt',3);
-INSERT INTO `bad_word` VALUES ('poofer',3);
-INSERT INTO `bad_word` VALUES ('anus ',3);
-INSERT INTO `bad_word` VALUES ('uranus',0);
-INSERT INTO `bad_word` VALUES ('phuck',2);
-INSERT INTO `bad_word` VALUES ('noob',1);
-INSERT INTO `bad_word` VALUES ('nob',1);
-INSERT INTO `bad_word` VALUES ('off',1);
+INSERT INTO `bad_word` VALUES ('fuk',2);
+INSERT INTO `bad_word` VALUES ('dick',2);
+INSERT INTO `bad_word` VALUES ('ass ',2);
+INSERT INTO `bad_word` VALUES ('luck',0);
+INSERT INTO `bad_word` VALUES ('rock',0);
+INSERT INTO `bad_word` VALUES ('restart',0);
 /*!40000 ALTER TABLE `bad_word` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,7 +165,7 @@ INSERT INTO `button_template` VALUES (53,'rank sta',16,0,0,44,42,8,5,'^8stabi','
 INSERT INTO `button_template` VALUES (54,'rank win',16,0,0,52,42,8,5,'^8win','');
 INSERT INTO `button_template` VALUES (55,'rank total',16,0,0,60,42,9,5,'^8total','');
 INSERT INTO `button_template` VALUES (56,'rank position',144,0,0,69,42,11,5,'^8position','');
-INSERT INTO `button_template` VALUES (57,'rank last update',64,0,0,1,31,25,5,'^0Last ^72008^2/^7Oct^2/^714','');
+INSERT INTO `button_template` VALUES (57,'rank last update',64,0,0,1,31,25,5,'^0Last ^72008^2/^7Oct^2/^721','');
 INSERT INTO `button_template` VALUES (58,'rank next update',64,0,0,24,31,20,5,'','');
 INSERT INTO `button_template` VALUES (67,'rank search button add',40,0,32,53,151,26,7,'^2Add','Licence Name');
 INSERT INTO `button_template` VALUES (60,'rank search button',40,0,0,27,158,26,10,'^2Search','');
@@ -188,51 +187,44 @@ INSERT INTO `button_template` VALUES (75,'result score display',160,0,0,21,59,7,
 INSERT INTO `button_template` VALUES (76,'result help text',32,0,0,80,76,25,5,'','');
 INSERT INTO `button_template` VALUES (77,'config maxspeed title',8,0,0,26,39,20,7,'^7Max Speed','');
 INSERT INTO `button_template` VALUES (78,'result bg',16,0,0,0,30,77,121,'','');
-INSERT INTO `button_template` VALUES (132,'end race flag',0,0,0,139,7,15,25,'^0','');
-INSERT INTO `button_template` VALUES (85,'flag green square',0,0,0,138,7,15,25,'^2','');
-INSERT INTO `button_template` VALUES (84,'flag green square',0,0,0,137,7,15,25,'^2','');
-INSERT INTO `button_template` VALUES (83,'flag green square',0,0,0,136,7,15,25,'^2','');
-INSERT INTO `button_template` VALUES (82,'flag green square',0,0,0,135,7,15,25,'^2','');
-INSERT INTO `button_template` VALUES (81,'flag green square',0,0,0,134,7,15,25,'^2','');
-INSERT INTO `button_template` VALUES (80,'flag green square',0,0,0,133,7,15,25,'^2','');
 INSERT INTO `button_template` VALUES (79,'Race flag text',0,0,0,138,8,10,4,'^0Race Flag','');
-INSERT INTO `button_template` VALUES (93,'pit close flag <',128,0,0,138,3,14,33,'^3<','');
-INSERT INTO `button_template` VALUES (92,'pit close flag >',64,0,0,134,3,14,33,'^3>','');
-INSERT INTO `button_template` VALUES (91,'flag red square',0,0,0,138,7,15,25,'^1','');
-INSERT INTO `button_template` VALUES (90,'flag red square',0,0,0,137,7,15,25,'^1','');
-INSERT INTO `button_template` VALUES (89,'flag red square',0,0,0,136,7,15,25,'^1','');
-INSERT INTO `button_template` VALUES (88,'flag red square',0,0,0,135,7,15,25,'^1','');
-INSERT INTO `button_template` VALUES (87,'flag red square',0,0,0,134,7,15,25,'^1','');
+INSERT INTO `button_template` VALUES (80,'flag green square',0,0,0,133,7,15,25,'^2','');
+INSERT INTO `button_template` VALUES (81,'flag green square',0,0,0,134,7,15,25,'^2','');
+INSERT INTO `button_template` VALUES (82,'flag green square',0,0,0,135,7,15,25,'^2','');
+INSERT INTO `button_template` VALUES (83,'flag green square',0,0,0,136,7,15,25,'^2','');
+INSERT INTO `button_template` VALUES (84,'flag green square',0,0,0,137,7,15,25,'^2','');
+INSERT INTO `button_template` VALUES (85,'flag green square',0,0,0,138,7,15,25,'^2','');
 INSERT INTO `button_template` VALUES (86,'flag red square',0,0,0,133,7,15,25,'^1','');
-INSERT INTO `button_template` VALUES (100,'yellow red square',0,0,0,137,12,12,15,'^0SC','');
+INSERT INTO `button_template` VALUES (87,'flag red square',0,0,0,134,7,15,25,'^1','');
+INSERT INTO `button_template` VALUES (88,'flag red square',0,0,0,135,7,15,25,'^1','');
+INSERT INTO `button_template` VALUES (89,'flag red square',0,0,0,136,7,15,25,'^1','');
+INSERT INTO `button_template` VALUES (90,'flag red square',0,0,0,137,7,15,25,'^1','');
+INSERT INTO `button_template` VALUES (91,'flag red square',0,0,0,138,7,15,25,'^1','');
+INSERT INTO `button_template` VALUES (92,'pit close flag >',64,0,0,134,3,14,33,'^3>','');
+INSERT INTO `button_template` VALUES (93,'pit close flag <',128,0,0,138,3,14,33,'^3<','');
 INSERT INTO `button_template` VALUES (94,'flag yellow square',0,0,0,133,7,15,25,'^3','');
 INSERT INTO `button_template` VALUES (95,'flag yellow square',0,0,0,134,7,15,25,'^3','');
 INSERT INTO `button_template` VALUES (96,'flag yellow square',0,0,0,135,7,15,25,'^3','');
 INSERT INTO `button_template` VALUES (97,'flag yellow square',0,0,0,136,7,15,25,'^3','');
 INSERT INTO `button_template` VALUES (98,'flag yellow square',0,0,0,137,7,15,25,'^3','');
 INSERT INTO `button_template` VALUES (99,'flag yellow square',0,0,0,138,7,15,25,'^3','');
-INSERT INTO `button_template` VALUES (106,'flag blue square',0,0,0,138,7,15,25,'^4','');
-INSERT INTO `button_template` VALUES (105,'flag blue square',0,0,0,137,7,15,25,'^4','');
-INSERT INTO `button_template` VALUES (112,'flag black square',0,0,0,138,7,15,25,'^0','');
-INSERT INTO `button_template` VALUES (111,'flag black square',0,0,0,137,7,15,25,'^0','');
-INSERT INTO `button_template` VALUES (110,'flag black square',0,0,0,136,7,15,25,'^0','');
-INSERT INTO `button_template` VALUES (109,'flag black square',0,0,0,135,7,15,25,'^0','');
-INSERT INTO `button_template` VALUES (108,'flag black square',0,0,0,134,7,15,25,'^0','');
-INSERT INTO `button_template` VALUES (107,'flag black square',0,0,0,133,7,15,25,'^0','');
-INSERT INTO `button_template` VALUES (119,'flag car probleme dot',0,0,0,137,8,12,22,'^3•','');
-INSERT INTO `button_template` VALUES (122,'end race flag',0,0,0,136,1,7,26,'^7-','');
+INSERT INTO `button_template` VALUES (100,'yellow red square',0,0,0,137,12,12,15,'^0SC','');
 INSERT INTO `button_template` VALUES (101,'flag blue square',0,0,0,133,7,15,25,'^4','');
 INSERT INTO `button_template` VALUES (102,'flag blue square',0,0,0,134,7,15,25,'^4','');
 INSERT INTO `button_template` VALUES (103,'flag blue square',0,0,0,135,7,15,25,'^4','');
 INSERT INTO `button_template` VALUES (104,'flag blue square',0,0,0,136,7,15,25,'^4','');
-INSERT INTO `button_template` VALUES (118,'flag black square',0,0,0,138,7,15,25,'^7','');
-INSERT INTO `button_template` VALUES (117,'flag black square',0,0,0,137,7,15,25,'^7','');
-INSERT INTO `button_template` VALUES (116,'flag black square',0,0,0,136,7,15,25,'^7','');
-INSERT INTO `button_template` VALUES (115,'flag black square',0,0,0,135,7,15,25,'^7','');
-INSERT INTO `button_template` VALUES (114,'flag black square',0,0,0,134,7,15,25,'^7','');
-INSERT INTO `button_template` VALUES (113,'flag black square',0,0,0,133,7,15,25,'^7','');
+INSERT INTO `button_template` VALUES (105,'flag blue square',0,0,0,137,7,15,25,'^4','');
+INSERT INTO `button_template` VALUES (106,'flag blue square',0,0,0,138,7,15,25,'^4','');
+INSERT INTO `button_template` VALUES (107,'flag black square',0,0,0,133,7,15,25,'^0','');
+INSERT INTO `button_template` VALUES (108,'flag black square',0,0,0,134,7,15,25,'^0','');
+INSERT INTO `button_template` VALUES (109,'flag black square',0,0,0,135,7,15,25,'^0','');
+INSERT INTO `button_template` VALUES (110,'flag black square',0,0,0,136,7,15,25,'^0','');
+INSERT INTO `button_template` VALUES (111,'flag black square',0,0,0,137,7,15,25,'^0','');
+INSERT INTO `button_template` VALUES (112,'flag black square',0,0,0,138,7,15,25,'^0','');
+INSERT INTO `button_template` VALUES (119,'flag car probleme dot',0,0,0,137,8,12,22,'^3•','');
 INSERT INTO `button_template` VALUES (120,'pit close flag >',64,0,0,134,3,14,33,'^7>','');
 INSERT INTO `button_template` VALUES (121,'pit close flag <',128,0,0,138,3,14,33,'^7<','');
+INSERT INTO `button_template` VALUES (122,'end race flag',0,0,0,136,1,7,26,'^7-','');
 INSERT INTO `button_template` VALUES (123,'end race flag',0,0,0,136,7,7,26,'^7-','');
 INSERT INTO `button_template` VALUES (124,'end race flag',0,0,0,138,4,7,26,'^7-','');
 INSERT INTO `button_template` VALUES (125,'end race flag',0,0,0,138,10,7,26,'^7-','');
@@ -242,6 +234,13 @@ INSERT INTO `button_template` VALUES (128,'end race flag',0,0,0,142,4,7,26,'^7-'
 INSERT INTO `button_template` VALUES (129,'end race flag',0,0,0,142,10,7,26,'^7-','');
 INSERT INTO `button_template` VALUES (130,'end race flag',0,0,0,144,1,7,26,'^7-','');
 INSERT INTO `button_template` VALUES (131,'end race flag',0,0,0,144,7,7,26,'^7-','');
+INSERT INTO `button_template` VALUES (132,'end race flag',0,0,0,139,7,15,25,'^0','');
+INSERT INTO `button_template` VALUES (113,'flag black square',0,0,0,133,7,15,25,'^7','');
+INSERT INTO `button_template` VALUES (114,'flag black square',0,0,0,134,7,15,25,'^7','');
+INSERT INTO `button_template` VALUES (115,'flag black square',0,0,0,135,7,15,25,'^7','');
+INSERT INTO `button_template` VALUES (116,'flag black square',0,0,0,136,7,15,25,'^7','');
+INSERT INTO `button_template` VALUES (117,'flag black square',0,0,0,137,7,15,25,'^7','');
+INSERT INTO `button_template` VALUES (118,'flag black square',0,0,0,138,7,15,25,'^7','');
 /*!40000 ALTER TABLE `button_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -295,14 +294,16 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `driver`;
 CREATE TABLE `driver` (
   `guid` int(11) unsigned NOT NULL auto_increment,
-  `licence_name` varchar(24) NOT NULL,
+  `licence_name` varchar(24) character set latin1 collate latin1_general_ci NOT NULL,
   `driver_name` varchar(24) NOT NULL,
   `config_data` blob,
   `warning_driving_count` int(8) unsigned NOT NULL default '0',
   `warning_chat_count` int(8) unsigned NOT NULL default '0',
   `last_connection_time` bigint(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
-  UNIQUE KEY `MapLicenceDriver` (`licence_name`,`driver_name`)
+  UNIQUE KEY `licence_name` (`licence_name`),
+  UNIQUE KEY `licence_name_2` (`licence_name`),
+  UNIQUE KEY `licence_name_3` (`licence_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -401,17 +402,17 @@ INSERT INTO `gui_template` VALUES (3,'help','31 32 33 34 35','',33,'^7A^3leaject
 INSERT INTO `gui_template` VALUES (4,'text','45 46','',44,'');
 INSERT INTO `gui_template` VALUES (5,'rank','47 48 57 58 59 60 61 62 63 64','50 51 52 53 54 55 56 65 66 67',49,'^7Top20 ^2is the 20 Best Driver for this Track/Car.\r\n^7Search ^2search for a Track/Car/Driver rank.\r\n^7Current ^2show rank for all online driver by Track/Car.\r\n^6Blue mean worst^2, ^3Yellow mean Better^2, ^7White mean event\r\n^2\r\n^2When button become ^1red ^2mean clearing for flood protection ');
 INSERT INTO `gui_template` VALUES (6,'result guid','71 72 73','74 75',76,'');
-INSERT INTO `gui_template` VALUES (17,'end race flag','79 107 108 109 110 111 112 132 122 123 124 125 126 127 128 129 130 131','',0,'');
-INSERT INTO `gui_template` VALUES (16,'black no longer scored','79 107 108 109 110 111 112 120 121','',0,'');
-INSERT INTO `gui_template` VALUES (15,'black flag car probleme','79 107 108 109 110 111 112 119','',0,'');
-INSERT INTO `gui_template` VALUES (14,'white flag final lap','79 113 114 115 116 117 118','',0,'');
-INSERT INTO `gui_template` VALUES (13,'blue flag slow car','79 101 102 103 104 105 106','',0,'');
-INSERT INTO `gui_template` VALUES (12,'black flag penality','79 107 108 109 110 111 112','',0,'');
-INSERT INTO `gui_template` VALUES (11,'red flag stop race','79 86 87 88 89 90 91','',0,'');
-INSERT INTO `gui_template` VALUES (10,'yellow flag global','79 94 95 96 97 98 99 100','',0,'');
-INSERT INTO `gui_template` VALUES (9,'yellow flag local','79 94 95 96 97 98 99','',0,'');
-INSERT INTO `gui_template` VALUES (8,'pit close flag','79 86 87 88 89 90 91 92 93','',0,'');
 INSERT INTO `gui_template` VALUES (7,'green flag','79 80 81 82 83 84 85','',0,'');
+INSERT INTO `gui_template` VALUES (8,'pit close flag','79 86 87 88 89 90 91 92 93','',0,'');
+INSERT INTO `gui_template` VALUES (9,'yellow flag local','79 94 95 96 97 98 99','',0,'');
+INSERT INTO `gui_template` VALUES (10,'yellow flag global','79 94 95 96 97 98 99 100','',0,'');
+INSERT INTO `gui_template` VALUES (11,'red flag stop race','79 86 87 88 89 90 91','',0,'');
+INSERT INTO `gui_template` VALUES (12,'black flag penality','79 107 108 109 110 111 112','',0,'');
+INSERT INTO `gui_template` VALUES (13,'blue flag slow car','79 101 102 103 104 105 106','',0,'');
+INSERT INTO `gui_template` VALUES (14,'white flag final lap','79 113 114 115 116 117 118','',0,'');
+INSERT INTO `gui_template` VALUES (15,'black flag car probleme','79 107 108 109 110 111 112 119','',0,'');
+INSERT INTO `gui_template` VALUES (16,'black no longer scored','79 107 108 109 110 111 112 120 121','',0,'');
+INSERT INTO `gui_template` VALUES (17,'end race flag','79 107 108 109 110 111 112 132 122 123 124 125 126 127 128 129 130 131','',0,'');
 /*!40000 ALTER TABLE `gui_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -502,6 +503,17 @@ INSERT INTO `race_map` VALUES (3,36);
 INSERT INTO `race_map` VALUES (3,37);
 INSERT INTO `race_map` VALUES (3,38);
 INSERT INTO `race_map` VALUES (3,39);
+INSERT INTO `race_map` VALUES (5,40);
+INSERT INTO `race_map` VALUES (5,41);
+INSERT INTO `race_map` VALUES (5,42);
+INSERT INTO `race_map` VALUES (5,43);
+INSERT INTO `race_map` VALUES (5,44);
+INSERT INTO `race_map` VALUES (5,45);
+INSERT INTO `race_map` VALUES (5,46);
+INSERT INTO `race_map` VALUES (5,47);
+INSERT INTO `race_map` VALUES (5,48);
+INSERT INTO `race_map` VALUES (6,49);
+INSERT INTO `race_map` VALUES (6,50);
 /*!40000 ALTER TABLE `race_map` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -568,8 +580,103 @@ INSERT INTO `race_template` VALUES (21,'Fernbay Green Rev, FOX',21,'18',0,0,7,0,
 INSERT INTO `race_template` VALUES (32,'Fernbay Club, XFG/XRG',18,'2 3',0,0,12,0,0,1);
 INSERT INTO `race_template` VALUES (31,'Southcity Sprint2 Rev, XFG/XRG',11,'2 3',0,0,10,0,0,1);
 INSERT INTO `race_template` VALUES (38,'Southcity Sprint1, FBM',9,'17',0,0,8,0,0,1);
-INSERT INTO `race_template` VALUES (39,'Blackwood GP, FBM',1,'17',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (39,'Blackwood GP, FBM',1,'17',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (40,'Aston Grand Prix, BF1',50,'20',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (41,'Western Hill, GTR',40,'13 14 15',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (42,'Kyoto GP, FO8',38,'19',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (43,'Blackwood Rally, LX6',2,'5',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (44,'Western Hill Rev, BF1',41,'20',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (45,'Aston Historic Rev, BF1',49,'20',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (46,'Fernbay Black Rev, FO8',25,'19',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (47,'Aston Club Rev, FO8',45,'20',0,0,5,0,0,1);
+INSERT INTO `race_template` VALUES (48,'Kyoto Ring, BF1',34,'20',0,0,7,0,0,1);
+INSERT INTO `race_template` VALUES (49,'Kyoto Ring, Nascar',34,'14 15',0,0,10,0,0,1);
+INSERT INTO `race_template` VALUES (50,'Kyoto Ring Rev, Nascar',35,'14 15',0,0,10,0,0,1);
 /*!40000 ALTER TABLE `race_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `restriction_join`
+--
+
+DROP TABLE IF EXISTS `restriction_join`;
+CREATE TABLE `restriction_join` (
+  `entry` int(8) unsigned NOT NULL,
+  `description` varchar(100) NOT NULL default '',
+  `safe_driving_pct` tinyint(3) unsigned NOT NULL default '0',
+  `safe_driving_pct_kick` tinyint(1) unsigned NOT NULL default '0',
+  `bad_language_pct` tinyint(3) unsigned NOT NULL default '0',
+  `bad_language_pct_kick` tinyint(1) unsigned NOT NULL default '0',
+  `pb_wr_diff_min` int(12) unsigned NOT NULL default '0',
+  `pb_wr_diff_max` int(12) unsigned NOT NULL default '0',
+  `pb_wr_diff_kick` tinyint(1) unsigned NOT NULL default '0',
+  `skin_name` varchar(16) character set latin1 collate latin1_general_ci NOT NULL default '',
+  `skin_name_kick` tinyint(1) unsigned NOT NULL default '0',
+  `driver_name` varchar(16) NOT NULL default '',
+  `driver_name_kick` tinyint(1) unsigned NOT NULL default '0',
+  `rank_best_min` smallint(6) unsigned NOT NULL default '0',
+  `rank_best_max` smallint(6) unsigned NOT NULL,
+  `rank_avg_min` smallint(6) unsigned NOT NULL default '0',
+  `rank_avg_max` smallint(6) unsigned NOT NULL default '0',
+  `rank_sta_min` smallint(6) unsigned NOT NULL default '0',
+  `rank_sta_max` smallint(6) unsigned NOT NULL default '0',
+  `rank_win_min` smallint(6) unsigned NOT NULL default '0',
+  `rank_win_max` smallint(6) unsigned NOT NULL default '0',
+  `rank_total_min` smallint(6) unsigned NOT NULL default '0',
+  `rank_total_max` smallint(6) unsigned NOT NULL,
+  `rank_kick` tinyint(1) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `restriction_join`
+--
+
+LOCK TABLES `restriction_join` WRITE;
+/*!40000 ALTER TABLE `restriction_join` DISABLE KEYS */;
+/*!40000 ALTER TABLE `restriction_join` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `restriction_race`
+--
+
+DROP TABLE IF EXISTS `restriction_race`;
+CREATE TABLE `restriction_race` (
+  `entry` int(8) unsigned NOT NULL,
+  `description` varchar(100) NOT NULL default '',
+  `max_speed_ms` float(4,1) unsigned NOT NULL default '0.0',
+  `max_speed_ms_lap_number` varchar(20) NOT NULL default '0',
+  `max_speed_ms_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `tyre_fl` tinyint(3) unsigned NOT NULL default '0',
+  `tyre_fr` tinyint(3) unsigned NOT NULL default '0',
+  `tyre_rl` tinyint(3) unsigned NOT NULL default '0',
+  `tyre_rr` tinyint(3) unsigned NOT NULL default '0',
+  `tyre_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `pit_work_1` smallint(5) unsigned NOT NULL default '0',
+  `pit_work_1_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `pit_work_2` smallint(5) unsigned NOT NULL default '0',
+  `pit_work_2_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `passenger` tinyint(3) unsigned NOT NULL default '0',
+  `passenger_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `added_mass` tinyint(3) unsigned NOT NULL default '0',
+  `added_mass_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `intake_restriction` tinyint(3) unsigned NOT NULL default '0',
+  `intake_restriction_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `penality` tinyint(3) unsigned NOT NULL default '0',
+  `penality_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  `driver_mask` smallint(5) unsigned NOT NULL default '0',
+  `driver_mask_pen_type` tinyint(3) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `restriction_race`
+--
+
+LOCK TABLES `restriction_race` WRITE;
+/*!40000 ALTER TABLE `restriction_race` DISABLE KEYS */;
+/*!40000 ALTER TABLE `restriction_race` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -715,4 +822,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-10-18 18:36:06
+-- Dump completed on 2008-10-22 15:28:26
