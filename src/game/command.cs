@@ -183,6 +183,16 @@ namespace Drive_LFSS.Server_
                     Program.Reload("race_template");
                     driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
                 } break;
+                case "restriction_race": 
+                {
+                    Program.Reload("restriction_race");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
+                }break;
+                case "restriction_join": 
+                {
+                    Program.Reload("restriction_join");
+                    driver.AddMessageMiddle("^7Completed reloading, ^3" + args[1], DISPLAY_TIME);
+                }break;
                 case "race_map":
                 {
                     Program.Reload("race_map");

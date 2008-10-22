@@ -60,8 +60,10 @@ namespace Drive_LFSS
         public static readonly GuiTemplate guiTemplate = new GuiTemplate(new string[2] { "gui_template", "pxssus" });
         public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "psssuuuuu" });
         public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssuu" });
-        public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psusuuuuuu" });
+        public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psuusuuuuuu" });
         public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
+        public static readonly RestrictionRace restrictionRace = new RestrictionRace(new string[2] { "restriction_race", "psfsuuuuuuuuuuuuuuuuuuuu" });
+        public static readonly RestrictionJoin restrictionJoin = new RestrictionJoin(new string[2] { "restriction_join", "psuuuuuuususuuuuuuuuuuuu" });
         
         //mIRC
         public static readonly IrcClient ircClient = new IrcClient();
@@ -209,6 +211,8 @@ namespace Drive_LFSS
             buttonTemplate.Load(true);
             guiTemplate.Load(true);
             raceTemplate.Load(false);
+            restrictionRace.Load(false);
+            restrictionJoin.Load(false);
             driverBan.Load(false);
             Log.normal("Completed initializing storage.\r\n\r\n");
 		}
@@ -318,6 +322,10 @@ namespace Drive_LFSS
                         Log.commandHelp("  gui_template reloaded.\r\n");
                         Program.raceTemplate.Load(false);
                         Log.commandHelp("  race_template reloaded.\r\n");
+                        Program.restrictionJoin.Load(false);
+                        Log.commandHelp("  restriction_join reloaded.\r\n");
+                        Program.restrictionRace.Load(false);
+                        Log.commandHelp("  restriction_race reloaded.\r\n");
                         Program.driverBan.Load(false);
                         Log.commandHelp("  driver_ban reloaded.\r\n");
                         InitChatModo();
@@ -369,6 +377,20 @@ namespace Drive_LFSS
                     Program.raceTemplate.Load(false);
                     Program.dlfssDatabase.Unlock();
                     Log.commandHelp("  race_template reloaded.\r\n");
+                } break;
+                case "restriction_join":
+                    {
+                        Program.dlfssDatabase.Lock();
+                        Program.restrictionJoin.Load(false);
+                        Program.dlfssDatabase.Unlock();
+                        Log.commandHelp("  restriction_join reloaded.\r\n");
+                    } break;
+                case "restriction_race":
+                {
+                    Program.dlfssDatabase.Lock();
+                    Program.restrictionRace.Load(false);
+                    Program.dlfssDatabase.Unlock();
+                    Log.commandHelp("  restriction_race reloaded.\r\n");
                 } break;
                 case "driver_ban":
                 {

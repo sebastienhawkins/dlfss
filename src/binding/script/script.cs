@@ -58,7 +58,7 @@ namespace Drive_LFSS.Script_
 
         //Any action you wich do do when a track vote is ended.
         //trackEntry is passed by a reference, so you can change it.
-        public bool NextTrackVoteEnded(IVote vote,ref ushort trackEntry)
+        public bool NextTrackVoteEnded(ITrack vote,ref ushort trackEntry)
         {
             if (trackEntry != 0)
                 return false;                                       //return false, will prepare the trackEntry

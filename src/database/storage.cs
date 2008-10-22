@@ -560,14 +560,15 @@ namespace Drive_LFSS.Storage_
         {
             entry = Convert.ToUInt32(rowInfos[0]);
             description = (string)(rowInfos[1]);
-            trackEntry = (byte)Convert.ToUInt16(rowInfos[2]);
-            carEntryAllowed = (string)rowInfos[3];
-            weather = (Weather_Status)Convert.ToUInt16(rowInfos[4]);
-            wind = (Wind_Status)Convert.ToUInt16(rowInfos[5]);
-            lapCount = (byte)Convert.ToUInt16(rowInfos[6]);
-            qualifyMinute = (byte)Convert.ToUInt16(rowInfos[7]);
-            maximunRaceEnd = Convert.ToUInt16(rowInfos[8]);
-            raceTemplateMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[9]);
+            entry_restriction = Convert.ToUInt16(rowInfos[2]);
+            trackEntry = (byte)Convert.ToUInt16(rowInfos[3]);
+            carEntryAllowed = (string)rowInfos[4];
+            weather = (Weather_Status)Convert.ToUInt16(rowInfos[5]);
+            wind = (Wind_Status)Convert.ToUInt16(rowInfos[6]);
+            lapCount = (byte)Convert.ToUInt16(rowInfos[7]);
+            qualifyMinute = (byte)Convert.ToUInt16(rowInfos[8]);
+            maximunRaceEnd = Convert.ToUInt16(rowInfos[9]);
+            raceTemplateMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[10]);
         }
         ~RaceTemplateInfo()
         {
@@ -575,6 +576,7 @@ namespace Drive_LFSS.Storage_
         }
         private uint entry = 0;
         private string description = "";
+        private uint entry_restriction = 0;
         private byte trackEntry = 0;
         private string carEntryAllowed = "";
         private Weather_Status weather = Weather_Status.WEATHER_CLEAR_DAY;
@@ -666,6 +668,176 @@ namespace Drive_LFSS.Storage_
         private uint endTime;
         private bool expired;
     }
+
+    sealed class RestrictionRace : Storage
+    {
+        public RestrictionRace(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~RestrictionRace()
+        {
+            if (true == false) { }
+        }
+        new public RestrictionRaceInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new RestrictionRaceInfo(_temp);
+            else
+                return null;
+        }
+    }
+    sealed class RestrictionRaceInfo
+    {
+        public RestrictionRaceInfo()
+        {
+
+        }
+        public RestrictionRaceInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt32(rowInfos[0]);
+            description = (string)rowInfos[1];
+            speedMsMax = Convert.ToDouble(rowInfos[2]);
+            speedMsMaxLapNumber = (string)rowInfos[3];
+            speedMsMaxPen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[4]);
+            tyre[(int)Tyre_Position.REAR_LEFT] = (Tyre_Compound)Convert.ToUInt16(rowInfos[5]);
+            tyre[(int)Tyre_Position.REAR_RIGHT] = (Tyre_Compound)Convert.ToUInt16(rowInfos[6]);
+            tyre[(int)Tyre_Position.FRONT_LEFT] = (Tyre_Compound)Convert.ToUInt16(rowInfos[7]);
+            tyre[(int)Tyre_Position.FRONT_RIGHT] = (Tyre_Compound)Convert.ToUInt16(rowInfos[8]);
+            tyrePen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[9]);
+            pitWork1 = (Pit_Work_Flag)Convert.ToUInt16(rowInfos[10]);
+            pitWork1Pen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[11]);
+            pitWork2 = (Pit_Work_Flag)Convert.ToUInt16(rowInfos[12]);
+            pitWork2Pen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[13]);
+            passenger = (Passenger_Flag)Convert.ToUInt16(rowInfos[14]);
+            passengerPen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[15]);
+            addedMass = (byte)Convert.ToUInt16(rowInfos[16]);
+            addedMassPen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[17]);
+            intakeRestriction = (byte)Convert.ToUInt16(rowInfos[18]);
+            intakeRestrictionPen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[19]);
+            penalityReason = (Penalty_Reason)Convert.ToUInt16(rowInfos[20]);
+            penalityReasonPen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[21]);
+            driverMask = (Driver_Flag)Convert.ToUInt16(rowInfos[22]);
+            driverMaskPen = (Penalty_Type_Ext)Convert.ToUInt16(rowInfos[23]);
+            
+        }
+        ~RestrictionRaceInfo()
+        {
+            if (true == false) { }
+        }
+        private uint entry = 0;
+        private string description = "";
+        
+        private double speedMsMax = 0;
+        private string speedMsMaxLapNumber = "";
+        private Penalty_Type_Ext speedMsMaxPen = Penalty_Type_Ext.NONE;
+        
+        private Tyre_Compound[] tyre = new Tyre_Compound[(int)Tyre_Position.MAX];
+        private Penalty_Type_Ext tyrePen = Penalty_Type_Ext.NONE;
+        
+        private Pit_Work_Flag pitWork1 = Pit_Work_Flag.NOTHING;
+        private Penalty_Type_Ext pitWork1Pen = Penalty_Type_Ext.NONE;
+        private Pit_Work_Flag pitWork2 = Pit_Work_Flag.NOTHING;
+        private Penalty_Type_Ext pitWork2Pen = Penalty_Type_Ext.NONE;
+        
+        private Passenger_Flag passenger = Passenger_Flag.NONE;
+        private Penalty_Type_Ext passengerPen = Penalty_Type_Ext.NONE;
+        
+        private byte addedMass = 0;
+        private Penalty_Type_Ext addedMassPen = Penalty_Type_Ext.NONE;
+
+        private byte intakeRestriction = 0;
+        private Penalty_Type_Ext intakeRestrictionPen = Penalty_Type_Ext.NONE;
+
+        private Penalty_Reason penalityReason = Penalty_Reason.PENALTY_REASON_UNK;
+        private Penalty_Type_Ext penalityReasonPen = Penalty_Type_Ext.NONE;
+        
+        private Driver_Flag driverMask = Driver_Flag.NONE;
+        private Penalty_Type_Ext driverMaskPen = Penalty_Type_Ext.NONE;
+    }
+
+    sealed class RestrictionJoin : Storage
+    {
+        public RestrictionJoin(string[] tableTemplateFmt) : base(tableTemplateFmt) { }
+        ~RestrictionJoin()
+        {
+            if (true == false) { }
+        }
+        new public RestrictionJoinInfo GetEntry(uint entry)
+        {
+            object[] _temp = base.GetEntry(entry);
+            if (_temp != null)
+                return new RestrictionJoinInfo(_temp);
+            else
+                return null;
+        }
+    }
+    sealed class RestrictionJoinInfo
+    {
+        public RestrictionJoinInfo()
+        {
+
+        }
+        public RestrictionJoinInfo(object[] rowInfos)
+        {
+            entry = Convert.ToUInt32(rowInfos[0]);
+            description = (string)rowInfos[1];
+            safeDrivingPct = Convert.ToByte(rowInfos[2]);
+            safeDrivingKick = Convert.ToBoolean(rowInfos[3]);
+            badlanguagePct = Convert.ToByte(rowInfos[4]);
+            badlanguagePctKick = Convert.ToBoolean(rowInfos[5]);
+            pbMin = Convert.ToUInt32(rowInfos[6]);
+            pbMax = Convert.ToUInt32(rowInfos[7]);
+            pbKick = Convert.ToBoolean(rowInfos[8]);
+            skinName = (string)rowInfos[9];
+            skinNameKick = Convert.ToBoolean(rowInfos[10]);
+            driverName = (string)rowInfos[11];
+            driverNameKick = Convert.ToBoolean(rowInfos[12]);
+            rankBestMin = Convert.ToUInt16(rowInfos[13]);
+            rankBestMax = Convert.ToUInt16(rowInfos[14]);
+            rankAvgMin = Convert.ToUInt16(rowInfos[15]);
+            rankAvgMax = Convert.ToUInt16(rowInfos[16]);
+            rankStaMin = Convert.ToUInt16(rowInfos[17]);
+            rankStaMax = Convert.ToUInt16(rowInfos[18]);
+            rankWinMin = Convert.ToUInt16(rowInfos[19]);
+            rankWinMax = Convert.ToUInt16(rowInfos[20]);
+            rankTotalMin = Convert.ToUInt16(rowInfos[21]);
+            rankTotalMax = Convert.ToUInt16(rowInfos[22]);
+            rankKick = Convert.ToBoolean(rowInfos[23]);
+
+        }
+        ~RestrictionJoinInfo()
+        {
+            if (true == false) { }
+        }
+        private uint entry = 0;
+        private string description = "";
+        private byte safeDrivingPct = 0;
+        private bool safeDrivingKick = false;
+        private byte badlanguagePct = 0;
+        private bool badlanguagePctKick = false;
+        private uint pbMin = 0;
+        private uint pbMax = 0;
+        private bool pbKick = false;
+        private string skinName = "";
+        private bool skinNameKick = false;
+        private string driverName = "";
+        private bool driverNameKick = false;
+        private ushort rankBestMin = 0;
+        private ushort rankBestMax = 0;
+        private ushort rankAvgMin = 0;
+        private ushort rankAvgMax = 0;
+        private ushort rankStaMin = 0;
+        private ushort rankStaMax = 0;
+        private ushort rankWinMin = 0;
+        private ushort rankWinMax = 0;
+        private ushort rankTotalMin = 0;
+        private ushort rankTotalMax = 0;
+        private bool rankKick = false;
+ 
+    }
+    
+    
+    
+    
     
     /*public sealed class DriverRank : Storage
     {
