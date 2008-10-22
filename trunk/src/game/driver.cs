@@ -600,7 +600,7 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.Lock();
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(LicenceName) + "' AND `driver_name`LIKE'" + ConvertX.SQLString(driverName) + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(LicenceName) + "' AND `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
