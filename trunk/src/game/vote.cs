@@ -37,7 +37,7 @@ namespace Drive_LFSS.Game_
         AUTO = 4,
         SEQUENCE = 5,
     }
-    abstract class Vote : IVote
+    abstract class Track : ITrack
     {
         protected virtual void ConfigApply()
         {
@@ -222,12 +222,12 @@ namespace Drive_LFSS.Game_
             {
                 switch(optionCount)
                 {
-                    case 1: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_1, "^7" + ((RaceTemplateInfo)Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 2: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_2, "^7" + ((RaceTemplateInfo)Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 3: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_3, "^7" + ((RaceTemplateInfo)Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 4: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_4, "^7" + ((RaceTemplateInfo)Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 5: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_5, "^7" + ((RaceTemplateInfo)Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 6: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_6, "^7" + ((RaceTemplateInfo)Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 1: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_1, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 2: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_2, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 3: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_3, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 4: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_4, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 5: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_5, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 6: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_6, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
                 }
                 optionCount++;
             }
@@ -257,7 +257,7 @@ namespace Drive_LFSS.Game_
             ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_5);
             ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_6);
 
-            if (((IRace)this).ISession.Script.NextTrackVoteEnded((IVote)this,ref chosedMap))
+            if (((IRace)this).ISession.Script.NextTrackVoteEnded((ITrack)this,ref chosedMap))
             {
                 voteInProgress = false;
                 return;

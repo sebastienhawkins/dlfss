@@ -170,6 +170,8 @@ namespace Drive_LFSS.CommandConsole_
                     Program.Reload("race_map");
                 }break;
                 case "race_template":Program.Reload("race_template");break;
+                case "restriction_race": Program.Reload("restriction_race"); break;
+                case "restriction_join": Program.Reload("restriction_join"); break;
                 case "race_map":Program.Reload("race_map");break;
                 case "ban":
                 case "driver_ban":Program.Reload("driver_ban");break;

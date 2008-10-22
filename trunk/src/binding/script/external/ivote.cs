@@ -18,7 +18,7 @@
 
 namespace Drive_LFSS.Script_
 {
-    public interface IVote
+    public interface ITrack
     {
         void StartNextTrackVote();
         void PrepareNextTrack(ushort trackEntry);

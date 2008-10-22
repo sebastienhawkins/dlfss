@@ -246,6 +246,16 @@ namespace Drive_LFSS.Definition_
         CHAT_USER_TYPE_O = 3,
         CHAT_USER_TYPE_MAX = 4,
     }
+    
+    public enum Tyre_Position : int
+    {
+        REAR_LEFT = 0,
+        REAR_RIGHT = 1,
+        FRONT_LEFT = 2,
+        FRONT_RIGHT = 3,
+        MAX = 4,
+    }
+
     public enum Tyre_Compound : byte
     {
         R1 = 0,
@@ -441,6 +451,7 @@ namespace Drive_LFSS.Definition_
     }
     public enum Passenger_Flag : byte
     {
+        NONE = 0,
         FRONT_FEMALE = 1,
         FRONT = 2,
         LEFT_REAR_FEMALE = 4,

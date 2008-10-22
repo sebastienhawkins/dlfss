@@ -20,6 +20,7 @@ using System;
 using System.Globalization;
 namespace Drive_LFSS
 {
+    using Definition_;
     //Real extention required .net 3.0 , since we don't need .net 3.0 for the rest , i prefer stay .net 2.0
     sealed class ConvertX
     {

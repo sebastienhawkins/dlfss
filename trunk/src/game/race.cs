@@ -29,7 +29,7 @@ namespace Drive_LFSS.Game_
     using Config_;
     using PubStats_;
 
-    class Race : Vote, IRace
+    class Race : Track, IRace
 	{
         private const int MIN_FORCED_FINISH_TIME = 40000;
         private const int MAX_FORCED_FINISH_TIME = 120000;
