@@ -158,8 +158,6 @@ namespace Drive_LFSS.Game_
 
             EnterTrack(firstTime);
 
-            laps.Add(new Lap());
-            
             if (IsBot())
             {
                 for (byte botAddGuid = 0; botAddGuid < 129; botAddGuid++)
@@ -185,16 +183,6 @@ namespace Drive_LFSS.Game_
         internal void ProcessLapInformation(PacketLAP _packet)
         {
             totalLapCount++;
-            Lap lap = null;
-            lock(laps)
-            {
-                if(laps.Count < 1)
-                {
-                    Log.error("Driver.ProcessLapInformation(), laps array was empty, HACKFIX DONE, DriverName:"+driverName+", LicenceName:"+licenceName+"\r\n");
-                    laps.Add(new Lap());
-                }
-                lap = laps[laps.Count - 1];
-            }
             lap.ProcessPacketLap(_packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
 
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
@@ -244,21 +232,12 @@ namespace Drive_LFSS.Game_
                 AddMessageMiddle("^2MS ^7" + Math.Round((decimal)ConvertX.MSToKhm(maxSpeedMs), 2) + " ^7Kmh", 6000);
             maxSpeedMs = 0.0d; 
 
-            laps.Add(new Lap());
+            laps.Enqueue(lap);
+            lap = new Lap();
         }
         internal void ProcessSplitInformation(PacketSPX _packet)
         {
             //Internal Lap
-            Lap lap = null;
-            lock (laps)
-            {
-                if (laps.Count < 1)
-                {
-                    Log.error("Driver.ProcessSplitInformation(), laps array was empty, HACKFIX DONE, DriverName:" + driverName + ", LicenceName:" + licenceName + "\r\n");
-                    laps.Add(new Lap());
-                }
-                lap = laps[laps.Count - 1];
-            }
             lap.ProcessPacketSplit(_packet);
             
             //PubStats
@@ -292,8 +271,8 @@ namespace Drive_LFSS.Game_
         internal void ProcessRaceStart()
         {
             wr = Program.pubStats.GetWR("");
-            laps.Add(new Lap());
             maxSpeedMs = 0.0d;
+            lap = new Lap();
             
             if(IsOnTrack() && currentGui == Gui_Entry.RESULT)
                 RemoveGui(Gui_Entry.RESULT);
@@ -333,12 +312,12 @@ namespace Drive_LFSS.Game_
                 if(_packet.blueOrYellow == Racing_Flag.RACE_BLUE_FLAG)
                 {
                     blueFlagActive = true;
-                    laps[laps.Count-1].BlueFlagCount++;
+                    lap.BlueFlagCount++;
                 }
                 else if(_packet.blueOrYellow == Racing_Flag.RACE_YELLOW_FLAG)
                 {
                     yellowFlagActive = true;
-                    laps[laps.Count - 1].YellowFlagCount++;
+                    lap.YellowFlagCount++;
                     if(warningDrivingCancelTimer == 0 && warningDrivingType == Warning_Driving_Type.VICTIM)
                     {
                         SendCancelWarningDriving();
@@ -438,61 +417,60 @@ namespace Drive_LFSS.Game_
             private byte pitStopTotalCount = 0; //To help make PitStop by lap and not by race.
             private byte pitStopCount = 0;      //this is the Current Lap Pitstop, cen be more then 2, since on a cruise server is possible i think so.
 
-            internal protected Penalty_Type CurrentPenality
+            internal Penalty_Type CurrentPenality
             {
                 get { return currentPenality; }
             }
-            internal protected Driver_Flag DriverMask
+            internal Driver_Flag DriverMask
             {
                 get { return driverMask; }
             }
-            internal protected string CarPrefix
+            internal string CarPrefix
             {
                 get { return carPrefix; }
             }
-            internal protected string TrackPrefix
+            internal string TrackPrefix
             {
                 get { return trackPrefix; }
              }
-            internal protected uint RaceGuid
+            internal uint RaceGuid
             {
                 get { return raceGuid; }
             }
-            internal protected uint LapTime
+            internal uint LapTime
             {
                 get {return lapTime;}
             }
-            internal protected uint[] SplitTime
+            internal uint[] SplitTime
             {
                 get { return splitTime; }
             }
-            internal protected ushort BlueFlagCount
+            internal ushort BlueFlagCount
             {
                 set { blueFlagCount = value; }
                 get { return blueFlagCount; }
             }
-            internal protected ushort YellowFlagCount
+            internal ushort YellowFlagCount
             {
                 set { yellowFlagCount = value; }
                 get { return yellowFlagCount; }
             }
-            internal protected uint TotalTime
+            internal uint TotalTime
             {
                 get { return totalTime; }
             }
-            internal protected ushort LapCompleted
+            internal ushort LapCompleted
             {
                 get { return lapCompleted; }
             }
-            internal protected double MaxSpeedMs
+            internal double MaxSpeedMs
             {
                 get { return maxSpeedKhm; }
             }
-            internal protected byte PitStopCount
+            internal byte PitStopCount
             {
                 get { return pitStopCount; }
             }
-
             private void SetPitStopCount(byte _pitStopTotal)
             {
                 pitStopTotal = _pitStopTotal;
@@ -504,7 +482,7 @@ namespace Drive_LFSS.Game_
             }
         }
         private Lap lap = new Lap();
-        private List<Lap> laps = new List<Lap>();
+        private Queue<Lap> laps = new Queue<Lap>();
         internal PB pb = null;
         internal WR wr = null;
         private Dictionary<string,Dictionary<string,Rank>> rank = null;
@@ -531,36 +509,23 @@ namespace Drive_LFSS.Game_
                     Program.dlfssDatabase.Unlock();
                     lock (laps)
                     {
-                        if (laps.Count > 0)
+                        while (laps.Count > 0)
                         {
-                            Lap currentLap = laps[laps.Count - 1];
-                            List<Lap>.Enumerator itr = laps.GetEnumerator();
-
-                            while (itr.MoveNext())
+                            Lap lapToSave = laps.Dequeue();
+                            if (lapToSave.LapTime < 1 )
+                                continue;
+                            Program.dlfssDatabase.Lock();
                             {
-                                Lap lap = itr.Current;
-                                if (lap.LapTime < 1)
-                                    continue;
-                                Program.dlfssDatabase.Lock();
-                                {   
-                                    SaveLapsToDB(lap);
-                                }
-                                Program.dlfssDatabase.Unlock();
-                                Log.database(iSession.GetSessionNameForLog() + "Lap for DriverGuid: " + guid + ", car_prefix:" + lap.CarPrefix + ", track_prefix: " + lap.TrackPrefix + ", saved to database.\r\n");
+                                SaveLapsToDB(lapToSave);
                             }
-                            laps.Clear();
-                            if (currentLap.LapTime < 1)
-                                laps.Add(currentLap);
-                            else
-                                laps.Add(new Lap());
+                            Program.dlfssDatabase.Unlock();
+                            Log.database(iSession.GetSessionNameForLog() + "Lap for DriverGuid: " + guid + ", car_prefix:" + lapToSave.CarPrefix + ", track_prefix: " + lapToSave.TrackPrefix + ", saved to database.\r\n");
                         }
+                        laps.Clear();
                     }
                 }
                 else //this is Bot Only
-                {
                     laps.Clear();
-                    laps.Add(new Lap());
-                }
             }
 
             if (driftScoreByTime > 0)
