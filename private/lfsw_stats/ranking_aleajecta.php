@@ -17,7 +17,7 @@ foreach($wrt as &$value)
 	$wr[$trackt][$value[2]] = $value[6];
 }
 
-$link = mysql_connect('192.168.101.200:33306', 'www', 'dexxa');
+$link = mysql_connect('192.168.101.200:33306', 'www', 'dexxa', true ,MYSQL_CLIENT_COMPRESS);
 if (!$link) {die(mysql_error());}
 if (!mysql_select_db('drive_lfss')){die(mysql_error());}
 
@@ -41,7 +41,7 @@ while ($row = mysql_fetch_array($result))
 {
 	array_push($licenceNames,$row[0]);
 }
-mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Oct^2/^714' WHERE `entry`IN(57)",$link);
+mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Oct^2/^726' WHERE `entry`IN(57)",$link);
 
 
 foreach($licenceNames as $licenceName)

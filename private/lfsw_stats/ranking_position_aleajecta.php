@@ -1,6 +1,6 @@
 <?php
 
-$link = mysql_connect('192.168.101.200:33306', 'www', 'dexxa');
+$link = mysql_connect('192.168.101.200:33306', 'www', 'dexxa',true ,MYSQL_CLIENT_COMPRESS);
 if (!$link) {die(mysql_error());}
 if (!mysql_select_db('drive_lfss')){die(mysql_error());}
 
