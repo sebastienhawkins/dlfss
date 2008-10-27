@@ -85,6 +85,7 @@ namespace Drive_LFSS.Game_
         private ushort orientation = 0;
         private short orientationSpeed = 0;
         private bool isOnTrack = false;
+        private bool isInPit = false;
         private bool isMoving = false;
         private uint timeIldeOnTrack = 0;
         private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
@@ -392,6 +393,7 @@ namespace Drive_LFSS.Game_
         }*/
         private void EnterPit()
         {
+            
         }
         private void EnterTrack(bool firstTime)
         {
@@ -427,7 +429,7 @@ namespace Drive_LFSS.Game_
             if(_rank != null)
             {
                 if (!ISession.IsFreezeMotdSend())
-                    ISession.SendMSTMessage("/msg "+driverName+" ^2" + _rank.GetGradeComment() + "^2 with ^7" + carPrefix);
+                    ISession.SendMSTMessage("/msg "+driverName+" ^2" + _rank.GetGradeComment() /*+ "^2 with ^7" + carPrefix*/);
                 //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
             }
             else
@@ -457,7 +459,7 @@ namespace Drive_LFSS.Game_
         }
         public bool IsOnTrack()
         {
-            return (carId > 0 && isOnTrack);
+            return (carId > 0 && isOnTrack && !isInPit && iSession.GetRaceGuid() != 0);
         }
         public byte CarId
         {

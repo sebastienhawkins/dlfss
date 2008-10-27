@@ -169,7 +169,7 @@ namespace Drive_LFSS.Game_
                 {
                     for (byte itr = 0; itr < buttonTimedList.Count; itr++ )
                     {
-                        if (buttonTimedList[itr].Time - diff > diff) //timer on button are maybe time to be rewrite, we have a dsync why this method, hack like.
+                        if ((int)buttonTimedList[itr].Time - diff > diff) //timer on button are maybe time to be rewrite, we have a dsync why this method, hack like.
                             buttonTimedList[itr].Time -= diff;
                         else
                         {
@@ -637,11 +637,9 @@ namespace Drive_LFSS.Game_
             SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^7Current");
             
             string trackPrefix = ((Driver)this).ISession.GetRaceTrackPrefix();
-            string carPrefix = ((ICar)this).CarPrefix;
-            uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
-            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7ALL, ^2Track:^7 "+trackPrefix+", ^2Count: ^7"+rankedCount);
-            if(rankedCount < 1)
-                return;
+            //uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
+            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7ALL, ^2Track:^7 "+trackPrefix+", ^2Count: ^7NA");
+
             List<Driver> driver = ((Session)((Driver)this).ISession).GetDriverList();
             
             ButtonTemplateInfo bName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_NAME);

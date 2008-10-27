@@ -57,7 +57,8 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_PLP_ENTER_GARAGE:              processPacket((PacketPLP)_packet);break;
                 case Packet_Type.PACKET_CPR_LICENCE_DRIVER_RENAME:     processPacket((PacketCPR)_packet);break;
                 case Packet_Type.PACKET_FLG_DRIVER_BLUE_YELLOW_FLAG:   processPacket((PacketFLG)_packet); break;
-
+                case Packet_Type.PACKET_PLA_DRIVER_PIT_LANE_STATUS:    processPacket((PacketPLA)_packet); break;
+                case Packet_Type.PACKET_PIT_DRIVER_PITSTOP_START:      processPacket((PacketPIT)_packet); break;
                 default: Log.missingDefinition("ProcessPacket(), No existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
@@ -130,7 +131,7 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketPIT _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " PIT_PlayerStopsAtPit(), PIT -> PLID=" + _packet.PLID + ", Flags=" + _packet.Flags + ", LapsDone=" + _packet.LapsDone + ", NumStops=" + _packet.NumStops + ", Penalty=" + _packet.Penalty + ", FL_Changed=" + _packet.FL_Changed + ", FR_Changed=" + _packet.FR_Changed + ", RL_Changed=" + _packet.RL_Changed + ", RR_Changed=" + _packet.RR_Changed + ", Work=" + _packet.Work + ", Spare=" + _packet.Spare + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " PIT_PlayerStopsAtPit(), PIT -> PLID=" + _packet.carId + ", Flags=" + _packet.driverMask + ", LapsDone=" + _packet.lapDoneCount + ", NumStops=" + _packet.pitStopCount + ", Penalty=" + _packet.penality + ", FL_Changed=" + _packet.frontLeftChange + ", FR_Changed=" + _packet.frontRightChange + ", RL_Changed=" + _packet.rearLeftChange + ", RR_Changed=" + _packet.rearRightChange + ", Work=" + _packet.workMask + ", Spare=" + _packet.spare + "\r\n");
         }
         protected virtual void processPacket(PacketPSF _packet)
         {
@@ -165,7 +166,7 @@ namespace Drive_LFSS.Packet_
         // A player entered or left the pitlane
         protected virtual void processPacket(PacketPLA _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " PLA_PitLaneChanged(), PLA -> PLID=" + _packet.carId + ", Fact=" + _packet.Fact + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " PLA_PitLaneChanged(), PLA -> PLID=" + _packet.carId + ", Fact=" + _packet.action + "\r\n");
         }
         // A player crossed a lap split
         protected virtual void processPacket(PacketSPX _packet)

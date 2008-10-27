@@ -98,6 +98,8 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_VTN_VOTE_NOTIFICATION, new PacketVTN());
             Add(Packet_Type.PACKET_PLP_ENTER_GARAGE, new PacketPLP());
             Add(Packet_Type.PACKET_MSX_SEND_BIG_CHAT, new PacketMSX());
+            Add(Packet_Type.PACKET_PIT_DRIVER_PITSTOP_START, new PacketPIT());
+            Add(Packet_Type.PACKET_PLA_DRIVER_PIT_LANE_STATUS, new PacketPLA());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -549,31 +551,31 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        internal byte ReqI;
-        internal byte PLID;
-        internal ushort LapsDone;
-        internal Driver_Flag Flags;
-        internal byte Sp0;
-        internal byte Penalty;
-        internal byte NumStops;
-        internal byte Sp3;
-        internal Tyre_Compound RL_Changed;
-        internal Tyre_Compound RR_Changed;
-        internal Tyre_Compound FL_Changed;
-        internal Tyre_Compound FR_Changed;
-        internal Pit_Work_Flag Work;
-        internal uint Spare;
+        internal byte requestId;
+        internal byte carId;
+        internal ushort lapDoneCount;
+        internal Driver_Flag driverMask;
+        internal byte spare0;
+        internal byte penality;
+        internal byte pitStopCount;
+        internal byte spare3;
+        internal Tyre_Compound rearLeftChange;
+        internal Tyre_Compound rearRightChange;
+        internal Tyre_Compound frontLeftChange;
+        internal Tyre_Compound frontRightChange;
+        internal Pit_Work_Flag workMask;
+        internal uint spare;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPLA
     {
         internal byte packetSize;
         internal byte packetType;
-        internal byte ReqI;
+        internal byte requestId;
         internal byte carId;
-        internal Pit_Lane_State Fact;
-        internal byte Sp1;
-        internal byte Sp2;
-        internal byte Sp3;
+        internal Pit_Lane_Action action;
+        internal byte spare1;
+        internal byte spare2;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPLL
     {

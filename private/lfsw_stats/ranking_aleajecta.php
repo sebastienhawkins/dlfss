@@ -167,10 +167,10 @@ foreach($licenceNames as $licenceName)
 			//echo "Stability Score: $driverStabilityS\n";
 
 			//Driver Win
-			$result = mysql_query("SELECT `race_win_rank` FROM `stats_rank_driver` WHERE `licence_name` LIKE'$licenceName'" ,$link);
-			if ($result && ($row = mysql_fetch_array($result))) 
-				$driverWinS = $row[0];
-			else
+			//$result = mysql_query("SELECT `race_win_rank` FROM `stats_rank_driver` WHERE `licence_name` LIKE'$licenceName'" ,$link);
+			//if ($result && ($row = mysql_fetch_array($result))) 
+			//	$driverWinS = $row[0];
+			//else
 				$driverWinS = 0;
 
 			$query = "SELECT `race`.`finish_order`,`race`.`race_laps`,`driver_lap`.`total_time`
