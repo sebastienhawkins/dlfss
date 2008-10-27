@@ -31,5 +31,6 @@ namespace Drive_LFSS.Script_
         uint LapCountTotalLastRace{ get; }
         uint TimeTotalLastRace{get;}
         uint TimeFastestLapLastRace{get;}
+        byte RacePosition{set;get;}
     }
 }

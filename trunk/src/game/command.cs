@@ -36,8 +36,10 @@ namespace Drive_LFSS.Server_
            command["reload"] = new CommandName(1, new CommandDelegate(Reload));
            command["help"] = new CommandName(0, new CommandDelegate(Help));
            command["config"] = new CommandName(0, new CommandDelegate(Config));
+           command["menu"] = new CommandName(0, new CommandDelegate(Menu));
            command["status"] = new CommandName(0, new CommandDelegate(Status));
            command["rank"] = new CommandName(0, new CommandDelegate(Rank));
+           command["ranking"] = new CommandName(0, new CommandDelegate(Rank));
            command["top"] = new CommandName(0, new CommandDelegate(Rank));
            command["top10"] = new CommandName(0, new CommandDelegate(Rank));
            command["top20"] = new CommandName(0, new CommandDelegate(Rank));
@@ -243,6 +245,10 @@ namespace Drive_LFSS.Server_
         {
             driver.SendConfigGui();
         }
+        private void Menu(Driver driver, string[] args)
+        {
+            driver.SendMenuGui();
+        }
         private void Status(Driver driver, string[] args)
         {
             if (args.Length != 2)
@@ -314,7 +320,11 @@ namespace Drive_LFSS.Server_
         private void Test(Driver driver, string[] args)
         {
             //driver.SendResultGui(new Dictionary<string, int>() { { "1- greenseed", 5000 }, { "mekac", 5000 }, { "maxdoel", 5000 } });
-            driver.SendGui((ushort)Gui_Entry.GREEN_FLAG, "");
+            driver.SendFlagRace((ushort)Gui_Entry.FLAG_BLACK_CAR_PROBLEM,60000);
+            driver.SendFlagRace((ushort)Gui_Entry.FLAG_BLACK_PENALITY, 60000);
+            driver.SendFlagRace((ushort)Gui_Entry.FLAG_GREEN, 60000);
+            driver.SendFlagRace((ushort)Gui_Entry.FLAG_YELLOW_GLOBAL, 60000);
+            driver.SendFlagRace((ushort)Gui_Entry.FLAG_WHITE_FINAL_LAP, 60000);
         }
         private void Result(Driver driver, string[] args)
         {

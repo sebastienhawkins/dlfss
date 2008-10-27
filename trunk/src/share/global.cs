@@ -70,11 +70,6 @@ namespace Drive_LFSS.Definition_
         AUTO_KICK_BAN = 256,
         AUTO_KICK_SPEC = 512,
     }
-    public enum Racing_Flag : byte
-    {
-        RACE_BLUE_FLAG = 1,
-        RACE_YELLOW_FLAG = 2
-    }
     public enum Race_Feature_Flag : ushort
     {
         RACE_FLAG_NONE = 0,
@@ -106,7 +101,7 @@ namespace Drive_LFSS.Definition_
         MOTD_BACKGROUND = 2,
         MOTD_BUTTON_DRIVE = 5,
         MOTD_BUTTON_HELP = 36,
-        MOTD_BUTTON_CONFIG = 30,
+        MOTD_BUTTON_MENU = 30,
         TRACK_PREFIX = 16,
         INFO_1 = 17,
         INFO_2 = 18,
@@ -125,7 +120,7 @@ namespace Drive_LFSS.Definition_
         CONFIG_USER_TIMEDIFF_SPLIT = 43,
         HELP_BG = 31,
         HELP_BUTTON_DRIVE = 34,
-        HELP_BUTTON_CONFIG = 35,
+        HELP_BUTTON_MENU = 35,
         TEXT_BUTTON_DRIVE = 45,
         RANK_BG = 47,
         RANK_NAME = 50,
@@ -153,6 +148,17 @@ namespace Drive_LFSS.Definition_
         RESULT_SCORE_DISPLAY = 75, 
         CONFIG_USER_MAX_SPEED_ON = 77,
         RESULT_BG = 78,
+        MENU_BUTTON_CLOSE = 134,
+        MENU_BUTTON_CONFIG = 136,
+        MENU_BUTTON_RANK = 137,
+        MENU_BUTTON_SCOREBOARD = 138,
+        MENU_BUTTON_RESULT = 139,
+        MENU_BUTTON_MYSTATS = 140,
+        MENU_BUTTON_STATUS = 142,
+        MENU_BUTTON_MANAGER = 141,
+        MENU_BUTTON_SAY = 143,
+        MENU_BUTTON_RELOAD = 144,
+        MENU_BUTTON_EXIT = 145,
     }
     public enum Button_Styles_Flag : byte
     {
@@ -174,18 +180,20 @@ namespace Drive_LFSS.Definition_
         TEXT = 4,
         RANK = 5,
         RESULT = 6,
-        GREEN_FLAG = 7,
-        PIT_CLOSE_FLAG = 8,
-        YELLOW_FLAG_LOCAL = 9,
-        YELLOW_FLAG_GLOBAL = 10,
-        REG_FLAG_STOP_RACE = 11,
-        BLACK_FLAG_PENALITY = 12,
-        BLUE_FLAG_SLOW_CAR = 13,
-        WHITE_FLAG_FINAL_LAP = 14,
-        BLACK_FLAG_CAR_PROBLEM = 15,
-        BLACK_FLAG_NO_SCORE = 16,
+        FLAG_BEGIN = 7,
+        FLAG_GREEN = 7,
+        FLAG_PIT_CLOSE = 8,
+        FLAG_YELLOW_LOCAL = 9,
+        FLAG_YELLOW_GLOBAL = 10,
+        FLAG_REG_STOP_RACE = 11,
+        FLAG_BLACK_PENALITY = 12,
+        FLAG_BLUE_SLOW_CAR = 13,
+        FLAG_WHITE_FINAL_LAP = 14,
+        FLAG_BLACK_CAR_PROBLEM = 15,
+        FLAG_BLACK_NO_SCORE = 16,
         FLAG_RACE_END = 17,
-        
+        FLAG_MAX = 18,
+        MENU = 18,
     }
     
     public enum Button_Safe_Coord_Range
@@ -391,14 +399,15 @@ namespace Drive_LFSS.Definition_
         ISB_RMB = 2,
         ISB_SHIFT = 8
     }
-    public enum Car_Racing_Flag : byte
+    public enum Flag_Race : ushort
     {
-        CAR_RACING_FLAG_NONE = 0,
-        CAR_RACING_FLAG_BLUE = 1,
-        CAR_RACING_FLAG_YELLOW = 2,
-        CAR_RACING_FLAG_LAG = 32,
-        CAR_RACING_FLAG_FIRST = 64,
-        CAR_RACING_FLAG_LAST = 128,
+        NONE = 0,
+        BLUE = 1,
+        YELLOW = 2,
+        LAG = 32,
+        FIRST = 64,
+        LAST = 128,
+        RACING = 512,
     }
     public enum InSim_Flag : byte
     {
@@ -521,7 +530,7 @@ namespace Drive_LFSS.Definition_
         public ushort lapNumber;
         public byte carId;
         public byte position;
-        public Car_Racing_Flag carFlag;
+        public Flag_Race carFlag;
         internal byte Sp3;
         public int posX;
         public int posY;

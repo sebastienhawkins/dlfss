@@ -156,6 +156,10 @@ namespace Drive_LFSS.Game_
         {
             return race.GetTrackPrefix();
         }
+        public byte GetRaceLapCount()
+        {
+            return race.GetLapCount();
+        }
         internal List<Driver> GetDriverList()
         {
             return driverList;
@@ -178,6 +182,17 @@ namespace Drive_LFSS.Game_
             for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].SendResultGui(scoringResultTextDisplay);
         }
+        public void SendFlagRaceToAll(ushort guiEntry, uint time)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+                driverList[itr].SendFlagRace(guiEntry,time);
+        }
+        public void RemoveFlagRaceToAll(ushort guiEntry)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+                driverList[itr].RemoveRaceFlag(guiEntry,true);
+        }
+        
         public void AddMessageTopToAll(string text, uint duration)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
@@ -271,7 +286,7 @@ namespace Drive_LFSS.Game_
             }
             return false;
         }
-        public IDriver GetDriverWith(byte carId)
+        public IDriver GetCarId(byte carId)
         {
             byte carIndex = GetCarIndex(carId);
             if (carIndex != 255)
@@ -698,10 +713,10 @@ namespace Drive_LFSS.Game_
                     driver.RemoveGui(Gui_Entry.MOTD);
                     driver.SendHelpGui();
                 } break;
-                case Button_Entry.MOTD_BUTTON_CONFIG:
+                case Button_Entry.MOTD_BUTTON_MENU:
                 {
                     driver.RemoveGui(Gui_Entry.MOTD);
-                    driver.SendConfigGui();
+                    driver.SendMenuGui();
                 } break;
                 case Button_Entry.CONFIG_USER_ACC_ON:
                 {
@@ -770,10 +785,10 @@ namespace Drive_LFSS.Game_
                     driver.RemoveGui(Gui_Entry.CONFIG_USER);
                 } break;
                 
-                case Button_Entry.HELP_BUTTON_CONFIG:
+                case Button_Entry.HELP_BUTTON_MENU:
                 {
                     driver.RemoveGui(Gui_Entry.HELP);
-                    driver.SendConfigGui();
+                    driver.SendMenuGui();
                 } break;
                 case Button_Entry.HELP_BUTTON_DRIVE:
                 {
@@ -809,7 +824,56 @@ namespace Drive_LFSS.Game_
                 {
                     driver.RemoveResultGui();
                 } break;
-                
+                case Button_Entry.MENU_BUTTON_CLOSE:
+                {
+                    driver.RemoveMenuGui();
+                } break;
+                case Button_Entry.MENU_BUTTON_CONFIG:
+                {
+                    driver.RemoveMenuGui();
+                    driver.SendConfigGui();
+                } break;
+                case Button_Entry.MENU_BUTTON_RANK:
+                {
+                    driver.RemoveMenuGui();
+                    driver.SendRankGui(Button_Entry.RANK_BUTTON_CURRENT);
+                } break;
+                case Button_Entry.MENU_BUTTON_SCOREBOARD:
+                {
+                    //driver.RemoveMenuGui();
+                } break;
+                case Button_Entry.MENU_BUTTON_RESULT:
+                {
+                    driver.RemoveMenuGui();
+                    driver.SendResultGui(GetRaceLastResult());
+                } break;
+                case Button_Entry.MENU_BUTTON_MYSTATS:
+                {
+                    //driver.RemoveMenuGui();
+                } break;
+                case Button_Entry.MENU_BUTTON_MANAGER:
+                {
+                    //driver.RemoveMenuGui();
+                } break;
+                case Button_Entry.MENU_BUTTON_SAY:
+                {
+                    //driver.RemoveMenuGui();
+                } break;
+                case Button_Entry.MENU_BUTTON_STATUS:
+                {
+                    driver.RemoveMenuGui();
+                    command.Exec(driver, "!status all");
+                } break;
+                case Button_Entry.MENU_BUTTON_RELOAD:
+                {
+                    driver.RemoveMenuGui();
+                    command.Exec(driver,"!reload all");
+                } break;
+                case Button_Entry.MENU_BUTTON_EXIT:
+                {
+                    driver.RemoveMenuGui();
+                    command.Exec(driver, "!exit");
+                } break;
                 case Button_Entry.VOTE_OPTION_1: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
                 case Button_Entry.VOTE_OPTION_2: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;
                 case Button_Entry.VOTE_OPTION_3: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.connectionId); break;

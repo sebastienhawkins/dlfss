@@ -35,11 +35,22 @@ namespace Drive_LFSS.Game_
         private const int MAX_FORCED_FINISH_TIME = 120000;
         private const int PCT_FORCED_FINISH_TIME = 8;
         private const int GTH_TIME_DIFF_FROM_GREEN_LIGHT = 16000;
-
-        internal Race(Session _session)
+        private sealed class RaceGrid
+        {
+            RaceGrid(uint _driverGuid)
+            {
+                driverGuid = _driverGuid;
+            }
+            uint driverGuid;
+            byte position;
+            ushort garageEnterCount;
+            bool leaved;
+        }
+        
+        internal Race(Session session)
         {
             
-            iSession = _session;
+            iSession = session;
         }
         ~Race()
         {
@@ -54,22 +65,25 @@ namespace Drive_LFSS.Game_
             grid.ConfigApply();
         }
 
-        internal void Init(PacketREO _packet)
+        internal void Init(PacketREO packet)
         {
             EndRestart(); //feature auto restart
-            driverGuidRESPos.Clear();
-            carFinishAndLeaveTrackCount = 0;
+            driverToPosition.Clear();
+            carWeWaitForFinish.Clear();
             gridOrder = "";
-            carCount = _packet.carCount;
+            carCount = packet.carCount;
             uint driverGuid;
             IDriver driver;
             for (byte itr = 0; itr < carCount; itr++)
             {
-                driver = iSession.GetDriverWith(_packet.carIds[itr]);
+                driver = iSession.GetCarId(packet.carIds[itr]);
                 if(driver == null)
                     driverGuid = 0;
                 else
+                {
+                    carWeWaitForFinish.Add(itr);
                     driverGuid = driver.GetGuid();
+                }
 
                 gridOrder += (driverGuid >= (uint)Bot_GUI.FIRST ? 0 : driverGuid) + " ";
             }
@@ -80,26 +94,26 @@ namespace Drive_LFSS.Game_
 
             stateHasChange = true;
         } //Is the first Race/qual START Procedure
-        internal void Init(PacketRST _packet)
+        internal void Init(PacketRST packet)
         {
             timeStart = (uint)(System.DateTime.Now.Ticks / Program.tickPerMs);
             requestedFinalResultDone = false;
             finishOrder = "";
 
-            if (trackPrefix != _packet.trackPrefix)
+            if (trackPrefix != packet.trackPrefix)
                 finishCount = 0;
-            trackPrefix = _packet.trackPrefix;
-            carCount = _packet.carCount;
-            nodeCount = _packet.nodeCount;
-            nodeFinishIndex = _packet.nodeFinishIndex;
-            raceFeatureMask = _packet.raceFeatureMask;
-            qualificationMinute = _packet.qualificationMinute;
-            lapCount = _packet.raceLaps;
-            weatherStatus = _packet.weatherStatus;
-            windStatus = _packet.windStatus;
-            nodeSplit1Index = _packet.nodeSplit1Index;
-            nodeSplit2Index = _packet.nodeSplit2Index;
-            nodeSplit3Index = _packet.nodeSplit3Index;
+            trackPrefix = packet.trackPrefix;
+            carCount = packet.carCount;
+            nodeCount = packet.nodeCount;
+            nodeFinishIndex = packet.nodeFinishIndex;
+            raceFeatureMask = packet.raceFeatureMask;
+            qualificationMinute = packet.qualificationMinute;
+            lapCount = packet.raceLaps;
+            weatherStatus = packet.weatherStatus;
+            windStatus = packet.windStatus;
+            nodeSplit1Index = packet.nodeSplit1Index;
+            nodeSplit2Index = packet.nodeSplit2Index;
+            nodeSplit3Index = packet.nodeSplit3Index;
             hasToBeSavedIntoPPSTA = true;
 
             grid.Init(nodeCount);
@@ -107,28 +121,28 @@ namespace Drive_LFSS.Game_
             if (!SetNewGuid())
                 Log.error("Error when creating a new GUID for race.\r\n");
         }
-        internal void Init(PacketSTA _packet)
+        internal void Init(PacketSTA packet)
         {
-            if(connectionCount != _packet.connectionCount || 
-                finishedCount != _packet.finishedCount ||
-                carCount != _packet.carCount ||
-                qualificationMinute != _packet.qualificationMinute ||
-                raceInProgressStatus != (Race_In_Progress_Status)_packet.raceInProgressStatus ||
-                lapCount != _packet.raceLaps ||
-                trackPrefix != _packet.trackPrefix ||
-                weatherStatus != (Weather_Status)_packet.weatherStatus ||
-                windStatus != (Wind_Status)_packet.windStatus)
+            if(connectionCount != packet.connectionCount || 
+                finishedCount != packet.finishedCount ||
+                carCount != packet.carCount ||
+                qualificationMinute != packet.qualificationMinute ||
+                raceInProgressStatus != (Race_In_Progress_Status)packet.raceInProgressStatus ||
+                lapCount != packet.lapCount ||
+                trackPrefix != packet.trackPrefix ||
+                weatherStatus != (Weather_Status)packet.weatherStatus ||
+                windStatus != (Wind_Status)packet.windStatus)
                 stateHasChange = true;
 
-            connectionCount = _packet.connectionCount;
-            finishedCount = _packet.finishedCount;
-            carCount = _packet.carCount;
-            qualificationMinute = _packet.qualificationMinute;
-            raceInProgressStatus = (Race_In_Progress_Status)_packet.raceInProgressStatus;
-            lapCount = _packet.raceLaps;
-            trackPrefix = _packet.trackPrefix;
-            weatherStatus = (Weather_Status)_packet.weatherStatus;
-            windStatus = (Wind_Status)_packet.windStatus;
+            connectionCount = packet.connectionCount;
+            finishedCount = packet.finishedCount;
+            carCount = packet.carCount;
+            qualificationMinute = packet.qualificationMinute;
+            raceInProgressStatus = (Race_In_Progress_Status)packet.raceInProgressStatus;
+            lapCount = packet.lapCount;
+            trackPrefix = packet.trackPrefix;
+            weatherStatus = (Weather_Status)packet.weatherStatus;
+            windStatus = (Wind_Status)packet.windStatus;
 
             if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_NONE)
                 return;
@@ -149,25 +163,31 @@ namespace Drive_LFSS.Game_
         {
             grid.ProcessCarInformation(car);
         }
-        internal void ProcessResult(PacketRES _packet)
+        internal void ProcessResult(PacketRES packet)
         {
             if(guid == 0) //No race, no result process
                 return;
 
-            if ( (_packet.requestId == 2 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
-                || _packet.confirmMask != Confirm_Flag.CONFIRM_NONE)
+            if ( (packet.requestId == 2 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
+                || packet.confirmMask != Confirm_Flag.CONFIRM_NONE)
             {
-                IDriver driver = iSession.GetDriverWith(_packet.carId);
+                if(carWeWaitForFinish.Contains(packet.carId))
+                    carWeWaitForFinish.Remove(packet.carId);
+                    
+                IDriver driver = iSession.GetCarId(packet.carId);
                 if(driver == null) //Probaly return from a network failure and driver got disconnected during the failure, we will cancel this result.
                     return;
-                if (driverGuidRESPos.ContainsKey(driver.GetGuid()))
-                    driverGuidRESPos[driver.GetGuid()] = _packet.positionFinal;
+
+                ((Button)driver).SendFlagRace((ushort)Gui_Entry.FLAG_RACE_END, 5000);
+                
+                if (driverToPosition.ContainsKey(driver.GetGuid()))
+                    driverToPosition[driver.GetGuid()] = packet.positionFinal;
                 else
-                    driverGuidRESPos.Add(driver.GetGuid(),_packet.positionFinal);
+                    driverToPosition.Add(driver.GetGuid(),packet.positionFinal);
 
                 if (timeTotalFromFirstRES == 0 && guid != 0)
                 {
-                    timeTotalFromFirstRES = _packet.totalTime+1;
+                    timeTotalFromFirstRES = packet.totalTime+1;
 
                     uint pcDiff = GetFirstRESTimePc(PCT_FORCED_FINISH_TIME);
                     iSession.SendUpdateButtonToAll((ushort)Button_Entry.INFO_1,"^1Finish in ^7" + (pcDiff / 1000));
@@ -179,8 +199,8 @@ namespace Drive_LFSS.Game_
         }
         internal void ProcessCarLeaveRace(CarMotion car)
         {
-            if( driverGuidRESPos.ContainsKey( ((IDriver)car).GetGuid() ) )
-                carFinishAndLeaveTrackCount++;
+            if( carWeWaitForFinish.Contains(car.CarId) )
+                carWeWaitForFinish.Remove(car.CarId);
             
             RemoveFromGrid(car);
         }
@@ -361,7 +381,8 @@ namespace Drive_LFSS.Game_
         private uint timeStart = 0;
         //This is too keep pos of live value and not accurate
         //private byte[] positionToCarId = new byte[(int)PositionIndex.POSITION_LAST+1]; //index 0, mean nothing and index 193 mean Nothing too.
-        private Dictionary<uint, byte> driverGuidRESPos = new Dictionary<uint, byte>(); //index 0, mean nothing and index 193 mean Nothing too.
+        private Dictionary<uint, byte> driverToPosition = new Dictionary<uint, byte>(); //index 0, mean nothing and index 193 mean Nothing too.
+        private List<byte> carWeWaitForFinish = new List<byte>();
         private uint RESTART_RACE_INTERVAL = 0;
         private uint timerRaceRestart = 0;
 
@@ -463,6 +484,10 @@ namespace Drive_LFSS.Game_
         {
             return (timeTotalFromFirstRES == 0 && !IsVoteInProgress());
         }
+        public byte GetLapCount()
+        {
+            return lapCount;
+        }
         private void AddToGrid(CarMotion car)
         {
             grid.Add(car);
@@ -491,13 +516,14 @@ namespace Drive_LFSS.Game_
         }
         private void FinishRace()
         {
+            //iSession.SendFlagRaceToAll((ushort)Gui_Entry.FLAG_BLACK_NO_SCORE, 5000);
             timeTotalFromFirstRES = 0;
             iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
             Log.debug("Race: " + guid + ", was finished successfully.\r\n");
 
             if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING)
             {//Win Scoring
-                Dictionary<uint,byte>.Enumerator enu = driverGuidRESPos.GetEnumerator();
+                Dictionary<uint,byte>.Enumerator enu = driverToPosition.GetEnumerator();
                 scoringResultTextDisplay.Clear();
                 int driverCount = gridOrder.Split(new char[]{' '}).Length-1;
                 bool goodResult = false;
@@ -535,7 +561,7 @@ namespace Drive_LFSS.Game_
                             break;
                         }
                     }
-                    enu = driverGuidRESPos.GetEnumerator();
+                    enu = driverToPosition.GetEnumerator();
                 }
                 if(goodResult)
                     iSession.SendResultGuiToAll(scoringResultTextDisplay);
@@ -574,8 +600,7 @@ namespace Drive_LFSS.Game_
         }
         private bool HasAllResult()
         {
-
-            return (driverGuidRESPos.Count - carFinishAndLeaveTrackCount >= carCount && carCount > 0);
+            return (carWeWaitForFinish.Count == 0);
         }
         private uint GetFirstRESTimePc(uint percentage)
         {
@@ -598,6 +623,7 @@ namespace Drive_LFSS.Game_
             Log.debug(iSession.GetSessionNameForLog() + " StartRestart(), has been launched with  '" + RESTART_RACE_INTERVAL + "' to go.\r\n");
             #endif
             timerRaceRestart = RESTART_RACE_INTERVAL;
+            //iSession.SendFlagRaceToAll((ushort)Gui_Entry.FLAG_GREEN, RESTART_RACE_INTERVAL + 12000);
             //iSession.AddMessageTopToAll("^2Race will restart in ^7" + RESTART_RACE_INTERVAL / 1000 + " ^2sec", (3000 > RESTART_RACE_INTERVAL ? RESTART_RACE_INTERVAL : 3000));
         }
         private void ExecRestart()
@@ -609,6 +635,9 @@ namespace Drive_LFSS.Game_
                 iSession.SendMSTMessage("/qualify");
             else
                 iSession.SendMSTMessage("/restart");
+
+            //iSession.RemoveFlagRaceToAll((ushort)Gui_Entry.FLAG_BLACK_NO_SCORE);
+            //iSession.SendFlagRaceToAll((ushort)Gui_Entry.FLAG_PIT_CLOSE, 12000);
         }
         private void EndRestart()
         {

@@ -175,7 +175,10 @@ namespace Drive_LFSS.Game_
         {
             totalLapCount++;
             lap.ProcessPacketLap(packet, iSession.GetRaceGuid(), CarPrefix, iSession.GetRaceTrackPrefix(), maxSpeedMs);
-
+            
+            if(packet.lapCompleted+1 == iSession.GetRaceLapCount())
+                SendFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP,15000);
+            
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + iSession.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarPrefix + iSession.GetRaceTrackPrefix());
             int lapDiff, lapWRDiff;
@@ -207,7 +210,7 @@ namespace Drive_LFSS.Game_
                     ISession.AddMessageMiddleToAll("^2New WR " + ConvertX.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
                 }
             }
-            if(isTimeDiffLap)
+            if(isTimeDiffDisplay)
             {
                 if (pb != null && wr != null)
                 {
@@ -300,14 +303,16 @@ namespace Drive_LFSS.Game_
         {
             if(packet.OffOn > 0)
             {
-                if(packet.blueOrYellow == Racing_Flag.RACE_BLUE_FLAG)
+                if(packet.blueOrYellow == Flag_Race.BLUE)
                 {
+                    SendFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR,60000);
                     blueFlagActive = true;
                     lap.BlueFlagCount++;
                 }
-                else if(packet.blueOrYellow == Racing_Flag.RACE_YELLOW_FLAG)
+                else if(packet.blueOrYellow == Flag_Race.YELLOW)
                 {
                     yellowFlagActive = true;
+                    SendFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL, 60000);
                     lap.YellowFlagCount++;
                     if(warningDrivingCancelTimer == 0 && warningDrivingType == Warning_Driving_Type.VICTIM)
                     {
@@ -317,12 +322,14 @@ namespace Drive_LFSS.Game_
             }
             else
             {
-                if (packet.blueOrYellow == Racing_Flag.RACE_BLUE_FLAG)
+                if (packet.blueOrYellow == Flag_Race.BLUE)
                 {
                     blueFlagActive = false;
+                    RemoveFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR,true);
                 }
-                else if (packet.blueOrYellow == Racing_Flag.RACE_YELLOW_FLAG)
+                else if (packet.blueOrYellow == Flag_Race.YELLOW)
                 {
+                    RemoveFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL,true);
                     yellowFlagActive = false;
                 }
             }
@@ -333,7 +340,7 @@ namespace Drive_LFSS.Game_
             LeaveTrack();
         }
 
-        private bool isTimeDiffLap = true;
+        private bool isTimeDiffDisplay = true;
         private bool isTimeDiffSplit = true;
         private bool isMaxSpeedDisplay = true;
         private bool isAdmin = false;
@@ -341,6 +348,7 @@ namespace Drive_LFSS.Game_
         private byte connectionId = 0;
         private string driverName = "";
         private byte driverModel = 0;
+        private byte racePosition = 0;
         private uint timeTotalLastRace = 0;
         private uint timeFastestLapLastRace = 0;
         private uint lapCountTotalLastRace = 0;
@@ -563,7 +571,7 @@ namespace Drive_LFSS.Game_
                 else
                 {
                     warningDrivingCancelTimer = 0;
-                    Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
+                    Driver _driver = (Driver)ISession.GetCarId(warningDrivingReferenceCarId);
                     if(_driver != null)
                     {
                         _driver.BadDrivingCount++;
@@ -731,11 +739,11 @@ namespace Drive_LFSS.Game_
 
         internal bool IsTimeDiffLapDisplay
         {
-            get { return isTimeDiffLap; }
+            get { return isTimeDiffDisplay; }
             set
             {
-                isTimeDiffLap = value;
-                SetConfigValue(Config_User.TIMEDIFF_LAP, (isTimeDiffLap ? "1" : "0"));
+                isTimeDiffDisplay = value;
+                SetConfigValue(Config_User.TIMEDIFF_LAP, (isTimeDiffDisplay ? "1" : "0"));
             }
         }
         internal bool IsTimeDiffSplitDisplay
@@ -769,7 +777,7 @@ namespace Drive_LFSS.Game_
         }
         public void SendCancelWarningDriving()
         {
-            Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
+            Driver _driver = (Driver)ISession.GetCarId(warningDrivingReferenceCarId);
             if (_driver == null)
                 return;
 
@@ -786,7 +794,7 @@ namespace Drive_LFSS.Game_
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_2);
             RemoveButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_3);
 
-            Driver _driver = (Driver)ISession.GetDriverWith(warningDrivingReferenceCarId);
+            Driver _driver = (Driver)ISession.GetCarId(warningDrivingReferenceCarId);
             if (_driver == null)
                 return;
 
@@ -860,6 +868,15 @@ namespace Drive_LFSS.Game_
         public uint LapCountTotalLastRace
         {
             get { return lapCountTotalLastRace; }
+        }
+        public byte RacePosition
+        {
+            set{racePosition = value;}
+            get{return racePosition;}
+        }
+        public byte GetRacePosition()
+        {
+            return RacePosition;
         }
         internal uint BadDrivingCount
         {
