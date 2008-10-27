@@ -77,8 +77,8 @@ foreach($licenceNames as $licenceName)
 			FROM `driver_lap`
 			WHERE `driver_lap`.`track_prefix`='$trackName'
 			AND `driver_lap`.`car_prefix`='$carPrefix'
-			AND `driver_lap`.`lap_time` < ".($bestEver *2)."
-			AND `driver_lap`.`lap_time` >= ".($bestEver );
+			AND `driver_lap`.`lap_time` < ".($bestEver*2)."
+			AND `driver_lap`.`lap_time` >= ".($bestEver-2000);
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
 			if ($result)
@@ -95,7 +95,7 @@ foreach($licenceNames as $licenceName)
 			WHERE `driver_lap`.`track_prefix`='$trackName'
 			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
 			AND `driver_lap`.`car_prefix`='$carPrefix'
-			AND `driver_lap`.`lap_time` >= ".($bestEver )."
+			AND `driver_lap`.`lap_time` >= ".($bestEver -2000)."
 			AND `driver_lap`.`lap_time` < ".($bestEver *2);
 
 			$result = mysql_query($query ,$link);
@@ -113,7 +113,7 @@ foreach($licenceNames as $licenceName)
 			WHERE `driver_lap`.`track_prefix`='$trackName'
 			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
 			AND `driver_lap`.`car_prefix`='$carPrefix'
-			AND `driver_lap`.`lap_time` >= ".($bestEver )."
+			AND `driver_lap`.`lap_time` >= ".($bestEver -2000)."
 			ORDER BY `driver_lap`.`lap_time` LIMIT 1";
 
 			$result = mysql_query($query ,$link);
@@ -156,9 +156,9 @@ foreach($licenceNames as $licenceName)
 				$driverAverageS = $driverAverageS * 5000 / 9999;
 				$driverAverageS = (int)$driverAverageS ;
 
-				$driverStabilityS = ($driverBest / $driverAverage *9999);
-				$driverStabilityS = $driverStabilityS-(((9949)-$driverStabilityS)*2); //Gave +50 point for sure
-				$driverStabilityS = $driverStabilityS * 5000 / 9999;
+				$driverStabilityS = ($driverBest / $driverAverage *5000);
+				$driverStabilityS = $driverStabilityS-(((4950)-$driverStabilityS)*2); //Gave +50 point for sure
+				$driverStabilityS = $driverStabilityS * 2500 / 5000;
 				$driverStabilityS = (int)$driverStabilityS ;
 			}
 			else
@@ -167,6 +167,12 @@ foreach($licenceNames as $licenceName)
 			//echo "Stability Score: $driverStabilityS\n";
 
 			//Driver Win
+			$result = mysql_query("SELECT `race_win_rank` FROM `stats_rank_driver` WHERE `licence_name` LIKE'$licenceName'" ,$link);
+			if ($result && ($row = mysql_fetch_array($result))) 
+				$driverWinS = $row[0];
+			else
+				$driverWinS = 0;
+
 			$query = "SELECT `race`.`finish_order`,`race`.`race_laps`,`driver_lap`.`total_time`
 			FROM `driver_lap`,`race`
 			WHERE `race`.`finish_order` != ''
@@ -178,7 +184,7 @@ foreach($licenceNames as $licenceName)
 
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
-			$driverWinS = 0;
+			
 			$winK = 0;
 			$averageLapTime = 0;
 			while($row = mysql_fetch_array($result))
@@ -194,14 +200,14 @@ foreach($licenceNames as $licenceName)
 					$itr++;
 					if($value != "" && strstr($driverGuids," ".$value." "))
 					{
-						$driverWinS = $winK + $driverCount-$itr + 1;
-						echo "$winK | $averageLapTime | $bestEver | $driverCount position: $itr | $driverWinS\n";
+						$_driverWinS = $winK + $driverCount-$itr + 1;
+						if($_driverWinS > 0)
+								$driverWinS += $_driverWinS ;
+						echo "$winK | $averageLapTime | $bestEver | $driverCount position: $itr | $_driverWinS | $driverWinS\n";
 						break;
 					}
 				}
 			}
-			if($driverWinS < 0)
-				$driverWinS = 0;
 			
 
 			$rank = (int)(($driverBestS + ($driverBestS/2)) + ($driverAverageS+($driverAverageS/5))+ $driverStabilityS + $driverWinS);
