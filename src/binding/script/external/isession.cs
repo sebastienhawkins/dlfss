@@ -29,6 +29,7 @@ namespace Drive_LFSS.Script_
         uint GetRaceGuid();
         bool IsRaceInProgress();
         string GetRaceTrackPrefix();
+        byte GetRaceLapCount();
         string GetSessionNameForLog();
         string GetSessionName();
         void SendMSTMessage(string message);
@@ -38,10 +39,13 @@ namespace Drive_LFSS.Script_
         void RemoveButton(ushort buttonEntry,byte licenceId);
         void AddMessageTopToAll(string text, uint duration);
         void AddMessageMiddleToAll(string text, uint duration);
+        void SendFlagRaceToAll(ushort guiEntry, uint time);
+        void RemoveFlagRaceToAll(ushort guiEntry);
         bool CanVote();
+        
         void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay);
         IDriver GetDriverWithGuid(uint guid);
-        IDriver GetDriverWith(byte carId);
+        IDriver GetCarId(byte carId);
         IDriver GetDriverWithConnectionId(byte connectionId);
         Script Script
         {

@@ -230,8 +230,8 @@ namespace Drive_LFSS.Ranking_
                         count++;
                         if(!top20ByTrackCar[itrTrack].ContainsKey(itrCar))
                             top20ByTrackCar[itrTrack].Add(itrCar,new List<string>());
-                        
-                        top20ByTrackCar[itrTrack][itrCar].Add(reader.GetString(0)+" "+reader.GetString(1)+" "+reader.GetString(2)+" "+reader.GetString(3)+" "+reader.GetString(4)+" "+reader.GetString(5));
+
+                        top20ByTrackCar[itrTrack][itrCar].Add(reader.GetString(0) + ((char)0) + reader.GetString(1) + ((char)0) + reader.GetString(2) + ((char)0) + reader.GetString(3) + ((char)0) + reader.GetString(4) + ((char)0) + reader.GetString(5));
                     }
                     reader.Dispose();
                 }

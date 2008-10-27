@@ -38,7 +38,7 @@ namespace Drive_LFSS.Game_
         {
             if (true == false) { }
         }
-        internal void ProcessBFNClearAll(bool sendConfig)
+        internal void ProcessBFNClearAll(bool sendMenu)
         {
             lock (bufferButtonPacket){bufferButtonPacket.Clear();}
             for (byte itr = 0; itr < BUTTON_MAX_COUNT; itr++)
@@ -52,12 +52,12 @@ namespace Drive_LFSS.Game_
             }
             rankGuiCurrentDisplay = Button_Entry.NONE;
             currentGui = 0;
-            if(sendConfig)
-                SendConfigGui();
+            if(sendMenu)
+                SendMenuGui();
         }
         internal void ProcessBFNRequest()
         {
-            SendConfigGui();
+            SendMenuGui();
         }
         private ushort[] buttonList = new ushort[BUTTON_MAX_COUNT];
 
@@ -116,6 +116,21 @@ namespace Drive_LFSS.Game_
         private Queue<ButtonMessage> buttonMessageTop = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
         private Queue<ButtonMessage> buttonMessageMiddle = new Queue<ButtonMessage>(BUTTON_MAX_COUNT);
         protected Gui_Entry currentGui = Gui_Entry.NONE;
+        private Gui_Entry currentFlagGui = Gui_Entry.NONE;
+        private Dictionary<Gui_Entry,uint> flagRaceGui = new Dictionary<Gui_Entry,uint>
+        {
+            {Gui_Entry.FLAG_GREEN,0},
+            {Gui_Entry.FLAG_PIT_CLOSE,0},
+            {Gui_Entry.FLAG_YELLOW_LOCAL,0},
+            {Gui_Entry.FLAG_YELLOW_GLOBAL,0},
+            {Gui_Entry.FLAG_REG_STOP_RACE,0},
+            {Gui_Entry.FLAG_BLACK_PENALITY,0},
+            {Gui_Entry.FLAG_BLUE_SLOW_CAR,0},
+            {Gui_Entry.FLAG_WHITE_FINAL_LAP,0},
+            {Gui_Entry.FLAG_BLACK_CAR_PROBLEM,0},
+            {Gui_Entry.FLAG_BLACK_NO_SCORE,0},
+            {Gui_Entry.FLAG_RACE_END,0},
+        };
         private Button_Entry rankGuiCurrentDisplay = Button_Entry.NONE;
         private byte rankSearchDisplayCount = 0;
         private string rankSearchTrackPrefix = "";
@@ -123,8 +138,10 @@ namespace Drive_LFSS.Game_
         private Queue<Packet> bufferButtonPacket = new Queue<Packet>();
 
         private uint timerBufferedButton = 0;
-        private const uint TIMER_BUFFERED_BUTTON = 100;
-        private const uint MAX_BUTTON_BY_CYCLE = 10;
+        private const uint TIMER_BUFFERED_BUTTON = 150;
+        private const uint MAX_BUTTON_BY_CYCLE = 16;
+        private const uint TIMER_FLAG_RACE_UPDATE = 1000;
+        private uint timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
         protected virtual void update(uint diff)
         {
             
@@ -209,6 +226,47 @@ namespace Drive_LFSS.Game_
                         buttonMessageMiddle.Dequeue();
                 }
             }
+            if (timerFlagRaceUpdate < diff)
+            {
+                timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
+                lock(flagRaceGui)
+                {
+                    bool send = false;
+                    for (Gui_Entry itr = Gui_Entry.FLAG_BEGIN; itr < Gui_Entry.FLAG_MAX; itr++)
+                    {
+                        if(flagRaceGui[itr] > TIMER_FLAG_RACE_UPDATE)
+                        {
+                            flagRaceGui[itr] -= TIMER_FLAG_RACE_UPDATE;
+                            if (!send && ((currentFlagGui == Gui_Entry.FLAG_MAX - 1 && itr < Gui_Entry.FLAG_MAX - 1)
+                                || itr > currentFlagGui))
+                            {
+                                send = true;
+                                SendGui(itr);
+                            }
+                        }
+                        else if(flagRaceGui[itr] > 0)
+                        {
+                            flagRaceGui[itr] = 0;
+                            if (currentFlagGui > 0 && currentFlagGui == itr)
+                                RemoveGui(itr);
+                        }
+                    }
+                    for (Gui_Entry itr = Gui_Entry.FLAG_BEGIN; itr < Gui_Entry.FLAG_MAX && !send; itr++)
+                    {
+                        if (flagRaceGui[itr] > TIMER_FLAG_RACE_UPDATE)
+                        {
+                            if (itr < currentFlagGui)
+                            {
+                                send = true;
+                                SendGui(itr);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+                timerFlagRaceUpdate -= diff;
 
         }
 
@@ -227,12 +285,23 @@ namespace Drive_LFSS.Game_
         {
             if (((Driver)this).IsBot())
                 return;
-            if (guiInfo.Entry == currentGui)
-                return;
 
-            if(currentGui > 0)
-                RemoveGui(currentGui);
-            
+            if(guiInfo.Entry >= Gui_Entry.FLAG_BEGIN && guiInfo.Entry < Gui_Entry.FLAG_MAX)
+            {
+                if(guiInfo.Entry == currentFlagGui)
+                    return;
+                if(currentFlagGui > 0)
+                    RemoveGui(currentFlagGui);
+                currentFlagGui = guiInfo.Entry;
+            }
+            else
+            {
+                if (guiInfo.Entry == currentGui)
+                    return;
+                if(currentGui > 0)
+                    RemoveGui(currentGui);
+                currentGui = guiInfo.Entry;
+            }
             string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
             ButtonTemplateInfo buttonInfo;
             
@@ -258,7 +327,6 @@ namespace Drive_LFSS.Game_
                     SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
                 }
             }
-            currentGui = guiInfo.Entry;
         }
         public void RemoveGui(ushort guiEntry)
         {
@@ -290,7 +358,11 @@ namespace Drive_LFSS.Game_
             {
                 RemoveButton(guiInfo.TextButtonEntry);
             }
-            currentGui = Gui_Entry.NONE;
+
+            if (guiInfo.Entry >= Gui_Entry.FLAG_BEGIN && guiInfo.Entry < Gui_Entry.FLAG_MAX)
+                currentFlagGui = Gui_Entry.NONE;
+            else
+                currentGui = Gui_Entry.NONE;
         }
         internal protected byte RemoveButton(Button_Entry buttonEntry)
         {
@@ -447,6 +519,33 @@ namespace Drive_LFSS.Game_
         {
             RemoveButton((ushort)Button_Entry.BANNER);
         }
+        internal void SendFlagRace(ushort guiEntry, uint time)
+        {
+            SendFlagRace((Gui_Entry)guiEntry, time);
+        }
+        protected void SendFlagRace(Gui_Entry guiEntry, uint time)
+        {
+            timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
+            SendGui(guiEntry);
+
+            lock (flagRaceGui)
+            {
+                flagRaceGui[guiEntry] = (time < TIMER_FLAG_RACE_UPDATE ? TIMER_FLAG_RACE_UPDATE : time);
+            }
+        }
+        internal void RemoveRaceFlag(ushort guiEntry, bool now)
+        {
+            RemoveFlagRace((Gui_Entry)guiEntry, now);
+        }
+        protected void RemoveFlagRace(Gui_Entry guiEntry, bool now)
+        {
+            if (now)
+                RemoveGui(guiEntry);
+            lock (flagRaceGui)
+            {
+                flagRaceGui[guiEntry] = 1;
+            }
+        }
         internal void SendTrackPrefix()
         {
             ButtonTemplateInfo button = Program.buttonTemplate.GetEntry((uint)Button_Entry.TRACK_PREFIX);
@@ -473,6 +572,14 @@ namespace Drive_LFSS.Game_
         internal void RemoveConfigGui()
         {
             RemoveGui(Gui_Entry.CONFIG_USER);
+        }
+        internal void SendMenuGui()
+        {
+            SendGui(Gui_Entry.MENU);
+        }
+        internal void RemoveMenuGui()
+        {
+            RemoveGui(Gui_Entry.MENU);
         }
         internal void SendHelpGui()
         {
@@ -781,11 +888,11 @@ namespace Drive_LFSS.Game_
             byte height = bName.Height;
             for(int itr = 0; itr < row.Length; itr++)
             {
-               string[] colum = row[itr].Split(new char[]{' '});
+                string[] colum = row[itr].Split(((char)0));
                if(colum.Length != 6)
                {
-                    Log.error("Button.SendRankTop10(), Found a bad Rank Row\r\n");
-                    return;
+                   Log.error("Button.SendRankTop10(), Found a bad Rank Row(" + row[itr] + ")\r\n");
+                    continue;
                }
                
                bName.Text = "^2"+colum[0];

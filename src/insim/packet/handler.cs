@@ -180,7 +180,7 @@ namespace Drive_LFSS.Packet_
         // The server/race state changed
         protected virtual void processPacket(PacketSTA _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged() -> ViewOptionMask=" + _packet.viewOptionMask + ", RaceInProgStatus=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumCar=" + _packet.carCount + ", FinishCount="+_packet.finishedCount+", QualMins=" + _packet.qualificationMinute + ", raceLaps="+ _packet.raceLaps+", ReplaySpeed="+_packet.replaySpeed+", TrackName="+_packet.trackPrefix+", WeatherStatus="+_packet.weatherStatus+"\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " STA_StateChanged() -> ViewOptionMask=" + _packet.viewOptionMask + ", RaceInProgStatus=" + _packet.raceInProgressStatus + ", ViewPLID=" + _packet.currentCarId + ", NumConns=" + _packet.connectionCount + ", NumCar=" + _packet.carCount + ", FinishCount="+_packet.finishedCount+", QualMins=" + _packet.qualificationMinute + ", raceLaps="+ _packet.lapCount+", ReplaySpeed="+_packet.replaySpeed+", TrackName="+_packet.trackPrefix+", WeatherStatus="+_packet.weatherStatus+"\r\n");
         }
         // A host is started or joined
         protected virtual void processPacket(PacketISM _packet)
