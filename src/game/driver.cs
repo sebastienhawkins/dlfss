@@ -114,7 +114,7 @@ namespace Drive_LFSS.Game_
 
                 return;
             }
-
+            timeIldeOnTrack = 0;
             driverMask = packet.driverMask;
 
             //_packet.SName; //What is that???
@@ -335,10 +335,20 @@ namespace Drive_LFSS.Game_
             }
             
         }
+        internal void ProcessPLAPacket(PacketPLA packet)
+        {
+            if(packet.action == Pit_Lane_Action.EXIT)
+                isInPit = false;
+        }
+        internal void ProcessPITPacket(PacketPIT packet)
+        {
+            isInPit = true;
+        }
         internal void ProcessEnterGarage()                //When a car enter garage.
         {
             LeaveTrack();
         }
+
 
         private bool isTimeDiffDisplay = true;
         private bool isTimeDiffSplit = true;
@@ -490,6 +500,7 @@ namespace Drive_LFSS.Game_
         
         private static uint TIMER_MOVING_CHECK = 300;
         private uint timerMovingCheck = 0;
+        private bool IdleWarningSend = false;
         
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
@@ -560,9 +571,40 @@ namespace Drive_LFSS.Game_
                     timerMovingCheck -= diff;
 
                 if (!isMoving)
+                {
                     timeIldeOnTrack += diff;
-            }
+                    
+                    if(timeIldeOnTrack > 10000)
+                    {
+                        uint _timeIldeOnTrack = timeIldeOnTrack - 10000;
 
+                        IdleWarningSend = true;
+
+                        if (_timeIldeOnTrack > 18000)
+                        {
+                            IdleWarningSend = false;
+                            RemoveButton(Button_Entry.INFO_2);
+                            iSession.SendMSTMessage("/spec "+driverName);
+                        }
+                        else if (_timeIldeOnTrack > 14000)
+                            SendUpdateButton(Button_Entry.INFO_2, "^1Idle Time ^7" + Math.Round(((double)timeIldeOnTrack / 1000.0d), 1));
+                        else if (_timeIldeOnTrack > 7000)
+                            SendUpdateButton(Button_Entry.INFO_2, "^3Idle Time ^7" + Math.Round(((double)timeIldeOnTrack / 1000.0d), 1));
+                        else
+                            SendUpdateButton(Button_Entry.INFO_2, "^2Idle Time ^7" + Math.Round(((double)timeIldeOnTrack / 1000.0d), 1));
+                    }
+                }
+                else if (IdleWarningSend)
+                {
+                    IdleWarningSend = false;
+                    RemoveButton(Button_Entry.INFO_2);
+                }
+            }
+            else if (IdleWarningSend)
+            {
+                IdleWarningSend = false;
+                RemoveButton(Button_Entry.INFO_2);
+            }
 
             if (warningDrivingCancelTimer > 0)
             {

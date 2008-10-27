@@ -1007,6 +1007,32 @@ namespace Drive_LFSS.Game_
             }
             driverList[index].ProcessFLGPacket(_packet);
         }
+        protected sealed override void processPacket(PacketPLA _packet)
+        {
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
+            byte index = GetCarIndex(_packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketPLA), we can find any driver with this car.\r\n");
+                return;
+            }
+            driverList[index].ProcessPLAPacket(_packet);
+        }
+        protected sealed override void processPacket(PacketPIT _packet)
+        {
+            #if DEBUG
+            base.processPacket(_packet); //Keep the Log
+            #endif
+            byte index = GetCarIndex(_packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketPIT), we can find any driver with this car.\r\n");
+                return;
+            }
+            driverList[index].ProcessPITPacket(_packet);
+        }
     }
 }
 

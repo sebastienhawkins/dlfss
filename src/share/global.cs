@@ -310,14 +310,14 @@ namespace Drive_LFSS.Definition_
         PENALTY_REASON_STOP_SHORT = 5,
         PENALTY_REASON_MAX = 7,
     }
-    public enum Pit_Lane_State : byte
+    public enum Pit_Lane_Action : byte
     {
-        PITLANE_STATE_EXIT = 0,
-        PITLANE_STATE_ENTER = 1,
-        PITLANE_STATE_NO_PURPOSE = 2,
-        PITLANE_STATE_DRIVE_THOUGHT_PENALITY = 3,
-        PITLANE_STATE_PITSTOP_PENALITY = 4,
-        PITLANE_STATE_NUM = 5
+        EXIT = 0,
+        ENTER = 1,
+        NO_PURPOSE = 2,
+        DRIVE_THOUGHT_PENALITY = 3,
+        PITSTOP_PENALITY = 4,
+        MAX = 5
     }
 
     public enum Vote_Action : byte
@@ -399,7 +399,7 @@ namespace Drive_LFSS.Definition_
         ISB_RMB = 2,
         ISB_SHIFT = 8
     }
-    public enum Flag_Race : ushort
+    public enum Flag_Race : byte
     {
         NONE = 0,
         BLUE = 1,
@@ -407,7 +407,6 @@ namespace Drive_LFSS.Definition_
         LAG = 32,
         FIRST = 64,
         LAST = 128,
-        RACING = 512,
     }
     public enum InSim_Flag : byte
     {
