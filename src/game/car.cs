@@ -435,7 +435,7 @@ namespace Drive_LFSS.Game_
             else
             {
                 if (!ISession.IsFreezeMotdSend())
-                    ISession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")+"^2 with ^7" + carPrefix);
+                    ISession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")/*+"^2 with ^7" + carPrefix*/);
                 //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
             }
             
