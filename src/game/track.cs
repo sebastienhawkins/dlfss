@@ -77,7 +77,7 @@ namespace Drive_LFSS.Game_
                 case Vote_Action.VOTE_QUALIFY:
                 case Vote_Action.VOTE_END:
                 {
-                    if (((Race)this).GetGuid() != 0)
+                    if (((Race)this).GetGuid() != 0 && ((IRace)this).GetCarCount() > 1)
                     {
                         IDriver driver = ((Race)this).ISession.GetDriverWithConnectionId(connectionId);
                         if (driver != null)
