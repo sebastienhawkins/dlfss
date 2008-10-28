@@ -152,6 +152,6 @@ UPDATE `lap_data` SET time_best_lap=0 WHERE < 5000;
 
 SELECT `track_prefix` As myTrack,`car_prefix` As myCar,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank` As myTotal,(SELECT COUNT(`total_rank`) FROM `stats_rank_driver` WHERE `track_prefix`=`myTrack` AND `car_prefix`=`myCar` AND `total_rank` > `myTotal`) As Position FROM `stats_rank_driver` WHERE `licence_name`='greenseed';
 
-
+UPDATE `stats_rank_driver` SET `total_rank`= IF(`best_lap_rank`>0 AND `average_lap_rank`>0,`best_lap_rank`+`average_lap_rank`+`race_win_rank`,0) ;
 
 

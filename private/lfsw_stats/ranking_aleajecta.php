@@ -41,11 +41,13 @@ while ($row = mysql_fetch_array($result))
 {
 	array_push($licenceNames,$row[0]);
 }
-mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Oct^2/^726' WHERE `entry`IN(57)",$link);
+mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Oct^2/^728' WHERE `entry`IN(57)",$link);
 
 
 foreach($licenceNames as $licenceName)
 {
+	//if(!strstr($licenceName,"OBP 55"))
+	//	continue;
 	echo "Driver_Guid: $licenceName\n";
 	$driverGuids = "";
 	$result = mysql_query("SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName'" ,$link);
@@ -59,9 +61,13 @@ foreach($licenceNames as $licenceName)
 	{
 		if(strstr($trackName,"AU") ) //later do this for Drag rank...
 			continue;
-			
+		
+		//if(!strstr($trackName,"BL1") ) //later do this for Drag rank...
+		//	continue;
 		foreach($carPrefixs as $carPrefix)
 		{
+			//if(!strstr($carPrefix,"FBM") ) //later do this for Drag rank...
+			//	continue;
 			
 			if(!isset($wr[$trackName][$carPrefix]))
 			{
@@ -153,12 +159,12 @@ foreach($licenceNames as $licenceName)
 			{
 				$driverAverageS = ( $average/$driverAverage*9999);
 				$driverAverageS = $driverAverageS-(((9999)-$driverAverageS)*2);
-				$driverAverageS = $driverAverageS * 5000 / 9999;
+				$driverAverageS = $driverAverageS * 4999 / 9999;
 				$driverAverageS = (int)$driverAverageS ;
 
-				$driverStabilityS = ($driverBest / $driverAverage *5000);
-				$driverStabilityS = $driverStabilityS-(((4950)-$driverStabilityS)*2); //Gave +50 point for sure
-				$driverStabilityS = $driverStabilityS * 2500 / 5000;
+				$driverStabilityS = ($driverBest / $driverAverage *9999);
+				$driverStabilityS = $driverStabilityS-(((9999)-$driverStabilityS)*2);
+				$driverStabilityS = $driverStabilityS * 4999 / 9999;
 				$driverStabilityS = (int)$driverStabilityS ;
 			}
 			else
@@ -171,7 +177,7 @@ foreach($licenceNames as $licenceName)
 			//if ($result && ($row = mysql_fetch_array($result))) 
 			//	$driverWinS = $row[0];
 			//else
-				$driverWinS = 0;
+			$driverWinS = 0;
 
 			$query = "SELECT `race`.`finish_order`,`race`.`race_laps`,`driver_lap`.`total_time`
 			FROM `driver_lap`,`race`
@@ -192,7 +198,9 @@ foreach($licenceNames as $licenceName)
 				$datas = split(" ",$row[0]);
 				$driverCount = count($datas);
 				$averageLapTime = $row[2]/$row[1];
-				$winK = $driverCount + (($bestEver-$averageLapTime)/$bestEver*100) - 5;
+				$lapRatio = ($row[1]+20) / 2;
+				$lapRatio = ($lapRatio * 20 / 100)-2;
+				$winK = ($driverCount + ((($bestEver+3000)-$averageLapTime)/($bestEver+3000)*100) - 5)+$lapRatio;
 //				- (($averageLapTime - $bestEver)/1000)) * (16-$driverCount)))/50;
 				$itr = 0;
 				foreach($datas as $itr => $value)
@@ -203,14 +211,14 @@ foreach($licenceNames as $licenceName)
 						$_driverWinS = $winK + $driverCount-$itr + 1;
 						if($_driverWinS > 0)
 								$driverWinS += $_driverWinS ;
-						echo "$winK | $averageLapTime | $bestEver | $driverCount position: $itr | $_driverWinS | $driverWinS\n";
+						echo "$trackName | $carPrefix | $winK | $averageLapTime | $bestEver | $driverCount position: $itr | $_driverWinS | $driverWinS\n";
 						break;
 					}
 				}
 			}
 			
 
-			$rank = (int)(($driverBestS + ($driverBestS/2)) + ($driverAverageS+($driverAverageS/5))+ $driverStabilityS + $driverWinS);
+			$rank = (int)(($driverBestS + ($driverBestS/2)) + ($driverAverageS+($driverAverageS/5))/*+ $driverStabilityS*/ + $driverWinS);
 			if($rank < 0)
 				$rank = 0;
 			

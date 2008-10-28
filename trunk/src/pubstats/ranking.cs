@@ -148,22 +148,22 @@ namespace Drive_LFSS.Ranking_
         }
         public string GetGradeComment()
         {
-            if (total > 20000)   // 17125 x
-                return "is a \"^7incredible^2\" driver";
-            if (total > 18200)   // 15700 a+
-                return "is a \"^7impressive^2\" driver";
-            if (total > 17213)   // 14713 a
+            if (total > 14640)   // 17125 x
+                return "is the \"^7ultimate^2\" driver";
+            if (total > 13972)   // 15700 a+
                 return "is a \"^7superior^2\" driver";
-            if (total > 16499)   // 14113 a-
-                return "is a \"^7excellent^2\" driver";
-            if (total > 15956)   // 13456 b+
-                return "is a \"^7fine\"^2 driver";
-            if (total > 15374)  // 12874 b
+            if (total > 13213)   // 14713 a
+                return "is a \"^7execlent^2\" driver";
+            if (total > 12399)   // 14113 a-
+                return "is a \"^7fine^2\" driver";
+            if (total > 11156)   // 13456 b+
+                return "is a \"^7good\"^2 driver";
+            if (total > 10000)  // 12874 b
                 return "is a \"^7classic^2\" driver";
-            if (total > 14517)  // 12017 b-
-                return "is a \"^7slow^2\" driver";
+            if (total > 9517)  // 12017 b-
+                return "is a \"^7sunday^2\" driver";
             
-            return "is a \"^7very slow^2\" driver";
+            return "is a \"^slow^2\" driver";
         }
         public string[] GetRankGuiString
         {

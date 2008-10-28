@@ -69,7 +69,7 @@ namespace Drive_LFSS.Game_
         {
             EndRestart(); //feature auto restart
             driverToPosition.Clear();
-            carWeWaitForFinish.Clear();
+            lock(carWeWaitForFinish){carWeWaitForFinish.Clear();}
             gridOrder = "";
             carCount = packet.carCount;
             uint driverGuid;
@@ -81,7 +81,7 @@ namespace Drive_LFSS.Game_
                     driverGuid = 0;
                 else
                 {
-                    carWeWaitForFinish.Add(itr);
+                    lock (carWeWaitForFinish) { carWeWaitForFinish.Add(packet.carIds[itr]); }
                     driverGuid = driver.GetGuid();
                 }
 
@@ -171,8 +171,11 @@ namespace Drive_LFSS.Game_
             if ( (packet.requestId == 2 && raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_QUALIFY)
                 || packet.confirmMask != Confirm_Flag.CONFIRM_NONE)
             {
-                if(carWeWaitForFinish.Contains(packet.carId))
-                    carWeWaitForFinish.Remove(packet.carId);
+                lock (carWeWaitForFinish)
+                {
+                    if(carWeWaitForFinish.Contains(packet.carId))
+                        carWeWaitForFinish.Remove(packet.carId);
+                }
                     
                 IDriver driver = iSession.GetCarId(packet.carId);
                 if(driver == null) //Probaly return from a network failure and driver got disconnected during the failure, we will cancel this result.
@@ -199,9 +202,11 @@ namespace Drive_LFSS.Game_
         }
         internal void ProcessCarLeaveRace(CarMotion car)
         {
-            if( carWeWaitForFinish.Contains(car.CarId) )
-                carWeWaitForFinish.Remove(car.CarId);
-            
+            lock(carWeWaitForFinish)
+            {
+                if( carWeWaitForFinish.Contains(car.CarId) )
+                    carWeWaitForFinish.Remove(car.CarId);
+            }
             RemoveFromGrid(car);
         }
         internal void ProcessCarJoinRace(CarMotion car)
@@ -339,7 +344,6 @@ namespace Drive_LFSS.Game_
                 if((timeTotalFromFirstRES+pcDiff) <= timeTotal*10)
                 {
                     iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
-                    timeTotalFromFirstRES = 0;
                     if(guid != 0)//In case we got all resulty before apply this.
                         FinishRace();
                 }
@@ -400,6 +404,9 @@ namespace Drive_LFSS.Game_
             {
                 if (guid != 0 )
                 {
+                    if (raceInProgressStatus == Race_In_Progress_Status.RACE_PROGRESS_RACING && HasAllResult())
+                        FinishRace();
+ 
                     if(stateHasChange)
                     {
                         if ((raceSaveInterval += diff) >= SAVE_INTERVAL)
@@ -411,15 +418,15 @@ namespace Drive_LFSS.Game_
                             Program.dlfssDatabase.Unlock();
                         }
                     }
+                    
                 }
-                
- 
+
                 if (requestGTHInterval < diff)
                 {
                     PacketTiny packetTiny = new PacketTiny(1, Tiny_Type.TINY_GTH);
                     Packet packet = new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, packetTiny);
                     ((Session)iSession).AddToTcpSendingQueud(packet);
-                    requestGTHInterval = 5000;
+                    requestGTHInterval = 1000;
                 }
                 else
                     requestGTHInterval -= diff;
@@ -500,6 +507,10 @@ namespace Drive_LFSS.Game_
         {
             return guid;
         }
+        public byte GetCarCount()
+        {
+            return carCount;
+        }
         public string GetTrackPrefix()
         {
             return trackPrefix;
@@ -516,6 +527,9 @@ namespace Drive_LFSS.Game_
         }
         private void FinishRace()
         {
+            if (timeTotalFromFirstRES == 0) //This can be multithread call, so we ensure the other thread exit.
+                return;
+
             //iSession.SendFlagRaceToAll((ushort)Gui_Entry.FLAG_BLACK_NO_SCORE, 5000);
             timeTotalFromFirstRES = 0;
             iSession.RemoveButtonToAll((ushort)Button_Entry.INFO_1);
@@ -541,10 +555,11 @@ namespace Drive_LFSS.Game_
                                 if(driver.GetCurrentWRTime() != 0 && driver.LapCountTotalLastRace > 0)
                                 {
                                     //int posScore = (driverCount / 2) - itr + 1;//+1 is position 0 become 1 ...
-                                    int averageLapTime = (int)(driver.TimeTotalLastRace / driver.LapCountTotalLastRace);
-                                    int bestEver = (int)driver.GetCurrentWRTime();
-
-				                    winScore = driverCount + ((bestEver-averageLapTime)/bestEver*100.0d)-5; // -5 , is the min factor
+                                    double averageLapTime = driver.TimeTotalLastRace / driver.LapCountTotalLastRace;
+                                    double bestEver = driver.GetCurrentWRTime() + 3000.0d;
+                                    double lapRatio = (((driver.LapCountTotalLastRace+20.0d)/2.0d)*20.0d/100.0d)-2.0d;
+                                    
+				                    winScore = (driverCount + ((bestEver-averageLapTime)/bestEver*100.0d)-5.0d)+lapRatio; // -5 , is the min factor
 					                winScore += driverCount-itr+1;
                                     if (winScore < 0)
                                         winScore = 0;
@@ -600,7 +615,7 @@ namespace Drive_LFSS.Game_
         }
         private bool HasAllResult()
         {
-            return (carWeWaitForFinish.Count == 0);
+            return (carWeWaitForFinish.Count == 0 && carCount > 0);
         }
         private uint GetFirstRESTimePc(uint percentage)
         {

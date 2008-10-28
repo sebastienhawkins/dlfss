@@ -312,12 +312,10 @@ namespace Drive_LFSS.Game_
                 else if(packet.blueOrYellow == Flag_Race.YELLOW)
                 {
                     yellowFlagActive = true;
-                    SendFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL, 60000);
+                    SendFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL, 13000);
                     lap.YellowFlagCount++;
                     if(warningDrivingCancelTimer == 0 && warningDrivingType == Warning_Driving_Type.VICTIM)
-                    {
                         SendCancelWarningDriving();
-                    }
                 }
             }
             else
@@ -373,6 +371,8 @@ namespace Drive_LFSS.Game_
         private int totalRaceFinishCount = 0;
         private uint driftScoreByTime = 0;
         private uint driftScoreTimer = 0;
+        private uint timeIldeOnTrack = 0;
+        private uint timeYellowFlag = 0;
         private const uint DRIFT_SCORE_TIMER = 40000;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
         internal Driver_Flag driverMask = Driver_Flag.NONE;
@@ -498,9 +498,9 @@ namespace Drive_LFSS.Game_
 
         private static uint TIMER_WARNING_DRIVING_CHECK = 3000;
         
-        private static uint TIMER_MOVING_CHECK = 300;
-        private uint timerMovingCheck = 0;
-        private bool IdleWarningSend = false;
+        private static uint TIMER_300_CHECK = 300;
+        private uint timer300Check = 0;
+        private bool yellowTimeSend = false;
         
         private static uint SAVE_INTERVAL = 60000;
         private uint driverSaveInterval = 0;
@@ -547,63 +547,56 @@ namespace Drive_LFSS.Game_
                     driftScoreByTime = 0;
                 }
             }
+            if(!IsMoving())
+                timeIldeOnTrack += diff;
+            else
+                timeIldeOnTrack = 0;    
             
+            if ((flagRace&Flag_Race.YELLOW) == Flag_Race.YELLOW)
+                timeYellowFlag += diff;
+            else if (timeYellowFlag > 0)
+                timeYellowFlag = 0;
+ 
             if (IsOnTrack())
             {
-                if(timerMovingCheck < diff)
+                if(timer300Check < diff)
                 { 
-                    timerMovingCheck = TIMER_MOVING_CHECK;
-                    if(x == xOld && y == yOld)
-                    {
-                        if(isMoving)
-                            isMoving = false;
-                    }
-                    else
-                    {
+                    //Idle Check
+                    timer300Check = TIMER_300_CHECK;
+                    if (x == xOld && y == yOld && isMoving)
+                       isMoving = false;
+                    else if(!isMoving)
                         isMoving = true;
-                        timeIldeOnTrack = 0;
-                    }
-                    
                     xOld = x;
                     yOld = y;
-                }
-                else
-                    timerMovingCheck -= diff;
-
-                if (!isMoving)
-                {
-                    timeIldeOnTrack += diff;
                     
-                    if(timeIldeOnTrack > 10000)
+                    
+                    //Yellow Time Check
+                    if (timeYellowFlag > 3000)
                     {
-                        uint _timeIldeOnTrack = timeIldeOnTrack - 10000;
+                        yellowTimeSend = true;
 
-                        IdleWarningSend = true;
-
-                        if (_timeIldeOnTrack > 18000)
+                        if (timeYellowFlag > 16000)
                         {
-                            IdleWarningSend = false;
+                            yellowTimeSend = false;
                             RemoveButton(Button_Entry.INFO_2);
-                            iSession.SendMSTMessage("/spec "+driverName);
+                            iSession.SendMSTMessage("/spec " + driverName);
                         }
-                        else if (_timeIldeOnTrack > 14000)
-                            SendUpdateButton(Button_Entry.INFO_2, "^1Idle Time ^7" + Math.Round(((double)timeIldeOnTrack / 1000.0d), 1));
-                        else if (_timeIldeOnTrack > 7000)
-                            SendUpdateButton(Button_Entry.INFO_2, "^3Idle Time ^7" + Math.Round(((double)timeIldeOnTrack / 1000.0d), 1));
+                        else if (timeYellowFlag > 11000)
+                            SendUpdateButton(Button_Entry.INFO_2, "^1Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
+                        else if (timeYellowFlag > 6000)
+                            SendUpdateButton(Button_Entry.INFO_2, "^3Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
                         else
-                            SendUpdateButton(Button_Entry.INFO_2, "^2Idle Time ^7" + Math.Round(((double)timeIldeOnTrack / 1000.0d), 1));
+                            SendUpdateButton(Button_Entry.INFO_2, "^2Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
+                    }
+                    else if (yellowTimeSend && !yellowFlagActive)
+                    {
+                        yellowTimeSend = false;
+                        RemoveButton(Button_Entry.INFO_2);
                     }
                 }
-                else if (IdleWarningSend)
-                {
-                    IdleWarningSend = false;
-                    RemoveButton(Button_Entry.INFO_2);
-                }
-            }
-            else if (IdleWarningSend)
-            {
-                IdleWarningSend = false;
-                RemoveButton(Button_Entry.INFO_2);
+                else
+                    timer300Check -= diff;
             }
 
             if (warningDrivingCancelTimer > 0)

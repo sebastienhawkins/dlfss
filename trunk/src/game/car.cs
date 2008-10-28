@@ -56,6 +56,20 @@ namespace Drive_LFSS.Game_
             featureAcceleration.Update(this);
             featureDriftScore.Update(this);
         }
+        private void SimulateLastMCI()
+        {
+            node = 0;
+            lapCompleted = 0;
+            racePosition = 0;
+            flagRace = 0;
+            x = 0.0d;
+            y = 0.0d;
+            z = 0.0d;
+            tracjectory = 0;
+            orientation = 0;
+            orientationSpeed = 0;
+            speedMs = 0.0d;
+        }
         private byte carId = 0;
         private string carPrefix = "";
         private string trackPrefix = "";
@@ -87,7 +101,6 @@ namespace Drive_LFSS.Game_
         private bool isOnTrack = false;
         private bool isInPit = false;
         private bool isMoving = false;
-        private uint timeIldeOnTrack = 0;
         private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
         private FeatureDriftScore featureDriftScore = new FeatureDriftScore();
 
@@ -452,14 +465,14 @@ namespace Drive_LFSS.Game_
         }
         internal void LeaveTrack()
         {
-            isMoving = false;
+            SimulateLastMCI();
             isOnTrack = false;
             SendBanner();
             SendTrackPrefix();
         }
         public bool IsOnTrack()
         {
-            return (carId > 0 && isOnTrack && !isInPit && iSession.GetRaceGuid() != 0);
+            return (carId > 0 && isOnTrack);
         }
         public byte CarId
         {
