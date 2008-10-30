@@ -47,6 +47,7 @@ namespace Drive_LFSS.Server_
            command["result"] = new CommandName(0, new CommandDelegate(Result));
            command["say"] = new CommandName(1, new CommandDelegate(Say));
            command["badword"] = new CommandName(2, new CommandDelegate(BadWord));
+           command["end"] = new CommandName(1, new CommandDelegate(EndRace));
         }
         ~CommandInGame()
         {
@@ -345,6 +346,10 @@ namespace Drive_LFSS.Server_
             Program.dlfssDatabase.Unlock();
             
             driver.AddMessageMiddle("^2Add^7/^2Update ^3badword ^7:^2 '^3"+args[1].Replace("%"," ")+"^2' with flag^7=^3"+args[2], DISPLAY_TIME);
+        }
+        private void EndRace(Driver driver, string[] args)
+        {
+            driver.ISession.EndRace();
         }
         #endregion
     }

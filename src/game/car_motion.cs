@@ -41,5 +41,6 @@ namespace Drive_LFSS.Game_
         void SetWarningDrivingCheck(Warning_Driving_Type _warningDrivingType, byte referenceCarId);
         bool IsYellowFlagActive();
         bool IsBlueFlagActive();
+        void TrySendCancelWarning();
     }
 }

@@ -399,11 +399,6 @@ namespace Drive_LFSS.Game_
         }
 
 
-        /*public void FinishRace() //this serve nothing, was to make a script call when car finish a race
-        {
-            if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
-                return;
-        }*/
         private void EnterPit()
         {
             
@@ -441,26 +436,22 @@ namespace Drive_LFSS.Game_
             Rank _rank = GetRank(ISession.GetRaceTrackPrefix(),CarPrefix);
             if(_rank != null)
             {
-                if (!ISession.IsFreezeMotdSend())
-                    ISession.SendMSTMessage("/msg "+driverName+" ^2" + _rank.GetGradeComment() /*+ "^2 with ^7" + carPrefix*/);
+                if (!iSession.IsFreezeMotdSend())
+                    iSession.SendMSTMessage("/msg "+driverName+" ^2" + _rank.GetGradeComment() /*+ "^2 with ^7" + carPrefix*/);
                 //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
             }
             else
             {
-                if (!ISession.IsFreezeMotdSend())
-                    ISession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")/*+"^2 with ^7" + carPrefix*/);
+                if (!iSession.IsFreezeMotdSend())
+                    iSession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")/*+"^2 with ^7" + carPrefix*/);
                 //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
             }
             
             if(!IsBot())
             {
-                float pctBad = ((float)badDrivingCount / (totalRaceFinishCount > 0 ? (float)totalRaceFinishCount : 1.0f));
-                pctBad *= 100.0f;
-                pctBad = 101.0f - pctBad;
-                if(pctBad > 100.0f)
-                    pctBad = 100.0f;
-                if (!ISession.IsFreezeMotdSend())
-                    ISession.SendMSTMessage("/msg ^2    and '^7" + Math.Round(pctBad,0) + "%^2' safe.");
+                SetSafePct();
+                if (!iSession.IsFreezeMotdSend())
+                    iSession.SendMSTMessage("/msg ^2    and '^7" + Math.Round(safePct,0) + "%^2' safe.");
             }
         }
         internal void LeaveTrack()

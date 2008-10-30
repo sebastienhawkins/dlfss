@@ -125,45 +125,41 @@ namespace Drive_LFSS.Ranking_
         }
         public string GetGrade()
         {
-            if (total > 20000)   // 17125 x
-                return "x";
-            if (total > 18200)   // 15700 a+
+            if (total > 14640)   // 17125 x
                 return "a+";
-            if (total > 17213)   // 14713 a
+            if (total > 13972)   // 15700 a+
                 return "a";
-            if (total > 16499)   // 14113 a-
+            if (total > 13213)   // 14713 a
                 return "a-";
-            if (total > 15956)   // 13456 b+
-                return "b+";
-            if (total > 15374)  // 12874 b
+            if (total > 12399)   // 14113 a-
                 return "b";
-            if (total > 14517)  // 12017 b-
-                return "b-";
-            if (total > 14000)  // 11500 c+
-                return "c+";
-            if(total > 13500)    // 10000 c
+            if (total > 11156)   // 13456 b+
                 return "c";
+            if (total > 10000)  // 12874 b
+                return "d+";
+            if (total > 9517)  // 12017 b-
+                return "d";
 
-            return "c-";
+            return "d-";
         }
         public string GetGradeComment()
         {
             if (total > 14640)   // 17125 x
-                return "is the \"^7ultimate^2\" driver";
+                return "is the \"^7ultimate(" + GetGrade() + ")^2\" driver";
             if (total > 13972)   // 15700 a+
-                return "is a \"^7superior^2\" driver";
+                return "is a \"^7superior(" + GetGrade() + ")^2\" driver";
             if (total > 13213)   // 14713 a
-                return "is a \"^7execlent^2\" driver";
+                return "is a \"^7execlent(" + GetGrade() + ")^2\" driver";
             if (total > 12399)   // 14113 a-
-                return "is a \"^7fine^2\" driver";
+                return "is a \"^7fine(" + GetGrade() + ")^2\" driver";
             if (total > 11156)   // 13456 b+
-                return "is a \"^7good\"^2 driver";
+                return "is a \"^7good(" + GetGrade() + ")\"^2 driver";
             if (total > 10000)  // 12874 b
-                return "is a \"^7classic^2\" driver";
+                return "is a \"^7classic(" + GetGrade() + ")^2\" driver";
             if (total > 9517)  // 12017 b-
-                return "is a \"^7sunday^2\" driver";
-            
-            return "is a \"^slow^2\" driver";
+                return "is a \"^7sunday(" + GetGrade() + ")^2\" driver";
+
+            return "is a \"^7slow(" + GetGrade() + ")^2\" driver";
         }
         public string[] GetRankGuiString
         {
@@ -182,6 +178,7 @@ namespace Drive_LFSS.Ranking_
         }
         internal static bool Initialize()
         {
+            return false;
             isActived = false;
             if(!LoadDriverRankedCount())
                 return false;

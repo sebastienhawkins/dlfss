@@ -42,7 +42,7 @@ namespace Drive_LFSS.Script_
         void SendFlagRaceToAll(ushort guiEntry, uint time);
         void RemoveFlagRaceToAll(ushort guiEntry);
         bool CanVote();
-        
+        void EndRace();
         void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay);
         IDriver GetDriverWithGuid(uint guid);
         IDriver GetCarId(byte carId);

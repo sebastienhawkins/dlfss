@@ -39,18 +39,22 @@ namespace Drive_LFSS.Game_
     }
     abstract class Track : ITrack
     {
+        protected Track()
+        {
+            m_race = (Race)this;
+        }
         protected virtual void ConfigApply()
         {
-            switch (Config.GetStringValue("Vote", ((IRace)this).ISession.GetSessionName(), "TrackChange").ToUpperInvariant())
+            switch (Config.GetStringValue("Vote", m_race.ISession.GetSessionName(), "TrackChange").ToUpperInvariant())
             {
                 case "USER": trackChangeBeviator = Vote_Track_Change.USER; break;
                 case "VOTE": trackChangeBeviator = Vote_Track_Change.VOTE; break;
                 case "STATIC": trackChangeBeviator = Vote_Track_Change.NO_CHANGE; break;
                 case "AUTO": trackChangeBeviator = Vote_Track_Change.AUTO; break;
-                case "SEQUENCE": trackChangeBeviator = Vote_Track_Change.SEQUENCE; break;              
-                default: Log.error("Vote System config Error, unknown Value for Vote." + ((IRace)this).ISession.GetSessionName() + ".TrackChange = " + Config.GetStringValue("Vote", ((IRace)this).ISession.GetSessionName(), "TrackChange") + "\r\n"); break;
+                case "SEQUENCE": trackChangeBeviator = Vote_Track_Change.SEQUENCE; break;
+                default: Log.error("Vote System config Error, unknown Value for Vote." + m_race.ISession.GetSessionName() + ".TrackChange = " + Config.GetStringValue("Vote", m_race.ISession.GetSessionName(), "TrackChange") + "\r\n"); break;
             }
-            raceMapEntry = (ushort)Config.GetIntValue("Vote", ((IRace)this).ISession.GetSessionName(), "RaceMap");
+            raceMapEntry = (ushort)Config.GetIntValue("Vote", m_race.ISession.GetSessionName(), "RaceMap");
             raceMap.Clear();
             if(raceMapEntry > 0)
             {
@@ -77,14 +81,14 @@ namespace Drive_LFSS.Game_
                 case Vote_Action.VOTE_QUALIFY:
                 case Vote_Action.VOTE_END:
                 {
-                    if (((Race)this).GetGuid() != 0 && ((IRace)this).GetCarCount() > 1)
+                    if (m_race.GetGuid() != 0 && m_race.GetCarCount() > 1)
                     {
-                        IDriver driver = ((Race)this).ISession.GetDriverWithConnectionId(connectionId);
+                        IDriver driver = m_race.ISession.GetDriverWithConnectionId(connectionId);
                         if (driver != null)
                         {
-                            if (!((Race)this).StartGridHasDriverGuid(driver.GetGuid()))
+                            if (m_race.HasRacerOn() && !m_race.IsStillRacing(((ICar)driver).CarId))
                             {
-                                ((IButton)driver).AddMessageMiddle("^7O^3nly ^2start grid ^3player can ^2restart^3/^2end^3/^2qualify ^3during a race",7000);
+                                ((IButton)driver).AddMessageMiddle("^7O^3nly ^2grid/racing ^3player can ^2restart^3/^2end^3/^2qualify ^3during a race",7000);
                                 SendVoteCancel();
                             }
                         }
@@ -99,12 +103,12 @@ namespace Drive_LFSS.Game_
             }
             if (voteInProgress)
             {
-                ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_1, connectionId);
-                ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_2, connectionId);
-                ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_3, connectionId);
-                ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_4, connectionId);
-                ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_5, connectionId);
-                ((IRace)this).ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, connectionId);
+                m_race.ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_1, connectionId);
+                m_race.ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_2, connectionId);
+                m_race.ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_3, connectionId);
+                m_race.ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_4, connectionId);
+                m_race.ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_5, connectionId);
+                m_race.ISession.RemoveButton((ushort)Button_Entry.VOTE_OPTION_6, connectionId);
             }
         }
         internal void ProcessVoteCancel()
@@ -124,7 +128,8 @@ namespace Drive_LFSS.Game_
 
         protected Vote_Track_Change trackChangeBeviator = Vote_Track_Change.USER;
         protected ushort raceMapEntry = 0;
-
+        
+        Race m_race;
         protected List<ushort> raceMap = new List<ushort>();
         protected int raceMapStaticItr = 0;
         private Dictionary<ushort, byte> voteOptions = new Dictionary<ushort, byte>();
@@ -146,7 +151,7 @@ namespace Drive_LFSS.Game_
         {
             if (voteTimer != 0)
             {
-                if (voteTimer <= diff || voteCount >= ((IRace)this).ISession.GetNbrOfConnection())
+                if (voteTimer <= diff || voteCount >= m_race.ISession.GetNbrOfConnection())
                 {
                     voteTimer = 0;
                     EndNextTrackVote();
@@ -160,7 +165,7 @@ namespace Drive_LFSS.Game_
                         string _voteTimer = (voteTimer/100).ToString();
                         if (_voteTimer.Length > 0)
                             _voteTimer = _voteTimer.Insert(_voteTimer.Length-1, ".");
-                        ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_TITLE, "^3Next Track Vote, ^2" + _voteTimer + "^3 ms.");
+                        m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_TITLE, "^3Next Track Vote, ^2" + _voteTimer + "^3 ms.");
                         voteTimerAdvert = 300;
                     }
                     else
@@ -195,13 +200,13 @@ namespace Drive_LFSS.Game_
         public void StartNextTrackVote()
         {
             //Script Call, Before Start.
-            if (((IRace)this).ISession.Script.NextTrackVoteStarted())
+            if (m_race.ISession.Script.NextTrackVoteStarted())
                 return;
 
             voteInProgress = true;
             voteCount = 0;
             voteOptions.Clear();
-            licenceCount = ((IRace)this).ISession.GetNbrOfConnection();
+            licenceCount = m_race.ISession.GetNbrOfConnection();
 
             List<ushort> _raceMap = GetSmartRaceMap();
             ushort raceMapMax = (ushort)_raceMap.Count;
@@ -215,19 +220,19 @@ namespace Drive_LFSS.Game_
                 if (voteOptions.Count == raceMapMax)
                     break;
             }
-            ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_TITLE, "^3Next Track Vote, ^240 ^3sec.");
+            m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_TITLE, "^3Next Track Vote, ^240 ^3sec.");
             Dictionary<ushort,byte>.Enumerator itr = voteOptions.GetEnumerator();
             byte optionCount = 1;
             while(itr.MoveNext())
             {
                 switch(optionCount)
                 {
-                    case 1: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_1, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 2: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_2, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 3: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_3, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 4: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_4, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 5: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_5, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
-                    case 6: ((IRace)this).ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_6, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 1: m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_1, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 2: m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_2, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 3: m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_3, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 4: m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_4, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 5: m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_5, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
+                    case 6: m_race.ISession.SendUpdateButtonToAll((ushort)Button_Entry.VOTE_OPTION_6, "^7" + (Program.raceTemplate.GetEntry(itr.Current.Key)).Description); break;
                 }
                 optionCount++;
             }
@@ -249,15 +254,15 @@ namespace Drive_LFSS.Game_
                 }
             }
 
-            ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_TITLE);
-            ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_1);
-            ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_2);
-            ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_3);
-            ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_4);
-            ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_5);
-            ((IRace)this).ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_6);
+            m_race.ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_TITLE);
+            m_race.ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_1);
+            m_race.ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_2);
+            m_race.ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_3);
+            m_race.ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_4);
+            m_race.ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_5);
+            m_race.ISession.RemoveButtonToAll((ushort)Button_Entry.VOTE_OPTION_6);
 
-            if (((IRace)this).ISession.Script.NextTrackVoteEnded((ITrack)this,ref chosedMap))
+            if (m_race.ISession.Script.NextTrackVoteEnded((ITrack)this, ref chosedMap))
             {
                 voteInProgress = false;
                 return;
@@ -270,36 +275,36 @@ namespace Drive_LFSS.Game_
             if (trackEntry == 0)
             {
                 //Hope to never see that message, but since ppl can customize script, can happen someone let go a 0.
-                Log.error(((IRace)this).ISession.GetSessionNameForLog() + " VOTE System, PrepareNextTrack(ushort trackEntry == 0), this should never happen");
+                Log.error(m_race.ISession.GetSessionNameForLog() + " VOTE System, PrepareNextTrack(ushort trackEntry == 0), this should never happen");
                 return;
             }
             previousRaceEntry = (ushort)raceInfo.Entry;
             raceInfo = Program.raceTemplate.GetEntry(trackEntry);
-            ((IRace)this).ISession.AddMessageMiddleToAll("^7Next Track Will Be ^3" + raceInfo.Description+"^7.", 10000);
+            m_race.ISession.AddMessageMiddleToAll("^7Next Track Will Be ^3" + raceInfo.Description + "^7.", 10000);
             nextRaceTimer = 10000;
         }
         private void LoadNextTrack()
         {
-            ((IRace)this).ISession.SendMSTMessage("/select "+(raceInfo.HasRaceTemplateFlag(Race_Template_Flag.CAN_SELECT_TRACK) ? "ban" : "no"));
+            m_race.ISession.SendMSTMessage("/select " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.CAN_SELECT_TRACK) ? "ban" : "no"));
             if (raceInfo.TrackEntry != 0)
-                ((IRace)this).ISession.SendMSTMessage("/track " + Program.trackTemplate.GetEntry(raceInfo.TrackEntry).NamePrefix);
-            ((IRace)this).ISession.SendMSTMessage("/qual " + raceInfo.QualifyMinute);
-            ((IRace)this).ISession.SendMSTMessage("/laps " + raceInfo.LapCount);
-            ((IRace)this).ISession.SendMSTMessage("/weather " + (byte)raceInfo.Weather);
-            ((IRace)this).ISession.SendMSTMessage("/wind " + (byte)raceInfo.Wind);
-            ((IRace)this).ISession.SendMSTMessage("/rstend 0");
-            ((IRace)this).ISession.SendMSTMessage("/vote " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.CAN_VOTE) ? "yes" : "no"));
-            
-            ((IRace)this).ISession.SendMSTMessage("/autokick "+(raceInfo.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_BAN) ? "ban" : "no"));
-            ((IRace)this).ISession.SendMSTMessage("/autokick "+(raceInfo.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_KICK) ? "kick" : "no"));
-            ((IRace)this).ISession.SendMSTMessage("/autokick "+(raceInfo.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_SPEC) ? "spec" : "no"));
+                m_race.ISession.SendMSTMessage("/track " + Program.trackTemplate.GetEntry(raceInfo.TrackEntry).NamePrefix);
+            m_race.ISession.SendMSTMessage("/qual " + raceInfo.QualifyMinute);
+            m_race.ISession.SendMSTMessage("/laps " + raceInfo.LapCount);
+            m_race.ISession.SendMSTMessage("/weather " + (byte)raceInfo.Weather);
+            m_race.ISession.SendMSTMessage("/wind " + (byte)raceInfo.Wind);
+            m_race.ISession.SendMSTMessage("/rstend 0");
+            m_race.ISession.SendMSTMessage("/vote " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.CAN_VOTE) ? "yes" : "no"));
 
-            ((IRace)this).ISession.SendMSTMessage("/clear");
-            ((IRace)this).ISession.SendMSTMessage("/cruise " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
-            ((IRace)this).ISession.SendMSTMessage("/canreset " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.CAN_RESET) ? "yes" : "no"));
-            ((IRace)this).ISession.SendMSTMessage("/fcv " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.FORCE_COCKPIT_VIEW) ? "yes" : "no"));
-            ((IRace)this).ISession.SendMSTMessage("/midrace " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.MID_RACE_JOIN) ? "yes" : "no"));
-            ((IRace)this).ISession.SendMSTMessage("/mustpit " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.MUST_PIT) ? "yes" : "no"));
+            m_race.ISession.SendMSTMessage("/autokick " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_BAN) ? "ban" : "no"));
+            m_race.ISession.SendMSTMessage("/autokick " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_KICK) ? "kick" : "no"));
+            m_race.ISession.SendMSTMessage("/autokick " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.AUTO_KICK_SPEC) ? "spec" : "no"));
+
+            m_race.ISession.SendMSTMessage("/clear");
+            m_race.ISession.SendMSTMessage("/cruise " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.ALLOW_WRONG_WAY) ? "yes" : "no"));
+            m_race.ISession.SendMSTMessage("/canreset " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.CAN_RESET) ? "yes" : "no"));
+            m_race.ISession.SendMSTMessage("/fcv " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.FORCE_COCKPIT_VIEW) ? "yes" : "no"));
+            m_race.ISession.SendMSTMessage("/midrace " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.MID_RACE_JOIN) ? "yes" : "no"));
+            m_race.ISession.SendMSTMessage("/mustpit " + (raceInfo.HasRaceTemplateFlag(Race_Template_Flag.MUST_PIT) ? "yes" : "no"));
 
             string carPrefix = "";
             if(raceInfo.CarEntryAllowed.IndexOf("all",StringComparison.InvariantCultureIgnoreCase) != -1)
@@ -311,16 +316,16 @@ namespace Drive_LFSS.Game_
                     carPrefix += Program.carTemplate.GetEntry(Convert.ToUInt32(carEntrys[itr])).NamePrefix + "+";
                 carPrefix = carPrefix.TrimEnd(new char[] { '+' });
             }
-            ((IRace)this).ISession.SendMSTMessage("/cars " + carPrefix);
+            m_race.ISession.SendMSTMessage("/cars " + carPrefix);
         }
         protected void EndRace()
         {
             doEnd = true;
-            ((IRace)this).ISession.SendMSTMessage("/end");
+            m_race.ISession.SendMSTMessage("/end");
         }
         protected void SendVoteCancel()
         {
-            ((Session)((IRace)this).ISession).AddToTcpSendingQueud
+            ((Session)m_race.ISession).AddToTcpSendingQueud
             (new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE,
                     new PacketTiny(1, Tiny_Type.TINY_VTC)));
         }
