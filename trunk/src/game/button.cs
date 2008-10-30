@@ -33,6 +33,7 @@ namespace Drive_LFSS.Game_
         private const byte BUTTON_MAX_COUNT = 240;
         internal protected Button() 
         {
+            m_driver = (Driver)this;
         }
         ~Button() 
         {
@@ -61,6 +62,7 @@ namespace Drive_LFSS.Game_
         }
         private ushort[] buttonList = new ushort[BUTTON_MAX_COUNT];
 
+        private Driver m_driver;
         private class ButtonTimed
         {
             public ButtonTimed(ushort _buttonEntry,uint _time)
@@ -139,7 +141,7 @@ namespace Drive_LFSS.Game_
 
         private uint timerBufferedButton = 0;
         private const uint TIMER_BUFFERED_BUTTON = 150;
-        private const uint MAX_BUTTON_BY_CYCLE = 16;
+        private const uint MAX_BUTTON_BY_CYCLE = 10;
         private const uint TIMER_FLAG_RACE_UPDATE = 1000;
         private uint timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
         protected virtual void update(uint diff)
@@ -153,7 +155,7 @@ namespace Drive_LFSS.Game_
                     int buttonBufferCount = bufferButtonPacket.Count;
                     for(byte count = 0; count < buttonBufferCount ; count++)
                     {
-                        ((Session)((Driver)this).ISession).AddToTcpSendingQueud(bufferButtonPacket.Dequeue());
+                        ((Session)m_driver.ISession).AddToTcpSendingQueud(bufferButtonPacket.Dequeue());
                         if(count >= MAX_BUTTON_BY_CYCLE)
                             break;
                     }
@@ -229,7 +231,7 @@ namespace Drive_LFSS.Game_
             if (timerFlagRaceUpdate < diff)
             {
                 timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
-                lock(flagRaceGui)
+                lock (flagRaceGui)
                 {
                     bool send = false;
                     for (Gui_Entry itr = Gui_Entry.FLAG_BEGIN; itr < Gui_Entry.FLAG_MAX; itr++)
@@ -246,7 +248,7 @@ namespace Drive_LFSS.Game_
                         }
                         else if(flagRaceGui[itr] > 0)
                         {
-                            flagRaceGui[itr] = 0;
+                            flagRaceGui[itr] = 1;
                             if (currentFlagGui > 0 && currentFlagGui == itr)
                                 RemoveGui(itr);
                         }
@@ -283,7 +285,7 @@ namespace Drive_LFSS.Game_
         }
         private void SendGui(GuiTemplateInfo guiInfo)
         {
-            if (((Driver)this).IsBot())
+            if (m_driver.IsBot())
                 return;
 
             if(guiInfo.Entry >= Gui_Entry.FLAG_BEGIN && guiInfo.Entry < Gui_Entry.FLAG_MAX)
@@ -302,6 +304,7 @@ namespace Drive_LFSS.Game_
                     RemoveGui(currentGui);
                 currentGui = guiInfo.Entry;
             }
+            
             string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
             ButtonTemplateInfo buttonInfo;
             
@@ -334,7 +337,7 @@ namespace Drive_LFSS.Game_
         }
         internal void RemoveGui(Gui_Entry guiEntry)
         {
-            if (((Driver)this).IsBot())
+            if (m_driver.IsBot())
                 return;
 
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
@@ -370,7 +373,7 @@ namespace Drive_LFSS.Game_
         }
         public byte RemoveButton(ushort buttonEntry)
         {
-            if (((Driver)this).IsBot())
+            if (m_driver.IsBot())
                 return 0xFF;
 
             byte previousId;
@@ -397,7 +400,7 @@ namespace Drive_LFSS.Game_
         }
         public void AddMessageTop(string text, uint duration)
         {
-            if (((Driver)this).IsBot())  //Become Redondant with SendButton, but since they since timer better this way.
+            if (m_driver.IsBot())  //Become Redondant with SendButton, but since they since timer better this way.
                 return;
 
             lock (buttonMessageTop)
@@ -407,7 +410,7 @@ namespace Drive_LFSS.Game_
         }
         public void AddMessageMiddle(string text, uint duration)
         {
-            if (((Driver)this).IsBot()) //Become Redondant with SendButton, but since they since timer better this way.
+            if (m_driver.IsBot()) //Become Redondant with SendButton, but since they since timer better this way.
                 return;
             lock (buttonMessageMiddle)
             {
@@ -481,7 +484,7 @@ namespace Drive_LFSS.Game_
         }
         private void SendButton(byte buttonId, ushort buttonEntry, byte buttonStyleMask, bool isAllwaysVisible, byte maxTextLength, byte left, byte top, byte width, byte height, string text, string textCaption)
         {
-            if (((Driver)this).IsBot())
+            if (m_driver.IsBot())
                 return;
 
             if( buttonId == 0xFF )
@@ -549,7 +552,7 @@ namespace Drive_LFSS.Game_
         internal void SendTrackPrefix()
         {
             ButtonTemplateInfo button = Program.buttonTemplate.GetEntry((uint)Button_Entry.TRACK_PREFIX);
-            button.Text += button.Text + ((Driver)this).ISession.GetRaceTrackPrefix();
+            button.Text += button.Text + m_driver.ISession.GetRaceTrackPrefix();
             SendUpdateButton(button);
         }
         internal void RemoveTrackPrefix()
@@ -560,14 +563,14 @@ namespace Drive_LFSS.Game_
         {
             SendGui(Gui_Entry.CONFIG_USER);
             
-            SendUpdateButton(Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + ((Driver)this).GetAccelerationStartSpeed() + "^2-^7" + ((Driver)this).GetAccelerationEndSpeed() + " ^2Kmh");
-            SendUpdateButton(Button_Entry.CONFIG_USER_ACC_ON, (((Driver)this).IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
-            SendUpdateButton(Button_Entry.CONFIG_USER_DRIFT_ON, (((Driver)this).IsDriftScoreOn() ? "^7" : "^8") + " Drift Score");
-            SendUpdateButton(Button_Entry.CONFIG_USER_MAX_SPEED_ON, (((Driver)this).IsMaxSpeedDisplay ? "^7" : "^8") + " Max Speed");
+            SendUpdateButton(Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + m_driver.GetAccelerationStartSpeed() + "^2-^7" + m_driver.GetAccelerationEndSpeed() + " ^2Kmh");
+            SendUpdateButton(Button_Entry.CONFIG_USER_ACC_ON, (m_driver.IsAccelerationOn() ? "^7" : "^8") + " Acceleration");
+            SendUpdateButton(Button_Entry.CONFIG_USER_DRIFT_ON, (m_driver.IsDriftScoreOn() ? "^7" : "^8") + " Drift Score");
+            SendUpdateButton(Button_Entry.CONFIG_USER_MAX_SPEED_ON, (m_driver.IsMaxSpeedDisplay ? "^7" : "^8") + " Max Speed");
 
-            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((((Driver)this).IsTimeDiffSplitDisplay && ((Driver)this).IsTimeDiffLapDisplay) ? "^7" : "^8") + " Time Diff");
-            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (((Driver)this).IsTimeDiffLapDisplay ? "^7" : "^8") + " PB vs lap");
-            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (((Driver)this).IsTimeDiffSplitDisplay ? "^7" : "^8") + " PB vs Split");
+            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((m_driver.IsTimeDiffSplitDisplay && m_driver.IsTimeDiffLapDisplay) ? "^7" : "^8") + " Time Diff");
+            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (m_driver.IsTimeDiffLapDisplay ? "^7" : "^8") + " PB vs lap");
+            SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (m_driver.IsTimeDiffSplitDisplay ? "^7" : "^8") + " PB vs Split");
         }
         internal void RemoveConfigGui()
         {
@@ -636,11 +639,11 @@ namespace Drive_LFSS.Game_
             SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
             SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^7Current");
             
-            string trackPrefix = ((Driver)this).ISession.GetRaceTrackPrefix();
+            string trackPrefix = m_driver.ISession.GetRaceTrackPrefix();
             //uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
             SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7ALL, ^2Track:^7 "+trackPrefix+", ^2Count: ^7NA");
 
-            List<Driver> driver = ((Session)((Driver)this).ISession).GetDriverList();
+            List<Driver> driver = ((Session)m_driver.ISession).GetDriverList();
             
             ButtonTemplateInfo bName = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_NAME);
             ButtonTemplateInfo bPB = Program.buttonTemplate.GetEntry((uint)Button_Entry.RANK_PB);
@@ -859,8 +862,10 @@ namespace Drive_LFSS.Game_
             SendUpdateButton(Button_Entry.RANK_BUTTON_SEARCH,"^2Search");
             SendUpdateButton(Button_Entry.RANK_BUTTON_CURRENT,"^2Current");
 
-            string trackPrefix = ((Driver)this).ISession.GetRaceTrackPrefix();
+            string trackPrefix = m_driver.ISession.GetRaceTrackPrefix();
             string carPrefix = ((ICar)this).CarPrefix;
+            if(carPrefix == "")
+                AddMessageTop("^2Ranking ^3Top20 ^2need you to enter a car first.",6000);
             uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
             SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7"+carPrefix+", ^2Track:^7 "+trackPrefix+", ^2Count: ^7"+rankedCount);
             if(rankedCount < 1)

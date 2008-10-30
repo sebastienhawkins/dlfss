@@ -192,7 +192,6 @@ namespace Drive_LFSS.Game_
             for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].RemoveRaceFlag(guiEntry,true);
         }
-        
         public void AddMessageTopToAll(string text, uint duration)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
@@ -219,6 +218,10 @@ namespace Drive_LFSS.Game_
         public bool CanVote()
         {
             return race.CanVote();
+        }
+        public void EndRace()
+        {
+            race.EndRace();
         }
         public Script Script
         {
@@ -492,8 +495,8 @@ namespace Drive_LFSS.Game_
             }
 
             //Do we delete the entire Driver on a Bot Leave Race???
-            ((Driver)driverList[itr]).ProcessLeaveRace(_packet);
             race.ProcessCarLeaveRace(((CarMotion)driverList[itr]));
+            ((Driver)driverList[itr]).ProcessLeaveRace(_packet);
         }      // Delete Car leave (spectate - loses slot)
         protected sealed override void processPacket(PacketMCI _packet)
         {

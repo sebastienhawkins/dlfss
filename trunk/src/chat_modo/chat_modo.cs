@@ -84,6 +84,9 @@ namespace Drive_LFSS.ChatModo_
         private static Dictionary<string,byte> wordScoreList = new Dictionary<string,byte>();
         private static int wordScoreListCount = 0;
         private Queue<string> licenceNameTextList = new Queue<string>();
+        private Dictionary<string, Dictionary<string, ushort[]>> floodList = new Dictionary<string, Dictionary<string, ushort[]>>();
+        private Dictionary<string, ushort[]> sosoWordList = new Dictionary<string, ushort[]>();
+        private Dictionary<string, ushort[]> badWordList = new Dictionary<string, ushort[]>();
         
         private int levenstein(string source, string filterWord)
         {
@@ -115,12 +118,107 @@ namespace Drive_LFSS.ChatModo_
             //Step 7
             return matrixContainer[sourceLength, filterWordLength];
         }
+        
+        private const ushort TIMER_FLOOD = 4500;
+        private const ushort FLOOD_MAX_COUNT = 3;
+        private const ushort TIMER_SOSO_WORD = 60000;
+        private const ushort SOSO_WORD_MAX_COUNT = 3;
+        private const ushort TIMER_BAD_WORD = 60000;
+        private const ushort BAD_WORD_MAX_COUNT = 1;
+
         private void update()
         {
+            uint SLEEP = 100;
             while (Program.MainRun)
             {
                 AnalyseNextLine();
-                System.Threading.Thread.Sleep(300);
+                
+                //Flood Check
+                if (floodList.Count > 0)
+                {
+                    Dictionary<string, Dictionary<string, ushort[]>>.KeyCollection.Enumerator itr1 = floodList.Keys.GetEnumerator();
+                    while(itr1.MoveNext())
+                    {
+                        if (floodList[itr1.Current].Count > 0)
+                        {
+                            Dictionary<string, ushort[]>.KeyCollection.Enumerator itr2 = floodList[itr1.Current].Keys.GetEnumerator();
+                            while (itr2.MoveNext())
+                            {
+                                if (floodList[itr1.Current][itr2.Current][0] >= FLOOD_MAX_COUNT)
+                                {
+                                    //floodList[itr1.Current].Remove(itr2.Current);
+                                    //itr2 = floodList[itr1.Current].Keys.GetEnumerator();
+                                    floodList[itr1.Current][itr2.Current][0] -= 1;
+                                    floodList[itr1.Current][itr2.Current][1] = TIMER_FLOOD;
+                                    iSession.SendMSTMessage("/msg " + itr1.Current + " ^8-> ^1STOP Flooding.");
+                                }
+                                else if (floodList[itr1.Current][itr2.Current][1] < SLEEP)
+                                {
+                                    floodList[itr1.Current].Remove(itr2.Current);
+                                    itr2 = floodList[itr1.Current].Keys.GetEnumerator();
+                                }
+                                else
+                                    floodList[itr1.Current][itr2.Current][1] -= (ushort)SLEEP;
+                            }
+                        }
+                        else
+                        {
+                            floodList.Remove(itr1.Current);
+                            itr1 = floodList.Keys.GetEnumerator();
+                        }
+                    }
+                    
+                }
+                //Bad Check
+                if (badWordList.Count > 0)
+                {
+                    Dictionary<string, ushort[]>.KeyCollection.Enumerator itr = badWordList.Keys.GetEnumerator();
+                    while (itr.MoveNext())
+                    {
+                        if(badWordList[itr.Current][0] > BAD_WORD_MAX_COUNT)
+                        {
+                            //badWordList.Remove(itr.Current);
+                            //itr = badWordList.Keys.GetEnumerator();
+                            badWordList[itr.Current][0] -= 1; 
+                            badWordList[itr.Current][1] = TIMER_BAD_WORD;
+                            iSession.SendMSTMessage("/msg " + itr.Current + " ^1is Bad talker.");
+                            iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1Should we Ban him?");
+                        }
+                        else if (badWordList[itr.Current][1] < SLEEP)
+                        {
+                            badWordList.Remove(itr.Current);
+                            itr = badWordList.Keys.GetEnumerator();
+                        }
+                        else
+                            badWordList[itr.Current][1] -= (ushort)SLEEP;
+                    }
+
+                }
+                //SoSo Check
+                if (sosoWordList.Count > 0)
+                {
+                    Dictionary<string, ushort[]>.KeyCollection.Enumerator itr = sosoWordList.Keys.GetEnumerator();
+                    while (itr.MoveNext())
+                    {
+                        if (sosoWordList[itr.Current][0] > SOSO_WORD_MAX_COUNT)
+                        {
+                            sosoWordList[itr.Current][0] -= 1;
+                            sosoWordList[itr.Current][1] = TIMER_SOSO_WORD;
+                            //sosoWordList.Remove(itr.Current);
+                            //itr = sosoWordList.Keys.GetEnumerator();
+                            iSession.SendMSTMessage("/msg " + itr.Current + " ^8-> ^3check your language.");
+                        }
+                        else if (sosoWordList[itr.Current][1] < SLEEP)
+                        {
+                            sosoWordList.Remove(itr.Current);
+                            itr = sosoWordList.Keys.GetEnumerator();
+                        }
+                        else
+                            sosoWordList[itr.Current][1] -= (ushort)SLEEP;
+                    }
+
+                }
+                System.Threading.Thread.Sleep((int)SLEEP);
             }
         }
         
@@ -133,7 +231,6 @@ namespace Drive_LFSS.ChatModo_
             string lineOftext;
             string licenceName;
             string pmLicenceName = "";
-            string badWordFound = "";
             Word_Flag sentenceMask = Word_Flag.NONE;
             lock(licenceNameTextList){lineOftext = licenceNameTextList.Dequeue();}
             licenceName = lineOftext.Split((char)0)[0];
@@ -163,7 +260,7 @@ namespace Drive_LFSS.ChatModo_
                     if(words[itr].IndexOf(jtr.Current.Key,StringComparison.InvariantCultureIgnoreCase) > -1)
                     {
                         #if DEBUG
-                        iSession.SendMSTMessage("/msg ^7C^3hatModo^51 ^7:^2 " + words[itr] + "^7->^2" + jtr.Current.Key);
+                        //iSession.SendMSTMessage("/msg ^7C^3hatModo^51 ^7:^2 " + words[itr] + "^7->^2" + jtr.Current.Key);
                         #endif
                         sentenceMask |= (Word_Flag)jtr.Current.Value;
                     }
@@ -187,7 +284,7 @@ namespace Drive_LFSS.ChatModo_
                         if (_levenScore < 5 && _levenScore < jtr.Current.Key.Length / 2 && levenScore > _levenScore)
                         {
                             #if DEBUG
-                            iSession.SendMSTMessage("/msg ^7C^3hatModo^52 ^7:^2 " + words[itr] + "^7->^2'" + jtr.Current.Key+"'");
+                            //iSession.SendMSTMessage("/msg ^7C^3hatModo^52 ^7:^2 " + words[itr] + "^7->^2'" + jtr.Current.Key+"'");
                             #endif
                             levenScore = _levenScore;
                             wordMask = (Word_Flag)jtr.Current.Value;
@@ -209,26 +306,60 @@ namespace Drive_LFSS.ChatModo_
                     if (lineOftext.Replace(" ", "").IndexOf(ConvertX.RemoveSpecialChar(jtr.Current.Key), StringComparison.InvariantCultureIgnoreCase) > -1)
                     {
                         #if DEBUG
-                        iSession.SendMSTMessage("/msg ^7C^3hatModo^53 ^7:^2 CompleteLine ^7->^2" + jtr.Current.Key);
+                        //iSession.SendMSTMessage("/msg ^7C^3hatModo^53 ^7:^2 CompleteLine ^7->^2" + jtr.Current.Key);
                         #endif
                         sentenceMask |= (Word_Flag)jtr.Current.Value;
                     }
                 }
             }
-
+            //part 4 Flood
+            if(floodList.ContainsKey(licenceName))
+            {
+                if(floodList[licenceName].ContainsKey(lineOftext))
+                    floodList[licenceName][lineOftext][0] += 1;
+                else
+                    floodList[licenceName].Add(lineOftext,new ushort[2]{1,TIMER_FLOOD});
+            }
+            else
+            {
+                floodList.Add(licenceName,new Dictionary<string,ushort[]>());
+                floodList[licenceName].Add(lineOftext, new ushort[2] { 1, TIMER_FLOOD });
+            }    
+            
             if ((sentenceMask & Word_Flag.IS_BAD) == Word_Flag.IS_BAD)
-            {
-                iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1UNDESIRABLE ^7chat detected.^3DEBUG");
-            }
+                Gotcha(true,licenceName);
             else if ((sentenceMask & Word_Flag.IF_DESIGNATION) == Word_Flag.IF_DESIGNATION)
-            {
-                iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^3PLEASE ^7correct your language.^3DEBUG");
-            }
+                Gotcha(false,licenceName);
             
             //Log.commandHelp("that line(" + lineOftext + ") scored (" + sentenceMask + ")\r\n");
 
         }
+        
+        private void Gotcha(bool badWord, string licenceName)
+        {
+            if(badWord)
+            {
+                if(badWordList.ContainsKey(licenceName))
+                    badWordList[licenceName][0] += 1;
+                else
+                    badWordList.Add(licenceName,new ushort[2]{1,TIMER_BAD_WORD});
 
+                //iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1UNDESIRABLE ^7chat detected.");
+            }
+            else
+            {
+                if (sosoWordList.ContainsKey(licenceName))
+                    sosoWordList[licenceName][0] += 1;
+                else
+                    sosoWordList.Add(licenceName, new ushort[2] { 1, TIMER_SOSO_WORD });
+
+                //iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^3PLEASE ^7correct your language.");
+            }
+        }
+        /*private void FloodCheck()
+        {
+            floodList
+        }*/
         public void AddNewLine(string licenceName, string lineOfText)
         {
             if(licenceName == "" || lineOfText == "")

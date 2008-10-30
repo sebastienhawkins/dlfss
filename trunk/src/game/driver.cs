@@ -306,16 +306,17 @@ namespace Drive_LFSS.Game_
                 if(packet.blueOrYellow == Flag_Race.BLUE)
                 {
                     SendFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR,60000);
+                    flagRace |= Flag_Race.YELLOW;
                     blueFlagActive = true;
                     lap.BlueFlagCount++;
                 }
                 else if(packet.blueOrYellow == Flag_Race.YELLOW)
                 {
                     yellowFlagActive = true;
+                    flagRace |= Flag_Race.BLUE;
                     SendFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL, 13000);
                     lap.YellowFlagCount++;
-                    if(warningDrivingCancelTimer == 0 && warningDrivingType == Warning_Driving_Type.VICTIM)
-                        SendCancelWarningDriving();
+                    TrySendCancelWarning();
                 }
             }
             else
@@ -323,11 +324,13 @@ namespace Drive_LFSS.Game_
                 if (packet.blueOrYellow == Flag_Race.BLUE)
                 {
                     blueFlagActive = false;
+                    flagRace ^= Flag_Race.YELLOW;
                     RemoveFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR,true);
                 }
                 else if (packet.blueOrYellow == Flag_Race.YELLOW)
                 {
                     RemoveFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL,true);
+                    flagRace ^= Flag_Race.BLUE;
                     yellowFlagActive = false;
                 }
             }
@@ -373,6 +376,7 @@ namespace Drive_LFSS.Game_
         private uint driftScoreTimer = 0;
         private uint timeIldeOnTrack = 0;
         private uint timeYellowFlag = 0;
+        private float safePct = 0.0f;
         private const uint DRIFT_SCORE_TIMER = 40000;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
         internal Driver_Flag driverMask = Driver_Flag.NONE;
@@ -496,7 +500,8 @@ namespace Drive_LFSS.Game_
         internal WR wr = null;
         private Dictionary<string,Dictionary<string,Rank>> rank = null;
 
-        private static uint TIMER_WARNING_DRIVING_CHECK = 3000;
+        private static uint TIMER_WARNING_DRIVING_CHECK = 1700;
+        private static uint WARNING_DRIVING_CANCEL_TIMER = 8000;
         
         private static uint TIMER_300_CHECK = 300;
         private uint timer300Check = 0;
@@ -606,11 +611,19 @@ namespace Drive_LFSS.Game_
                 else
                 {
                     warningDrivingCancelTimer = 0;
-                    Driver _driver = (Driver)ISession.GetCarId(warningDrivingReferenceCarId);
-                    if(_driver != null)
+                    Driver driver = (Driver)iSession.GetCarId(warningDrivingReferenceCarId);
+                    if(driver != null)
                     {
-                        _driver.BadDrivingCount++;
-                        _driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
+                        driver.BadDrivingCount++;
+                        double oldSafePct = Math.Round(safePct,0);
+                        SetSafePct();
+                        driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
+                        if (oldSafePct != Math.Round(safePct,0))
+                            iSession.SendMSTMessage("/msg "+driver.DriverName+" ^2 now '^7" + Math.Round(safePct, 0) + "%^2' safe.");
+                        if(safePct < 0.0f)
+                            iSession.SendMSTMessage("/msg ^1Ban ^8" + driver.DriverName + "^2 for 1 days?");
+
+                        driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);    
                     }
                     RemoveCancelWarningDriving(false);
                 }
@@ -771,6 +784,15 @@ namespace Drive_LFSS.Game_
             else
                 return null;
         }
+        private void SetSafePct()
+        {
+            safePct = ((float)badDrivingCount / (totalRaceFinishCount > 0 ? (float)totalRaceFinishCount : 1.0f));
+            safePct += ((float)badDrivingCount / (totalLapCount > 0 ? (float)totalLapCount/10.0f : 1.0f));
+            safePct *= 100.0f;
+            safePct = 101.0f - safePct;
+            if(safePct > 100.0f)
+                safePct = 100.0f;
+        }
 
         internal bool IsTimeDiffLapDisplay
         {
@@ -810,13 +832,18 @@ namespace Drive_LFSS.Game_
             warningDrivingTypeTimer = TIMER_WARNING_DRIVING_CHECK;
             warningDrivingReferenceCarId = referenceCarId; //TODO: licenceName hihi :) this can become not funny!
         }
-        public void SendCancelWarningDriving()
+        public void TrySendCancelWarning()
+        {       
+            if(warningDrivingCancelTimer == 0 && warningDrivingType == Warning_Driving_Type.VICTIM)
+                SendCancelWarningDriving();
+        }             
+        private void SendCancelWarningDriving()
         {
             Driver _driver = (Driver)ISession.GetCarId(warningDrivingReferenceCarId);
             if (_driver == null)
                 return;
 
-            warningDrivingTypeTimer = warningDrivingCancelTimer = 8000;
+            warningDrivingTypeTimer = warningDrivingCancelTimer = WARNING_DRIVING_CANCEL_TIMER;
             SendUpdateButton(Button_Entry.CANCEL_WARNING_DRIVING_1);
             SendUpdateButton(Button_Entry.CANCEL_WARNING_DRIVING_2);
             SendUpdateButton((ushort)Button_Entry.CANCEL_WARNING_DRIVING_3, _driver.driverName);
@@ -836,7 +863,17 @@ namespace Drive_LFSS.Game_
             if(isCancelClick)
                 AddMessageMiddle("^2Removed Warning Driving for "+_driver.driverName,4500);
         }
- 
+
+        public void FinishRace()
+        {
+            totalRaceFinishCount++;
+            double oldSafePct = Math.Round(safePct, 0);
+            SetSafePct();
+            if (oldSafePct != Math.Round(safePct, 0))
+                iSession.SendMSTMessage("/msg " + driverName + " ^2is now '^7" + Math.Round(safePct, 0) + "%^2' safe.");
+           // if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
+           //    return;
+        }
         public bool IsYellowFlagActive()
         {
             return yellowFlagActive;

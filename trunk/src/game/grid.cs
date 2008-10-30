@@ -68,6 +68,7 @@ namespace Drive_LFSS.Game_
                // return;
             carContainer[car] = car.GetNode();
             checkCollision(car);
+            checkLostControl(car);
             
             //if(((IDriver)car).IsAdmin)
                 //((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3Z ^7" + car.GetPosZ());
@@ -121,6 +122,12 @@ namespace Drive_LFSS.Game_
         }
 
         //Feature
+        private void checkLostControl(CarMotion car)
+        {
+            if(car.HasWarningDrivingCheck() && Math.Abs(car.GetOrientationSpeed()) > 100.0d)
+                car.TrySendCancelWarning();
+        }
+
         private void checkCollision(CarMotion car)
         {
             if(car.HasWarningDrivingCheck())
@@ -165,7 +172,7 @@ namespace Drive_LFSS.Game_
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
-                        Log.commandHelp("Warning Driving Part 1 Detected\r\n");
+                        Log.commandHelp("Warning Driving Part 2 Detected\r\n");
                         return;
                     }
 
@@ -173,7 +180,7 @@ namespace Drive_LFSS.Game_
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, car.CarId);
-                        Log.commandHelp("Warning Driving Part 1 Detected\r\n");
+                        Log.commandHelp("Warning Driving Part 3 Detected\r\n");
                         return;
                     }
                 } 
