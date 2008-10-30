@@ -178,7 +178,9 @@ namespace Drive_LFSS.Ranking_
         }
         internal static bool Initialize()
         {
+            #if DEBUG
             return false;
+            #endif
             isActived = false;
             if(!LoadDriverRankedCount())
                 return false;
