@@ -516,6 +516,10 @@ namespace Drive_LFSS.Storage_
         private ushort brakeDist;
         private Car_Multiple_Flag mask;
         
+        public uint Entry
+        {
+            get{return entry;}
+        }
         public string NamePrefix
         {
             get { return namePrefix; }
@@ -569,6 +573,8 @@ namespace Drive_LFSS.Storage_
             qualifyMinute = (byte)Convert.ToUInt16(rowInfos[8]);
             maximunRaceEnd = Convert.ToUInt16(rowInfos[9]);
             raceTemplateMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[10]);
+            restriction_join_entry = Convert.ToUInt32(rowInfos[11]);
+            restriction_race_entry = Convert.ToUInt32(rowInfos[12]);
         }
         ~RaceTemplateInfo()
         {
@@ -585,7 +591,8 @@ namespace Drive_LFSS.Storage_
         private byte qualifyMinute = 0;
         private ushort maximunRaceEnd = 0;
         private Race_Template_Flag raceTemplateMask = Race_Template_Flag.NONE;
-
+        private uint restriction_join_entry = 0;
+        private uint restriction_race_entry = 0;
         public uint Entry
         {
             get { return entry; }
@@ -625,6 +632,14 @@ namespace Drive_LFSS.Storage_
         public bool HasRaceTemplateFlag(Race_Template_Flag flag)
         {
             return (raceTemplateMask & flag) == flag;
+        }
+        public uint Restriction_join_entry
+        {
+            get { return restriction_join_entry; }
+        }
+        public uint Restriction_race_entry
+        {
+            get { return restriction_race_entry; }
         }
     }
 
@@ -787,21 +802,24 @@ namespace Drive_LFSS.Storage_
             pbMin = Convert.ToUInt32(rowInfos[6]);
             pbMax = Convert.ToUInt32(rowInfos[7]);
             pbKick = Convert.ToBoolean(rowInfos[8]);
-            skinName = (string)rowInfos[9];
-            skinNameKick = Convert.ToBoolean(rowInfos[10]);
-            driverName = (string)rowInfos[11];
-            driverNameKick = Convert.ToBoolean(rowInfos[12]);
-            rankBestMin = Convert.ToUInt16(rowInfos[13]);
-            rankBestMax = Convert.ToUInt16(rowInfos[14]);
-            rankAvgMin = Convert.ToUInt16(rowInfos[15]);
-            rankAvgMax = Convert.ToUInt16(rowInfos[16]);
-            rankStaMin = Convert.ToUInt16(rowInfos[17]);
-            rankStaMax = Convert.ToUInt16(rowInfos[18]);
-            rankWinMin = Convert.ToUInt16(rowInfos[19]);
-            rankWinMax = Convert.ToUInt16(rowInfos[20]);
-            rankTotalMin = Convert.ToUInt16(rowInfos[21]);
-            rankTotalMax = Convert.ToUInt16(rowInfos[22]);
-            rankKick = Convert.ToBoolean(rowInfos[23]);
+            wrMin = Convert.ToUInt32(rowInfos[9]);
+            wrMax = Convert.ToUInt32(rowInfos[10]);
+            wrKick = Convert.ToBoolean(rowInfos[11]);
+            skinName = (string)rowInfos[12];
+            skinNameKick = Convert.ToBoolean(rowInfos[13]);
+            driverName = (string)rowInfos[14];
+            driverNameKick = Convert.ToBoolean(rowInfos[15]);
+            rankBestMin = Convert.ToUInt16(rowInfos[16]);
+            rankBestMax = Convert.ToUInt16(rowInfos[17]);
+            rankAvgMin = Convert.ToUInt16(rowInfos[18]);
+            rankAvgMax = Convert.ToUInt16(rowInfos[19]);
+            rankStaMin = Convert.ToUInt16(rowInfos[20]);
+            rankStaMax = Convert.ToUInt16(rowInfos[21]);
+            rankWinMin = Convert.ToUInt16(rowInfos[22]);
+            rankWinMax = Convert.ToUInt16(rowInfos[23]);
+            rankTotalMin = Convert.ToUInt16(rowInfos[24]);
+            rankTotalMax = Convert.ToUInt16(rowInfos[25]);
+            rankKick = Convert.ToBoolean(rowInfos[26]);
 
         }
         ~RestrictionJoinInfo()
@@ -817,6 +835,9 @@ namespace Drive_LFSS.Storage_
         private uint pbMin = 0;
         private uint pbMax = 0;
         private bool pbKick = false;
+        private uint wrMin = 0;
+        private uint wrMax = 0;
+        private bool wrKick = false;
         private string skinName = "";
         private bool skinNameKick = false;
         private string driverName = "";
@@ -832,6 +853,107 @@ namespace Drive_LFSS.Storage_
         private ushort rankTotalMin = 0;
         private ushort rankTotalMax = 0;
         private bool rankKick = false;
+
+        public byte SafeDrivingPct
+        {
+            get { return safeDrivingPct; }
+        }
+        public bool SafeDrivingKick
+        {
+            get { return safeDrivingKick; }
+        }
+        public byte BadlanguagePct
+        {
+            get { return badlanguagePct; }
+        }
+        public bool BadlanguagePctKick
+        {
+            get { return badlanguagePctKick; }
+        }
+        public uint PbMin
+        {
+            get { return pbMin; }
+        }
+        public uint PbMax
+        {
+            get { return pbMax; }
+        }
+        public bool PbKick
+        {
+            get { return pbKick; }
+        }
+        public uint WrMin
+        {
+            get { return wrMin; }
+        }
+        public uint WrMax
+        {
+            get { return wrMax; }
+        }
+        public bool WrKick
+        {
+            get { return wrKick; }
+        }
+        public string SkinName
+        {
+            get { return skinName; }
+        }
+        public bool SkinNameKick
+        {
+            get { return skinNameKick; }
+        }
+        public string DriverName
+        {
+            get { return driverName; }
+        }
+        public bool DriverNameKick
+        {
+            get { return driverNameKick; }
+        }
+        public ushort RankBestMin
+        {
+            get { return rankBestMin; }
+        }
+        public ushort RankBestMax
+        {
+            get { return rankBestMax; }
+        }
+        public ushort RankAvgMin
+        {
+            get { return rankAvgMin; }
+        }
+        public ushort RankAvgMax
+        {
+            get { return rankAvgMax; }
+        }
+        public ushort RankStaMin
+        {
+            get { return rankStaMin; }
+        }
+        public ushort RankStaMax
+        {
+            get { return rankStaMax; }
+        }
+        public ushort RankWinMin
+        {
+            get { return rankWinMin; }
+        }
+        public ushort RankWinMax
+        {
+            get { return rankWinMax; }
+        }
+        public ushort RankTotalMin
+        {
+            get { return rankTotalMin; }
+        }
+        public ushort RankTotalMax
+        {
+            get { return rankTotalMax; }
+        }
+        public bool RankKick
+        {
+            get { return rankKick; }
+        }
  
     }
     

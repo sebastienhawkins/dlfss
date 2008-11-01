@@ -64,12 +64,18 @@ namespace Drive_LFSS.Game_
             //Only a Host will trigger a NCN as a Bot, real AI Bot trigger only a NPL
             if (IsBot()) 
                 return;
+
+            if (isAdmin)
+            {
+                iSession.SendMSXMessage("^7Admin ^8"+driverName+"^7 has come ^2online.");
+                ((Session)iSession).AddAdminOnline(connectionId);
+            }
             ProcessBFNClearAll(false);
             SendBanner();
             SendTrackPrefix();
 
             //To make the MOTD look on a very Black BG
-            if (!ISession.IsFreezeMotdSend())
+            if (!iSession.IsFreezeMotdSend())
             {
                 for (byte itr = 0; ++itr < 5; )
                     SendButton(Button_Entry.MOTD_BACKGROUND);
@@ -207,18 +213,18 @@ namespace Drive_LFSS.Game_
                     wr.Splits[3] = lap.SplitTime[3];
                     wr.LapTime = lap.LapTime;
                     wr.LicenceName = LicenceName;
-                    ISession.AddMessageMiddleToAll("^2New WR " + ConvertX.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
+                    ISession.AddMessageMiddleToAll("^2New WR " + ConvertX.MSTimeToHMSC(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
                 }
             }
             if(isTimeDiffDisplay)
             {
                 if (pb != null && wr != null)
                 {
-                    AddMessageTop("^2PB " + ConvertX.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + ConvertX.MSToString(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                    AddMessageTop("^2PB " + ConvertX.MSTimeToHMSC(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + ConvertX.MSTimeToHMSC(lapWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
                 }
                 else if (pb != null)
                 {
-                    AddMessageTop("^2PB " + ConvertX.MSToString(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                    AddMessageTop("^2PB " + ConvertX.MSTimeToHMSC(lapDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
                 }
             }
             
@@ -250,10 +256,10 @@ namespace Drive_LFSS.Game_
                 if (wr != null && pb != null)
                 {
                     splitWRDiff = (int)lap.SplitTime[packet.splitNode] - (int)wr.Splits[packet.splitNode];
-                    AddMessageMiddle("^2Split " + ConvertX.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + ConvertX.MSToString(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                    AddMessageMiddle("^2Split " + ConvertX.MSTimeToHMSC(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER) + " ^2WR " + ConvertX.MSTimeToHMSC(splitWRDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
                 }
                 else if(pb != null)
-                    AddMessageMiddle("^2Split " + ConvertX.MSToString(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
+                    AddMessageMiddle("^2Split " + ConvertX.MSTimeToHMSC(splitDiff, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 4500);
             }
         }
         internal void ProcessRESPacket(PacketRES packet)
@@ -292,6 +298,9 @@ namespace Drive_LFSS.Game_
             //Only a host will trigger this a real bot trigger only a Leave race.
             if(IsBot())
                 return;
+
+            if (isAdmin)
+                ((Session)iSession).RemoveAdminOnline(connectionId);
 
             Program.dlfssDatabase.Lock();
             {
@@ -368,7 +377,7 @@ namespace Drive_LFSS.Game_
         private uint warningDrivingCancelTimer = 0;
         private uint warningDrivingTypeTimer = 0;
         private byte warningDrivingReferenceCarId = 0;
-        private uint badDrivingCount = 0;
+        private int badDrivingCount = 0;
         private int totalLapCount = 0;
         private int totalRaceCount = 0;
         private int totalRaceFinishCount = 0;
@@ -376,7 +385,8 @@ namespace Drive_LFSS.Game_
         private uint driftScoreTimer = 0;
         private uint timeIldeOnTrack = 0;
         private uint timeYellowFlag = 0;
-        private float safePct = 0.0f;
+        private int safePct = 0;
+        private int oldSafePct = 0;
         private const uint DRIFT_SCORE_TIMER = 40000;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
         internal Driver_Flag driverMask = Driver_Flag.NONE;
@@ -536,7 +546,6 @@ namespace Drive_LFSS.Game_
                             Program.dlfssDatabase.Unlock();
                             Log.database(iSession.GetSessionNameForLog() + "Lap for DriverGuid: " + guid + ", car_prefix:" + lapToSave.CarPrefix + ", track_prefix: " + lapToSave.TrackPrefix + ", saved to database.\r\n");
                         }
-                        laps.Clear();
                     }
                 }
                 else //this is Bot Only
@@ -614,16 +623,17 @@ namespace Drive_LFSS.Game_
                     Driver driver = (Driver)iSession.GetCarId(warningDrivingReferenceCarId);
                     if(driver != null)
                     {
-                        driver.BadDrivingCount++;
-                        double oldSafePct = Math.Round(safePct,0);
-                        SetSafePct();
-                        driver.AddMessageMiddle("^1Undesirable driving detected and recorded.",7000);
-                        if (oldSafePct != Math.Round(safePct,0))
-                            iSession.SendMSTMessage("/msg "+driver.DriverName+" ^2 now '^7" + Math.Round(safePct, 0) + "%^2' safe.");
-                        if(safePct < 0.0f)
+                        driver.AddBadDriving();
+                        driver.SetSafePct();
+                        driver.SaySafe();
+                        if (driver.GetSafePct() < 0)
+                        {
+                            SendMTCMessage("^2Your safe ^7% ^2is very low.");
+                            SendMTCMessage("^2You ^1MUST ^2stay ^1CLEAN ^2at ^1ALL COST.");
                             iSession.SendMSTMessage("/msg ^1Ban ^8" + driver.DriverName + "^2 for 1 days?");
+                        }
+                        driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);
 
-                        driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);    
                     }
                     RemoveCancelWarningDriving(false);
                 }
@@ -652,7 +662,7 @@ namespace Drive_LFSS.Game_
                 {
                     guid = (uint)reader.GetInt32(0);
                     SetConfigData(reader.GetString(1));
-                    badDrivingCount = (uint)reader.GetInt32(2);
+                    badDrivingCount = reader.GetInt32(2);
                     reader.Close();reader.Dispose();
                     
                     reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='"+guid+"'");
@@ -660,12 +670,12 @@ namespace Drive_LFSS.Game_
                         totalLapCount = reader.GetInt32(0);
                     reader.Close(); reader.Dispose();
 
-                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE LOCATE(' " + guid + "',`grid_order`) > 0 OR LOCATE('" + guid + " ',`grid_order`) > 0");
+                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE (LOCATE(' " + guid + "',`grid_order`) > 0 OR LOCATE('" + guid + " ',`grid_order`) > 0) AND `race_laps`>1");
                     if (reader.Read())
                         totalRaceCount = reader.GetInt32(0);
                     reader.Close(); reader.Dispose();
 
-                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE LOCATE(' " + guid + "',`finish_order`) > 0 OR LOCATE('" + guid + " ',`finish_order`) > 0");
+                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE (LOCATE(' " + guid + "',`finish_order`) > 0 OR LOCATE('" + guid + " ',`finish_order`) > 0) AND `race_laps`>1");
                     if (reader.Read())
                         totalRaceFinishCount = reader.GetInt32(0);
                     reader.Close(); reader.Dispose();
@@ -784,16 +794,28 @@ namespace Drive_LFSS.Game_
             else
                 return null;
         }
-        private void SetSafePct()
+        public void SetSafePct()
         {
-            safePct = ((float)badDrivingCount / (totalRaceFinishCount > 0 ? (float)totalRaceFinishCount : 1.0f));
-            safePct += ((float)badDrivingCount / (totalLapCount > 0 ? (float)totalLapCount/10.0f : 1.0f));
-            safePct *= 100.0f;
-            safePct = 101.0f - safePct;
-            if(safePct > 100.0f)
-                safePct = 100.0f;
-        }
+            oldSafePct = safePct;
 
+            safePct = (badDrivingCount / (totalRaceFinishCount > 0 ? totalRaceFinishCount : 1))*25;
+            safePct += (int)((badDrivingCount / (totalLapCount > 0 ? ((double)totalLapCount/10.0d) : 1))*75);
+            safePct = 101 - safePct;
+            if(safePct > 100)
+                safePct = 100;
+        }
+        public int GetSafePct()
+        {
+            return safePct;
+        }
+        public void SaySafe()
+        {
+            if (oldSafePct > safePct)
+                iSession.SendMSTMessage("/msg " + driverName + " ^2is now '^4" + safePct + "^7%^2' safe.");
+            else if (oldSafePct < safePct)
+                iSession.SendMSTMessage("/msg " + driverName + " ^2is now '^3" + safePct + "^7%^2' safe.");
+           
+        }     
         internal bool IsTimeDiffLapDisplay
         {
             get { return isTimeDiffDisplay; }
@@ -867,10 +889,8 @@ namespace Drive_LFSS.Game_
         public void FinishRace()
         {
             totalRaceFinishCount++;
-            double oldSafePct = Math.Round(safePct, 0);
             SetSafePct();
-            if (oldSafePct != Math.Round(safePct, 0))
-                iSession.SendMSTMessage("/msg " + driverName + " ^2is now '^7" + Math.Round(safePct, 0) + "%^2' safe.");
+            SaySafe();
            // if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
            //    return;
         }
@@ -921,7 +941,7 @@ namespace Drive_LFSS.Game_
 
             ((Session)iSession).AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MTC, Packet_Type.PACKET_MTC_CHAT_TO_LICENCE, _packet));
        
-            Log.progress("Sending MTC packet to: " + CarId + ", with ConnectionId: " + ConnectionId + "\r\n");
+            //Log.progress("Sending MTC packet to: " + CarId + ", with ConnectionId: " + ConnectionId + "\r\n");
         }
         public uint GetCurrentWRTime()
         {
@@ -950,10 +970,13 @@ namespace Drive_LFSS.Game_
         {
             return RacePosition;
         }
-        internal uint BadDrivingCount
+        public int GetBadDrivingCount()
         {
-            get{return badDrivingCount;}
-            set{badDrivingCount = value;}
+            return badDrivingCount;
+        }
+        public void AddBadDriving()
+        {
+            badDrivingCount++;
         }
     }
 }

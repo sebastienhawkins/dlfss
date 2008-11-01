@@ -30,6 +30,8 @@ namespace Drive_LFSS.CommandConsole_
     {
         public static void Exec(string _commandText)
         {
+            if(_commandText == null)
+                return;
             _commandText = _commandText.TrimStart(new char[] { ' ' });
             if (_commandText == "")
                 return;

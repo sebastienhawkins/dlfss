@@ -63,16 +63,17 @@ namespace Drive_LFSS.Packet_
             }
         }
 
-        protected void processPacket(PacketVER _packet)
+        protected virtual void processPacket(PacketVER _packet)
         {
             #if DEBUG
             Log.debug(((Session)this).GetSessionNameForLog() + " Process packet -> " + _packet + "\r\n");
             #endif
-            Log.normal(((Session)this).GetSessionNameForLog() + " InSim v" + _packet.inSimVersion + ", Licence: " + _packet.productVersion + "." + _packet.serverVersion + "\r\n");
         }
         protected virtual void processPacket(PacketTiny _packet)
         {
+            #if DEBUG
             Log.debug(((Session)this).GetSessionNameForLog() + " Process packet TINY\r\n");
+            #endif
         }
         protected virtual void processPacket(PacketSmall _packet)
         {

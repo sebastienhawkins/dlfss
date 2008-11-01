@@ -21,6 +21,6 @@ namespace Drive_LFSS.Script_
     public interface ITrack
     {
         void StartNextTrackVote();
-        void PrepareNextTrack(ushort trackEntry);
+        void LoadNextTrack(ushort trackEntry);
     }
 }

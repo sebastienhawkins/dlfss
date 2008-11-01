@@ -41,7 +41,7 @@ while ($row = mysql_fetch_array($result))
 {
 	array_push($licenceNames,$row[0]);
 }
-mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Oct^2/^728' WHERE `entry`IN(57)",$link);
+mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Nov^2/^701' WHERE `entry`IN(57)",$link);
 
 
 foreach($licenceNames as $licenceName)
@@ -141,7 +141,7 @@ foreach($licenceNames as $licenceName)
 			//echo "Best | Score : $driverBest | $driverBestS\n";
 
 			//Driver Average
-			$query = "SELECT AVG(`lap_time`)
+			$query = "SELECT AVG(`lap_time`),COUNT(`lap_time`)
 			FROM `driver_lap`
 			WHERE `driver_lap`.`track_prefix`='$trackName'
 			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
@@ -161,11 +161,16 @@ foreach($licenceNames as $licenceName)
 				$driverAverageS = $driverAverageS-(((9999)-$driverAverageS)*2);
 				$driverAverageS = $driverAverageS * 4999 / 9999;
 				$driverAverageS = (int)$driverAverageS ;
-
+				if($row[1]<10)
+						$driverAverageS = $driverAverageS/2;
+	
 				$driverStabilityS = ($driverBest / $driverAverage *9999);
 				$driverStabilityS = $driverStabilityS-(((9999)-$driverStabilityS)*2);
 				$driverStabilityS = $driverStabilityS * 4999 / 9999;
 				$driverStabilityS = (int)$driverStabilityS ;
+				if($row[1]<10)
+						$driverStabilityS = $driverStabilityS/2;
+				
 			}
 			else
 				$driverAverage = $driverAverageS = $driverStabilityS = 0;

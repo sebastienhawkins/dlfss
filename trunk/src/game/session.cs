@@ -105,14 +105,17 @@ namespace Drive_LFSS.Game_
         internal bool connectionRequest;
         private byte clientConnectionCount = 0;
         private uint freezeMotdSend = 7000;
-
-        //Object
+        private List<byte> adminOnlineList = new List<byte>();
         private Script script;
         private CommandInGame command;
         private Race race;
         private List<Driver> driverList;
         private ChatModo chatModo;
         
+        public void LoadRace(ushort entry)
+        {
+            race.LoadNextTrack(entry);
+        }
         public bool IsFreezeMotdSend()
         {
             return freezeMotdSend > 0;
@@ -172,6 +175,20 @@ namespace Drive_LFSS.Game_
         {
             AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_MSX, Packet_Type.PACKET_MSX_SEND_BIG_CHAT, new PacketMSX(message)));
         }
+        public void SendMTCMessageToAllAdmin(string message)
+        {
+            if(adminOnlineList.Count < 1)
+                return;
+                
+           foreach(byte connectionId in adminOnlineList)
+           {
+               byte index = GetConnectionIdNotBot(connectionId);
+               if(index != 255)
+               {
+                    driverList[index].SendMTCMessage(message);
+               }
+           }
+        }
         public void SendUpdateButtonToAll(ushort buttonEntry, string text)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
@@ -209,7 +226,7 @@ namespace Drive_LFSS.Game_
         }
         public void RemoveButton(ushort buttonEntry, byte connectionId)
         {
-            driverList[GetLicenceIndexNotBot(connectionId)].RemoveButton(buttonEntry);
+            driverList[GetConnectionIdNotBot(connectionId)].RemoveButton(buttonEntry);
         }
         public bool IsRaceInProgress()
         {
@@ -226,6 +243,20 @@ namespace Drive_LFSS.Game_
         public Script Script
         {
             get { return script; }
+        }
+        internal void AddAdminOnline(byte connectionId)
+        {
+            if(!adminOnlineList.Contains(connectionId))
+                adminOnlineList.Add(connectionId);
+        }
+        internal void RemoveAdminOnline(byte connectionId)
+        {
+            if (!adminOnlineList.Contains(connectionId))
+                adminOnlineList.Remove(connectionId);
+        }
+        public bool HasAdminOnline()
+        {
+            return adminOnlineList.Count > 0;
         }
         private byte GetCarIndex(byte _carId)
         {
@@ -259,7 +290,7 @@ namespace Drive_LFSS.Game_
             }
             return 255;
         }
-        private byte GetLicenceIndexNotBot(byte connectionId)
+        private byte GetConnectionIdNotBot(byte connectionId)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
@@ -309,7 +340,7 @@ namespace Drive_LFSS.Game_
         public IDriver GetDriverWithConnectionId(byte connectionId)
         {
             int index;
-            if( (index = GetLicenceIndexNotBot(connectionId)) != 255 )
+            if( (index = GetConnectionIdNotBot(connectionId)) != 255 )
                 return driverList[index];
             return null;
         }
@@ -388,16 +419,16 @@ namespace Drive_LFSS.Game_
                 ProcessPacket((Packet_Type)_nextUdpPacket[0], _nextUdpPacket[1]);
         }
 
-        protected sealed override void processPacket(PacketNCN _packet)
+        protected sealed override void processPacket(PacketNCN packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
             
             //Since we create the driver index 0 in this.construstor()
             //will conflit with the Host NCN receive packet, so here is a overide!
             //will have to rethink this later, that is looking like a HackFix, suck CPU for nothing.
-            if (IsExistconnectionId(_packet.connectionId))
+            if (IsExistconnectionId(packet.connectionId))
             {
                 /*if (_packet.connectionId == 0)
                 {
@@ -410,20 +441,23 @@ namespace Drive_LFSS.Game_
                     return;
                 }
             }
-            Driver _driver = new Driver(this);
-            _driver.Init(_packet);
-
+            Driver driver = new Driver(this);
+            driver.Init(packet);
+            
+            
+            
+            lock (this) { driverList.Add(driver); }
             //Prevent the Main thread from Doing the driverList.update()
-            lock (this){driverList.Add(_driver);}
+            
         }      // new Connection
-        protected sealed override void processPacket(PacketCNL _packet)
+        protected sealed override void processPacket(PacketCNL packet)
         {
             //TODO: use _packet.Total as a Debug check to be sure we have same racer count into our memory as the server do. 
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
 
-            if (!IsExistconnectionId(_packet.connectionId))
+            if (!IsExistconnectionId(packet.connectionId))
             {
                 Log.error(GetSessionNameForLog() + " Licence disconnection, but no connectionId associated with it, what to do?");
                 return;
@@ -432,24 +466,25 @@ namespace Drive_LFSS.Game_
             //Prevent the Main thread from Doing the driverList.update()
             //Im not sure i love this design, since Mutex refresh time.
             byte index;
-            while ((index = GetFirstLicenceIndex(_packet.connectionId)) != 255)
+            while ((index = GetFirstLicenceIndex(packet.connectionId)) != 255)
             {
-                driverList[index].ProcessCNLPacket(_packet);
+                driverList[index].ProcessCNLPacket(packet);
+                
                 lock (this) { driverList.RemoveAt((int)index); }
             }
    
         }      // delete Connection
-        protected sealed override void processPacket(PacketCPR _packet)
+        protected sealed override void processPacket(PacketCPR packet)
         {
-            driverList[GetLicenceIndexNotBot(_packet.connectionId)].ProcessCPR(_packet);
-        }       //Driver Rename it self.
-        protected sealed override void processPacket(PacketNPL _packet)
+            driverList[GetConnectionIdNotBot(packet.connectionId)].ProcessCPR(packet);
+        }      // Driver Rename it self.
+        protected sealed override void processPacket(PacketNPL packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
 
-            if (!IsExistconnectionId(_packet.connectionId))
+            if (!IsExistconnectionId(packet.connectionId))
             {
                 Log.error(GetSessionNameForLog() + " New car joined race, but no ConnectionId associated with it, what to do?");
                 return;
@@ -459,36 +494,36 @@ namespace Drive_LFSS.Game_
             byte index;
             //this is first version, i expect some probleme into the case, we don't know Driver as Leave the Race or Disconnected... Let See.
             Driver driver;
-            if ((_packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
+            if ((packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
             {
-                if ((index = GetLicenceIndexWithName(_packet.connectionId, _packet.driverName)) != 255)
+                if ((index = GetLicenceIndexWithName(packet.connectionId, packet.driverName)) != 255)
                 {
-                    driverList[index].Init(_packet);
+                    driverList[index].Init(packet);
                     driver = driverList[index];
                 }
                 else
                 {
                     driver = new Driver(this);
-                    driver.Init(_packet);
+                    driver.Init(packet);
                     driverList.Add(driver);
                 }
             }
             else    //Human
             {
-                index = GetLicenceIndexWithName(_packet.connectionId, _packet.driverName);
-                driverList[index].Init(_packet);
+                index = GetLicenceIndexWithName(packet.connectionId, packet.driverName);
+                driverList[index].Init(packet);
                 driver = driverList[index];
             }
             race.ProcessCarJoinRace(driver);
         }      // Car Join Race
-        protected sealed override void processPacket(PacketPLL _packet)
+        protected sealed override void processPacket(PacketPLL packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
 
             byte itr;
-            if ((itr = GetCarIndex(_packet.carId)) == 255)
+            if ((itr = GetCarIndex(packet.carId)) == 255)
             {
                 Log.error(GetSessionNameForLog() + " Car left race, but no car association found, what to do?");
                 return;
@@ -496,7 +531,7 @@ namespace Drive_LFSS.Game_
 
             //Do we delete the entire Driver on a Bot Leave Race???
             race.ProcessCarLeaveRace(((CarMotion)driverList[itr]));
-            ((Driver)driverList[itr]).ProcessLeaveRace(_packet);
+            ((Driver)driverList[itr]).ProcessLeaveRace(packet);
         }      // Delete Car leave (spectate - loses slot)
         protected sealed override void processPacket(PacketMCI _packet)
         {
@@ -703,7 +738,7 @@ namespace Drive_LFSS.Game_
             base.processPacket(_packet); //Keep the Log
             #endif
 
-            Driver driver = driverList[GetLicenceIndexNotBot(_packet.connectionId)];
+            Driver driver = driverList[GetConnectionIdNotBot(_packet.connectionId)];
 
             switch ((Button_Entry)driver.GetButtonEntry(_packet.buttonId))
             {
@@ -895,7 +930,7 @@ namespace Drive_LFSS.Game_
             base.processPacket(_packet); //Keep the Log
             #endif
 
-            byte driverIndex = GetLicenceIndexNotBot(_packet.connectionId);
+            byte driverIndex = GetConnectionIdNotBot(_packet.connectionId);
             Driver car = driverList[driverIndex];
             switch((Button_Entry)car.GetButtonEntry(_packet.buttonId))
             {
@@ -957,7 +992,7 @@ namespace Drive_LFSS.Game_
             #if DEBUG
             base.processPacket(_packet); //Keep the Log
             #endif
-            int index = GetLicenceIndexNotBot(_packet.connectionId);
+            int index = GetConnectionIdNotBot(_packet.connectionId);
             if(index == 255)
             {
                 Log.error("processPacket(PacketBFN), received a Not Found Driver ID.\r\n");
@@ -973,15 +1008,15 @@ namespace Drive_LFSS.Game_
                 case Button_Function.BUTTON_FUNCTION_REQUEST:
                     driverList[index].ProcessBFNRequest(); break;
             }
-        }      //Delete All Button or request Button.
+        }      // Delete All Button or request Button.
         protected sealed override void processPacket(PacketVTN _packet)
         {
             #if DEBUG
             base.processPacket(_packet); //Keep the Log
             #endif
             race.ProcessVoteNotification(_packet.voteAction, _packet.connectionId);
-        }      //Vote Notification
-        protected sealed override void processPacket(PacketPLP _packet)         //Car enter garage
+        }      // Vote Notification
+        protected sealed override void processPacket(PacketPLP _packet)         // Car enter garage
         {
             #if DEBUG
             base.processPacket(_packet); //Keep the Log
@@ -1035,6 +1070,14 @@ namespace Drive_LFSS.Game_
                 return;
             }
             driverList[index].ProcessPITPacket(_packet);
+        }
+        protected sealed override void processPacket(PacketVER _packet)
+        {
+            Log.normal(GetSessionNameForLog() + " InSim v" + _packet.inSimVersion + ", Licence: " + _packet.productVersion + "." + _packet.serverVersion + "\r\n");
+            SendMSXMessage("^7D^3rive_LFSS ^7as come ^2Online.");
+            #if DEBUG
+            race.ProcessVoteAction(Vote_Action.VOTE_END);
+            #endif
         }
     }
 }
