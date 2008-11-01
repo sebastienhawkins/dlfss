@@ -145,18 +145,20 @@ namespace Drive_LFSS.Game_
                 double _temp = endSpeed - startSpeed;
                 _temp = timeElapsed.TotalSeconds / effectiveStartSpeed * _temp;
 
-
-                Log.feature(driver.DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + (decimal)_temp + "sec.\r\n");
-
                 //This must be removed when we find why some Accelariont become pretty fast.
                 if (timeElapsed.TotalSeconds < 1.0d)
                 {
+                    #if DEBUG
                     Log.error(driver.DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + _temp + "sec, TOO FAST TOO FAST!\r\n");
+                    #endif
                     return;
                 }
 
+                Log.feature(driver.DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + (decimal)_temp + "sec.\r\n");
                 if (driver.ISession.Script.CarAccelerationSucess((ICar)driver, (ushort)startSpeed, (ushort)endSpeed, _temp))
                     return;
+                    
+                    
             }
             internal double StartSpeed
             {
@@ -420,17 +422,17 @@ namespace Drive_LFSS.Game_
             if (wr != null)
             {
                 //lapTime = lapTime.Insert();
-                AddMessageMiddle("^2WR " + ConvertX.MSToString(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + wr.LicenceName, 6000);
+                AddMessageMiddle("^2WR " + ConvertX.MSTimeToHMSC(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + wr.LicenceName, 6000);
             }
 
             pb = Program.pubStats.GetPB(licenceName, carPrefix + ISession.GetRaceTrackPrefix());
             if (pb != null && wr != null)
             {
-                AddMessageMiddle("^2PB " + ConvertX.MSToString(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + ConvertX.MSToString(pb.LapTime - wr.LapTime, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
+                AddMessageMiddle("^2PB " + ConvertX.MSTimeToHMSC(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + ConvertX.MSTimeToHMSC(pb.LapTime - wr.LapTime, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
             }
             else if (pb != null)
             {
-                AddMessageMiddle("^2PB " + ConvertX.MSToString(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
+                AddMessageMiddle("^2PB " + ConvertX.MSTimeToHMSC(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
             }
 
             Rank _rank = GetRank(ISession.GetRaceTrackPrefix(),CarPrefix);
@@ -446,12 +448,11 @@ namespace Drive_LFSS.Game_
                     iSession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")/*+"^2 with ^7" + carPrefix*/);
                 //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
             }
-            
-            if(!IsBot())
+            SetSafePct();
+            if (!iSession.IsFreezeMotdSend() && safePct < 100)
             {
                 SetSafePct();
-                if (!iSession.IsFreezeMotdSend())
-                    iSession.SendMSTMessage("/msg ^2    and '^7" + Math.Round(safePct,0) + "%^2' safe.");
+                iSession.SendMSTMessage("/msg ^2    and '^7" + safePct + "%^2' safe.");
             }
         }
         internal void LeaveTrack()

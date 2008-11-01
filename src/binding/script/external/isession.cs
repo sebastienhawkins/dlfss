@@ -34,6 +34,7 @@ namespace Drive_LFSS.Script_
         string GetSessionName();
         void SendMSTMessage(string message);
         void SendMSXMessage(string message);
+        void SendMTCMessageToAllAdmin(string message);
         void SendUpdateButtonToAll(ushort buttonEntry, string text);
         void RemoveButtonToAll(ushort buttonEntry);
         void RemoveButton(ushort buttonEntry,byte licenceId);

@@ -60,10 +60,10 @@ namespace Drive_LFSS
         public static readonly GuiTemplate guiTemplate = new GuiTemplate(new string[2] { "gui_template", "pxssus" });
         public static readonly TrackTemplate trackTemplate = new TrackTemplate(new string[2] { "track_template", "psssuuuuu" });
         public static readonly CarTemplate carTemplate = new CarTemplate(new string[2] { "car_template", "pssuu" });
-        public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psuusuuuuuu" });
+        public static readonly RaceTemplate raceTemplate = new RaceTemplate(new string[2] { "race_template", "psuusuuuuuuuu" });
         public static readonly DriverBan driverBan = new DriverBan(new string[2] { "driver_ban", "psssuuu" });
         public static readonly RestrictionRace restrictionRace = new RestrictionRace(new string[2] { "restriction_race", "psfsuuuuuuuuuuuuuuuuuuuu" });
-        public static readonly RestrictionJoin restrictionJoin = new RestrictionJoin(new string[2] { "restriction_join", "psuuuuuuususuuuuuuuuuuuu" });
+        public static readonly RestrictionJoin restrictionJoin = new RestrictionJoin(new string[2] { "restriction_join", "psuuuuuuuuuususuuuuuuuuuuuu" });
         
         //mIRC
         public static readonly IrcClient ircClient = new IrcClient();
@@ -457,7 +457,8 @@ namespace Drive_LFSS
         private static void Exit(bool real)
         {
             Log.normal("Exit requested, please wait for all threads to exit...\r\n");
-
+            CommandConsole.Exec("say all ^7D^3rive_LFSS ^7is going ^1Offline.");
+            System.Threading.Thread.Sleep(1000);
             MainRun = false;
 
             SessionList.DisconnectAll();
@@ -491,6 +492,7 @@ namespace Drive_LFSS
         }
         private static void UnHandleException(object sender, UnhandledExceptionEventArgs args)
         {
+            CommandConsole.Exec("say all ^7D^3rive_LFSS ^1Alert code 18 ;).");
             Log.error("Critical error, auto-shutdown in 20 Seconds...\r\n");
             Log.error("Exception was: " + args.ExceptionObject.ToString() + "\r\n");
             Exit(false);
@@ -500,7 +502,7 @@ namespace Drive_LFSS
         }
         private static void DisgraceExit(object sender, ConsoleCancelEventArgs args)
         {
-            args.Cancel = true;
+            //args.Cancel = true;
             DisgraceExit();
             System.Environment.Exit(0);
         }

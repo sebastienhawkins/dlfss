@@ -24,11 +24,11 @@ namespace Drive_LFSS
     //Real extention required .net 3.0 , since we don't need .net 3.0 for the rest , i prefer stay .net 2.0
     sealed class ConvertX
     {
-        public static string MSToString(uint msTime, string negativeColor, string positiveColor)
+        public static string MSTimeToHMSC(uint msTime, string negativeColor, string positiveColor)
         {
-            return MSToString((int)msTime,negativeColor, positiveColor);
+            return MSTimeToHMSC((int)msTime,negativeColor, positiveColor);
         }
-        public static string MSToString(int msTime,string negativeColor, string positiveColor)
+        public static string MSTimeToHMSC(int msTime,string negativeColor, string positiveColor)
         {
             string stringTime = "";
             bool isNegative = msTime < 0 ? true : false;

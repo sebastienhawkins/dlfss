@@ -22,6 +22,6 @@ namespace Drive_LFSS.Script_
     {
         bool CanVote();
         byte GetCarCount();
-        ISession ISession{get;}
+        ISession GetSession();
     }
 }

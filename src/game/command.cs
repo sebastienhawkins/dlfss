@@ -24,6 +24,7 @@ namespace Drive_LFSS.Server_
     using Game_;
     using Definition_;
     using ChatModo_;
+    using Storage_;
 
     sealed class CommandInGame
     {
@@ -47,7 +48,10 @@ namespace Drive_LFSS.Server_
            command["result"] = new CommandName(0, new CommandDelegate(Result));
            command["say"] = new CommandName(1, new CommandDelegate(Say));
            command["badword"] = new CommandName(2, new CommandDelegate(BadWord));
+           command["endrace"] = new CommandName(1, new CommandDelegate(EndRace));
            command["end"] = new CommandName(1, new CommandDelegate(EndRace));
+           command["searchrace"] = new CommandName(1, new CommandDelegate(SearchRace));
+           command["loadrace"] = new CommandName(1, new CommandDelegate(LoadRace));
         }
         ~CommandInGame()
         {
@@ -350,6 +354,95 @@ namespace Drive_LFSS.Server_
         private void EndRace(Driver driver, string[] args)
         {
             driver.ISession.EndRace();
+        }
+        private void SearchRace(Driver driver, string[] args)
+        {
+            if (args.Length != 2)
+            {
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!searchrace ^3$carPrefix.", DISPLAY_TIME);
+                return;
+            }
+            if(args[1].Length != 3)
+            {
+                driver.AddMessageMiddle("^7SearchRace invalid carPrefix(^3"+args[1]+"^7).", DISPLAY_TIME);
+                return;  
+            }
+            
+            string carEntry = "";
+            string textToSend = "";
+            uint count = 0;
+            uint itrMax = Program.carTemplate.GetMaxEntry();
+            RaceTemplateInfo raceInfo = null;
+            CarTemplateInfo carInfo = null;
+            for(uint itr = 0; itr < itrMax; itr++)
+            {
+                carInfo = Program.carTemplate.GetEntry(itr);
+                if(carInfo != null && carInfo.NamePrefix.ToLowerInvariant() == args[1].ToLowerInvariant())
+                {
+                    carEntry = carInfo.Entry.ToString();
+                    break;
+                }
+            }
+            if (carEntry == "")
+            {
+                driver.AddMessageMiddle("^7SearchRace not found carPrefix(^3"+args[1]+"^7).", DISPLAY_TIME);
+                return;
+            }
+            
+            itrMax = Program.raceTemplate.GetMaxEntry();
+            string[] carList;
+            for(uint itr = 0; itr < itrMax; itr++)
+            {
+                raceInfo = Program.raceTemplate.GetEntry(itr);
+                if(raceInfo == null)
+                    continue;
+                
+                carList = raceInfo.CarEntryAllowed.Split(new char[]{' '},StringSplitOptions.RemoveEmptyEntries);
+                foreach(string entry in carList)
+                {
+                    if(entry == carEntry)
+                    {
+                        if(count == 2)
+                        {
+                            count = 1;
+                            textToSend = textToSend.Substring(0,textToSend.Length-15);
+                            textToSend += "\r\n";
+                            textToSend += "^7" + raceInfo.Entry + " ^3-> ^7" + raceInfo.Description + "      ^2|      ";
+                        }
+                        else
+                        {
+                            textToSend += "^7" + raceInfo.Entry + " ^3-> ^7" + raceInfo.Description + "      ^2|      "; 
+                            count++;
+                        }
+                    }
+                }
+            }
+            if (textToSend != "")
+            {
+                textToSend = textToSend.Substring(0,textToSend.Length-15);
+                driver.SendGui((ushort)Gui_Entry.TEXT, textToSend);
+            }
+            else
+                driver.AddMessageMiddle("^7SearchRace no race found that has carPrefix(^3" + args[1] + "^7).", DISPLAY_TIME);
+        }
+        private void LoadRace(Driver driver, string[] args)
+        {
+            if (args.Length != 2)
+            {
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!loadrace ^3#raceEntry", DISPLAY_TIME);
+                return;
+            }
+            ushort entry = 0;
+            try{entry = Convert.ToUInt16(args[1]);}
+            catch(Exception){}
+
+            if (entry == 0)
+            {
+                driver.AddMessageMiddle("^1Invalid track entry : " + args[1], DISPLAY_TIME);
+                return;
+            }
+
+            session.LoadRace(entry);
         }
         #endregion
     }
