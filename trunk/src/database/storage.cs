@@ -564,17 +564,16 @@ namespace Drive_LFSS.Storage_
         {
             entry = Convert.ToUInt32(rowInfos[0]);
             description = (string)(rowInfos[1]);
-            entry_restriction = Convert.ToUInt16(rowInfos[2]);
-            trackEntry = (byte)Convert.ToUInt16(rowInfos[3]);
-            carEntryAllowed = (string)rowInfos[4];
-            weather = (Weather_Status)Convert.ToUInt16(rowInfos[5]);
-            wind = (Wind_Status)Convert.ToUInt16(rowInfos[6]);
-            lapCount = (byte)Convert.ToUInt16(rowInfos[7]);
-            qualifyMinute = (byte)Convert.ToUInt16(rowInfos[8]);
-            maximunRaceEnd = Convert.ToUInt16(rowInfos[9]);
-            raceTemplateMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[10]);
-            restriction_join_entry = Convert.ToUInt32(rowInfos[11]);
-            restriction_race_entry = Convert.ToUInt32(rowInfos[12]);
+            trackEntry = (byte)Convert.ToUInt16(rowInfos[2]);
+            carEntryAllowed = (string)rowInfos[3];
+            weather = (Weather_Status)Convert.ToUInt16(rowInfos[4]);
+            wind = (Wind_Status)Convert.ToUInt16(rowInfos[5]);
+            lapCount = (byte)Convert.ToUInt16(rowInfos[6]);
+            qualifyMinute = (byte)Convert.ToUInt16(rowInfos[7]);
+            maximunRaceEnd = Convert.ToUInt16(rowInfos[8]);
+            raceTemplateMask = (Race_Template_Flag)Convert.ToUInt16(rowInfos[9]);
+            restriction_join_entry = Convert.ToUInt32(rowInfos[10]);
+            restriction_race_entry = Convert.ToUInt32(rowInfos[11]);
         }
         ~RaceTemplateInfo()
         {
@@ -582,7 +581,6 @@ namespace Drive_LFSS.Storage_
         }
         private uint entry = 0;
         private string description = "";
-        private uint entry_restriction = 0;
         private byte trackEntry = 0;
         private string carEntryAllowed = "";
         private Weather_Status weather = Weather_Status.WEATHER_CLEAR_DAY;

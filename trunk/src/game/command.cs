@@ -32,7 +32,7 @@ namespace Drive_LFSS.Server_
         {
             session = _session;
             //       CommandName                CommandLevel                    CommandReference
-           command["exit"] = new CommandName(1, new CommandDelegate(Exit));
+           command["exit"] = new CommandName(2, new CommandDelegate(Exit));
            command["kick"] = new CommandName(1, new CommandDelegate(Kick));
            command["reload"] = new CommandName(1, new CommandDelegate(Reload));
            command["help"] = new CommandName(0, new CommandDelegate(Help));
@@ -52,6 +52,7 @@ namespace Drive_LFSS.Server_
            command["end"] = new CommandName(1, new CommandDelegate(EndRace));
            command["searchrace"] = new CommandName(1, new CommandDelegate(SearchRace));
            command["loadrace"] = new CommandName(1, new CommandDelegate(LoadRace));
+           command["yellowtime"] = new CommandName(1, new CommandDelegate(YellowTime));
         }
         ~CommandInGame()
         {
@@ -434,15 +435,34 @@ namespace Drive_LFSS.Server_
             }
             ushort entry = 0;
             try{entry = Convert.ToUInt16(args[1]);}
-            catch(Exception){}
-
-            if (entry == 0)
+            catch(Exception)
             {
                 driver.AddMessageMiddle("^1Invalid track entry : " + args[1], DISPLAY_TIME);
                 return;
             }
-
             session.LoadRace(entry);
+        }
+        private void YellowTime(Driver driver, string[] args)
+        {
+            if (args.Length != 2)
+            {
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!yellowtime ^3#timeMax", DISPLAY_TIME);
+                return;
+            }
+            uint value = 0;
+            try { value = Convert.ToUInt32(args[1]); }
+            catch (Exception)
+            {
+                driver.AddMessageMiddle("^1Invalid timeMax value : " + args[1], DISPLAY_TIME);
+                return;
+            }
+            if(value < 3000)
+            {
+                driver.AddMessageMiddle("^1TimeMax must be ^3> ^1then 3000.", DISPLAY_TIME);
+                return; 
+            }
+            session.SetTimeYellowMax(value);
+            driver.AddMessageMiddle("^3Yellow time max is now:^7" + value.ToString()+ "^3.", DISPLAY_TIME);
         }
         #endregion
     }

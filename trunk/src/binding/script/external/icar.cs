@@ -21,7 +21,7 @@ namespace Drive_LFSS.Script_
     public interface ICar
     {
         byte CarId { get; }
-        bool IsOnTrack();
+        bool IsRacing();
         string CarPrefix { get; }
     }
 }

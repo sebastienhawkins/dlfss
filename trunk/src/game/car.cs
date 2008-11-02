@@ -98,7 +98,7 @@ namespace Drive_LFSS.Game_
         private ushort tracjectory = 0;
         private ushort orientation = 0;
         private short orientationSpeed = 0;
-        private bool isOnTrack = false;
+        private bool isInRace = false;
         private bool isInPit = false;
         private bool isMoving = false;
         private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
@@ -400,72 +400,6 @@ namespace Drive_LFSS.Game_
             ((Driver)this).SetConfigValue(Config_User.DRIFT_SCORE_ON, (isOn ? "1" : "0"));
         }
 
-
-        private void EnterPit()
-        {
-            
-        }
-        private void EnterTrack(bool firstTime)
-        {
-            isOnTrack = true;
-
-            RemoveTrackPrefix();
-            RemoveBanner();
-            
-            if(firstTime)
-                EnterTrackFirstTime();
-        }
-        //should be into driver
-        private void EnterTrackFirstTime()
-        {
-            wr = Program.pubStats.GetWR(carPrefix + ISession.GetRaceTrackPrefix());
-            if (wr != null)
-            {
-                //lapTime = lapTime.Insert();
-                AddMessageMiddle("^2WR " + ConvertX.MSTimeToHMSC(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by^ " + wr.LicenceName, 6000);
-            }
-
-            pb = Program.pubStats.GetPB(licenceName, carPrefix + ISession.GetRaceTrackPrefix());
-            if (pb != null && wr != null)
-            {
-                AddMessageMiddle("^2PB " + ConvertX.MSTimeToHMSC(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT) + " ^2WR " + ConvertX.MSTimeToHMSC(pb.LapTime - wr.LapTime, Msg.COLOR_DIFF_LOWER, Msg.COLOR_DIFF_HIGHER), 7000);
-            }
-            else if (pb != null)
-            {
-                AddMessageMiddle("^2PB " + ConvertX.MSTimeToHMSC(pb.LapTime, Msg.COLOR_DIFF_EVENT, Msg.COLOR_DIFF_EVENT), 7000);
-            }
-
-            Rank _rank = GetRank(ISession.GetRaceTrackPrefix(),CarPrefix);
-            if(_rank != null)
-            {
-                if (!iSession.IsFreezeMotdSend())
-                    iSession.SendMSTMessage("/msg "+driverName+" ^2" + _rank.GetGradeComment() /*+ "^2 with ^7" + carPrefix*/);
-                //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
-            }
-            else
-            {
-                if (!iSession.IsFreezeMotdSend())
-                    iSession.SendMSTMessage("/msg "+driverName+" ^2is "+( IsBot() ? "a ^7BOT" : "^7new")/*+"^2 with ^7" + carPrefix*/);
-                //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
-            }
-            SetSafePct();
-            if (!iSession.IsFreezeMotdSend() && safePct < 100)
-            {
-                SetSafePct();
-                iSession.SendMSTMessage("/msg ^2    and '^7" + safePct + "%^2' safe.");
-            }
-        }
-        internal void LeaveTrack()
-        {
-            SimulateLastMCI();
-            isOnTrack = false;
-            SendBanner();
-            SendTrackPrefix();
-        }
-        public bool IsOnTrack()
-        {
-            return (carId > 0 && isOnTrack);
-        }
         public byte CarId
         {
             get { return carId; }
@@ -555,6 +489,10 @@ namespace Drive_LFSS.Game_
         public bool IsMoving()
         {
             return isMoving;
+        }
+        public string GetSkinName()
+        {
+            return carSkin;
         }
     }
 }
