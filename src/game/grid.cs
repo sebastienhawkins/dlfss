@@ -256,7 +256,7 @@ namespace Drive_LFSS.Game_
 
             //TODO: need to find the perfect angle, based on a static car ~size.
             //12.0d was too big at very high speed
-            return ( (angleDiff <= 6.0d) && (angleDiff >= -6.0d ) );
+            return ( (angleDiff <= 5.0d) && (angleDiff >= -5.0d ) );
         }
     }
 }
