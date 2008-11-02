@@ -238,7 +238,7 @@ namespace Drive_LFSS.Game_
             maxSpeedMs = 0.0d; 
 
             laps.Enqueue(lap);
-            lap = new Lap();
+            lap = new Lap(packet);
         }
         internal void ProcessSplitInformation(PacketSPX packet)
         {
@@ -412,6 +412,11 @@ namespace Drive_LFSS.Game_
         {
             internal protected Lap()
             {
+            }
+            internal protected Lap(PacketLAP packet)
+            {
+                totalTime = packet.totalTime;
+                lapCompleted = packet.lapCompleted;
             }
             ~Lap()
             {
@@ -1022,6 +1027,8 @@ namespace Drive_LFSS.Game_
 
             EnterRace(false);
             ClearAllStaticButton();
+            if(currentGui == Gui_Entry.RESULT)
+                RemoveResultGui();
         }
 
         public void FinishRace()
