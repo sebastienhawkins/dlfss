@@ -163,6 +163,10 @@ namespace Drive_LFSS.Game_
         {
             return race.GetLapCount();
         }
+        public Race_In_Progress_Status GetRaceInProgressStatus()
+        {
+            return race.GetInProgressStatus();
+        }
         internal List<Driver> GetDriverList()
         {
             return driverList;
@@ -193,6 +197,11 @@ namespace Drive_LFSS.Game_
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].SendUpdateButton(buttonEntry, text);
+        }
+        public void SetTimeYellowMax(uint value)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+                driverList[itr].SetTimeYellowMax(value); 
         }
         public void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay)
         {
@@ -625,15 +634,13 @@ namespace Drive_LFSS.Game_
             if (_packet.currentCarId == 0)
                 race.Init(_packet);
 
-            if (_packet.trackPrefix != oldTrackPrefix)
-            {//THIS IS NOT NEEDED IF WE FOLLOW TINY_CLR WHO MEAN ALL PLAYE CLEARED FROM TRACK.
-
-                //SendMSTMessage(Msg.TRACK_PREFIX_NEW + GetRaceTrackPrefix());
-            }
-
             clientConnectionCount = _packet.connectionCount;
-            //else
-            //    ;//driver Case
+
+            if (_packet.trackPrefix != oldTrackPrefix)
+            {
+                for (byte itr = 0; itr < driverList.Count; itr++)
+                    driverList[itr].ProcessTrackChange();
+            }
 
         }      // State Change race/car
         protected sealed override void processPacket(PacketTiny _packet)
@@ -659,7 +666,8 @@ namespace Drive_LFSS.Game_
                     byte itrEnd = (byte)driverList.Count;
                     while (itr < itrEnd)
                     {
-                        driverList[itr].LeaveTrack();
+                        race.ProcessCarLeaveRace(driverList[itr]);
+                        driverList[itr].LeaveRace();
                         itr++;
                     }
                 } break;
@@ -1028,9 +1036,9 @@ namespace Drive_LFSS.Game_
                 Log.error("processPacket(PacketSPX), we can find any driver with this car.\r\n");
                 return;
             }
-
-            driverList[index].ProcessEnterGarage();
             race.ProcessCarLeaveRace(((CarMotion)driverList[index]));
+            driverList[index].ProcessEnterGarage();
+            
         }
         protected sealed override void processPacket(PacketFLG _packet)
         {

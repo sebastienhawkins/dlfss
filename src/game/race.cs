@@ -168,7 +168,7 @@ namespace Drive_LFSS.Game_
                 if(driver == null) //Probaly return from a network failure and driver got disconnected during the failure, we will cancel this result.
                     return;
 
-                ((Button)driver).SendFlagRace((ushort)Gui_Entry.FLAG_RACE_END, 5000);
+                ((Button)driver).SendFlagRace((ushort)Gui_Entry.FLAG_RACE_END, 15000);
                 
                 if (driverToPosition.ContainsKey(driver.GetGuid()))
                     driverToPosition[driver.GetGuid()] = packet.positionFinal;
@@ -477,6 +477,10 @@ namespace Drive_LFSS.Game_
         public byte GetLapCount()
         {
             return lapCount;
+        }
+        public Race_In_Progress_Status GetInProgressStatus()
+        {
+            return raceInProgressStatus;
         }
         private void AddToGrid(CarMotion car)
         {

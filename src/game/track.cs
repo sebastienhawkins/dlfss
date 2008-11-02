@@ -87,8 +87,9 @@ namespace Drive_LFSS.Game_
                         {
                             if (race.HasRacerOn() && !race.IsStillRacing(((ICar)driver).CarId))
                             {
-                                ((IButton)driver).AddMessageMiddle("^7O^3nly ^2grid/racing ^3player can ^2restart^3/^2end^3/^2qualify ^3during a race",7000);
-                                SendVoteCancel();
+                                //Desativated cause piss off, need much better support for this.
+                                //((IButton)driver).AddMessageMiddle("^7O^3nly ^2grid/racing ^3player can ^2restart^3/^2end^3/^2qualify ^3during a race",7000);
+                                //SendVoteCancel();
                             }
                         }
                     }
@@ -263,18 +264,19 @@ namespace Drive_LFSS.Game_
         }
         public void LoadNextTrack(ushort trackEntry)
         {
-            if (trackEntry == 0)
-            {
-                //Hope to never see that message, but since ppl can customize script, can happen someone let go a 0.
-                Log.error(session.GetSessionNameForLog() + " VOTE System, LoadNextTrack(ushort trackEntry == 0), this should never happen");
-                return;
-            }
             previousRaceEntry = (ushort)raceInfo.Entry;
             raceInfo = Program.raceTemplate.GetEntry(trackEntry);
-
+            if(raceInfo == null)
+                raceInfo = new RaceTemplateInfo();
+            
             LoadRestrictionJoin(raceInfo.Restriction_join_entry);
             LoadRestrictionRace(raceInfo.Restriction_race_entry);
 
+            if (trackEntry == 0)
+            {
+                session.AddMessageMiddleToAll("^7Race template has been ^3Cleared.", 10000);
+                return;
+            }
             session.AddMessageMiddleToAll("^7Next Track Will Be ^3" + raceInfo.Description + "^7.", 10000);
             nextRaceTimer = 10000;
         }
