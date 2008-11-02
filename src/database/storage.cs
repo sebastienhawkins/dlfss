@@ -631,7 +631,7 @@ namespace Drive_LFSS.Storage_
         {
             return (raceTemplateMask & flag) == flag;
         }
-        public uint Restriction_join_entry
+        public uint RestrictionJoinEntry
         {
             get { return restriction_join_entry; }
         }
@@ -760,7 +760,7 @@ namespace Drive_LFSS.Storage_
         private byte intakeRestriction = 0;
         private Penalty_Type_Ext intakeRestrictionPen = Penalty_Type_Ext.NONE;
 
-        private Penalty_Reason penalityReason = Penalty_Reason.PENALTY_REASON_UNK;
+        private Penalty_Reason penalityReason = Penalty_Reason.NONE;
         private Penalty_Type_Ext penalityReasonPen = Penalty_Type_Ext.NONE;
         
         private Driver_Flag driverMask = Driver_Flag.NONE;
@@ -851,7 +851,11 @@ namespace Drive_LFSS.Storage_
         private ushort rankTotalMin = 0;
         private ushort rankTotalMax = 0;
         private bool rankKick = false;
-
+        
+        public string Description
+        {
+            get{return description;}
+        }
         public byte SafeDrivingPct
         {
             get { return safeDrivingPct; }

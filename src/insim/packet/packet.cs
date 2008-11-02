@@ -100,6 +100,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_MSX_SEND_BIG_CHAT, new PacketMSX());
             Add(Packet_Type.PACKET_PIT_DRIVER_PITSTOP_START, new PacketPIT());
             Add(Packet_Type.PACKET_PLA_DRIVER_PIT_LANE_STATUS, new PacketPLA());
+            Add(Packet_Type.PACKET_PEN_DRIVER_PENALITY_STATUS, new PacketPEN());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -531,12 +532,12 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        internal byte ReqI;
-        internal byte PLID;
-        internal Penalty_Type OldPen;
-        internal Penalty_Type NewPen;
-        internal Penalty_Reason Reason;
-        internal byte Sp3;
+        internal byte requestId;
+        internal byte carId;
+        internal Penalty_Type penalityOld;
+        internal Penalty_Type penalityCurrent;
+        internal Penalty_Reason penalityReason;
+        internal byte spare3;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPFL
     {

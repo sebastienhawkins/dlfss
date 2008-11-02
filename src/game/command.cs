@@ -401,6 +401,7 @@ namespace Drive_LFSS.Server_
                 carList = raceInfo.CarEntryAllowed.Split(new char[]{' '},StringSplitOptions.RemoveEmptyEntries);
                 foreach(string entry in carList)
                 {
+                    string restriction = "";
                     if(entry == carEntry)
                     {
                         if(count == 2)
@@ -408,11 +409,17 @@ namespace Drive_LFSS.Server_
                             count = 1;
                             textToSend = textToSend.Substring(0,textToSend.Length-15);
                             textToSend += "\r\n";
-                            textToSend += "^7" + raceInfo.Entry + " ^3-> ^7" + raceInfo.Description + "      ^2|      ";
+                            restriction = "";
+                            if(raceInfo.RestrictionJoinEntry != 0)
+                                restriction = " ^3-> ^7"+Program.restrictionJoin.GetEntry(raceInfo.RestrictionJoinEntry).Description;
+                            textToSend += "^7" + raceInfo.Entry + " ^3-> ^7" + raceInfo.Description +restriction+"   ^2|   ";
                         }
                         else
                         {
-                            textToSend += "^7" + raceInfo.Entry + " ^3-> ^7" + raceInfo.Description + "      ^2|      "; 
+                            restriction = "";
+                            if(raceInfo.RestrictionJoinEntry != 0)
+                                restriction = " ^3-> ^7" + Program.restrictionJoin.GetEntry(raceInfo.RestrictionJoinEntry).Description;
+                            textToSend += "^7" + raceInfo.Entry + " ^3-> ^7" + raceInfo.Description + restriction + "   ^2|   "; 
                             count++;
                         }
                     }
@@ -420,8 +427,8 @@ namespace Drive_LFSS.Server_
             }
             if (textToSend != "")
             {
-                textToSend = textToSend.Substring(0,textToSend.Length-15);
-                driver.SendGui((ushort)Gui_Entry.TEXT, textToSend);
+                textToSend = textToSend.Substring(0,textToSend.Length-9);
+                driver.SendUpdateGui(Gui_Entry.TEXT, textToSend);
             }
             else
                 driver.AddMessageMiddle("^7SearchRace no race found that has carPrefix(^3" + args[1] + "^7).", DISPLAY_TIME);

@@ -198,6 +198,11 @@ namespace Drive_LFSS.Game_
             for (byte itr = 0; itr < driverList.Count; itr++)
                 driverList[itr].SendUpdateButton(buttonEntry, text);
         }
+        public void SendUpdateGuiToAll(Gui_Entry guiEntry, string text)
+        {
+            for (byte itr = 0; itr < driverList.Count; itr++)
+                driverList[itr].SendUpdateGui(guiEntry, text);
+        }
         public void SetTimeYellowMax(uint value)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
@@ -216,7 +221,7 @@ namespace Drive_LFSS.Game_
         public void RemoveFlagRaceToAll(ushort guiEntry)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
-                driverList[itr].RemoveRaceFlag(guiEntry,true);
+                driverList[itr].RemoveRaceFlag(guiEntry);
         }
         public void AddMessageTopToAll(string text, uint duration)
         {
@@ -542,13 +547,13 @@ namespace Drive_LFSS.Game_
             race.ProcessCarLeaveRace(((CarMotion)driverList[itr]));
             ((Driver)driverList[itr]).ProcessLeaveRace(packet);
         }      // Delete Car leave (spectate - loses slot)
-        protected sealed override void processPacket(PacketMCI _packet)
+        protected sealed override void processPacket(PacketMCI packet)
         {
             #if DEBUG
             //base.processPacket(_packet); //Keep the Log
             #endif
 
-            CarInformation[] carInformation = _packet.carInformation;
+            CarInformation[] carInformation = packet.carInformation;
             byte carIndex;
             for (byte itr = 0; itr < carInformation.Length; itr++)
             {
@@ -570,7 +575,7 @@ namespace Drive_LFSS.Game_
                 race.ProcessCarInformation(((CarMotion)driverList[carIndex]));
             }
         }      // Multiple Car Information
-        protected sealed override void processPacket(PacketMSO _packet)
+        protected sealed override void processPacket(PacketMSO packet)
         {
             #if DEBUG
             //base.processPacket(_packet); //Keep the Log
@@ -578,45 +583,45 @@ namespace Drive_LFSS.Game_
             //Chat_User_Type chatUserType = allo;
 
             //_packet.chatUserType;
-            if (!IsExistconnectionId(_packet.connectionId))
+            if (!IsExistconnectionId(packet.connectionId))
                 return;
 
-            Driver driver = driverList[GetFirstLicenceIndex(_packet.connectionId)];
+            Driver driver = driverList[GetFirstLicenceIndex(packet.connectionId)];
 
-            if (_packet.message[_packet.textStart] == commandPrefix) //Ingame Command
+            if (packet.message[packet.textStart] == commandPrefix) //Ingame Command
             {
                 #if DEBUG
-                Log.debug(GetSessionNameForLog() + " Received Command: " + _packet.message.Substring(_packet.textStart) + ", From LicenceUser: " + driver.LicenceName + "\r\n");
+                Log.debug(GetSessionNameForLog() + " Received Command: " + packet.message.Substring(packet.textStart) + ", From LicenceUser: " + driver.LicenceName + "\r\n");
                 #endif
-                CommandExec(driver, _packet.message.Substring(_packet.textStart));
+                CommandExec(driver, packet.message.Substring(packet.textStart));
             }
-            else if (_packet.chatUserType == Chat_Type.SYSTEM || driver.IsBot()) //Host chat
+            else if (packet.chatUserType == Chat_Type.SYSTEM || driver.IsBot()) //Host chat
             {
-                Program.ircClient.SendToChannel(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
-                Log.chat(GetSessionNameForLog() + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
+                Program.ircClient.SendToChannel(GetSessionNameForLog() + " Say: " + packet.message.Substring(packet.textStart).Replace("^", "\x03"));
+                Log.chat(GetSessionNameForLog() + " Say: " + packet.message.Substring(packet.textStart).Replace("^", "\x03") + "\r\n");
             
             }
-            else if (_packet.chatUserType == Chat_Type.USER && !driver.IsBot())  //Player Chat
+            else if (packet.chatUserType == Chat_Type.USER && !driver.IsBot())  //Player Chat
             {
                 if(driver.GetGuid() != 0)
-                    chatModo.AddNewLine(driver.DriverName,_packet.message );
-                Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + driver.DriverName.Replace("^", "\x03") + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03"));
-                Log.chat(GetSessionNameForLog() + " " + driver.DriverName + " Say: " + _packet.message.Substring(_packet.textStart).Replace("^", "\x03") + "\r\n");
+                    chatModo.AddNewLine(driver.DriverName,packet.message );
+                Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + driver.DriverName.Replace("^", "\x03") + " Say: " + packet.message.Substring(packet.textStart).Replace("^", "\x03"));
+                Log.chat(GetSessionNameForLog() + " " + driver.DriverName + " Say: " + packet.message.Substring(packet.textStart).Replace("^", "\x03") + "\r\n");
             }
         }      // message out
-        protected sealed override void processPacket(PacketREO _packet)
+        protected sealed override void processPacket(PacketREO packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            race.Init(_packet);
+            race.Init(packet);
         }      // Race Grid Order
-        protected sealed override void processPacket(PacketRST _packet)
+        protected sealed override void processPacket(PacketRST packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            race.Init(_packet);
+            race.Init(packet);
 
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
@@ -624,31 +629,31 @@ namespace Drive_LFSS.Game_
                 driverList[itr].ProcessRaceStart();
             }
         }      // Race Start
-        protected sealed override void processPacket(PacketSTA _packet)
+        protected sealed override void processPacket(PacketSTA packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
 
             string oldTrackPrefix =  race.GetTrackPrefix();
-            if (_packet.currentCarId == 0)
-                race.Init(_packet);
+            if (packet.currentCarId == 0)
+                race.Init(packet);
 
-            clientConnectionCount = _packet.connectionCount;
+            clientConnectionCount = packet.connectionCount;
 
-            if (_packet.trackPrefix != oldTrackPrefix)
+            if (packet.trackPrefix != oldTrackPrefix)
             {
                 for (byte itr = 0; itr < driverList.Count; itr++)
                     driverList[itr].ProcessTrackChange();
             }
 
         }      // State Change race/car
-        protected sealed override void processPacket(PacketTiny _packet)
+        protected sealed override void processPacket(PacketTiny packet)
         {
             #if DEBUG
             //base.processPacket(_packet); //Keep the Log
             #endif
-            switch (_packet.subTinyType)
+            switch (packet.subTinyType)
             {
                 case Tiny_Type.TINY_REPLY: PingReceived(); break;
                 case Tiny_Type.TINY_REN: 
@@ -672,83 +677,83 @@ namespace Drive_LFSS.Game_
                     }
                 } break;
                 case Tiny_Type.TINY_NONE: break;
-                default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + _packet.subTinyType + "\r\n"); break;
+                default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for TinyPacket: " + packet.subTinyType + "\r\n"); break;
             }
         }     // Multipurpose 
-        protected sealed override void processPacket(PacketSmall _packet)
+        protected sealed override void processPacket(PacketSmall packet)
         {
             #if DEBUG
             //base.processPacket(_packet); //Keep the Log
             #endif
-            switch (_packet.subType)
+            switch (packet.subType)
             {
                 case Small_Type.SMALL_VTA_VOTE_ACTION:
                 {
-                    race.ProcessVoteAction((Vote_Action)_packet.uintValue);
+                    race.ProcessVoteAction((Vote_Action)packet.uintValue);
                 } break;
                 case Small_Type.SMALL_RTP_RACE_TIME:
                 {
-                    race.ProcessGTH(_packet.uintValue);
+                    race.ProcessGTH(packet.uintValue);
                 }break;
-                default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)_packet.subType + "\r\n"); break;
+                default: Log.missingDefinition(GetSessionNameForLog() + " Missing case for SmallPacket: " + (Small_Type)packet.subType + "\r\n"); break;
             }
         }    // Multipurpose 
-        protected sealed override void processPacket(PacketLAP _packet)
+        protected sealed override void processPacket(PacketLAP packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            byte index = GetCarIndex(_packet.carId);
+            byte index = GetCarIndex(packet.carId);
             if(index == 255)
             {
                 Log.error("processPacket(PacketLAP), we can find any driver with this car.\r\n");
                 return;
             }
-            driverList[index].ProcessLapInformation(_packet);
+            driverList[index].ProcessLapInformation(packet);
         }      // Lap Completed
-        protected sealed override void processPacket(PacketSPX _packet)
+        protected sealed override void processPacket(PacketSPX packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            byte index = GetCarIndex(_packet.carId);
+            byte index = GetCarIndex(packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketSPX), we can find any driver with this car.\r\n");
                 return;
             }
-            driverList[index].ProcessSplitInformation(_packet);
+            driverList[index].ProcessSplitInformation(packet);
         }      // Split Time Receive
-        protected sealed override void processPacket(PacketRES _packet)
+        protected sealed override void processPacket(PacketRES packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            byte index = GetCarIndex(_packet.carId);
+            byte index = GetCarIndex(packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketRES), we can find any driver with this car.\r\n");
                 return;
             }
-            driverList[index].ProcessRESPacket(_packet);
+            driverList[index].ProcessRESPacket(packet);
 
-            race.ProcessResult(_packet);
+            race.ProcessResult(packet);
         }      // Result, "Confimation" is only working for a race not qualify
-        protected sealed override void processPacket(PacketFIN _packet)
+        protected sealed override void processPacket(PacketFIN packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
         }      // Final Result, Only into a Race
-        protected sealed override void processPacket(PacketBTC _packet)
+        protected sealed override void processPacket(PacketBTC packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
 
-            Driver driver = driverList[GetConnectionIdNotBot(_packet.connectionId)];
+            Driver driver = driverList[GetConnectionIdNotBot(packet.connectionId)];
 
-            switch ((Button_Entry)driver.GetButtonEntry(_packet.buttonId))
+            switch ((Button_Entry)driver.GetButtonEntry(packet.buttonId))
             {
                 case Button_Entry.MOTD_BUTTON_DRIVE:
                 {
@@ -920,35 +925,35 @@ namespace Drive_LFSS.Game_
                     driver.RemoveMenuGui();
                     command.Exec(driver, "!exit");
                 } break;
-                case Button_Entry.VOTE_OPTION_1: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,_packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_2: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_3: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_4: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_4, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_5: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_5, _packet.connectionId); break;
-                case Button_Entry.VOTE_OPTION_6: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, _packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_1: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_1,packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_2: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_2, packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_3: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_3, packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_4: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_4, packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_5: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_5, packet.connectionId); break;
+                case Button_Entry.VOTE_OPTION_6: race.ProcessVoteNotification(Vote_Action.VOTE_CUSTOM_6, packet.connectionId); break;
                 default:
                 {
                     Log.error("We received a button ClickId from an unknown source, licenceName: " + driver.LicenceName + "\r\n");
                 } break;
             }
         }      // Button Click Receive
-        protected sealed override void processPacket(PacketBTT _packet)         // Button Text Receive
+        protected sealed override void processPacket(PacketBTT packet)         // Button Text Receive
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
 
-            byte driverIndex = GetConnectionIdNotBot(_packet.connectionId);
+            byte driverIndex = GetConnectionIdNotBot(packet.connectionId);
             Driver car = driverList[driverIndex];
-            switch((Button_Entry)car.GetButtonEntry(_packet.buttonId))
+            switch((Button_Entry)car.GetButtonEntry(packet.buttonId))
             {
                 case Button_Entry.CONFIG_USER_ACC_START:
                 {
                     ushort startKmh;
-                    try { startKmh = Convert.ToUInt16(_packet.typedText); }
+                    try { startKmh = Convert.ToUInt16(packet.typedText); }
                     catch (Exception)
                     {
-                        car.AddMessageMiddle("^1Bad value (^7" + _packet.typedText + "^1) entered for 'Acceleration Start speed (in Kmh)'.", 7000);
+                        car.AddMessageMiddle("^1Bad value (^7" + packet.typedText + "^1) entered for 'Acceleration Start speed (in Kmh)'.", 7000);
                         return;
                     }
                     if (startKmh > car.GetAccelerationEndSpeed())
@@ -962,10 +967,10 @@ namespace Drive_LFSS.Game_
                 case Button_Entry.CONFIG_USER_ACC_END:
                 {
                     ushort endKmh;
-                    try { endKmh = Convert.ToUInt16(_packet.typedText); }
+                    try { endKmh = Convert.ToUInt16(packet.typedText); }
                     catch (Exception)
                     {
-                        car.AddMessageMiddle("^1Bad value (^7" + _packet.typedText + "^1) entered for 'Acceleration End speed (in Kmh)'.", 7000);
+                        car.AddMessageMiddle("^1Bad value (^7" + packet.typedText + "^1) entered for 'Acceleration End speed (in Kmh)'.", 7000);
                         return;
                     }
                     if (endKmh < car.GetAccelerationStartSpeed())
@@ -983,30 +988,30 @@ namespace Drive_LFSS.Game_
                 } break;
                 case Button_Entry.RANK_SEARCH_BUTTON_TRACK:
                 {
-                    car.RankSearchTrack(_packet.typedText.ToUpperInvariant());
+                    car.RankSearchTrack(packet.typedText.ToUpperInvariant());
                 } break;
                 case Button_Entry.RANK_SEARCH_BUTTON_CAR:
                 {
-                    car.RankSearchCar(_packet.typedText.ToUpperInvariant());
+                    car.RankSearchCar(packet.typedText.ToUpperInvariant());
                 } break;
                 case Button_Entry.RANK_SEARCH_BUTTON_LICENCE:
                 {
-                    car.RankSearchAdd(_packet.typedText);
+                    car.RankSearchAdd(packet.typedText);
                 }break;
             }
         }
-        protected sealed override void processPacket(PacketBFN _packet)
+        protected sealed override void processPacket(PacketBFN packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            int index = GetConnectionIdNotBot(_packet.connectionId);
+            int index = GetConnectionIdNotBot(packet.connectionId);
             if(index == 255)
             {
                 Log.error("processPacket(PacketBFN), received a Not Found Driver ID.\r\n");
                 return;
             }
-            switch (_packet.buttonFunction)
+            switch (packet.buttonFunction)
             {
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
                 {
@@ -1017,20 +1022,20 @@ namespace Drive_LFSS.Game_
                     driverList[index].ProcessBFNRequest(); break;
             }
         }      // Delete All Button or request Button.
-        protected sealed override void processPacket(PacketVTN _packet)
+        protected sealed override void processPacket(PacketVTN packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            race.ProcessVoteNotification(_packet.voteAction, _packet.connectionId);
+            race.ProcessVoteNotification(packet.voteAction, packet.connectionId);
         }      // Vote Notification
-        protected sealed override void processPacket(PacketPLP _packet)         // Car enter garage
+        protected sealed override void processPacket(PacketPLP packet)         // Car enter garage
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
 
-            byte index = GetCarIndex(_packet.carId);
+            byte index = GetCarIndex(packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketSPX), we can find any driver with this car.\r\n");
@@ -1040,51 +1045,64 @@ namespace Drive_LFSS.Game_
             driverList[index].ProcessEnterGarage();
             
         }
-        protected sealed override void processPacket(PacketFLG _packet)
+        protected sealed override void processPacket(PacketFLG packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            byte index = GetCarIndex(_packet.carId);
+            byte index = GetCarIndex(packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketFLG), we can find any driver with this car.\r\n");
                 return;
             }
-            driverList[index].ProcessFLGPacket(_packet);
+            driverList[index].ProcessFLGPacket(packet);
         }
-        protected sealed override void processPacket(PacketPLA _packet)
+        protected sealed override void processPacket(PacketPLA packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            byte index = GetCarIndex(_packet.carId);
+            byte index = GetCarIndex(packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketPLA), we can find any driver with this car.\r\n");
                 return;
             }
-            driverList[index].ProcessPLAPacket(_packet);
+            driverList[index].ProcessPLAPacket(packet);
         }
-        protected sealed override void processPacket(PacketPIT _packet)
+        protected sealed override void processPacket(PacketPIT packet)
         {
             #if DEBUG
-            base.processPacket(_packet); //Keep the Log
+            base.processPacket(packet); //Keep the Log
             #endif
-            byte index = GetCarIndex(_packet.carId);
+            byte index = GetCarIndex(packet.carId);
             if (index == 255)
             {
                 Log.error("processPacket(PacketPIT), we can find any driver with this car.\r\n");
                 return;
             }
-            driverList[index].ProcessPITPacket(_packet);
+            driverList[index].ProcessPITPacket(packet);
         }
-        protected sealed override void processPacket(PacketVER _packet)
+        protected sealed override void processPacket(PacketPEN packet)
         {
-            Log.normal(GetSessionNameForLog() + " InSim v" + _packet.inSimVersion + ", Licence: " + _packet.productVersion + "." + _packet.serverVersion + "\r\n");
+            #if DEBUG
+            base.processPacket(packet); //Keep the Log
+            #endif
+            byte index = GetCarIndex(packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketPEN), we can find any driver with this car.\r\n");
+                return;
+            }
+            driverList[index].ProcessPenality(packet);
+        }
+        protected sealed override void processPacket(PacketVER packet)
+        {
+            Log.normal(GetSessionNameForLog() + " InSim v" + packet.inSimVersion + ", Licence: " + packet.productVersion + "." + packet.serverVersion + "\r\n");
             SendMSXMessage("^7D^3rive_LFSS ^7as come ^2Online.");
             #if DEBUG
-            race.ProcessVoteAction(Vote_Action.VOTE_END);
+            //race.ProcessVoteAction(Vote_Action.VOTE_END);
             #endif
         }
     }

@@ -192,7 +192,7 @@ namespace Drive_LFSS.Game_
             lock(carWeWaitForFinish)
             {
                 if( carWeWaitForFinish.Contains(car.CarId) )
-                    carWeWaitForFinish.Remove(car.CarId);
+                    carWeWaitForFinish.Remove(car.CarId);  
             }
             RemoveFromGrid(car);
         }

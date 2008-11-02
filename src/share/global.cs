@@ -279,14 +279,14 @@ namespace Drive_LFSS.Definition_
     }
     public enum Penalty_Type : byte
     {
-        PENALTY_TYPE_NONE = 0,
-        PENALTY_TYPE_DRIVE_THROUGH = 1,
-        PENALTY_TYPE_DRIVE_THROUGHT_VALID = 2,
-        PENALTY_TYPE_PIT_STOP = 3,
-        PENALTY_TYPE_PIT_STOP_VALID = 4,
-        PENALTY_TYPE_ADD_30_SEC = 5,
-        PENALTY_TYPE_ADD_45_SEC = 6,
-        PENALTY_TYPE_MAX = 7
+        NONE = 0,
+        DRIVE_THROUGH = 1,
+        DRIVE_THROUGHT_VALID = 2,
+        PIT_STOP = 3,
+        PIT_STOP_VALID = 4,
+        ADD_30_SEC = 5,
+        ADD_45_SEC = 6,
+        MAX = 7
     }
     public enum Penalty_Type_Ext : byte
     {
@@ -301,14 +301,14 @@ namespace Drive_LFSS.Definition_
     }
     public enum Penalty_Reason : byte
     {
-        PENALTY_REASON_UNK = 0,
-        PENALTY_REASON_ADMIN = 1,
-        PENALTY_REASON_WRONG_WAY = 2,
-        PENALTY_REASON_FALSE_START = 3,
-        PENALTY_REASON_PIT_SPEEDING = 4,
-        PENALTY_REASON_STOP_LATE = 6,
-        PENALTY_REASON_STOP_SHORT = 5,
-        PENALTY_REASON_MAX = 7,
+        NONE = 0,
+        ADMIN = 1,
+        WRONG_WAY = 2,
+        FALSE_START = 3,
+        PIT_SPEEDING = 4,
+        STOP_LATE = 6,
+        STOP_SHORT = 5,
+        MAX = 7,
     }
     public enum Pit_Lane_Action : byte
     {

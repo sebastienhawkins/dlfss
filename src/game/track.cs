@@ -269,7 +269,7 @@ namespace Drive_LFSS.Game_
             if(raceInfo == null)
                 raceInfo = new RaceTemplateInfo();
             
-            LoadRestrictionJoin(raceInfo.Restriction_join_entry);
+            LoadRestrictionJoin(raceInfo.RestrictionJoinEntry);
             LoadRestrictionRace(raceInfo.Restriction_race_entry);
 
             if (trackEntry == 0)
@@ -277,7 +277,8 @@ namespace Drive_LFSS.Game_
                 session.AddMessageMiddleToAll("^7Race template has been ^3Cleared.", 10000);
                 return;
             }
-            session.AddMessageMiddleToAll("^7Next Track Will Be ^3" + raceInfo.Description + "^7.", 10000);
+            SayNextTrack();
+            //session.AddMessageMiddleToAll("^7Next Track Will Be ^3" + raceInfo.Description + "^7.", 10000);
             nextRaceTimer = 10000;
         }
         protected void ExecNextTrack()
@@ -340,6 +341,60 @@ namespace Drive_LFSS.Game_
             ((Session)session).AddToTcpSendingQueud
             (new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE,
                     new PacketTiny(1, Tiny_Type.TINY_VTC)));
+        }
+        protected void SayNextTrack()
+        {
+            string resApply = "^7N^3ext ^7Race\r\n";
+            resApply += "^7R^3ace ^7Name ^2" + race.raceInfo.Description + "^7, Race Entry ^2" + race.raceInfo.Entry + "\r\n";
+            resApply += "^7T^3rack^7Prefix ^2"+Program.trackTemplate.GetEntry(raceInfo.TrackEntry).NamePrefix;
+            resApply += "^7, TrackName ^2" + Program.trackTemplate.GetEntry(raceInfo.TrackEntry).Name+"\r\n";
+            resApply += "^7C^3ar^7Allowed ^2";
+            if (raceInfo.CarEntryAllowed.IndexOf("all", StringComparison.InvariantCultureIgnoreCase) != -1)
+                resApply += "all\r\n";
+            else
+            {
+                string[] carEntrys = raceInfo.CarEntryAllowed.Split(new char[] { ' ' });
+                uint carEntry;
+                for (byte itr = 0; itr < carEntrys.Length; itr++)
+                {
+                    carEntry = 0;
+                    try { carEntry = Convert.ToUInt32(carEntrys[itr]); }
+                    catch (Exception exception)
+                    {
+                        Log.error("SayNextTrack(), Colum race_template.car_entry_allowed(" + raceInfo.CarEntryAllowed + ") has a bad value\r\n");
+                        continue;
+                    }
+                    resApply += Program.carTemplate.GetEntry(carEntry).NamePrefix + "^7,^2";
+                }
+                resApply = resApply.Substring(0, resApply.Length-3);
+            }
+            resApply += "^7\r\n^7\r\n";
+            resApply += "^7R^3estriction\r\n";
+            if (restrictionJoinInfo == null)
+                resApply += "^2None Apply";
+            else
+            {
+                resApply += "^7SafeDrivingMin(^1{0}^7%),^7BadLanguage(^1{1}^7%)\r\n";
+                resApply += "^7PBMin(^3{2}^7),PBMax(^4{3}^7)\r\n";
+                resApply += "^7DriverName(^1{4}^7),SkinName(^3{5}^7)\r\n";
+                resApply += "^7RankBestMin(^1{6}^7),RankBestMax(^3{7}^7)\r\n";
+                resApply += "^7RankAvgMin(^1{8}^7),RankAvgMax(^3{9}^7)\r\n";
+                resApply += "^7RankStaMin(^1{10}^7),RankStaMax(^3{11}^7)\r\n";
+                resApply += "^7RankWinMin(^1{12}^7),RankWinMax(^3{13}^7)\r\n";
+                resApply += "^7RankTotalMin(^1{14}^7),RankTotalMax(^3{15}^7)\r\n";
+                resApply = String.Format(resApply,
+                restrictionJoinInfo.SafeDrivingPct, restrictionJoinInfo.BadlanguagePct,
+                restrictionJoinInfo.PbMin, restrictionJoinInfo.PbMax,
+                restrictionJoinInfo.DriverName, restrictionJoinInfo.SkinName,
+                restrictionJoinInfo.RankBestMin, restrictionJoinInfo.RankBestMax,
+                restrictionJoinInfo.RankAvgMin, restrictionJoinInfo.RankAvgMax,
+                restrictionJoinInfo.RankStaMin, restrictionJoinInfo.RankStaMax,
+                restrictionJoinInfo.RankWinMin, restrictionJoinInfo.RankWinMax,
+                restrictionJoinInfo.RankTotalMin, restrictionJoinInfo.RankTotalMax);
+            }
+
+            //session.SendMSXMessage()
+            session.SendUpdateGuiToAll(Gui_Entry.TEXT, resApply);
         }
     }
 }
