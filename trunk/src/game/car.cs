@@ -82,7 +82,7 @@ namespace Drive_LFSS.Game_
         private Tyre_Compound tyreFrontRight = Tyre_Compound.CAR_TYRE_NOTCHANGED;
         private Tyre_Compound tyreRearLeft = Tyre_Compound.CAR_TYRE_NOTCHANGED;
         private Tyre_Compound tyreRearRight = Tyre_Compound.CAR_TYRE_NOTCHANGED;
-        private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
+        private Penalty_Type currentPenality = Penalty_Type.NONE;
         protected double maxSpeedMs = 0.0d;
         private ushort lapCompleted = 0;
         private ushort node = 0;

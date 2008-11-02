@@ -89,7 +89,7 @@ namespace Drive_LFSS.Game_
                 penType = (_penType = RankTotalMin()) > penType ? _penType : penType;
                 penType = (_penType = RankTotalMax()) > penType ? _penType : penType;
             }
-
+            ExecPenalityExt(penType);
             driver = null;
             rank = null;
             return penType;

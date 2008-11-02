@@ -160,7 +160,7 @@ namespace Drive_LFSS.Game_
         private uint timerBufferedButton = 0;
         private const uint TIMER_BUFFERED_BUTTON = 150;
         private const uint MAX_BUTTON_BY_CYCLE = 10;
-        private const uint TIMER_FLAG_RACE_UPDATE = 1000;
+        private const uint TIMER_FLAG_RACE_UPDATE = 1500;
         private uint timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
         protected virtual void update(uint diff)
         {
@@ -266,7 +266,7 @@ namespace Drive_LFSS.Game_
                         }
                         else if(flagRaceGui[itr] > 0)
                         {
-                            flagRaceGui[itr] = 1;
+                            flagRaceGui[itr] = 0;
                             if (currentFlagGui > 0 && currentFlagGui == itr)
                                 RemoveGui(itr);
                         }
@@ -290,10 +290,19 @@ namespace Drive_LFSS.Game_
 
         }
 
+        
         public void SendGui(ushort guiEntry, string text)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             guiInfo.Text = text;
+            SendGui(guiInfo);
+        }
+        internal void SendUpdateGui(Gui_Entry guiEntry, string text)
+        {
+            GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
+            guiInfo.Text = text;
+            if(currentGui == guiEntry)
+                RemoveGui(currentGui);
             SendGui(guiInfo);
         }
         protected void SendGui(Gui_Entry guiEntry)
@@ -551,14 +560,12 @@ namespace Drive_LFSS.Game_
                 flagRaceGui[guiEntry] = (time < TIMER_FLAG_RACE_UPDATE ? TIMER_FLAG_RACE_UPDATE : time);
             }
         }
-        internal void RemoveRaceFlag(ushort guiEntry, bool now)
+        internal void RemoveRaceFlag(ushort guiEntry)
         {
-            RemoveFlagRace((Gui_Entry)guiEntry, now);
+            RemoveFlagRace((Gui_Entry)guiEntry);
         }
-        protected void RemoveFlagRace(Gui_Entry guiEntry, bool now)
+        protected void RemoveFlagRace(Gui_Entry guiEntry)
         {
-            if (now)
-                RemoveGui(guiEntry);
             lock (flagRaceGui)
             {
                 flagRaceGui[guiEntry] = 1;
@@ -880,7 +887,7 @@ namespace Drive_LFSS.Game_
             string trackPrefix = driver.ISession.GetRaceTrackPrefix();
             string carPrefix = ((ICar)this).CarPrefix;
             if(carPrefix == "")
-                AddMessageTop("^2Ranking ^3Top20 ^2need you to enter a car first.",6000);
+                AddMessageMiddle("^2Ranking ^3Top20 ^2need you to enter a car first.",6000);
             uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
             SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7"+carPrefix+", ^2Track:^7 "+trackPrefix+", ^2Count: ^7"+rankedCount);
             if(rankedCount < 1)

@@ -154,8 +154,8 @@ namespace Drive_LFSS.Game_
             tyreRearLeft = packet.tyreRearLeft;
             tyreRearRight = packet.tyreRearRight;
             
-            if(session.GetRaceInProgressStatus() != Race_In_Progress_Status.RACE_PROGRESS_NONE)
-                EnterRace(firstTime);
+            //if(session.GetRaceInProgressStatus() != Race_In_Progress_Status.RACE_PROGRESS_NONE)
+            EnterRace(firstTime);
 
             if (IsBot())
             {
@@ -184,9 +184,12 @@ namespace Drive_LFSS.Game_
             totalLapCount++;
             lap.ProcessPacketLap(packet, session.GetRaceGuid(), CarPrefix, session.GetRaceTrackPrefix(), maxSpeedMs);
             
-            if(packet.lapCompleted+1 == session.GetRaceLapCount())
-                SendFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP,120000);
-            
+           // if(packet.lapCompleted+1 == session.GetRaceLapCount())
+            //    SendFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP,120000);
+            //else if (HasFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP))
+            //    RemoveFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP);
+                
+
             pb = Program.pubStats.GetPB(LicenceName, CarPrefix + session.GetRaceTrackPrefix());
             wr = Program.pubStats.GetWR(CarPrefix + session.GetRaceTrackPrefix());
             int lapDiff, lapWRDiff;
@@ -338,11 +341,11 @@ namespace Drive_LFSS.Game_
                 {
                     blueFlagActive = false;
                     flagRace ^= Flag_Race.YELLOW;
-                    RemoveFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR,true);
+                    RemoveFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR);
                 }
                 else if (packet.blueOrYellow == Flag_Race.YELLOW)
                 {
-                    RemoveFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL,true);
+                    RemoveFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL);
                     flagRace ^= Flag_Race.BLUE;
                     yellowFlagActive = false;
                 }
@@ -357,6 +360,12 @@ namespace Drive_LFSS.Game_
         internal void ProcessPITPacket(PacketPIT packet)
         {
             isInPit = true;
+        }
+        internal void ProcessPenality(PacketPEN packet)
+        {
+            penalityCurrent = packet.penalityCurrent;
+            penalityOld = packet.penalityOld;
+            penalityReason = packet.penalityReason;
         }
         internal void ProcessEnterGarage()                //When a car enter garage.
         {
@@ -389,6 +398,9 @@ namespace Drive_LFSS.Game_
         private uint driftScoreTimer = 0;
         private int safePct = 0;
         private int oldSafePct = 0;
+        private Penalty_Type  penalityOld = Penalty_Type.NONE;
+        private Penalty_Type penalityCurrent = Penalty_Type.NONE;
+        private Penalty_Reason penalityReason = Penalty_Reason.NONE;
         private const uint DRIFT_SCORE_TIMER = 40000;
         private Warning_Driving_Type warningDrivingType = Warning_Driving_Type.NONE;
         internal Driver_Flag driverMask = Driver_Flag.NONE;
@@ -436,7 +448,7 @@ namespace Drive_LFSS.Game_
             private uint[] splitTime = new uint[4] { 0, 0, 0, 0 };
             private ushort yellowFlagCount = 0;
             private ushort blueFlagCount = 0;
-            private Penalty_Type currentPenality = Penalty_Type.PENALTY_TYPE_NONE;
+            private Penalty_Type currentPenality = Penalty_Type.NONE;
             private byte pitStopTotal = 0;      //current race total pitstop.
             private byte pitStopTotalCount = 0; //To help make PitStop by lap and not by race.
             private byte pitStopCount = 0;      //this is the Current Lap Pitstop, cen be more then 2, since on a cruise server is possible i think so.
@@ -589,47 +601,67 @@ namespace Drive_LFSS.Game_
             else if (timeYellowFlag > 0)
                 timeYellowFlag = 0;
  
-            if (IsRacing())
+
+            if(timer300Check < diff)
             {
-                if(timer300Check < diff)
-                { 
+                timer300Check = TIMER_300_CHECK;
+                if (IsRacing())
+                {
                     //Idle Check
-                    timer300Check = TIMER_300_CHECK;
                     if (x == xOld && y == yOld && isMoving)
                        isMoving = false;
                     else if(!isMoving)
                         isMoving = true;
                     xOld = x;
                     yOld = y;
-                    
-                    
-                    //Yellow Time Check
-                    if (timeYellowFlag > TIME_YELLOW_1_10)
-                    {
-                        timeYellowSend = true;
+                }
+                
+                //Yellow Time Check
+                if (timeYellowFlag > TIME_YELLOW_1_10)
+                {
+                    timeYellowSend = true;
 
-                        if (timeYellowFlag > TIME_YELLOW_MAX)
-                        {
-                            timeYellowSend = false;
-                            RemoveButton(Button_Entry.INFO_2);
-                            session.SendMSTMessage("/spec " + driverName);
-                        }
-                        else if (timeYellowFlag > TIME_YELLOW_2_3)
-                            SendUpdateButton(Button_Entry.INFO_2, "^1Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
-                        else if (timeYellowFlag > TIME_YELLOW_1_3)
-                            SendUpdateButton(Button_Entry.INFO_2, "^3Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
-                        else
-                            SendUpdateButton(Button_Entry.INFO_2, "^2Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
-                    }
-                    else if (timeYellowSend && !yellowFlagActive)
+                    if (timeYellowFlag > TIME_YELLOW_MAX)
                     {
                         timeYellowSend = false;
                         RemoveButton(Button_Entry.INFO_2);
+                        session.SendMSTMessage("/spec " + driverName);
                     }
+                    else if (timeYellowFlag > TIME_YELLOW_2_3)
+                        SendUpdateButton(Button_Entry.INFO_2, "^1Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
+                    else if (timeYellowFlag > TIME_YELLOW_1_3)
+                        SendUpdateButton(Button_Entry.INFO_2, "^3Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
+                    else
+                        SendUpdateButton(Button_Entry.INFO_2, "^2Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
                 }
-                else
-                    timer300Check -= diff;
+                else if (timeYellowSend && !yellowFlagActive)
+                {
+                    timeYellowSend = false;
+                    RemoveButton(Button_Entry.INFO_2);
+                }
+                //FinalLap Check
+                if(IsRacing() && lap.LapCompleted+1 == session.GetRaceLapCount() )
+                {
+                    if(!HasFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP))
+                        SendFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP,999999);
+                }
+                else if(HasFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP))
+                    RemoveFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP);   
+                
+                //PenalityFlag Check
+                if (IsRacing() && (penalityCurrent == Penalty_Type.PIT_STOP
+                    || penalityCurrent == Penalty_Type.DRIVE_THROUGH
+                    || penalityCurrent == Penalty_Type.ADD_30_SEC
+                    || penalityCurrent == Penalty_Type.ADD_45_SEC))
+                {
+                    if (!HasFlagRace(Gui_Entry.FLAG_BLACK_PENALITY))
+                        SendFlagRace(Gui_Entry.FLAG_BLACK_PENALITY, 999999);
+                }
+                else if(HasFlagRace(Gui_Entry.FLAG_BLACK_PENALITY))
+                    RemoveFlagRace(Gui_Entry.FLAG_BLACK_PENALITY);  
             }
+            else
+                timer300Check -= diff;
 
             if (warningDrivingCancelTimer > 0)
             {

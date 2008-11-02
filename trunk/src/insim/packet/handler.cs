@@ -59,6 +59,7 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_FLG_DRIVER_BLUE_YELLOW_FLAG:   processPacket((PacketFLG)_packet); break;
                 case Packet_Type.PACKET_PLA_DRIVER_PIT_LANE_STATUS:    processPacket((PacketPLA)_packet); break;
                 case Packet_Type.PACKET_PIT_DRIVER_PITSTOP_START:      processPacket((PacketPIT)_packet); break;
+                case Packet_Type.PACKET_PEN_DRIVER_PENALITY_STATUS:    processPacket((PacketPEN)_packet); break;
                 default: Log.missingDefinition("ProcessPacket(), No existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
@@ -157,7 +158,7 @@ namespace Drive_LFSS.Packet_
         }
         protected virtual void processPacket(PacketPEN _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " PEN_PenaltyChanged(), PEN -> PLID=" + _packet.PLID + ", Reason=" + _packet.Reason + ", NewPen=" + _packet.NewPen + ", OldPen=" + _packet.OldPen + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " PEN_PenaltyChanged(), PEN -> PLID=" + _packet.carId + ", Reason=" + _packet.penalityReason + ", NewPen=" + _packet.penalityCurrent + ", OldPen=" + _packet.penalityOld + "\r\n");
         }
         // Yellow or blue flag changed
         protected virtual void processPacket(PacketFLG _packet)
