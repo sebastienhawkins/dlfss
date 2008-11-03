@@ -35,6 +35,7 @@ namespace Drive_LFSS
     using PubStats_;
     using Ranking_;
     using ChatModo_;
+    using Map_;
 
     sealed class Program
     {
@@ -73,7 +74,10 @@ namespace Drive_LFSS
 
         //Local Path
         public static string processPath = "";
-
+        
+        //Data Path
+        public static string dataPath = "";
+        
         [MTAThread]
         private static void Main()
 		{
@@ -91,7 +95,10 @@ namespace Drive_LFSS
 
             //Configuration
             InitConfig();
-
+            
+            //Init Data Path
+            InitDataPath();
+            
             //Logging
             InitLoging();
            
@@ -105,6 +112,9 @@ namespace Drive_LFSS
 
             //Initialize Storage
             InitStorage();
+            
+            //Init Map
+            InitMap();
 
             //Irc Client
             InitMircClient();
@@ -165,6 +175,17 @@ namespace Drive_LFSS
                System.Threading.Thread.Sleep(sleep);
             }
             #endregion
+		}
+		private static void InitMap()
+		{
+            Log.normal("Initializing Map...\r\n");
+            if (!Map.Initialize())
+            {
+                Log.error("Map system error.\r\n");
+                System.Threading.Thread.Sleep(5000);
+                CommandConsole.Exec("exit");
+            }
+            Log.normal("Completed initializing Map.\r\n\r\n");
 		}
         private static void InitChatModo()
         {
@@ -260,6 +281,12 @@ namespace Drive_LFSS
             }
             ConfigApply(); 
             Log.normal("Config initialized...\r\n\r\n");
+        }
+        private static void InitDataPath()
+        {
+            dataPath = Config.GetStringValue("Database","DataFolder","Path");
+            if(dataPath == ".")
+                dataPath = processPath;
         }
         private static void InitProcessPath()
         {
