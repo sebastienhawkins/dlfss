@@ -76,7 +76,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="chat_modo\chat_modo.cs" />
+    <Compile Include="game\chat_modo.cs" />
     <Compile Include="database\database.cs" />
     <Compile Include="database\database_mysql.cs" />
     <Compile Include="database\database_sqlite.cs" />
@@ -100,15 +100,16 @@
     <Compile Include="drive_lfss\command.cs" />
     <Compile Include="share\global.cs" />
     <Compile Include="game\command.cs" />
-    <Compile Include="config\config.cs" />
+    <Compile Include="drive_lfss\config.cs" />
     <Compile Include="game\race.cs" />
     <Compile Include="game\car.cs" />
     <Compile Include="drive_lfss\session_list.cs" />
-    <Compile Include="log\log.cs" />
+    <Compile Include="drive_lfss\log.cs" />
     <Compile Include="drive_lfss\drive_lfss.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="pubstats\pubstats.cs" />
     <Compile Include="pubstats\ranking.cs" />
+    <Compile Include="share\map.cs" />
     <Compile Include="share\message.cs" />
     <None Include="res\icone.res" />
   </ItemGroup>

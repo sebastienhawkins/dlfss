@@ -964,6 +964,9 @@ namespace Drive_LFSS.Game_
         }
         internal void LeaveRacing()
         {
+            penalityOld = Penalty_Type.NONE;
+            penalityCurrent = Penalty_Type.NONE;
+            penalityReason = Penalty_Reason.NONE;
             SimulateLastMCI();
             SendBanner();
             SendTrackPrefix();
