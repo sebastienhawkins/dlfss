@@ -30,6 +30,7 @@ namespace Drive_LFSS.Ranking_
     using Drive_LFSS.Database_;
     using Drive_LFSS.Log_;
     using Drive_LFSS.Definition_;
+
     public class Rank
     {
         internal Rank(short _bestLap, short _averageLap, short _stability, int _raceWin, int _total, uint _position, uint _changeMask)
@@ -123,43 +124,61 @@ namespace Drive_LFSS.Ranking_
         {
             get{return position;}
         }
-        public string GetGrade()
+        public string GetLicenceComment()
         {
-            if (total > 14640)   // 17125 x
-                return "a+";
-            if (total > 13972)   // 15700 a+
-                return "a";
-            if (total > 13213)   // 14713 a
-                return "a-";
-            if (total > 12399)   // 14113 a-
-                return "b";
-            if (total > 11156)   // 13456 b+
-                return "c";
-            if (total > 10000)  // 12874 b
-                return "d+";
-            if (total > 9517)  // 12017 b-
-                return "d";
+            if (bestLap + averageLap > 9100)
+                return Msg.RANK_SPEED_CLASS_A1;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_A1;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_A2;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_A3;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_B1;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_B2;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_B3;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_D1;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_D2;
+            if (bestLap + averageLap > 9000)
+                return Msg.RANK_SPEED_CLASS_D3;
 
-            return "d-";
+            return Msg.RANK_SPEED_CLASS_E;
         }
-        public string GetGradeComment()
+        public string GetStabilityComment()
         {
-            if (total > 14640)   // 17125 x
-                return "is the \"^7ultimate(" + GetGrade() + ")^2\" driver";
-            if (total > 13972)   // 15700 a+
-                return "is a \"^7superior(" + GetGrade() + ")^2\" driver";
-            if (total > 13213)   // 14713 a
-                return "is a \"^7execlent(" + GetGrade() + ")^2\" driver";
-            if (total > 12399)   // 14113 a-
-                return "is a \"^7fine(" + GetGrade() + ")^2\" driver";
-            if (total > 11156)   // 13456 b+
-                return "is a \"^7good(" + GetGrade() + ")\"^2 driver";
-            if (total > 10000)  // 12874 b
-                return "is a \"^7classic(" + GetGrade() + ")^2\" driver";
-            if (total > 9517)  // 12017 b-
-                return "is a \"^7sunday(" + GetGrade() + ")^2\" driver";
+            if (bestLap+(stability-(5000-bestLap)) > 8900)   // x
+                return Msg.RANK_SPEEDSTA_CLASS_X;
+            if (bestLap + (stability - (5000 - bestLap)) > 8700)   // a+
+                return Msg.RANK_SPEEDSTA_CLASS_A1;
+            if (bestLap + (stability - (5000 - bestLap)) > 8500)   // a
+                return Msg.RANK_SPEEDSTA_CLASS_A2;
+            if (bestLap + (stability - (5000 - bestLap)) > 8300)   // a-
+                return Msg.RANK_SPEEDSTA_CLASS_A3;
+            if (bestLap + (stability - (5000 - bestLap)) > 8100)   // b+
+                return Msg.RANK_SPEEDSTA_CLASS_B1;
+            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // b
+                return Msg.RANK_SPEEDSTA_CLASS_B2;
+            if (bestLap + (stability - (5000 - bestLap)) > 7700)  // b-
+                return Msg.RANK_SPEEDSTA_CLASS_B3;
+            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // c+
+                return Msg.RANK_SPEEDSTA_CLASS_C1;
+            if (bestLap + (stability - (5000 - bestLap)) > 7700)  // c
+                return Msg.RANK_SPEEDSTA_CLASS_C2;
+            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // c-
+                return Msg.RANK_SPEEDSTA_CLASS_C3;
+            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // d+
+                return Msg.RANK_SPEEDSTA_CLASS_D1;
+            if (bestLap + (stability - (5000 - bestLap)) > 7700)  // d
+                return Msg.RANK_SPEEDSTA_CLASS_D2;
+            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // d-
+                return Msg.RANK_SPEEDSTA_CLASS_D3; 
 
-            return "is a \"^7slow(" + GetGrade() + ")^2\" driver";
+            return Msg.RANK_SPEEDSTA_CLASS_E;;         // e
         }
         public string[] GetRankGuiString
         {

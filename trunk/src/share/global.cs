@@ -159,6 +159,10 @@ namespace Drive_LFSS.Definition_
         MENU_BUTTON_SAY = 143,
         MENU_BUTTON_RELOAD = 144,
         MENU_BUTTON_EXIT = 145,
+        TASKBAR_BUTTON_MENU = 161,
+        TASKBAR_BUTTON_EXIT = 162,
+        TASKBAR_BUTTON_CURRENT = 163,
+        TASKBAR_BUTTON_TIME = 165,
     }
     public enum Button_Styles_Flag : byte
     {

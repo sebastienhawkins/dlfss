@@ -755,6 +755,11 @@ namespace Drive_LFSS.Game_
 
             switch ((Button_Entry)driver.GetButtonEntry(packet.buttonId))
             {
+                case Button_Entry.TASKBAR_BUTTON_MENU:
+                {
+                    if(!driver.HasGuiDisplay(Gui_Entry.MENU))
+                        driver.SendMenuGui();
+                } break;
                 case Button_Entry.MOTD_BUTTON_DRIVE:
                 {
                     driver.RemoveGui(Gui_Entry.MOTD);
@@ -831,11 +836,10 @@ namespace Drive_LFSS.Game_
                         driver.IsMaxSpeedDisplay = true;
                     driver.SendUpdateButton(Button_Entry.CONFIG_USER_MAX_SPEED_ON, (driver.IsMaxSpeedDisplay ? "^7" : "^8") + " Max Speed");
                 } break;
-                case Button_Entry.CONFIG_USER_CLOSE:
+                case Button_Entry.TASKBAR_BUTTON_EXIT:
                 {
-                    driver.RemoveGui(Gui_Entry.CONFIG_USER);
-                } break;
-                
+                    driver.RemoveCurrentGui();
+                }break;
                 case Button_Entry.HELP_BUTTON_MENU:
                 {
                     driver.RemoveGui(Gui_Entry.HELP);
@@ -848,10 +852,6 @@ namespace Drive_LFSS.Game_
                 case Button_Entry.TEXT_BUTTON_DRIVE:
                 {
                     driver.RemoveGui(Gui_Entry.TEXT);
-                } break;
-                case Button_Entry.RANK_BUTTON_CLOSE:
-                {
-                    driver.RemoveRankGui();
                 } break;
                 case Button_Entry.RANK_BUTTON_TOP20:
                 {
@@ -870,14 +870,6 @@ namespace Drive_LFSS.Game_
                 case Button_Entry.CANCEL_WARNING_DRIVING_3:
                 {
                     driver.RemoveCancelWarningDriving(true);
-                } break;
-                case Button_Entry.RESULT_CLOSE_BUTTON:
-                {
-                    driver.RemoveResultGui();
-                } break;
-                case Button_Entry.MENU_BUTTON_CLOSE:
-                {
-                    driver.RemoveMenuGui();
                 } break;
                 case Button_Entry.MENU_BUTTON_CONFIG:
                 {
@@ -1016,7 +1008,7 @@ namespace Drive_LFSS.Game_
                 case Button_Function.BUTTON_FUNCTION_USER_CLEAR:
                 {
                     Driver driver = driverList[index];
-                    driver.ProcessBFNClearAll(driver.HasGuiDisplay() ? false : true);
+                    driver.ProcessBFNClearAll(driver.HasAGuiDisplay() ? false : true);
                 } break;
                 case Button_Function.BUTTON_FUNCTION_REQUEST:
                     driverList[index].ProcessBFNRequest(); break;

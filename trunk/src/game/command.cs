@@ -325,12 +325,7 @@ namespace Drive_LFSS.Server_
         }
         private void Test(Driver driver, string[] args)
         {
-            //driver.SendResultGui(new Dictionary<string, int>() { { "1- greenseed", 5000 }, { "mekac", 5000 }, { "maxdoel", 5000 } });
-            driver.SendFlagRace((ushort)Gui_Entry.FLAG_BLACK_CAR_PROBLEM,60000);
-            driver.SendFlagRace((ushort)Gui_Entry.FLAG_BLACK_PENALITY, 60000);
-            driver.SendFlagRace((ushort)Gui_Entry.FLAG_GREEN, 60000);
-            driver.SendFlagRace((ushort)Gui_Entry.FLAG_YELLOW_GLOBAL, 60000);
-            driver.SendFlagRace((ushort)Gui_Entry.FLAG_WHITE_FINAL_LAP, 60000);
+            
         }
         private void Result(Driver driver, string[] args)
         {

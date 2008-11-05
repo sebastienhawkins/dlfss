@@ -22,6 +22,36 @@ namespace Drive_LFSS.Definition_
 { 
     struct Msg
     {
+        public const string RANK_SPEED_CLASS_X = "Track owner";
+        public const string RANK_SPEED_CLASS_A1 = "has a Instructor '^2A^7' Liscence";
+        public const string RANK_SPEED_CLASS_A2 = "has a Instructor '^3B^7' Liscence";
+        public const string RANK_SPEED_CLASS_A3 = "has a Instructor '^1C^7' Liscence";
+        public const string RANK_SPEED_CLASS_B1 = "has a MotorSport '^2A^7' Liscence";
+        public const string RANK_SPEED_CLASS_B2 = "has a MotorSport '^3B^7' Liscence";
+        public const string RANK_SPEED_CLASS_B3 = "has a MotorSport '^1C^7' Liscence";
+        public const string RANK_SPEED_CLASS_C1 = "has a Drivers '^2A^7' Liscence";
+        public const string RANK_SPEED_CLASS_C2 = "has a Drivers '^3B^7' Liscence";
+        public const string RANK_SPEED_CLASS_C3 = "has a Drivers '^1C^7' Liscence";
+        public const string RANK_SPEED_CLASS_D1 = "has a Provisional '^2A^7' Liscence";
+        public const string RANK_SPEED_CLASS_D2 = "has a Provisional '^3B^7' Liscence";
+        public const string RANK_SPEED_CLASS_D3 = "has a Provisional '^1C^7' Liscence";
+        public const string RANK_SPEED_CLASS_E = "has a Learners Liscence";
+
+        public const string RANK_SPEEDSTA_CLASS_X = "^7Speed Category ^2X";
+        public const string RANK_SPEEDSTA_CLASS_A1 = "^7Speed Category ^2A+";
+        public const string RANK_SPEEDSTA_CLASS_A2 = "^7Speed Category ^2A";
+        public const string RANK_SPEEDSTA_CLASS_A3 = "^7Speed Category ^2A-";
+        public const string RANK_SPEEDSTA_CLASS_B1 = "^7Speed Category ^2B+";
+        public const string RANK_SPEEDSTA_CLASS_B2 = "^7Speed Category ^2B";
+        public const string RANK_SPEEDSTA_CLASS_B3 = "^7Speed Category ^2B-";
+        public const string RANK_SPEEDSTA_CLASS_C1 = "^7Speed Category ^2C+";
+        public const string RANK_SPEEDSTA_CLASS_C2 = "^7Speed Category ^2C";
+        public const string RANK_SPEEDSTA_CLASS_C3 = "^7Speed Category ^2C-";
+        public const string RANK_SPEEDSTA_CLASS_D1 = "^7Speed Category ^2D+";
+        public const string RANK_SPEEDSTA_CLASS_D2 = "^7Speed Category ^2D";
+        public const string RANK_SPEEDSTA_CLASS_D3 = "^7Speed Category ^2D-";
+        public const string RANK_SPEEDSTA_CLASS_E = "^7Speed Category ^2E"; 
+
         public const string COLOR_DIFF_LOWER = "^3";
         public const string COLOR_DIFF_EVENT = "^8";
         public const string COLOR_DIFF_HIGHER = "^6";

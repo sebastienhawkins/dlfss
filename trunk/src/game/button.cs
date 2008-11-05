@@ -162,9 +162,11 @@ namespace Drive_LFSS.Game_
         private const uint MAX_BUTTON_BY_CYCLE = 10;
         private const uint TIMER_FLAG_RACE_UPDATE = 1500;
         private uint timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
+        private const uint TIMER_TIME_UPDATE = 1000;
+        private uint timerTimeUpdate = 1000;
+        
         protected virtual void update(uint diff)
         {
-            
             if(timerBufferedButton < diff)
             {
                 timerBufferedButton = TIMER_BUFFERED_BUTTON;
@@ -182,7 +184,16 @@ namespace Drive_LFSS.Game_
             else
                 timerBufferedButton -= diff; 
             
-
+            if(HasAGuiDisplay())
+            {
+                if(timerTimeUpdate < diff)
+                {
+                    timerTimeUpdate = TIMER_TIME_UPDATE;
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_TIME,"^7"+DateTime.Now.ToLongTimeString());
+                }
+                else
+                    timerTimeUpdate -= diff;
+            }
             lock(buttonTimedList)
             {
                 if (buttonTimedList.Count > 0)
@@ -331,7 +342,6 @@ namespace Drive_LFSS.Game_
                     RemoveGui(currentGui);
                 currentGui = guiInfo.Entry;
             }
-            
             string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' });
             ButtonTemplateInfo buttonInfo;
             
@@ -357,10 +367,31 @@ namespace Drive_LFSS.Game_
                     SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
                 }
             }
+
+            switch (currentGui)
+            {
+                case Gui_Entry.MENU:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Menu"); break;
+                case Gui_Entry.RANK:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Ranking Driver"); break;
+                case Gui_Entry.TEXT:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Text Display"); break;
+                case Gui_Entry.RESULT:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Last Result"); break;
+                case Gui_Entry.CONFIG_USER:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0User Config"); break;
+                default:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0"); break;
+            }
         }
         public void RemoveGui(ushort guiEntry)
         {
             RemoveGui((Gui_Entry)guiEntry);
+        }
+        public void RemoveCurrentGui()
+        {
+            if(currentGui != Gui_Entry.NONE)
+                RemoveGui(currentGui);
         }
         internal void RemoveGui(Gui_Entry guiEntry)
         {
@@ -537,7 +568,7 @@ namespace Drive_LFSS.Game_
 
         private void AddNextBufferedButton(Packet _packet)
         {
-            bufferButtonPacket.Enqueue(_packet);
+            lock (bufferButtonPacket) { bufferButtonPacket.Enqueue(_packet); }
         }
 
         internal void SendBanner()
@@ -663,7 +694,7 @@ namespace Drive_LFSS.Game_
 
             string trackPrefix = session.GetRaceTrackPrefix();
             //uint rankedCount = Ranking.GetRankedCount(trackPrefix,carPrefix);
-            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7ALL, ^2Track:^7 "+trackPrefix+", ^2Count: ^7NA");
+            SendUpdateButton(Button_Entry.RANK_INFO,"^2Car: ^7Mixed, ^2Track:^7 "+trackPrefix+", ^2Count: ^7NA");
 
             List<Driver> driver = session.GetDriverList();
             
@@ -693,58 +724,57 @@ namespace Drive_LFSS.Game_
                 Rank rank = driver[itr].GetRank(trackPrefix, driver[itr].CarPrefix);
                 if(rank != null)
                 {
-                   
-                   bName.Text = "^2"+driver[itr].LicenceName;
-                   bName.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bPB.Text = rank.GetRankGuiString[0];
-                   bPB.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bAverage.Text = rank.GetRankGuiString[1];
-                   bAverage.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bStability.Text = rank.GetRankGuiString[2];
-                   bStability.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bWin.Text = rank.GetRankGuiString[3];
-                   bWin.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bTotal.Text = rank.GetRankGuiString[4];
-                   bTotal.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bPosition.Text = rank.GetRankGuiString[5];
-                   bPosition.Top = (byte)((height*(rankedCountSended+1))+top);
-                   
-                   SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
-                   SendButton(newButtonId(Button_Entry.RANK_PB), bPB);
-                   SendButton(newButtonId(Button_Entry.RANK_AVERAGE), bAverage);
-                   SendButton(newButtonId(Button_Entry.RANK_STABILITY), bStability);
-                   SendButton(newButtonId(Button_Entry.RANK_WIN), bWin);
-                   SendButton(newButtonId(Button_Entry.RANK_TOTAL), bTotal);
-                   SendButton(newButtonId(Button_Entry.RANK_POSITION), bPosition); 
-                   
-                   rankedCountSended++;
+                    bName.Text = "^2"+driver[itr].LicenceName +"^7 -> ^3"+driver[itr].CarPrefix;
+                    bName.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bPB.Text = rank.GetRankGuiString[0];
+                    bPB.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bAverage.Text = rank.GetRankGuiString[1];
+                    bAverage.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bStability.Text = rank.GetRankGuiString[2];
+                    bStability.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bWin.Text = rank.GetRankGuiString[3];
+                    bWin.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bTotal.Text = rank.GetRankGuiString[4];
+                    bTotal.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bPosition.Text = rank.GetRankGuiString[5];
+                    bPosition.Top = (byte)((height*(rankedCountSended+1))+top);
+
+                    SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
+                    SendButton(newButtonId(Button_Entry.RANK_PB), bPB);
+                    SendButton(newButtonId(Button_Entry.RANK_AVERAGE), bAverage);
+                    SendButton(newButtonId(Button_Entry.RANK_STABILITY), bStability);
+                    SendButton(newButtonId(Button_Entry.RANK_WIN), bWin);
+                    SendButton(newButtonId(Button_Entry.RANK_TOTAL), bTotal);
+                    SendButton(newButtonId(Button_Entry.RANK_POSITION), bPosition); 
+
+                    rankedCountSended++;
                 }
                 else
                 {
-                   bName.Text = "^2"+driver[itr].LicenceName;
-                   bName.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bPB.Text = "^80";
-                   bPB.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bAverage.Text = "^80";
-                   bAverage.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bStability.Text = "^80";
-                   bStability.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bWin.Text = "^80";
-                   bWin.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bTotal.Text = "^80";
-                   bTotal.Top = (byte)((height*(rankedCountSended+1))+top);
-                   bPosition.Text = "^1NA";
-                   bPosition.Top = (byte)((height*(rankedCountSended+1))+top);
-                   
-                   SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
-                   SendButton(newButtonId(Button_Entry.RANK_PB), bPB);
-                   SendButton(newButtonId(Button_Entry.RANK_AVERAGE), bAverage);
-                   SendButton(newButtonId(Button_Entry.RANK_STABILITY), bStability);
-                   SendButton(newButtonId(Button_Entry.RANK_WIN), bWin);
-                   SendButton(newButtonId(Button_Entry.RANK_TOTAL), bTotal);
-                   SendButton(newButtonId(Button_Entry.RANK_POSITION), bPosition); 
-                   
-                   rankedCountSended++; 
+                    bName.Text = "^2" + driver[itr].LicenceName + "^7 -> ^3" + driver[itr].CarPrefix;
+                    bName.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bPB.Text = "^80";
+                    bPB.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bAverage.Text = "^80";
+                    bAverage.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bStability.Text = "^80";
+                    bStability.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bWin.Text = "^80";
+                    bWin.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bTotal.Text = "^80";
+                    bTotal.Top = (byte)((height*(rankedCountSended+1))+top);
+                    bPosition.Text = "^1NA";
+                    bPosition.Top = (byte)((height*(rankedCountSended+1))+top);
+
+                    SendButton(newButtonId(Button_Entry.RANK_NAME), bName);
+                    SendButton(newButtonId(Button_Entry.RANK_PB), bPB);
+                    SendButton(newButtonId(Button_Entry.RANK_AVERAGE), bAverage);
+                    SendButton(newButtonId(Button_Entry.RANK_STABILITY), bStability);
+                    SendButton(newButtonId(Button_Entry.RANK_WIN), bWin);
+                    SendButton(newButtonId(Button_Entry.RANK_TOTAL), bTotal);
+                    SendButton(newButtonId(Button_Entry.RANK_POSITION), bPosition); 
+
+                    rankedCountSended++; 
                 }
                     
             }
@@ -995,9 +1025,13 @@ namespace Drive_LFSS.Game_
             RemoveBanner();
             RemoveFlagRaceGuiAll();
         }
-        internal bool HasGuiDisplay()
+        internal bool HasAGuiDisplay()
         {
             return currentGui != Gui_Entry.NONE;
+        }
+        internal bool HasGuiDisplay(Gui_Entry guiEntry)
+        {
+            return currentGui == guiEntry;
         }
         private byte GetButtonId(ushort buttonEntry)
         {
