@@ -71,10 +71,6 @@ namespace Drive_LFSS.Game_
                     session.SendMSXMessage("^7Admin ^8"+driverName+"^7 has come ^2online.");
                 ((Session)session).AddAdminOnline(connectionId);
             }
-            ProcessBFNClearAll(false);
-            SendBanner();
-            SendTrackPrefix();
-
             //To make the MOTD look on a very Black BG
             if (!session.IsFreezeMotdSend())
             {
@@ -94,6 +90,9 @@ namespace Drive_LFSS.Game_
             }
             pb = Program.pubStats.GetPB(LicenceName, "");
             rank = Ranking.GetDriverRanks(LicenceName);
+
+            ProcessBFNClearAll(false);
+            SendAllStaticButton();
         }
         internal void ProcessCPR(PacketCPR packet)
         {
@@ -680,14 +679,14 @@ namespace Drive_LFSS.Game_
                     {
                         driver.AddBadDriving();
                         driver.SetSafePct();
-                        driver.SaySafe();
-                        if (driver.GetSafePct() < 0)
+                        session.SendMTCMessageToAllAdmin("^1Bad ^7driving ^8"+driver.DriverName +" safe(^4"+ driver.GetSafePct()+"^7)%.");
+                        if (driver.GetSafePct() < -300)
                         {
-                            SendMTCMessage("^2Your safe ^7% ^2is very low.");
-                            SendMTCMessage("^2You ^1MUST ^2stay ^1CLEAN ^2at ^1ALL COST.");
-                            session.SendMSTMessage("/msg ^1Ban ^8" + driver.DriverName + "^2 for 1 days?");
+                            SendMTCMessage("^4" + driver.GetSafePct() + "^7% is very low.");
+                            SendMTCMessage("^7You ^1MUST ^7stay ^1CLEAN ^7at ^1ALL COST^7.");
+                            session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
                         }
-                        driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);
+                        //driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);
 
                     }
                     RemoveCancelWarningDriving(false);
@@ -968,8 +967,7 @@ namespace Drive_LFSS.Game_
             penalityCurrent = Penalty_Type.NONE;
             penalityReason = Penalty_Reason.NONE;
             SimulateLastMCI();
-            SendBanner();
-            SendTrackPrefix();
+            SendAllStaticButton();
             RemoveFlagRaceGuiAll();
         }
         private void EnterRace(bool firstTime)
@@ -1005,7 +1003,7 @@ namespace Drive_LFSS.Game_
             if (_rank != null)
             {
                 if (!session.IsFreezeMotdSend())
-                    session.SendMSTMessage("/msg " + driverName + " ^2" + _rank.GetGradeComment() /*+ "^2 with ^7" + carPrefix*/);
+                    session.SendMSTMessage("/msg " + driverName + " ^2" + _rank.GetStabilityComment() /*+ "^2 with ^7" + carPrefix*/);
                 //AddMessageTop("^2Rank Detail, ^2BL^7"+_rank.BestLap+" ^2AV^7"+_rank.AverageLap+" ^2ST^7"+_rank.Stability+" ^2WI^7"+_rank.RaceWin,5000);
             }
             else
@@ -1016,10 +1014,7 @@ namespace Drive_LFSS.Game_
             }
             SetSafePct();
             if (!session.IsFreezeMotdSend() && safePct < 100)
-            {
-                SetSafePct();
                 session.SendMSTMessage("/msg ^2    and '^7" + safePct + "%^2' safe.");
-            }
         }
         private void StartRacing()
         {
