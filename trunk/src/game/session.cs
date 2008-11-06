@@ -167,6 +167,11 @@ namespace Drive_LFSS.Game_
         {
             return race.GetInProgressStatus();
         }
+        public bool IsInRaceStartGrid(uint driverGuid)
+        {
+            return race.StartGridHasDriverGuid(driverGuid);
+        }
+        
         internal List<Driver> GetDriverList()
         {
             return driverList;

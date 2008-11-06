@@ -41,13 +41,13 @@ while ($row = mysql_fetch_array($result))
 {
 	array_push($licenceNames,$row[0]);
 }
-mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Nov^2/^701' WHERE `entry`IN(57)",$link);
+//mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Nov^2/^705' WHERE `entry`IN(57)",$link);
 
 
 foreach($licenceNames as $licenceName)
 {
-	//if(!strstr($licenceName,"OBP 55"))
-	//	continue;
+	if(!strstr($licenceName,"OBP 55"))
+		continue;
 	echo "Driver_Guid: $licenceName\n";
 	$driverGuids = "";
 	$result = mysql_query("SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName'" ,$link);
@@ -81,9 +81,10 @@ foreach($licenceNames as $licenceName)
 			$average = 0;
 			$query = "SELECT AVG(`lap_time`)
 			FROM `driver_lap`
-			WHERE `driver_lap`.`track_prefix`='$trackName'
+			WHERE `driver_lap`.`guid_race`!=0 
+			AND `driver_lap`.`track_prefix`='$trackName'
 			AND `driver_lap`.`car_prefix`='$carPrefix'
-			AND `driver_lap`.`lap_time` < ".($bestEver*2)."
+			AND `driver_lap`.`lap_time` < ".($bestEver+($bestEver/5))."
 			AND `driver_lap`.`lap_time` >= ".($bestEver-2000);
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
@@ -98,11 +99,10 @@ foreach($licenceNames as $licenceName)
 			//Driver RaceCount
 			$query = "SELECT COUNT(`guid_driver`)
 			FROM `driver_lap`
-			WHERE `driver_lap`.`track_prefix`='$trackName'
+			WHERE `driver_lap`.`guid_race`!=0 
+			AND `driver_lap`.`track_prefix`='$trackName'
 			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
-			AND `driver_lap`.`car_prefix`='$carPrefix'
-			AND `driver_lap`.`lap_time` >= ".($bestEver -2000)."
-			AND `driver_lap`.`lap_time` < ".($bestEver *2);
+			AND `driver_lap`.`car_prefix`='$carPrefix'";
 
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}
@@ -138,16 +138,17 @@ foreach($licenceNames as $licenceName)
 			{
 				$driverBestS = $driverBest = 0;
 			}
-			//echo "Best | Score : $driverBest | $driverBestS\n";
+			echo "Best | Score : $driverBest | $driverBestS\n";
 
 			//Driver Average
 			$query = "SELECT AVG(`lap_time`),COUNT(`lap_time`)
 			FROM `driver_lap`
-			WHERE `driver_lap`.`track_prefix`='$trackName'
+			WHERE `driver_lap`.`guid_race`!=0 
+			AND `driver_lap`.`track_prefix`='$trackName'
 			AND `driver_lap`.`guid_driver`IN(SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName')
 			AND `driver_lap`.`car_prefix`='$carPrefix'
-			AND `driver_lap`.`lap_time` >= ".($bestEver )."
-			AND `driver_lap`.`lap_time` < ".($bestEver *2);
+			AND `driver_lap`.`lap_time` >= ".($bestEver-2000)."
+			AND `driver_lap`.`lap_time` < ".($driverBest+($driverBest/5));
 
 			$result = mysql_query($query ,$link);
 			if (!$result) {die(mysql_error());}

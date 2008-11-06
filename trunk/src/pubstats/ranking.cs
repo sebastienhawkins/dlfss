@@ -151,31 +151,31 @@ namespace Drive_LFSS.Ranking_
         }
         public string GetStabilityComment()
         {
-            if (bestLap+(stability-(5000-bestLap)) > 8900)   // x
+            if (bestLap+(stability-(5000-bestLap)) > 9143)   // x
                 return Msg.RANK_SPEEDSTA_CLASS_X;
-            if (bestLap + (stability - (5000 - bestLap)) > 8700)   // a+
+            if (bestLap + (stability - (5000 - bestLap)) > 8943)   // a+
                 return Msg.RANK_SPEEDSTA_CLASS_A1;
-            if (bestLap + (stability - (5000 - bestLap)) > 8500)   // a
+            if (bestLap + (stability - (5000 - bestLap)) > 8743)   // a
                 return Msg.RANK_SPEEDSTA_CLASS_A2;
-            if (bestLap + (stability - (5000 - bestLap)) > 8300)   // a-
+            if (bestLap + (stability - (5000 - bestLap)) > 8543)   // a-
                 return Msg.RANK_SPEEDSTA_CLASS_A3;
-            if (bestLap + (stability - (5000 - bestLap)) > 8100)   // b+
+            if (bestLap + (stability - (5000 - bestLap)) > 8343)   // b+
                 return Msg.RANK_SPEEDSTA_CLASS_B1;
-            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // b
+            if (bestLap + (stability - (5000 - bestLap)) > 8143)  // b
                 return Msg.RANK_SPEEDSTA_CLASS_B2;
-            if (bestLap + (stability - (5000 - bestLap)) > 7700)  // b-
+            if (bestLap + (stability - (5000 - bestLap)) > 7943)  // b-
                 return Msg.RANK_SPEEDSTA_CLASS_B3;
-            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // c+
+            if (bestLap + (stability - (5000 - bestLap)) > 7743)  // c+
                 return Msg.RANK_SPEEDSTA_CLASS_C1;
-            if (bestLap + (stability - (5000 - bestLap)) > 7700)  // c
+            if (bestLap + (stability - (5000 - bestLap)) > 7543)  // c
                 return Msg.RANK_SPEEDSTA_CLASS_C2;
-            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // c-
+            if (bestLap + (stability - (5000 - bestLap)) > 7343)  // c-
                 return Msg.RANK_SPEEDSTA_CLASS_C3;
-            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // d+
+            if (bestLap + (stability - (5000 - bestLap)) > 7143)  // d+
                 return Msg.RANK_SPEEDSTA_CLASS_D1;
-            if (bestLap + (stability - (5000 - bestLap)) > 7700)  // d
+            if (bestLap + (stability - (5000 - bestLap)) > 6943)  // d
                 return Msg.RANK_SPEEDSTA_CLASS_D2;
-            if (bestLap + (stability - (5000 - bestLap)) > 7900)  // d-
+            if (bestLap + (stability - (5000 - bestLap)) > 6743)  // d-
                 return Msg.RANK_SPEEDSTA_CLASS_D3; 
 
             return Msg.RANK_SPEEDSTA_CLASS_E;;         // e

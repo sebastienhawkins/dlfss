@@ -403,7 +403,7 @@ namespace Drive_LFSS.Definition_
         ISB_RMB = 2,
         ISB_SHIFT = 8
     }
-    public enum Flag_Race : byte
+    public enum LFS_Race_Flag : byte
     {
         NONE = 0,
         BLUE = 1,
@@ -533,7 +533,7 @@ namespace Drive_LFSS.Definition_
         public ushort lapNumber;
         public byte carId;
         public byte position;
-        public Flag_Race carFlag;
+        public LFS_Race_Flag carFlag;
         internal byte Sp3;
         public int posX;
         public int posY;
