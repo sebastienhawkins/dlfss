@@ -318,17 +318,17 @@ namespace Drive_LFSS.Game_
         {
             if(packet.OffOn > 0)
             {
-                if(packet.blueOrYellow == Flag_Race.BLUE)
+                if(packet.blueOrYellow == LFS_Race_Flag.BLUE)
                 {
                     SendFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR,999000);
-                    flagRace |= Flag_Race.YELLOW;
+                    lfsRaceFlag |= LFS_Race_Flag.YELLOW;
                     blueFlagActive = true;
                     lap.BlueFlagCount++;
                 }
-                else if(packet.blueOrYellow == Flag_Race.YELLOW)
+                else if(packet.blueOrYellow == LFS_Race_Flag.YELLOW)
                 {
                     yellowFlagActive = true;
-                    flagRace |= Flag_Race.BLUE;
+                    lfsRaceFlag |= LFS_Race_Flag.BLUE;
                     SendFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL, 999000);
                     lap.YellowFlagCount++;
                     TrySendCancelWarning();
@@ -336,16 +336,16 @@ namespace Drive_LFSS.Game_
             }
             else
             {
-                if (packet.blueOrYellow == Flag_Race.BLUE)
+                if (packet.blueOrYellow == LFS_Race_Flag.BLUE)
                 {
                     blueFlagActive = false;
-                    flagRace ^= Flag_Race.YELLOW;
+                    lfsRaceFlag ^= LFS_Race_Flag.YELLOW;
                     RemoveFlagRace(Gui_Entry.FLAG_BLUE_SLOW_CAR);
                 }
-                else if (packet.blueOrYellow == Flag_Race.YELLOW)
+                else if (packet.blueOrYellow == LFS_Race_Flag.YELLOW)
                 {
                     RemoveFlagRace(Gui_Entry.FLAG_YELLOW_LOCAL);
-                    flagRace ^= Flag_Race.BLUE;
+                    lfsRaceFlag ^= LFS_Race_Flag.BLUE;
                     yellowFlagActive = false;
                 }
             }
@@ -600,7 +600,7 @@ namespace Drive_LFSS.Game_
             else
                 timeIldeOnTrack = 0;    
             
-            if ((flagRace&Flag_Race.YELLOW) == Flag_Race.YELLOW)
+            if (HasLFSRaceFlag(LFS_Race_Flag.YELLOW))
                 timeYellowFlag += diff;
             else if (timeYellowFlag > 0)
                 timeYellowFlag = 0;
@@ -638,7 +638,7 @@ namespace Drive_LFSS.Game_
                     else
                         SendUpdateButton(Button_Entry.INFO_2, "^2Yellow Time ^7" + Math.Round(((double)timeYellowFlag / 1000.0d), 1));
                 }
-                else if (timeYellowSend && !yellowFlagActive)
+                else if (timeYellowSend && !HasLFSRaceFlag(LFS_Race_Flag.YELLOW))
                 {
                     timeYellowSend = false;
                     RemoveButton(Button_Entry.INFO_2);
@@ -897,7 +897,12 @@ namespace Drive_LFSS.Game_
                 SetConfigValue(Config_User.MAX_SPEED_ON, (isMaxSpeedDisplay ? "1" : "0"));
             }
         }
-        
+        private void ClearPenalty()
+        {
+            penalityCurrent = Penalty_Type.NONE;
+            penalityOld = Penalty_Type.NONE;
+            penalityReason = Penalty_Reason.NONE;
+        }
         public bool HasWarningDrivingCheck()
         {
             return warningDrivingType != Warning_Driving_Type.NONE;
@@ -939,15 +944,10 @@ namespace Drive_LFSS.Game_
             if(isCancelClick)
                 AddMessageMiddle("^2Removed Warning Driving for "+_driver.driverName,4500);
         }
-
-
         private void EnterPit()
         {
 
         }
-        //should be into driver
-
-
         public bool IsRacing()
         {
             return (carId > 0 && isInRace && session.GetRaceInProgressStatus() != Race_In_Progress_Status.RACE_PROGRESS_NONE);
@@ -963,9 +963,7 @@ namespace Drive_LFSS.Game_
         }
         internal void LeaveRacing()
         {
-            penalityOld = Penalty_Type.NONE;
-            penalityCurrent = Penalty_Type.NONE;
-            penalityReason = Penalty_Reason.NONE;
+            ClearPenalty();
             SimulateLastMCI();
             SendAllStaticButton();
             RemoveFlagRaceGuiAll();
@@ -979,6 +977,9 @@ namespace Drive_LFSS.Game_
 
             if (firstTime)
                 EnterRaceFirstTime();
+               
+            if(!session.IsInRaceStartGrid(guid))
+                SendFlagRace(Gui_Entry.FLAG_BLACK_NO_SCORE,30000);
         }
         private void EnterRaceFirstTime()
         {
@@ -1024,11 +1025,11 @@ namespace Drive_LFSS.Game_
             lap = new Lap();
 
             EnterRace(false);
+            ClearPenalty();
             ClearAllStaticButton();
             if(currentGui == Gui_Entry.RESULT)
                 RemoveResultGui();
         }
-
         public void FinishRace()
         {
             totalRaceFinishCount++;
@@ -1037,7 +1038,10 @@ namespace Drive_LFSS.Game_
            // if (((Session)((Driver)this).ISession).script.CarFinishRace((ICar)this))
            //    return;
         }
-
+        public bool HasLFSRaceFlag(LFS_Race_Flag _lfsRaceFlag)
+        {
+            return (lfsRaceFlag&_lfsRaceFlag) == _lfsRaceFlag;
+        }
         public bool IsYellowFlagActive()
         {
             return yellowFlagActive;

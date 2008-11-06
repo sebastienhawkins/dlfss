@@ -276,7 +276,7 @@ namespace Drive_LFSS.Packet_
         internal byte requestId;
         internal byte carId;
         internal byte OffOn;
-        internal Flag_Race blueOrYellow;
+        internal LFS_Race_Flag blueOrYellow;
         internal byte carIdBehind;
         internal byte spare3;
     }

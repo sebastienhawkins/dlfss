@@ -36,7 +36,7 @@ namespace Drive_LFSS.Game_
             node = _carInformation.nodeTrack;
             lapCompleted = _carInformation.lapNumber;
             racePosition = _carInformation.position;
-            flagRace = _carInformation.carFlag;
+            lfsRaceFlag = _carInformation.carFlag;
             
 
             x = _carInformation.posX / 65536.0d;
@@ -61,7 +61,7 @@ namespace Drive_LFSS.Game_
             node = 0;
             lapCompleted = 0;
             racePosition = 0;
-            flagRace = 0;
+            lfsRaceFlag = 0;
             x = 0.0d;
             y = 0.0d;
             z = 0.0d;
@@ -86,7 +86,7 @@ namespace Drive_LFSS.Game_
         protected double maxSpeedMs = 0.0d;
         private ushort lapCompleted = 0;
         private ushort node = 0;
-        private Flag_Race flagRace = Flag_Race.NONE;
+        private LFS_Race_Flag lfsRaceFlag = LFS_Race_Flag.NONE;
         private double x = 0.0d;
         private double y = 0.0d;
         private double z = 0.0d;

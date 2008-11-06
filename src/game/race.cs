@@ -549,7 +549,7 @@ namespace Drive_LFSS.Game_
         }
         public bool StartGridHasDriverGuid(uint driverGuid)
         {
-            if(gridOrder.IndexOf(driverGuid+" ") != -1)
+            if (gridOrder.IndexOf(driverGuid + " ") != -1)
                 return true;
             return false;
         }
