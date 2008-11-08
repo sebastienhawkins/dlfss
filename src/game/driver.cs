@@ -397,6 +397,7 @@ namespace Drive_LFSS.Game_
         private uint driftScoreTimer = 0;
         private int safePct = 0;
         private int oldSafePct = 0;
+        private bool isStupidDriving = false;
         private Penalty_Type  penalityOld = Penalty_Type.NONE;
         private Penalty_Type penalityCurrent = Penalty_Type.NONE;
         private Penalty_Reason penalityReason = Penalty_Reason.NONE;
@@ -679,11 +680,24 @@ namespace Drive_LFSS.Game_
                     {
                         driver.AddBadDriving();
                         driver.SetSafePct();
-                        session.SendMTCMessageToAllAdmin("^1Bad ^7driving ^8"+driver.DriverName +" safe(^4"+ driver.GetSafePct()+"^7)%.");
+                        session.SendMTCMessageToAllAdmin("^1Bad ^7driving ^8"+driver.DriverName +"^7 safe(^4"+ driver.GetSafePct()+"^7)%.");
+                        if (driver.GetSafePct() < -700)
+                        {
+                            driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is too low.");
+                            session.SendMSTMessage("/ban " + driver.LicenceName+" 1");
+                            session.SendMTCMessageToAllAdmin("/msg ^1Banned ^8" + driver.DriverName + "^7 for 1 day.");
+                        }
+                        if (driver.GetSafePct() < -600)
+                        {
+                            driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is too low.");
+                            session.SendMSTMessage("/kick " + driver.LicenceName);
+                            session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
+                        }
                         if (driver.GetSafePct() < -300)
                         {
-                            SendMTCMessage("^4" + driver.GetSafePct() + "^7% is very low.");
-                            SendMTCMessage("^7You ^1MUST ^7stay ^1CLEAN ^7at ^1ALL COST^7.");
+                            driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is very low.");
+                            driver.SendMTCMessage("^7You ^1MUST ^7stay ^1CLEAN ^7at ^1ALL COST^7.");
+                            session.SendMSTMessage("/spec " + driver.LicenceName);
                             session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
                         }
                         //driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);
@@ -963,10 +977,12 @@ namespace Drive_LFSS.Game_
         }
         internal void LeaveRacing()
         {
+            isLostControl = false;
             ClearPenalty();
             SimulateLastMCI();
             SendAllStaticButton();
             RemoveFlagRaceGuiAll();
+            RemoveNodeBar();
         }
         private void EnterRace(bool firstTime)
         {
@@ -1042,13 +1058,13 @@ namespace Drive_LFSS.Game_
         {
             return (lfsRaceFlag&_lfsRaceFlag) == _lfsRaceFlag;
         }
-        public bool IsYellowFlagActive()
+        public bool HasYellowFlagActive()
         {
-            return yellowFlagActive;
+            return HasLFSRaceFlag(LFS_Race_Flag.YELLOW);
         }
         public bool IsBlueFlagActive()
         {
-            return blueFlagActive;
+            return HasLFSRaceFlag(LFS_Race_Flag.BLUE);
         }
         public bool IsAdmin
         {
@@ -1125,6 +1141,47 @@ namespace Drive_LFSS.Game_
         public void AddBadDriving()
         {
             badDrivingCount++;
+        }
+        public bool IsStupidDriving()
+        {
+            return isStupidDriving;
+        }
+        public void SetStupidDriving(bool value)
+        {
+            if (isStupidDriving != value)
+            {
+                isStupidDriving = value;
+                if (isStupidDriving)
+                    SendUpdateButton(Button_Entry.INFO_4, "^1StupidDriving");
+                else
+                    SendUpdateButton(Button_Entry.INFO_4, "^2SmartDriving");
+            }
+        }
+
+        private string tracjectoryDisplay = "";
+        public void SendTrajDisplay(string trajDisplay)
+        {
+            if (tracjectoryDisplay == trajDisplay)
+                return;
+            
+            tracjectoryDisplay = trajDisplay;
+            SendUpdateButton((ushort)Button_Entry.NODE_TRAJ_TO_TRACK, trajDisplay);
+        }
+        private string orientationDisplay = "";
+        public void SendOriDisplay(string oriDisplay)
+        {
+            if (orientationDisplay == oriDisplay)
+                return;
+            orientationDisplay = oriDisplay;
+            SendUpdateButton((ushort)Button_Entry.NODE_ORIE_TO_TRACK, oriDisplay);
+        }
+        private string pathDisplay = "";
+        public void SendPathDisplay(string _pathDisplay)
+        {
+            if (pathDisplay == _pathDisplay)
+                return;
+            pathDisplay = _pathDisplay;
+            SendUpdateButton((ushort)Button_Entry.NODE_POS_TO_PATH, pathDisplay);
         }
     }
 }

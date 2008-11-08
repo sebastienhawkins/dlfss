@@ -21,6 +21,7 @@ namespace Drive_LFSS.Packet_
     using System.Runtime.InteropServices;
     using System.Collections.Generic;
     using Drive_LFSS.Definition_;
+    using Drive_LFSS.Codepage_;
     using Drive_LFSS.InSim_;
 
     sealed public class Packet

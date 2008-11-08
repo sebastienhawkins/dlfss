@@ -45,7 +45,24 @@ namespace Drive_LFSS.Map_
         DRIVE_RIGHT = 36,
     }
 
-    class MapData
+    public class NodeData
+    {
+        internal double centreX;                    // fp
+        internal double centreY;                    // fp
+        internal double centreZ;                    // fp
+        internal float dirX;                     // float
+        internal float dirY;                     // float
+        internal float dirZ;                     // float
+        internal float limitLeft;                // outer limit
+        internal float limitRight;               // outer limit
+        internal float driveLeft;                // road limit
+        internal float driveRight;               // road limit
+        internal double GetOrientation()
+        {
+            return Math.Atan2(dirY, dirX) * 180.0f / Math.PI;
+        }
+    }
+    struct MapData
     {
         internal MapData(int _nodeCount, int _finishLine)
         {
@@ -53,13 +70,14 @@ namespace Drive_LFSS.Map_
             finishLine = _finishLine;
             nodeData = new NodeData[nodeCount];
         }
-        internal void SetNode(int nodeIndex, int _centerX, int _centerY, int _centerZ,
+        internal void SetNode(int nodeIndex, double _centerX, double _centerY, double _centerZ,
                               float _dirX, float _dirY, float _dirZ, float _limitLeft, 
                               float _limitRight, float _driveLeft, float _driveRight)
         {
-            nodeData[nodeIndex].centreX = _centerX;
-            nodeData[nodeIndex].centreY = _centerY;
-            nodeData[nodeIndex].centreZ = _centerZ;
+            nodeData[nodeIndex] = new NodeData();
+            nodeData[nodeIndex].centreX = _centerX / 65536.0d;
+            nodeData[nodeIndex].centreY = _centerY / 65536.0d;
+            nodeData[nodeIndex].centreZ = _centerZ / 65536.0d;
             nodeData[nodeIndex].dirX = _dirX;
             nodeData[nodeIndex].dirY = _dirY;
             nodeData[nodeIndex].dirZ = _dirZ;
@@ -70,20 +88,13 @@ namespace Drive_LFSS.Map_
         }
         private int nodeCount;
         private int finishLine;
-        private struct NodeData
-        {
-            internal int centreX;                    // fp
-            internal int centreY;                    // fp
-            internal int centreZ;                    // fp
-            internal float dirX;                     // float
-            internal float dirY;                     // float
-            internal float dirZ;                     // float
-            internal float limitLeft;                // outer limit
-            internal float limitRight;               // outer limit
-            internal float driveLeft;                // road limit
-            internal float driveRight;               // road limit
-        }
         private NodeData[] nodeData;
+        public NodeData GetNode(int nodeIndex)
+        {
+            if (nodeIndex > -1 && nodeIndex < nodeData.Length)
+                return nodeData[nodeIndex];
+            return null;
+        }
     }
     class Map
     {
@@ -162,6 +173,14 @@ namespace Drive_LFSS.Map_
         private static float GetFloat(byte[] buffer, int start)
         {
             return BitConverter.ToSingle(buffer,start);
+        }
+
+        internal static NodeData GetNode(string mapPrefix, int nodeIndex)
+        {
+            if (!maps.ContainsKey(mapPrefix))
+                return null;
+
+            return maps[mapPrefix].GetNode(nodeIndex);
         }
     }
 }

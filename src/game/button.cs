@@ -158,8 +158,8 @@ namespace Drive_LFSS.Game_
         private Queue<Packet> bufferButtonPacket = new Queue<Packet>();
 
         private uint timerBufferedButton = 0;
-        private const uint TIMER_BUFFERED_BUTTON = 150;
-        private const uint MAX_BUTTON_BY_CYCLE = 10;
+        private const uint TIMER_BUFFERED_BUTTON = 100;
+        private const uint MAX_BUTTON_BY_CYCLE = 20;
         private const uint TIMER_FLAG_RACE_UPDATE = 1500;
         private uint timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
         private const uint TIMER_TIME_UPDATE = 1000;
@@ -1013,6 +1013,12 @@ namespace Drive_LFSS.Game_
         internal void RemoveResultGui()
         {
             RemoveGui(Gui_Entry.RESULT);
+        }
+        internal void RemoveNodeBar()
+        {
+            RemoveButton(Button_Entry.NODE_POS_TO_PATH);
+            RemoveButton(Button_Entry.NODE_ORIE_TO_TRACK);
+            RemoveButton(Button_Entry.NODE_TRAJ_TO_TRACK);
         }
         protected void SendAllStaticButton()
         {

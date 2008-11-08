@@ -163,6 +163,9 @@ namespace Drive_LFSS.Definition_
         TASKBAR_BUTTON_EXIT = 162,
         TASKBAR_BUTTON_CURRENT = 163,
         TASKBAR_BUTTON_TIME = 165,
+        NODE_TRAJ_TO_TRACK = 169,
+        NODE_ORIE_TO_TRACK = 170,
+        NODE_POS_TO_PATH = 171,
     }
     public enum Button_Styles_Flag : byte
     {
@@ -198,6 +201,7 @@ namespace Drive_LFSS.Definition_
         FLAG_RACE_END = 17,
         FLAG_MAX = 18,
         MENU = 18,
+        NODE_TRAC = 19,
     }
     
     public enum Button_Safe_Coord_Range
