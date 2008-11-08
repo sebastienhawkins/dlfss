@@ -25,6 +25,7 @@ namespace Drive_LFSS.Game_
     {
         byte CarId { get; }
         string CarPrefix { get; }
+        string TrackPrefix { get; }
         ushort GetNode();
         byte GetRacePosition();
         double GetOrientationSpeed();
@@ -39,8 +40,20 @@ namespace Drive_LFSS.Game_
         double GetPosZ();
         bool HasWarningDrivingCheck();
         void SetWarningDrivingCheck(Warning_Driving_Type _warningDrivingType, byte referenceCarId);
-        bool IsYellowFlagActive();
+        bool HasYellowFlagActive();
+
         bool IsBlueFlagActive();
+        bool IsLostControl();
+        void SetLostControl(bool value);
+        bool IsDrifting();
+        void SetDrifting(bool value);
+        bool IsOutsideDrive();
+        void SetOutsideDrive(bool value);
+        void SetStupidDriving(bool value);
+        bool IsStupidDriving();
         void TrySendCancelWarning();
+        void SendTrajDisplay(string trajDisplay);
+        void SendOriDisplay(string oriDisplay);
+        void SendPathDisplay(string pathDisplay);
     }
 }

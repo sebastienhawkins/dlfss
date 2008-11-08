@@ -325,7 +325,7 @@ namespace Drive_LFSS.Server_
         }
         private void Test(Driver driver, string[] args)
         {
-            
+            driver.SendGui((ushort)Gui_Entry.NODE_TRAC,"");
         }
         private void Result(Driver driver, string[] args)
         {

@@ -101,6 +101,9 @@ namespace Drive_LFSS.Game_
         private bool isInRace = false;
         private bool isInPit = false;
         private bool isMoving = false;
+        private bool isLostControl = true;
+        private bool isDrifting = true;
+        private bool isOutsideDrive = true;
         private FeatureAcceleration featureAcceleration = new FeatureAcceleration();
         private FeatureDriftScore featureDriftScore = new FeatureDriftScore();
 
@@ -408,6 +411,10 @@ namespace Drive_LFSS.Game_
         {
             get { return carPrefix; }
         }
+        public string TrackPrefix
+        {
+            get { return trackPrefix; }
+        }
         public Penalty_Type CurrentPenality
         {
             get { return currentPenality; }
@@ -419,6 +426,60 @@ namespace Drive_LFSS.Game_
         public ushort GetNode()
         {
             return node;
+        }
+        public bool IsLostControl()
+        {
+            return isLostControl;
+        }
+        public void SetLostControl(bool value)
+        {
+            if (isLostControl != value)
+            {
+                isLostControl = value;
+                if (isAdmin)
+                {
+                    if (isLostControl)
+                        SendUpdateButton(Button_Entry.INFO_3, "^1Code Red");
+                    else
+                        SendUpdateButton(Button_Entry.INFO_3, "^2Code Green");
+                }
+            }
+        }
+        public bool IsDrifting()
+        {
+            return isDrifting;
+        }
+        public void SetDrifting(bool value)
+        {
+            if (isDrifting != value)
+            {
+                isDrifting = value;
+                if (isAdmin)
+                {
+                    if (isDrifting)
+                        SendUpdateButton(Button_Entry.INFO_5, "^1Drift");
+                    else
+                        SendUpdateButton(Button_Entry.INFO_5, "^2Grip");
+                }
+            }
+        }
+        public bool IsOutsideDrive()
+        {
+            return isOutsideDrive;
+        }
+        public void SetOutsideDrive(bool value)
+        {
+            if (isOutsideDrive != value)
+            {
+                isOutsideDrive = value;
+                if (isAdmin)
+                {
+                    if (isOutsideDrive)
+                        SendUpdateButton(Button_Entry.INFO_4, "^1GrassOn");
+                    else
+                        SendUpdateButton(Button_Entry.INFO_4, "^2GrassOff");
+                }
+            }
         }
         //Speed
         public double GetSpeedMs()
