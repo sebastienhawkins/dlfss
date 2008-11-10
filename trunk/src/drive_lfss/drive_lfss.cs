@@ -143,16 +143,18 @@ namespace Drive_LFSS
            
             #region MainThread update
 
-            DateTime ticks = DateTime.Now;
+            DateTime lastNow = DateTime.Now;
             //long ticks = DateTime.Now.Ticks;
             uint diff = 0;
             uint TimerLogFlush = 0;
             while (MainRun)
             {
                 //Timer Thing, Really have to test .net fastest solution.
-                TimeSpan diffSpan = (DateTime.Now - ticks);
+                DateTime _lastNow = DateTime.Now;
+                TimeSpan diffSpan = (_lastNow - lastNow);
+                lastNow = _lastNow;
                 diff = (uint)diffSpan.TotalMilliseconds;
-                ticks = DateTime.Now;
+                
                 
                 //diff = (uint)((DateTime.Now.Ticks - ticks) / tickPerMs); //Diff in MS
                 //ticks = DateTime.Now.Ticks;

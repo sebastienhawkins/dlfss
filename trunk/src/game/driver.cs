@@ -71,15 +71,8 @@ namespace Drive_LFSS.Game_
                     session.SendMSXMessage("^7Admin ^8"+driverName+"^7 has come ^2online.");
                 ((Session)session).AddAdminOnline(connectionId);
             }
-            //To make the MOTD look on a very Black BG
-            if (!session.IsFreezeMotdSend())
-            {
-                for (byte itr = 0; ++itr < 5; )
-                    SendButton(Button_Entry.MOTD_BACKGROUND);
-
-                SendGui(Gui_Entry.MOTD);
-            }
-
+            
+            ProcessBFNClearAll(false);
             SetConfigData("");
             
             LoadFromDB();
@@ -90,8 +83,9 @@ namespace Drive_LFSS.Game_
             }
             pb = Program.pubStats.GetPB(LicenceName, "");
             rank = Ranking.GetDriverRanks(LicenceName);
-
-            ProcessBFNClearAll(false);
+            
+            if (!session.IsFreezeMotdSend())
+                SendGui(Gui_Entry.MOTD);
             SendAllStaticButton();
         }
         internal void ProcessCPR(PacketCPR packet)
@@ -645,7 +639,7 @@ namespace Drive_LFSS.Game_
                     RemoveButton(Button_Entry.INFO_2);
                 }
                 //FinalLap Check
-                if(IsRacing() && lap.LapCompleted+1 == session.GetRaceLapCount() )
+                if (IsRacing() && session.GetRaceInProgressStatus() != Race_In_Progress_Status.RACE_PROGRESS_QUALIFY && lap.LapCompleted + 1 == session.GetRaceLapCount())
                 {
                     if(!HasFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP))
                         SendFlagRace(Gui_Entry.FLAG_WHITE_FINAL_LAP,999999);
@@ -681,24 +675,27 @@ namespace Drive_LFSS.Game_
                         driver.AddBadDriving();
                         driver.SetSafePct();
                         session.SendMTCMessageToAllAdmin("^1Bad ^7driving ^8"+driver.DriverName +"^7 safe(^4"+ driver.GetSafePct()+"^7)%.");
-                        if (driver.GetSafePct() < -700)
+                        if (driver.GetSafePct() < -350)
                         {
                             driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is too low.");
+                            session.SendMSXMessage("^1Banned " + driver.DriverName + "^7 1 days for Bad driving.");
                             session.SendMSTMessage("/ban " + driver.LicenceName+" 1");
-                            session.SendMTCMessageToAllAdmin("/msg ^1Banned ^8" + driver.DriverName + "^7 for 1 day.");
+                            //session.SendMTCMessageToAllAdmin("/msg ^1Banned ^8" + driver.DriverName + "^7 for 1 day.");
                         }
-                        if (driver.GetSafePct() < -600)
+                        else if (driver.GetSafePct() < -250)
                         {
                             driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is too low.");
+                            session.SendMSXMessage("^1Kicked " + driver.DriverName + "^7 for Bad driving.");
                             session.SendMSTMessage("/kick " + driver.LicenceName);
-                            session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
+                            //session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
                         }
-                        if (driver.GetSafePct() < -300)
+                        else if (driver.GetSafePct() < -100)
                         {
                             driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is very low.");
                             driver.SendMTCMessage("^7You ^1MUST ^7stay ^1CLEAN ^7at ^1ALL COST^7.");
+                            session.SendMSXMessage("^1Spec " + driver.DriverName + "^7 for Bad driving.");
                             session.SendMSTMessage("/spec " + driver.LicenceName);
-                            session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
+                            //session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
                         }
                         //driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);
 

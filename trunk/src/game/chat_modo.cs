@@ -84,9 +84,9 @@ namespace Drive_LFSS.ChatModo_
         private static Dictionary<string,byte> wordScoreList = new Dictionary<string,byte>();
         private static int wordScoreListCount = 0;
         private Queue<string> licenceNameTextList = new Queue<string>();
-        private Dictionary<string, Dictionary<string, ushort[]>> floodList = new Dictionary<string, Dictionary<string, ushort[]>>();
-        private Dictionary<string, ushort[]> sosoWordList = new Dictionary<string, ushort[]>();
-        private Dictionary<string, ushort[]> badWordList = new Dictionary<string, ushort[]>();
+        private Dictionary<string, Dictionary<string, uint[]>> floodList = new Dictionary<string, Dictionary<string, uint[]>>();
+        private Dictionary<string, uint[]> sosoWordList = new Dictionary<string, uint[]>();
+        private Dictionary<string, uint[]> badWordList = new Dictionary<string, uint[]>();
         
         private int levenstein(string source, string filterWord)
         {
@@ -121,9 +121,9 @@ namespace Drive_LFSS.ChatModo_
         
         private const ushort TIMER_FLOOD = 4500;
         private const ushort FLOOD_MAX_COUNT = 3;
-        private const ushort TIMER_SOSO_WORD = 60000;
+        private const ushort TIMER_SOSO_WORD = 12000;
         private const ushort SOSO_WORD_MAX_COUNT = 3;
-        private const ushort TIMER_BAD_WORD = 60000;
+        private const uint TIMER_BAD_WORD = 300000;
         private const ushort BAD_WORD_MAX_COUNT = 1;
 
         private void update()
@@ -136,12 +136,12 @@ namespace Drive_LFSS.ChatModo_
                 //Flood Check
                 if (floodList.Count > 0)
                 {
-                    Dictionary<string, Dictionary<string, ushort[]>>.KeyCollection.Enumerator itr1 = floodList.Keys.GetEnumerator();
+                    Dictionary<string, Dictionary<string, uint[]>>.KeyCollection.Enumerator itr1 = floodList.Keys.GetEnumerator();
                     while(itr1.MoveNext())
                     {
                         if (floodList[itr1.Current].Count > 0)
                         {
-                            Dictionary<string, ushort[]>.KeyCollection.Enumerator itr2 = floodList[itr1.Current].Keys.GetEnumerator();
+                            Dictionary<string, uint[]>.KeyCollection.Enumerator itr2 = floodList[itr1.Current].Keys.GetEnumerator();
                             while (itr2.MoveNext())
                             {
                                 if (floodList[itr1.Current][itr2.Current][0] >= FLOOD_MAX_COUNT)
@@ -158,7 +158,7 @@ namespace Drive_LFSS.ChatModo_
                                     itr2 = floodList[itr1.Current].Keys.GetEnumerator();
                                 }
                                 else
-                                    floodList[itr1.Current][itr2.Current][1] -= (ushort)SLEEP;
+                                    floodList[itr1.Current][itr2.Current][1] -= (uint)SLEEP;
                             }
                         }
                         else
@@ -172,7 +172,7 @@ namespace Drive_LFSS.ChatModo_
                 //Bad Check
                 if (badWordList.Count > 0)
                 {
-                    Dictionary<string, ushort[]>.KeyCollection.Enumerator itr = badWordList.Keys.GetEnumerator();
+                    Dictionary<string, uint[]>.KeyCollection.Enumerator itr = badWordList.Keys.GetEnumerator();
                     while (itr.MoveNext())
                     {
                         if(badWordList[itr.Current][0] > BAD_WORD_MAX_COUNT)
@@ -197,7 +197,7 @@ namespace Drive_LFSS.ChatModo_
                 //SoSo Check
                 if (sosoWordList.Count > 0)
                 {
-                    Dictionary<string, ushort[]>.KeyCollection.Enumerator itr = sosoWordList.Keys.GetEnumerator();
+                    Dictionary<string, uint[]>.KeyCollection.Enumerator itr = sosoWordList.Keys.GetEnumerator();
                     while (itr.MoveNext())
                     {
                         if (sosoWordList[itr.Current][0] > SOSO_WORD_MAX_COUNT)
@@ -214,14 +214,14 @@ namespace Drive_LFSS.ChatModo_
                             itr = sosoWordList.Keys.GetEnumerator();
                         }
                         else
-                            sosoWordList[itr.Current][1] -= (ushort)SLEEP;
+                            sosoWordList[itr.Current][1] -= (uint)SLEEP;
                     }
 
                 }
                 System.Threading.Thread.Sleep((int)SLEEP);
             }
         }
-        
+
         private void AnalyseNextLine()
         {
             if(licenceNameTextList.Count < 1)
@@ -318,12 +318,12 @@ namespace Drive_LFSS.ChatModo_
                 if(floodList[licenceName].ContainsKey(lineOftext))
                     floodList[licenceName][lineOftext][0] += 1;
                 else
-                    floodList[licenceName].Add(lineOftext,new ushort[2]{1,TIMER_FLOOD});
+                    floodList[licenceName].Add(lineOftext, new uint[2] { 1, TIMER_FLOOD });
             }
             else
             {
-                floodList.Add(licenceName,new Dictionary<string,ushort[]>());
-                floodList[licenceName].Add(lineOftext, new ushort[2] { 1, TIMER_FLOOD });
+                floodList.Add(licenceName, new Dictionary<string, uint[]>());
+                floodList[licenceName].Add(lineOftext, new uint[2] { 1, TIMER_FLOOD });
             }    
             
             if ((sentenceMask & Word_Flag.IS_BAD) == Word_Flag.IS_BAD)
@@ -342,7 +342,7 @@ namespace Drive_LFSS.ChatModo_
                 if(badWordList.ContainsKey(licenceName))
                     badWordList[licenceName][0] += 1;
                 else
-                    badWordList.Add(licenceName,new ushort[2]{1,TIMER_BAD_WORD});
+                    badWordList.Add(licenceName, new uint[2] { 1, TIMER_BAD_WORD });
 
                 //iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1UNDESIRABLE ^7chat detected.");
             }
@@ -351,7 +351,7 @@ namespace Drive_LFSS.ChatModo_
                 if (sosoWordList.ContainsKey(licenceName))
                     sosoWordList[licenceName][0] += 1;
                 else
-                    sosoWordList.Add(licenceName, new ushort[2] { 1, TIMER_SOSO_WORD });
+                    sosoWordList.Add(licenceName, new uint[2] { 1, TIMER_SOSO_WORD });
 
                 //iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^3PLEASE ^7correct your language.");
             }
