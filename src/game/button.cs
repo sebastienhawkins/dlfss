@@ -377,9 +377,13 @@ namespace Drive_LFSS.Game_
                 case Gui_Entry.TEXT:
                     SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Text Display"); break;
                 case Gui_Entry.RESULT:
-                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Last Result"); break;
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Result"); break;
                 case Gui_Entry.CONFIG_USER:
                     SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0User Config"); break;
+                case Gui_Entry.MYSTATS:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0MyStatus"); break;
+                case Gui_Entry.HELP:
+                    SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Help"); break;
                 default:
                     SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0"); break;
             }
@@ -523,6 +527,9 @@ namespace Drive_LFSS.Game_
         public void SendUpdateButton(ushort buttonEntry, string text)
         {
             ButtonTemplateInfo buttonInfo = Program.buttonTemplate.GetEntry((uint)buttonEntry);
+            if (buttonInfo == null)
+                return;
+
             if(text != "")
                 buttonInfo.Text = text;
             SendUpdateButton(buttonInfo);
@@ -978,6 +985,10 @@ namespace Drive_LFSS.Game_
         {
             rankGuiCurrentDisplay = Button_Entry.NONE;
             RemoveGui(Gui_Entry.RANK);
+        }
+        internal void SendMyStats()
+        {
+            SendGui(Gui_Entry.MYSTATS);
         }
         internal void SendResultGui(Dictionary<string, int> scoringResultTextDisplay)
         {

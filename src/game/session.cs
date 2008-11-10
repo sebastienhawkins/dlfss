@@ -769,9 +769,9 @@ namespace Drive_LFSS.Game_
                 {
                     driver.RemoveGui(Gui_Entry.MOTD);
                 } break;
+                case Button_Entry.MENU_BUTTON_HELP:
                 case Button_Entry.MOTD_BUTTON_HELP:
                 {
-                    driver.RemoveGui(Gui_Entry.MOTD);
                     driver.SendHelpGui();
                 } break;
                 case Button_Entry.MOTD_BUTTON_MENU:
@@ -897,7 +897,7 @@ namespace Drive_LFSS.Game_
                 } break;
                 case Button_Entry.MENU_BUTTON_MYSTATS:
                 {
-                    //driver.RemoveMenuGui();
+                    driver.SendMyStats();
                 } break;
                 case Button_Entry.MENU_BUTTON_MANAGER:
                 {

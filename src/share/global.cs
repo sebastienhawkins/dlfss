@@ -159,6 +159,7 @@ namespace Drive_LFSS.Definition_
         MENU_BUTTON_SAY = 143,
         MENU_BUTTON_RELOAD = 144,
         MENU_BUTTON_EXIT = 145,
+        MENU_BUTTON_HELP = 156,
         TASKBAR_BUTTON_MENU = 161,
         TASKBAR_BUTTON_EXIT = 162,
         TASKBAR_BUTTON_CURRENT = 163,
@@ -202,6 +203,7 @@ namespace Drive_LFSS.Definition_
         FLAG_MAX = 18,
         MENU = 18,
         NODE_TRAC = 19,
+        MYSTATS = 20,
     }
     
     public enum Button_Safe_Coord_Range
