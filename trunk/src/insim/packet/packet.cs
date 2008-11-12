@@ -102,6 +102,7 @@ namespace Drive_LFSS.Packet_
             Add(Packet_Type.PACKET_PIT_DRIVER_PITSTOP_START, new PacketPIT());
             Add(Packet_Type.PACKET_PLA_DRIVER_PIT_LANE_STATUS, new PacketPLA());
             Add(Packet_Type.PACKET_PEN_DRIVER_PENALITY_STATUS, new PacketPEN());
+            Add(Packet_Type.PACKET_PFL_DRIVER_FLAG, new PacketPFL());
         }
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketAXI
@@ -544,10 +545,10 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        internal byte ReqI;
-        internal byte PLID;
-        internal Driver_Flag Flags;
-        internal ushort Spare;
+        internal byte requestId;
+        internal byte carId;
+        internal Driver_Flag driverMask;
+        internal ushort spare;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketPIT
     {

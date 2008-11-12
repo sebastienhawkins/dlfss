@@ -158,12 +158,16 @@ namespace Drive_LFSS.Game_
         private Queue<Packet> bufferButtonPacket = new Queue<Packet>();
 
         private uint timerBufferedButton = 0;
-        private const uint TIMER_BUFFERED_BUTTON = 100;
-        private const uint MAX_BUTTON_BY_CYCLE = 20;
+        private const uint TIMER_BUFFERED_BUTTON = 50;
+        private const uint MAX_BUTTON_BY_CYCLE = 5;
         private const uint TIMER_FLAG_RACE_UPDATE = 1500;
         private uint timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
         private const uint TIMER_TIME_UPDATE = 1000;
         private uint timerTimeUpdate = 1000;
+        private const uint TIMER_300 = 300;
+        private uint timer300 = 0;
+        private int fetchingWaitDisplayIndex = 0;
+        private string[] fetchingWaitDisplay = new string[4] { "|", "/", "-", "\\"}; 
         
         protected virtual void update(uint diff)
         {
@@ -299,6 +303,19 @@ namespace Drive_LFSS.Game_
             else
                 timerFlagRaceUpdate -= diff;
 
+            if (timer300 > TIMER_300)
+            {
+                timer300 = 0;
+                if (isWaitingPST)
+                {
+                    if (fetchingWaitDisplayIndex > 3)
+                        fetchingWaitDisplayIndex = 0;
+                    SendUpdateButton(Button_Entry.MYSTATUS_FETCHING_REQUEST, "^7Retriving L^5FSW^7 Data ^4" + fetchingWaitDisplay[fetchingWaitDisplayIndex++]);
+                }
+            }
+            else
+                timer300 += diff;
+
         }
 
         
@@ -380,7 +397,7 @@ namespace Drive_LFSS.Game_
                     SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Result"); break;
                 case Gui_Entry.CONFIG_USER:
                     SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0User Config"); break;
-                case Gui_Entry.MYSTATS:
+                case Gui_Entry.MYSTATUS:
                     SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0MyStatus"); break;
                 case Gui_Entry.HELP:
                     SendUpdateButton(Button_Entry.TASKBAR_BUTTON_CURRENT, "^0Help"); break;
@@ -403,6 +420,10 @@ namespace Drive_LFSS.Game_
                 return;
 
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
+            
+            if (guiInfo.Entry == Gui_Entry.MYSTATUS)
+                isWaitingPST = false;
+            
             string[] buttonEntrys = guiInfo.ButtonEntry.Split(new char[] { ' ' },StringSplitOptions.RemoveEmptyEntries);
             System.Collections.IEnumerator itr = buttonEntrys.GetEnumerator();
             ushort buttonEntry;
@@ -427,7 +448,9 @@ namespace Drive_LFSS.Game_
             if (guiInfo.Entry >= Gui_Entry.FLAG_BEGIN && guiInfo.Entry < Gui_Entry.FLAG_MAX)
                 currentFlagGui = Gui_Entry.NONE;
             else
+            {
                 currentGui = Gui_Entry.NONE;
+            }
         }
         internal protected byte RemoveButton(Button_Entry buttonEntry)
         {
@@ -986,10 +1009,265 @@ namespace Drive_LFSS.Game_
             rankGuiCurrentDisplay = Button_Entry.NONE;
             RemoveGui(Gui_Entry.RANK);
         }
-        internal void SendMyStats()
+
+        private bool isWaitingPST = false;
+        private string myStatusLicenceName = "";
+        
+        internal void SendMyStatus()
         {
-            SendGui(Gui_Entry.MYSTATS);
+            myStatusLicenceName = driver.LicenceName;
+            SendGui(Gui_Entry.MYSTATUS);
+            isWaitingPST = true;
+            fetchingWaitDisplayIndex = 0;
+            //SendUpdateButton(Button_Entry.MYSTATUS_FETCHING_REQUEST, "^7Please Wait Fetching Data ^2" + fetchingWaitDisplay[fetchingWaitDisplayIndex]);
+            driver.pst = Program.pubStats.GetPST(myStatusLicenceName, new PubStats_.PSTCallBack(CallBackPST));
+            SendAleajectaData();
+            SendTopBottom3Rank();
         }
+        internal void SearchMyStatus(string _licenceName)
+        {
+            SendUpdateButton(Button_Entry.MYSTATUS_WIN, "^2First Place ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_SECOND, "^2Second Place ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_THIRD, "^2Third Place ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_FINISH, "^2Races Finish ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_QUAL, "^2Qual Join ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_POLE, "^2Pole Position ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_DRAGS, "^2Drag Join ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_DRAGS_WIN, "^2Drags Win ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_DISTANCE, "^2Distance ^7: ^1NA ^7Km");
+            SendUpdateButton(Button_Entry.MYSTATUS_FUEL, "^2Fuel burnt ^7: ^1NA ^7L");
+            SendUpdateButton(Button_Entry.MYSTATUS_LAPS, "^2Lap count ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_HOST_JOIN, "^2Host join ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_ONLINE, "^2Online Status ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_SERVER, "^2Last Server ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_LASTTIME, "^2Last Seen ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_TRACK, "^2Last Track ^7: ^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_CAR, "^2Last Car ^7: ^1NA");
+                
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_TRACK, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_CAR, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_BEST, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_AVG, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_STA, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_WIN, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_TOTAL, "^1NA");
+
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_TRACK, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_CAR, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_BEST, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_AVG, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_STA, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_WIN, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_TOTAL, "^1NA");
+
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_TRACK, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_CAR, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_BEST, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_AVG, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_STA, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_WIN, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_TOTAL, "^1NA");
+
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_TRACK, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_CAR, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_BEST, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_AVG, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_STA, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_WIN, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_TOTAL, "^1NA");
+
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_TRACK, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_CAR, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_BEST, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_AVG, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_STA, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_WIN, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_TOTAL, "^1NA");
+
+
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_TRACK, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_CAR, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_BEST, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_AVG, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_STA, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_WIN, "^1NA");
+            SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_TOTAL, "^1NA");
+
+            myStatusLicenceName = _licenceName;
+            isWaitingPST = true;
+            fetchingWaitDisplayIndex = 0;
+            //SendUpdateButton(Button_Entry.MYSTATUS_FETCHING_REQUEST, "^7Please Wait Fetching Data ^2" + fetchingWaitDisplay[fetchingWaitDisplayIndex]);
+            driver.pst = Program.pubStats.GetPST(myStatusLicenceName, new PubStats_.PSTCallBack(CallBackPST));
+            SendAleajectaData();
+            SendTopBottom3Rank();
+        }
+        public void CallBackPST()
+        {
+            if (!isWaitingPST)
+                return;
+            isWaitingPST = false;
+            RemoveButton(Button_Entry.MYSTATUS_FETCHING_REQUEST);
+            driver.pst = Program.pubStats.GetPST(myStatusLicenceName, null);
+            if(driver.pst != null)
+                SendPSTData();
+        }
+        private void SendTopBottom3Rank()
+        {
+            Rank[] ranks = Ranking.GetTopBottom3Rank(myStatusLicenceName);
+            if (ranks[0] != null)
+            {
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_TRACK, "^3"+ranks[0].TrackPrefix);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_CAR, "^3" + ranks[0].CarPrefix);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_BEST, "^3" + ranks[0].BestLap);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_AVG, "^3" + ranks[0].AverageLap);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_STA, "^3" + ranks[0].Stability);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_WIN, "^3" + ranks[0].RaceWin);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKT1_TOTAL, "^3" + ranks[0].Total);
+                if (ranks[1] != null)
+                {
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_TRACK, "^3" + ranks[1].TrackPrefix);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_CAR, "^3" + ranks[1].CarPrefix);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_BEST, "^3" + ranks[1].BestLap);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_AVG, "^3" + ranks[1].AverageLap);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_STA, "^3" + ranks[1].Stability);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_WIN, "^3" + ranks[1].RaceWin);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKT2_TOTAL, "^3" + ranks[1].Total);
+
+                    if (ranks[2] != null)
+                    {
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_TRACK, "^3" + ranks[2].TrackPrefix);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_CAR, "^3" + ranks[2].CarPrefix);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_BEST, "^3" + ranks[2].BestLap);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_AVG, "^3" + ranks[2].AverageLap);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_STA, "^3" + ranks[2].Stability);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_WIN, "^3" + ranks[2].RaceWin);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKT3_TOTAL, "^3" + ranks[2].Total);
+                    }
+                }
+            }
+            
+            if (ranks[3] != null)
+            {
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_TRACK, "^3" + ranks[3].TrackPrefix);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_CAR, "^3" + ranks[3].CarPrefix);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_BEST, "^3" + ranks[3].BestLap);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_AVG, "^3" + ranks[3].AverageLap);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_STA, "^3" + ranks[3].Stability);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_WIN, "^3" + ranks[3].RaceWin);
+                SendUpdateButton(Button_Entry.MYSTATUS_RANKB1_TOTAL, "^3" + ranks[3].Total);
+                if (ranks[4] != null)
+                {
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_TRACK, "^3" + ranks[4].TrackPrefix);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_CAR, "^3" + ranks[4].CarPrefix);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_BEST, "^3" + ranks[4].BestLap);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_AVG, "^3" + ranks[4].AverageLap);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_STA, "^3" + ranks[4].Stability);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_WIN, "^3" + ranks[4].RaceWin);
+                    SendUpdateButton(Button_Entry.MYSTATUS_RANKB2_TOTAL, "^3" + ranks[4].Total);
+
+                    if (ranks[5] != null)
+                    {
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_TRACK, "^3" + ranks[5].TrackPrefix);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_CAR, "^3" + ranks[5].CarPrefix);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_BEST, "^3" + ranks[5].BestLap);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_AVG, "^3" + ranks[5].AverageLap);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_STA, "^3" + ranks[5].Stability);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_WIN, "^3" + ranks[5].RaceWin);
+                        SendUpdateButton(Button_Entry.MYSTATUS_RANKB3_TOTAL, "^3" + ranks[5].Total);
+                    }
+                }
+            }
+
+        }
+        private void SendAleajectaData()
+        {
+            string[] overall = Ranking.GetOverall(myStatusLicenceName);
+            
+            SendUpdateButton(Button_Entry.MYSTATUS_LICENCE_NAME, "^2LicenceName^7 : ^3" + myStatusLicenceName);
+            SendUpdateButton(Button_Entry.MYSTATUS_WIN_OVERALL, "^2WinOverall^7 : ^3" + overall[0]);
+            SendUpdateButton(Button_Entry.MYSTATUS_RANK_OVERALL, "^2RankOverall^7 : ^3" + overall[1]);
+
+            if (myStatusLicenceName == driver.LicenceName)
+            {
+                SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + driver.DriverName);
+                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + driver.GetSafePct()+"^7%");
+                //SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^3");
+                //SendUpdateButton(Button_Entry.MYSTATUS_DRIFT_BEST, "^3");
+                //SendUpdateButton(Button_Entry.MYSTATUS_TIME_RACED, "^3" );
+                //SendUpdateButton(Button_Entry.MYSTATUS_TIME_SPEC, "^3" );
+                //SendUpdateButton(Button_Entry.MYSTATUS_TIME_GARAGE, "^3" );
+                //SendUpdateButton(Button_Entry.MYSTATUS_TIME_TOTAL, "^3" );
+            }
+            else
+            {
+                int badCount = 0;
+                int lapCount = 0;
+                int finishCount = 0;
+                string _driverName = "";
+                Program.dlfssDatabase.Lock();
+                {
+                    System.Data.IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`warning_driving_count`,`driver_name` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(myStatusLicenceName) + "'");
+                    if (reader.Read())
+                    {
+                        uint _guid = (uint)reader.GetInt32(0);
+                        badCount = reader.GetInt32(1);
+                        _driverName = reader.GetString(2);
+                        reader.Close(); reader.Dispose();
+
+                        reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='" + _guid + "'");
+                        if (reader.Read())
+                            lapCount = reader.GetInt32(0);
+                        reader.Close(); reader.Dispose();
+
+                        reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE (LOCATE(' " + _guid + "',`finish_order`) > 0 OR LOCATE('" + _guid + " ',`finish_order`) > 0) AND `race_laps`>1");
+                        if (reader.Read())
+                            finishCount = reader.GetInt32(0);
+                        reader.Close(); reader.Dispose();
+
+                    }
+                }
+                Program.dlfssDatabase.Unlock();
+                int _safePct = driver.SetSafePct(badCount, finishCount, lapCount);
+                SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + _driverName);
+                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + _safePct+"^7%");
+            }
+
+
+        }
+        private void SendPSTData()
+        {
+            string onlineStatus = "NA";
+            switch (driver.pst.Online)
+            {
+                case 0: onlineStatus = "offline"; break;
+                case 1: onlineStatus = "spectate"; break;
+                case 2: onlineStatus = "pits"; break;
+                case 3: onlineStatus = "in-race"; break;
+            }
+            string lastSeen = "NA";
+            //DateTime.UtcNow
+            DateTime _lastSeen = ConvertX.UTCToDatetime(driver.pst.LastTime).AddHours(-5.0d);
+            lastSeen = _lastSeen.ToShortDateString() +" "+ _lastSeen.ToShortTimeString();
+
+            SendUpdateButton(Button_Entry.MYSTATUS_WIN, "^2First Place ^7: ^3"+driver.pst.Win.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_SECOND, "^2Second Place ^7: ^3" + driver.pst.Second.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_THIRD, "^2Third Place ^7: ^3" + driver.pst.Third.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_FINISH, "^2Races Finish ^7: ^3" + driver.pst.Finished.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_QUAL, "^2Qual Join ^7: ^3" + driver.pst.Quals.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_POLE, "^2Pole Position ^7: ^3" + driver.pst.Pole.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_DRAGS, "^2Drag Join ^7: ^3" + driver.pst.Drags.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_DRAGS_WIN, "^2Drags Win ^7: ^3" + driver.pst.DragWins.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_DISTANCE, "^2Distance ^7: ^3" + (driver.pst.Distance/1000).ToString()+" ^7Km");
+            SendUpdateButton(Button_Entry.MYSTATUS_FUEL, "^2Fuel burnt ^7: ^3" + (driver.pst.Fuel/100).ToString() + " ^7L");
+            SendUpdateButton(Button_Entry.MYSTATUS_LAPS, "^2Lap count ^7: ^3" + driver.pst.Laps.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_HOST_JOIN, "^2Host join ^7: ^3" + driver.pst.HostJoin.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_ONLINE, "^2Online Status ^7: ^3" + onlineStatus);
+            SendUpdateButton(Button_Entry.MYSTATUS_SERVER, "^2Last Server ^7: ^3" + driver.pst.LastServer);
+            SendUpdateButton(Button_Entry.MYSTATUS_LASTTIME, "^2Last Seen ^7: ^3" + lastSeen);
+            SendUpdateButton(Button_Entry.MYSTATUS_TRACK, "^2Last Track ^7: ^3" + driver.pst.Track);
+            SendUpdateButton(Button_Entry.MYSTATUS_CAR, "^2Last Car ^7: ^3" + driver.pst.Car);
+        }
+        
         internal void SendResultGui(Dictionary<string, int> scoringResultTextDisplay)
         {
             if(currentGui == Gui_Entry.RESULT)

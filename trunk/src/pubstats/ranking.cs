@@ -33,8 +33,10 @@ namespace Drive_LFSS.Ranking_
 
     public class Rank
     {
-        internal Rank(short _bestLap, short _averageLap, short _stability, int _raceWin, int _total, uint _position, uint _changeMask)
+        internal Rank(string _trackPrefix, string _carPrefix, short _bestLap, short _averageLap, short _stability, int _raceWin, int _total, uint _position, uint _changeMask)
         {
+            carPrefix = _carPrefix;
+            trackPrefix = _trackPrefix;
             bestLap = _bestLap;
             averageLap = _averageLap;
             stability = _stability;
@@ -99,7 +101,17 @@ namespace Drive_LFSS.Ranking_
         uint position = 0;
         Rank_Change_Mask changeMask = Rank_Change_Mask.NONE;
         private string[] rankGuiString;
+        private string carPrefix = "";
+        private string trackPrefix = "";
 
+        public string TrackPrefix
+        {
+            get { return trackPrefix; }
+        }
+        public string CarPrefix
+        {
+            get { return carPrefix; }
+        }
         public short BestLap
         {
             get { return bestLap; }
@@ -324,6 +336,32 @@ namespace Drive_LFSS.Ranking_
         {
             return isActived;
         }
+        internal static Rank[] GetTopBottom3Rank(string licenceName)
+        {
+            Rank[] ranks = new Rank[6]{null,null,null,null,null,null};
+
+            string query = "SELECT `track_prefix`,`car_prefix`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position`,`change_mask` FROM `stats_rank_driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "' ORDER BY `total_rank` DESC LIMIT 3";
+            Program.dlfssDatabase.Lock();
+            {
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                int index = 0;
+                while(reader.Read())
+                    ranks[index++] = new Rank(reader.GetString(0), reader.GetString(1),reader.GetInt16(2), reader.GetInt16(3), reader.GetInt16(4), reader.GetInt32(5), reader.GetInt32(6), (uint)reader.GetInt32(7), (uint)reader.GetInt32(8));
+            }
+            Program.dlfssDatabase.Unlock();
+
+            query = "SELECT `track_prefix`,`car_prefix`,`best_lap_rank`,`average_lap_rank`,`stability_rank`,`race_win_rank`,`total_rank`,`position`,`change_mask` FROM `stats_rank_driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "' ORDER BY `total_rank` LIMIT 3";
+            Program.dlfssDatabase.Lock();
+            {
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                int index = 3;
+                while (reader.Read())
+                    ranks[index++] = new Rank(reader.GetString(0), reader.GetString(1), reader.GetInt16(2), reader.GetInt16(3), reader.GetInt16(4), reader.GetInt32(5), reader.GetInt32(6), (uint)reader.GetInt32(7), (uint)reader.GetInt32(8));
+            }
+            Program.dlfssDatabase.Unlock();
+
+            return ranks;
+        }
         internal static Rank GetRank(string trackPrefix, string carPrefix, string licenceName)
         {
             Rank rank = null;
@@ -332,11 +370,30 @@ namespace Drive_LFSS.Ranking_
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
                 if(reader.Read())
-                    rank = new Rank(reader.GetInt16(0),reader.GetInt16(1),reader.GetInt16(2),reader.GetInt32(3),reader.GetInt32(4),(uint)reader.GetInt32(5),(uint)reader.GetInt32(6));
+                    rank = new Rank(trackPrefix, carPrefix, reader.GetInt16(0), reader.GetInt16(1), reader.GetInt16(2), reader.GetInt32(3), reader.GetInt32(4), (uint)reader.GetInt32(5), (uint)reader.GetInt32(6));
             }
             Program.dlfssDatabase.Unlock();
             
             return rank;
+        }
+        internal static string[] GetOverall(string licenceName)
+        {
+            string[] overall = new string[2]{"",""};
+            string query = "SELECT AVG(`race_win_rank`),AVG(`total_rank`) FROM `stats_rank_driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'";
+            Program.dlfssDatabase.Lock();
+            {
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
+                if (reader.Read())
+                {
+                    if(!reader.IsDBNull(0))
+                        overall[0] = reader.GetInt32(0).ToString();
+                    if(!reader.IsDBNull(1))
+                        overall[1] = reader.GetInt32(1).ToString();
+                }
+            }
+            Program.dlfssDatabase.Unlock();
+
+            return overall;
         }
         internal static Dictionary<string,Dictionary<string,Rank>> GetDriverRanks(string licenceName)
         {
@@ -360,7 +417,7 @@ namespace Drive_LFSS.Ranking_
                     if(!data[trackPrefix].ContainsKey(carPrefix))
                         data[trackPrefix].Add(carPrefix,null);
 
-                    data[trackPrefix][carPrefix] = new Rank(reader.GetInt16(2), reader.GetInt16(3), reader.GetInt16(4), reader.GetInt32(5), reader.GetInt32(6), (uint)reader.GetInt32(7), (uint)reader.GetInt32(8));
+                    data[trackPrefix][carPrefix] = new Rank(reader.GetString(0), reader.GetString(1), reader.GetInt16(2), reader.GetInt16(3), reader.GetInt16(4), reader.GetInt32(5), reader.GetInt32(6), (uint)reader.GetInt32(7), (uint)reader.GetInt32(8));
                 }
             }
             Program.dlfssDatabase.Unlock();
