@@ -216,7 +216,10 @@ namespace Drive_LFSS.Game_
         public void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay)
         {
             for (byte itr = 0; itr < driverList.Count; itr++)
-                driverList[itr].SendResultGui(scoringResultTextDisplay);
+            {
+                if (!driverList[itr].HasAGuiDisplay())
+                    driverList[itr].SendResultGui(scoringResultTextDisplay);
+            }
         }
         public void SendFlagRaceToAll(ushort guiEntry, uint time)
         {
@@ -628,10 +631,11 @@ namespace Drive_LFSS.Game_
             #endif
             race.Init(packet);
 
-            int count = driverList.Count;
-            for (byte itr = 0; itr < count; itr++)
+            if (GetRaceInProgressStatus() != Race_In_Progress_Status.RACE_PROGRESS_NONE)
             {
-                driverList[itr].ProcessRaceStart();
+                int count = driverList.Count;
+                for (byte itr = 0; itr < count; itr++)
+                    driverList[itr].ProcessRaceStart();
             }
         }      // Race Start
         protected sealed override void processPacket(PacketSTA packet)
@@ -641,16 +645,26 @@ namespace Drive_LFSS.Game_
             #endif
 
             string oldTrackPrefix =  race.GetTrackPrefix();
+            Race_In_Progress_Status oldRaceStatus = GetRaceInProgressStatus();
+
             if (packet.currentCarId == 0)
                 race.Init(packet);
-
             clientConnectionCount = packet.connectionCount;
-
-            if (packet.trackPrefix != oldTrackPrefix)
+            
+            if (packet.trackPrefix != oldTrackPrefix /*|| packet.raceInProgressStatus != oldRaceStatus*/)
             {
                 for (byte itr = 0; itr < driverList.Count; itr++)
-                    driverList[itr].ProcessTrackChange();
+                {
+                    //if (packet.trackPrefix != oldTrackPrefix) 
+                        driverList[itr].ProcessTrackChange();
+
+                    //if (oldRaceStatus == Race_In_Progress_Status.RACE_PROGRESS_NONE && packet.raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE)
+                        //driverList[itr].ProcessRaceStart();
+                }
             }
+            
+
+            
 
         }      // State Change race/car
         protected sealed override void processPacket(PacketTiny packet)
@@ -897,7 +911,7 @@ namespace Drive_LFSS.Game_
                 } break;
                 case Button_Entry.MENU_BUTTON_MYSTATS:
                 {
-                    driver.SendMyStats();
+                    driver.SendMyStatus();
                 } break;
                 case Button_Entry.MENU_BUTTON_MANAGER:
                 {
@@ -941,8 +955,8 @@ namespace Drive_LFSS.Game_
             #endif
 
             byte driverIndex = GetConnectionIdNotBot(packet.connectionId);
-            Driver car = driverList[driverIndex];
-            switch((Button_Entry)car.GetButtonEntry(packet.buttonId))
+            Driver driver = driverList[driverIndex];
+            switch((Button_Entry)driver.GetButtonEntry(packet.buttonId))
             {
                 case Button_Entry.CONFIG_USER_ACC_START:
                 {
@@ -950,16 +964,16 @@ namespace Drive_LFSS.Game_
                     try { startKmh = Convert.ToUInt16(packet.typedText); }
                     catch (Exception)
                     {
-                        car.AddMessageMiddle("^1Bad value (^7" + packet.typedText + "^1) entered for 'Acceleration Start speed (in Kmh)'.", 7000);
+                        driver.AddMessageMiddle("^1Bad value (^7" + packet.typedText + "^1) entered for 'Acceleration Start speed (in Kmh)'.", 7000);
                         return;
                     }
-                    if (startKmh > car.GetAccelerationEndSpeed())
+                    if (startKmh > driver.GetAccelerationEndSpeed())
                     {
-                        car.AddMessageMiddle("^1Start speed (^7" + startKmh + "^1) cannot be higher then End speed (^7" + car.GetAccelerationEndSpeed() + "^1)", 7000);
+                        driver.AddMessageMiddle("^1Start speed (^7" + startKmh + "^1) cannot be higher then End speed (^7" + driver.GetAccelerationEndSpeed() + "^1)", 7000);
                         return;
                     }
-                    car.SetAccelerationStartSpeed(startKmh);
-                    car.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + car.GetAccelerationStartSpeed() + "^2-^7" + car.GetAccelerationEndSpeed() + " ^2Kmh");
+                    driver.SetAccelerationStartSpeed(startKmh);
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + driver.GetAccelerationStartSpeed() + "^2-^7" + driver.GetAccelerationEndSpeed() + " ^2Kmh");
                 } break;
                 case Button_Entry.CONFIG_USER_ACC_END:
                 {
@@ -967,34 +981,39 @@ namespace Drive_LFSS.Game_
                     try { endKmh = Convert.ToUInt16(packet.typedText); }
                     catch (Exception)
                     {
-                        car.AddMessageMiddle("^1Bad value (^7" + packet.typedText + "^1) entered for 'Acceleration End speed (in Kmh)'.", 7000);
+                        driver.AddMessageMiddle("^1Bad value (^7" + packet.typedText + "^1) entered for 'Acceleration End speed (in Kmh)'.", 7000);
                         return;
                     }
-                    if (endKmh < car.GetAccelerationStartSpeed())
+                    if (endKmh < driver.GetAccelerationStartSpeed())
                     {
-                        car.AddMessageMiddle("^1End speed (^7" + endKmh + "^1) cannot be lower than the Start speed (^7"+car.GetAccelerationStartSpeed()+"^1)", 7000);
+                        driver.AddMessageMiddle("^1End speed (^7" + endKmh + "^1) cannot be lower than the Start speed (^7"+driver.GetAccelerationStartSpeed()+"^1)", 7000);
                         return;
                     }
                     if (endKmh < 10)
                     {
-                        car.AddMessageMiddle("^1End speed (^7" + endKmh + "^1) cannot be lower than ^710.", 7000);
+                        driver.AddMessageMiddle("^1End speed (^7" + endKmh + "^1) cannot be lower than ^710.", 7000);
                         return;
                     }
-                    car.SetAccelerationEndSpeed(endKmh);
-                    car.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + car.GetAccelerationStartSpeed() + "^2-^7" + car.GetAccelerationEndSpeed() + " ^2Kmh");
+                    driver.SetAccelerationEndSpeed(endKmh);
+                    driver.SendUpdateButton((ushort)Button_Entry.CONFIG_USER_ACC_CURRENT, "^7" + driver.GetAccelerationStartSpeed() + "^2-^7" + driver.GetAccelerationEndSpeed() + " ^2Kmh");
                 } break;
                 case Button_Entry.RANK_SEARCH_BUTTON_TRACK:
                 {
-                    car.RankSearchTrack(packet.typedText.ToUpperInvariant());
+                    driver.RankSearchTrack(packet.typedText.ToUpperInvariant());
                 } break;
                 case Button_Entry.RANK_SEARCH_BUTTON_CAR:
                 {
-                    car.RankSearchCar(packet.typedText.ToUpperInvariant());
+                    driver.RankSearchCar(packet.typedText.ToUpperInvariant());
                 } break;
                 case Button_Entry.RANK_SEARCH_BUTTON_LICENCE:
                 {
-                    car.RankSearchAdd(packet.typedText);
+                    driver.RankSearchAdd(packet.typedText);
                 }break;
+                case Button_Entry.MYSTATUS_BUTTON_SEARCH:
+                {
+                    if (packet.typedText.Trim() != "")
+                        driver.SearchMyStatus(packet.typedText);
+                } break;
             }
         }
         protected sealed override void processPacket(PacketBFN packet)
@@ -1080,6 +1099,19 @@ namespace Drive_LFSS.Game_
                 return;
             }
             driverList[index].ProcessPITPacket(packet);
+        }
+        protected sealed override void processPacket(PacketPFL packet)
+        {
+            #if DEBUG
+            base.processPacket(packet); //Keep the Log
+            #endif
+            byte index = GetCarIndex(packet.carId);
+            if (index == 255)
+            {
+                Log.error("processPacket(PacketPFL), we can find any driver with this car.\r\n");
+                return;
+            }
+            driverList[index].ProcessPFLPacket(packet);
         }
         protected sealed override void processPacket(PacketPEN packet)
         {

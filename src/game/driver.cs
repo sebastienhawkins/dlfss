@@ -206,11 +206,11 @@ namespace Drive_LFSS.Game_
                 lapWRDiff = (int)lap.LapTime - (int)wr.LapTime;
                 if (lapWRDiff < 0)//A New World Record
                 {
-                    wr.Splits[1] = lap.SplitTime[1];
-                    wr.Splits[2] = lap.SplitTime[2];
-                    wr.Splits[3] = lap.SplitTime[3];
-                    wr.LapTime = lap.LapTime;
-                    wr.LicenceName = LicenceName;
+                    //wr.Splits[1] = lap.SplitTime[1];
+                    //wr.Splits[2] = lap.SplitTime[2];
+                    //wr.Splits[3] = lap.SplitTime[3];
+                    //wr.LapTime = lap.LapTime;
+                    //wr.LicenceName = LicenceName;
                     ISession.AddMessageMiddleToAll("^2New WR " + ConvertX.MSTimeToHMSC(wr.LapTime, Msg.COLOR_DIFF_TOP, Msg.COLOR_DIFF_TOP) + " ^2by " + LicenceName + ", Bravo!", 8000);
                 }
             }
@@ -268,7 +268,8 @@ namespace Drive_LFSS.Game_
         }
         internal void ProcessRaceStart()
         {
-            StartRacing();
+            if(IsRacing())
+                StartRacing();
         }
         internal void ProcessTrackChange()
         {
@@ -353,6 +354,11 @@ namespace Drive_LFSS.Game_
         internal void ProcessPITPacket(PacketPIT packet)
         {
             isInPit = true;
+            driverMask = packet.driverMask;
+        }
+        internal void ProcessPFLPacket(PacketPFL packet)
+        {
+            driverMask = packet.driverMask;
         }
         internal void ProcessPenality(PacketPEN packet)
         {
@@ -520,6 +526,7 @@ namespace Drive_LFSS.Game_
         private Queue<Lap> laps = new Queue<Lap>();
         internal PB pb = null;
         internal WR wr = null;
+        internal PST pst = null;
         private Dictionary<string,Dictionary<string,Rank>> rank = null;
 
 
@@ -661,7 +668,7 @@ namespace Drive_LFSS.Game_
             }
             else
                 timer300Check -= diff;
-
+            
             if (warningDrivingCancelTimer > 0)
             {
                 if (warningDrivingCancelTimer > diff)
@@ -679,26 +686,24 @@ namespace Drive_LFSS.Game_
                         {
                             driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is too low.");
                             session.SendMSXMessage("^1Banned " + driver.DriverName + "^7 1 days for Bad driving.");
-                            session.SendMSTMessage("/ban " + driver.LicenceName+" 1");
-                            //session.SendMTCMessageToAllAdmin("/msg ^1Banned ^8" + driver.DriverName + "^7 for 1 day.");
+                            if(!driver.IsAdmin)
+                                session.SendMSTMessage("/ban " + driver.LicenceName+" 1");
                         }
-                        else if (driver.GetSafePct() < -250)
+                        else if (driver.GetSafePct() < -100)
                         {
                             driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is too low.");
                             session.SendMSXMessage("^1Kicked " + driver.DriverName + "^7 for Bad driving.");
-                            session.SendMSTMessage("/kick " + driver.LicenceName);
-                            //session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
+                            if (!driver.IsAdmin)
+                                session.SendMSTMessage("/kick " + driver.LicenceName);
                         }
-                        else if (driver.GetSafePct() < -100)
+                        else if (driver.GetSafePct() < 0)
                         {
                             driver.SendMTCMessage("^4" + driver.GetSafePct() + "^7% is very low.");
                             driver.SendMTCMessage("^7You ^1MUST ^7stay ^1CLEAN ^7at ^1ALL COST^7.");
                             session.SendMSXMessage("^1Spec " + driver.DriverName + "^7 for Bad driving.");
-                            session.SendMSTMessage("/spec " + driver.LicenceName);
-                            //session.SendMTCMessageToAllAdmin("/msg ^1Ban ^8" + driver.DriverName + "^7 for 1 days?");
+                            if (!driver.IsAdmin)
+                                session.SendMSTMessage("/spec " + driver.LicenceName);
                         }
-                        //driver.AddMessageMiddle("^1Undesirable driving detected & recorded.", 7000);
-
                     }
                     RemoveCancelWarningDriving(false);
                 }
@@ -722,7 +727,7 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.Lock();
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(LicenceName) + "' AND `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
@@ -748,6 +753,7 @@ namespace Drive_LFSS.Game_
                 }
             }
             Program.dlfssDatabase.Unlock();
+            SetSafePct();
         }
         private void SaveLapsToDB(Lap lap)
         {
@@ -862,12 +868,16 @@ namespace Drive_LFSS.Game_
         public void SetSafePct()
         {
             oldSafePct = safePct;
-
-            safePct = (badDrivingCount / (totalRaceFinishCount > 0 ? totalRaceFinishCount : 1))*25;
-            safePct += (int)((badDrivingCount / (totalLapCount > 0 ? ((double)totalLapCount/10.0d) : 1))*75);
-            safePct = 101 - safePct;
-            if(safePct > 100)
-                safePct = 100;
+            safePct = SetSafePct(badDrivingCount, totalRaceFinishCount, totalLapCount);
+        }
+        internal int SetSafePct(int badDriving, int raceFinish, int lapCount)
+        {
+            int _safePct = (badDriving / (raceFinish > 0 ? (raceFinish*2) : 1)) * 25;
+            _safePct += (int)((badDriving / (lapCount > 0 ? ((double)lapCount / 10.0d) : 1)) * 75);
+            _safePct = 102 - _safePct;
+            if (_safePct > 100)
+                _safePct = 100;
+            return _safePct;
         }
         public int GetSafePct()
         {
@@ -1162,7 +1172,7 @@ namespace Drive_LFSS.Game_
                 return;
             
             tracjectoryDisplay = trajDisplay;
-            SendUpdateButton((ushort)Button_Entry.NODE_TRAJ_TO_TRACK, trajDisplay);
+            //SendUpdateButton((ushort)Button_Entry.NODE_TRAJ_TO_TRACK, trajDisplay);
         }
         private string orientationDisplay = "";
         public void SendOriDisplay(string oriDisplay)
@@ -1170,7 +1180,7 @@ namespace Drive_LFSS.Game_
             if (orientationDisplay == oriDisplay)
                 return;
             orientationDisplay = oriDisplay;
-            SendUpdateButton((ushort)Button_Entry.NODE_ORIE_TO_TRACK, oriDisplay);
+            //SendUpdateButton((ushort)Button_Entry.NODE_ORIE_TO_TRACK, oriDisplay);
         }
         private string pathDisplay = "";
         public void SendPathDisplay(string _pathDisplay)
@@ -1178,7 +1188,7 @@ namespace Drive_LFSS.Game_
             if (pathDisplay == _pathDisplay)
                 return;
             pathDisplay = _pathDisplay;
-            SendUpdateButton((ushort)Button_Entry.NODE_POS_TO_PATH, pathDisplay);
+            //SendUpdateButton((ushort)Button_Entry.NODE_POS_TO_PATH, pathDisplay);
         }
     }
 }

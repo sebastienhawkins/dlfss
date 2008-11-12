@@ -342,7 +342,7 @@ namespace Drive_LFSS.Game_
             (new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE,
                     new PacketTiny(1, Tiny_Type.TINY_VTC)));
         }
-        protected void SayNextTrack()
+        internal void SayNextTrack()
         {
             string resApply = "^7N^3ext ^7Race\r\n";
             resApply += "^7R^3ace ^7Name ^2" + race.raceInfo.Description + "^7, Race Entry ^2" + race.raceInfo.Entry + "\r\n";

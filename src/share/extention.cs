@@ -24,6 +24,10 @@ namespace Drive_LFSS
     //Real extention required .net 3.0 , since we don't need .net 3.0 for the rest , i prefer stay .net 2.0
     sealed class ConvertX
     {
+        public static DateTime UTCToDatetime(uint timestamp)
+        {
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(timestamp);
+        }
         public static string MSTimeToHMSC(uint msTime, string negativeColor, string positiveColor)
         {
             return MSTimeToHMSC((int)msTime,negativeColor, positiveColor);

@@ -104,6 +104,8 @@ namespace Drive_LFSS.Game_
                         session.SendMSTMessage("/spec " + driver.LicenceName);
                     else
                         driver.SendMTCMessage("^5AdminDetected ^7restriction ^2Removed^7.");
+
+                    //track.SayNextTrack();
                     break;
                 case Penalty_Type_Ext.KICK:
                     session.SendMTCMessageToAllAdmin(driver.DriverName + " ^7-> ^3Kick, Restriction Apply");
@@ -111,6 +113,8 @@ namespace Drive_LFSS.Game_
                         session.SendMSTMessage("/kick " + driver.LicenceName);
                     else
                         driver.SendMTCMessage("^5AdminDetected ^7restriction ^2Removed^7.");
+
+                    //track.SayNextTrack();
                     break;
                 case Penalty_Type_Ext.NONE: break;
             }

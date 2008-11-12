@@ -97,21 +97,153 @@ namespace Drive_LFSS.PubStats_
         public uint[] Splits
         {
             get { return splits; }
-            set { splits = value; }
         }
         public uint LapTime
         {
             get { return lapTime; }
-            set { lapTime = value; }
         }
         public string LicenceName
         {
             get { return licenceName; }
-            set { licenceName = value; }
         }
         //<id_wr> <track> <car> <split1> <split2> <split3> <laptime> <flags_hlaps> <racername>
     }
+    public class PST
+    {
+        internal PST(string[] args)
+        {
+            distance = Convert.ToUInt32(args[0]);
+            fuel = Convert.ToUInt32(args[1]);
+            laps = Convert.ToUInt32(args[2]);
+            hostJoin = Convert.ToUInt32(args[3]);
+            win = Convert.ToUInt32(args[4]);
+            second = Convert.ToUInt32(args[5]);
+            third = Convert.ToUInt32(args[6]);
+            finished = Convert.ToUInt32(args[7]);
+            quals = Convert.ToUInt32(args[8]);
+            pole = Convert.ToUInt32(args[9]);
+            drags = Convert.ToUInt32(args[10]);
+            dragWins = Convert.ToUInt32(args[11]);
+            country = args[12];
+            online = Convert.ToByte(args[13]);
+            lastServer = args[14];
+            lastTime = Convert.ToUInt32(args[15]);
+            track = args[16];
+            car = args[17];
+        }
+        ~PST()
+        {
+            if (false == true) { }
+        }
+        private uint distance;
 
+        public uint Distance
+        {
+            get { return distance; }
+        }
+        private uint fuel;
+
+        public uint Fuel
+        {
+            get { return fuel; }
+        }
+        private uint laps;
+
+        public uint Laps
+        {
+            get { return laps; }
+        }
+        private uint hostJoin;
+
+        public uint HostJoin
+        {
+            get { return hostJoin; }
+        }
+        private uint win;
+
+        public uint Win
+        {
+            get { return win; }
+        }
+        private uint second;
+
+        public uint Second
+        {
+            get { return second; }
+        }
+        private uint third;
+
+        public uint Third
+        {
+            get { return third; }
+        }
+        private uint finished;
+
+        public uint Finished
+        {
+            get { return finished; }
+        }
+        private uint quals;
+
+        public uint Quals
+        {
+            get { return quals; }
+        }
+        private uint pole;
+
+        public uint Pole
+        {
+            get { return pole; }
+        }
+        private uint drags;
+        public uint Drags
+        {
+            get { return drags; }
+        }
+        
+        private uint dragWins;
+        public uint DragWins
+        {
+            get { return dragWins; }
+        }
+        
+        private string country;
+        public string Country
+        {
+            get { return country; }
+        }
+        
+        private byte online;
+        public byte Online
+        {
+            get { return online; }
+        }
+       
+        private string lastServer;
+        public string LastServer
+        {
+            get { return lastServer; }
+        }
+       
+        private uint lastTime;
+        public uint LastTime
+        {
+            get { return lastTime; }
+        }
+        
+        private string track;
+        public string Track
+        {
+            get { return track; }
+        }
+        
+        private string car;
+        public string Car
+        {
+            get { return car; }
+        }
+    }
+    public delegate void PSTCallBack();
     public sealed class PubStats
     {
         public PubStats()
@@ -169,16 +301,24 @@ namespace Drive_LFSS.PubStats_
         private delegate bool FetchDelegate(params string[] args);
         private struct Request : IDisposable
         {
-            public Request(FetchDelegate _fetchDelegate, params string[] _args)
+            public Request(FetchDelegate _fetchDelegate, PSTCallBack _pstCallBack, params string[] _args)
             {
                 fetchDelegate = _fetchDelegate;
+                pstCallBack = _pstCallBack;
                 args = _args;
             }
             private FetchDelegate fetchDelegate;
+            private PSTCallBack pstCallBack;
             private string[] args;
             public void Exec()
             {
-                fetchDelegate(args);
+                bool fetchGood = fetchDelegate(args);
+                if (pstCallBack != null)
+                {
+                    pstCallBack();
+                }
+                   
+
                 this.Dispose();
             }
             public void Dispose()
@@ -191,6 +331,7 @@ namespace Drive_LFSS.PubStats_
 
         private Dictionary<string, PB> storagePB = new Dictionary<string, PB>();
         private Dictionary<string, WR> storageWR = new Dictionary<string, WR>();
+        private Dictionary<string, PST> storagePST = new Dictionary<string, PST>();
 
         private bool HasPremiumService(params string[] args)
         {
@@ -236,7 +377,7 @@ namespace Drive_LFSS.PubStats_
             return answer;
         }
 
-        private bool FetchLicencePB(params string[] args)
+        private bool FetchPB(params string[] args)
         {
             string data = FetchData("&action=pb&racer=" + args[0]);
             if (data == "")
@@ -288,6 +429,25 @@ namespace Drive_LFSS.PubStats_
             //<id_wr> <track> <car> <split1> <split2> <split3> <laptime> <flags_hlaps> <racername>
             return true;
         }
+        private bool FetchPST(params string[] args)
+        {
+            string data = FetchData("&action=pst&racer=" + args[0]);
+            if (data == "")
+                return false;
+
+            string[] datas = data.Split(new string[] { "\n" }, StringSplitOptions.None);
+            if(datas.Length != 18)
+                return false;
+
+            datas[16] = LFSWTrackToTrackPrefix(datas[16]);
+
+            if (storagePST.ContainsKey(args[0]))
+                storagePST[args[0]] = new PST(datas);
+            else
+                storagePST.Add(args[0], new PST(datas));
+
+            return true;
+        }
         
         public PB GetPB(string licenceName, string carTrackPrefix)
         {
@@ -298,7 +458,7 @@ namespace Drive_LFSS.PubStats_
             if (storagePB.ContainsKey(key))
                 return storagePB[key];
 
-            Request request = new Request( new FetchDelegate(FetchLicencePB), licenceName);
+            Request request = new Request( new FetchDelegate(FetchPB), null, licenceName);
             if (!requestQueue.Contains(request))
             {
                 //storagePB.Add(key, null); //this create a null index, so we don't ask for this PB anymore.
@@ -312,11 +472,31 @@ namespace Drive_LFSS.PubStats_
             if (storageWR.ContainsKey(carTrackPrefix))
                 return storageWR[carTrackPrefix];
 
-            Request request = new Request(new FetchDelegate(FetchWR), "");
+            Request request = new Request(new FetchDelegate(FetchWR),null, "");
             if (!requestQueue.Contains(request))
             {
                 lock(requestQueue){requestQueue.Enqueue(request);}
             }
+            return null;
+        }
+        public PST GetPST(string licenceName, PSTCallBack _pstCallBack)
+        {
+            //Maybe we should put PST into struct format , cause if 2 player search the same driver
+            // one will overwrite during the display process of the other.
+            if (licenceName == "AI")
+                return null;
+
+            string key = licenceName;
+            if (storagePST.ContainsKey(key) && _pstCallBack == null)
+                return storagePST[key];
+
+            Request request = new Request(new FetchDelegate(FetchPST), _pstCallBack, licenceName);
+            if (!requestQueue.Contains(request))
+            {
+                //storagePB.Add(key, null); //this create a null index, so we don't ask for this PB anymore.
+                lock (requestQueue) { requestQueue.Enqueue(request); }
+            }
+
             return null;
         }
 

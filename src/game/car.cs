@@ -436,13 +436,13 @@ namespace Drive_LFSS.Game_
             if (isLostControl != value)
             {
                 isLostControl = value;
-                if (isAdmin)
+                /*if (isAdmin)
                 {
                     if (isLostControl)
                         SendUpdateButton(Button_Entry.INFO_3, "^1Code Red");
                     else
                         SendUpdateButton(Button_Entry.INFO_3, "^2Code Green");
-                }
+                }*/
             }
         }
         public bool IsDrifting()
@@ -454,13 +454,13 @@ namespace Drive_LFSS.Game_
             if (isDrifting != value)
             {
                 isDrifting = value;
-                if (isAdmin)
+                /*if (isAdmin)
                 {
                     if (isDrifting)
                         SendUpdateButton(Button_Entry.INFO_5, "^1Drift");
                     else
                         SendUpdateButton(Button_Entry.INFO_5, "^2Grip");
-                }
+                }*/
             }
         }
         public bool IsOutsideDrive()
@@ -472,13 +472,13 @@ namespace Drive_LFSS.Game_
             if (isOutsideDrive != value)
             {
                 isOutsideDrive = value;
-                if (isAdmin)
+                /*if (isAdmin)
                 {
                     if (isOutsideDrive)
                         SendUpdateButton(Button_Entry.INFO_4, "^1GrassOn");
                     else
                         SendUpdateButton(Button_Entry.INFO_4, "^2GrassOff");
-                }
+                }*/
             }
         }
         //Speed

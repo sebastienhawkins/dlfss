@@ -59,6 +59,7 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_FLG_DRIVER_BLUE_YELLOW_FLAG:   processPacket((PacketFLG)_packet); break;
                 case Packet_Type.PACKET_PLA_DRIVER_PIT_LANE_STATUS:    processPacket((PacketPLA)_packet); break;
                 case Packet_Type.PACKET_PIT_DRIVER_PITSTOP_START:      processPacket((PacketPIT)_packet); break;
+                case Packet_Type.PACKET_PFL_DRIVER_FLAG:               processPacket((PacketPFL)_packet); break;
                 case Packet_Type.PACKET_PEN_DRIVER_PENALITY_STATUS:    processPacket((PacketPEN)_packet); break;
                 default: Log.missingDefinition("ProcessPacket(), No existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
@@ -107,7 +108,7 @@ namespace Drive_LFSS.Packet_
         // Player help settings changed.
         protected virtual void processPacket(PacketPFL _packet)
         {
-            Log.debug(((Session)this).GetSessionNameForLog() + " PFL_PlayerFlagsChanged(), PFL -> PLID=" + _packet.PLID + ", Flags=" + _packet.Flags + ", Spare=" + _packet.Spare + "\r\n");
+            Log.debug(((Session)this).GetSessionNameForLog() + " PFL_PlayerFlagsChanged(), PFL -> PLID=" + _packet.carId + ", Flags=" + _packet.driverMask + ", Spare=" + _packet.spare + "\r\n");
         }
         // A player goes to the garage (setup screen).
         protected virtual void processPacket(PacketPLP _packet)
