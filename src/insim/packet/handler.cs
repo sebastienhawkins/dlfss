@@ -61,6 +61,7 @@ namespace Drive_LFSS.Packet_
                 case Packet_Type.PACKET_PIT_DRIVER_PITSTOP_START:      processPacket((PacketPIT)_packet); break;
                 case Packet_Type.PACKET_PFL_DRIVER_FLAG:               processPacket((PacketPFL)_packet); break;
                 case Packet_Type.PACKET_PEN_DRIVER_PENALITY_STATUS:    processPacket((PacketPEN)_packet); break;
+                case Packet_Type.PACKET_CCH_LICENCE_CAMERA_CHANGE:     processPacket((PacketCCH)_packet); break;
                 default: Log.missingDefinition("ProcessPacket(), No existing PacketHandler for packetType->" + _packetType + "\r\n"); break;
             }
         }
