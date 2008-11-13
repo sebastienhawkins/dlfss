@@ -48,6 +48,7 @@ namespace Drive_LFSS.Script_
         IDriver GetDriverWithGuid(uint guid);
         IDriver GetCarId(byte carId);
         IDriver GetDriverWithConnectionId(byte connectionId);
+        IDriver GetDriverWithLicenceName(string licenceName);
         Script Script
         {
             get;

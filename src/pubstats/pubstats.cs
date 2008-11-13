@@ -110,87 +110,108 @@ namespace Drive_LFSS.PubStats_
     }
     public class PST
     {
-        internal PST(string[] args)
+        internal PST(string _licenceName, string[] args)
         {
-            distance = Convert.ToUInt32(args[0]);
-            fuel = Convert.ToUInt32(args[1]);
-            laps = Convert.ToUInt32(args[2]);
-            hostJoin = Convert.ToUInt32(args[3]);
-            win = Convert.ToUInt32(args[4]);
-            second = Convert.ToUInt32(args[5]);
-            third = Convert.ToUInt32(args[6]);
-            finished = Convert.ToUInt32(args[7]);
-            quals = Convert.ToUInt32(args[8]);
-            pole = Convert.ToUInt32(args[9]);
-            drags = Convert.ToUInt32(args[10]);
-            dragWins = Convert.ToUInt32(args[11]);
-            country = args[12];
-            online = Convert.ToByte(args[13]);
-            lastServer = args[14];
-            lastTime = Convert.ToUInt32(args[15]);
-            track = args[16];
-            car = args[17];
+            licenceName = _licenceName;
+            try
+            {
+                distance = Convert.ToUInt32(args[0]);
+                fuel = Convert.ToUInt32(args[1]);
+                laps = Convert.ToUInt32(args[2]);
+                hostJoin = Convert.ToUInt32(args[3]);
+                win = Convert.ToUInt32(args[4]);
+                second = Convert.ToUInt32(args[5]);
+                third = Convert.ToUInt32(args[6]);
+                finished = Convert.ToUInt32(args[7]);
+                quals = Convert.ToUInt32(args[8]);
+                pole = Convert.ToUInt32(args[9]);
+                drags = Convert.ToUInt32(args[10]);
+                dragWins = Convert.ToUInt32(args[11]);
+                country = args[12];
+                online = Convert.ToByte(args[13]);
+                lastServer = args[14];
+                lastTime = Convert.ToUInt32(args[15]);
+                track = args[16];
+                car = args[17];
+            }
+            catch (Exception)
+            {
+                Log.error("PST(), Licence: " + licenceName + " has a bad PST data.\r\n");
+                distance = 0;
+                fuel = 0;
+                laps = 0;
+                hostJoin = 0;
+                win = 0;
+                second = 0;
+                third = 0;
+                finished = 0;
+                quals = 0;
+                pole = 0;
+                drags = 0;
+                dragWins = 0;
+                country = args[12];
+                online = 0;
+                lastServer = args[14];
+                lastTime = 0;
+                track = args[16];
+                car = args[17];
+            }
         }
         ~PST()
         {
             if (false == true) { }
         }
+        string licenceName;
+        string LicenceName
+        {
+            get { return licenceName; }
+        }
         private uint distance;
-
         public uint Distance
         {
             get { return distance; }
         }
         private uint fuel;
-
         public uint Fuel
         {
             get { return fuel; }
         }
         private uint laps;
-
         public uint Laps
         {
             get { return laps; }
         }
         private uint hostJoin;
-
         public uint HostJoin
         {
             get { return hostJoin; }
         }
         private uint win;
-
         public uint Win
         {
             get { return win; }
         }
         private uint second;
-
         public uint Second
         {
             get { return second; }
         }
         private uint third;
-
         public uint Third
         {
             get { return third; }
         }
         private uint finished;
-
         public uint Finished
         {
             get { return finished; }
         }
         private uint quals;
-
         public uint Quals
         {
             get { return quals; }
         }
         private uint pole;
-
         public uint Pole
         {
             get { return pole; }
@@ -200,43 +221,36 @@ namespace Drive_LFSS.PubStats_
         {
             get { return drags; }
         }
-        
         private uint dragWins;
         public uint DragWins
         {
             get { return dragWins; }
         }
-        
         private string country;
         public string Country
         {
             get { return country; }
         }
-        
         private byte online;
         public byte Online
         {
             get { return online; }
         }
-       
         private string lastServer;
         public string LastServer
         {
             get { return lastServer; }
         }
-       
         private uint lastTime;
         public uint LastTime
         {
             get { return lastTime; }
         }
-        
         private string track;
         public string Track
         {
             get { return track; }
         }
-        
         private string car;
         public string Car
         {
@@ -442,9 +456,9 @@ namespace Drive_LFSS.PubStats_
             datas[16] = LFSWTrackToTrackPrefix(datas[16]);
 
             if (storagePST.ContainsKey(args[0]))
-                storagePST[args[0]] = new PST(datas);
+                storagePST[args[0]] = new PST(args[0],datas);
             else
-                storagePST.Add(args[0], new PST(datas));
+                storagePST.Add(args[0], new PST(args[0],datas));
 
             return true;
         }

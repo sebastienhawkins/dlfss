@@ -390,6 +390,8 @@ namespace Drive_LFSS.Game_
         private uint warningDrivingTypeTimer = 0;
         private byte warningDrivingReferenceCarId = 0;
         private int badDrivingCount = 0;
+        private int warningChatCount = 0;
+        private int floodChatCount = 0;
         private int totalLapCount = 0;
         private int totalRaceCount = 0;
         private int totalRaceFinishCount = 0;
@@ -727,12 +729,14 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.Lock();
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
                     SetConfigData(reader.GetString(1));
                     badDrivingCount = reader.GetInt32(2);
+                    warningChatCount = reader.GetInt32(3);
+                    floodChatCount = reader.GetInt32(4);
                     reader.Close();reader.Dispose();
                     
                     reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='"+guid+"'");
@@ -764,7 +768,7 @@ namespace Drive_LFSS.Game_
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`warning_driving_count`,`last_connection_time`) VALUES ('" + guid + "', '" + ConvertX.SQLString(LicenceName) + "','" + ConvertX.SQLString(driverName) + "', '" + String.Join(" ", configData) + "','"+badDrivingCount+"', '" + (System.DateTime.Now.Ticks / 10000000) + "')");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count`,`last_connection_time`) VALUES ('" + guid + "', '" + ConvertX.SQLString(LicenceName) + "','" + ConvertX.SQLString(driverName) + "', '" + String.Join(" ", configData) + "','"+badDrivingCount+"', '" +warningChatCount + "', '" +floodChatCount + "', '" + (System.DateTime.Now.Ticks / 10000000) + "')");
             driverSaveInterval = 0;
         }
         private bool SetNewGuid()
@@ -1148,6 +1152,22 @@ namespace Drive_LFSS.Game_
         public void AddBadDriving()
         {
             badDrivingCount++;
+        }
+        public void AddWarningChat()
+        {
+            warningChatCount++;
+        }
+        public int GetWarningChatCount()
+        {
+            return warningChatCount;
+        }
+        public void AddFloodChat()
+        {
+            floodChatCount++;
+        }
+        public int GetFloodChatCount()
+        {
+            return floodChatCount;
         }
         public bool IsStupidDriving()
         {

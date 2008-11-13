@@ -27,6 +27,8 @@ namespace Drive_LFSS.ChatModo_
     using Config_;
     using Log_;
     using Database_;
+    using Game_;
+
     [Flags]enum Word_Flag : byte
     {
         NONE = 0,
@@ -66,7 +68,7 @@ namespace Drive_LFSS.ChatModo_
             lock(wordScoreList)
             {
                 wordScoreList.Clear();
-                string query = "SELECT * FROM `bad_word;";
+                string query = "SELECT * FROM `bad_word`;";
                 int count = 0;
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
                 while(reader.Read())
@@ -150,7 +152,13 @@ namespace Drive_LFSS.ChatModo_
                                     //itr2 = floodList[itr1.Current].Keys.GetEnumerator();
                                     floodList[itr1.Current][itr2.Current][0] -= 1;
                                     floodList[itr1.Current][itr2.Current][1] = TIMER_FLOOD;
-                                    iSession.SendMSTMessage("/msg " + itr1.Current + " ^8-> ^1STOP Flooding.");
+
+                                    IDriver driver = iSession.GetDriverWithLicenceName(itr1.Current);
+                                    if (driver != null)
+                                    {
+                                        driver.AddFloodChat();
+                                        iSession.SendMSTMessage("/msg " + driver.DriverName + " ^8-> ^1STOP Flooding.");
+                                    }
                                 }
                                 else if (floodList[itr1.Current][itr2.Current][1] < SLEEP)
                                 {
@@ -181,8 +189,14 @@ namespace Drive_LFSS.ChatModo_
                             //itr = badWordList.Keys.GetEnumerator();
                             badWordList[itr.Current][0] -= 1; 
                             badWordList[itr.Current][1] = TIMER_BAD_WORD;
-                            iSession.SendMSTMessage("/msg " + itr.Current + " ^1is Bad talker.");
-                            iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1Should we Ban him?");
+                            IDriver driver = iSession.GetDriverWithLicenceName(itr.Current);
+                            if (driver != null)
+                            {
+                                driver.AddWarningChat();
+                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^1is Bad talker.");
+                                iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1Ban ^8" + driver.DriverName + "^7?");
+                            }
+
                         }
                         else if (badWordList[itr.Current][1] < SLEEP)
                         {
@@ -204,9 +218,13 @@ namespace Drive_LFSS.ChatModo_
                         {
                             sosoWordList[itr.Current][0] -= 1;
                             sosoWordList[itr.Current][1] = TIMER_SOSO_WORD;
-                            //sosoWordList.Remove(itr.Current);
-                            //itr = sosoWordList.Keys.GetEnumerator();
-                            iSession.SendMSTMessage("/msg " + itr.Current + " ^8-> ^3check your language.");
+                            
+                            IDriver driver = iSession.GetDriverWithLicenceName(itr.Current);
+                            if (driver != null)
+                            {
+                                driver.AddWarningChat();
+                                iSession.SendMSTMessage("/msg " + driver.DriverName + " ^8-> ^3check your language.");
+                            }
                         }
                         else if (sosoWordList[itr.Current][1] < SLEEP)
                         {

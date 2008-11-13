@@ -302,7 +302,7 @@ namespace Drive_LFSS.Game_
             }
             return _return;
         }
-        private byte GetLicenceIndexWithName(byte connectionId, string _driverName)
+        private byte GetDriverIndexWith(byte connectionId, string _driverName)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
@@ -364,6 +364,16 @@ namespace Drive_LFSS.Game_
             int index;
             if( (index = GetConnectionIdNotBot(connectionId)) != 255 )
                 return driverList[index];
+            return null;
+        }
+        public IDriver GetDriverWithLicenceName(string licenceName)
+        {
+            int count = driverList.Count;
+            for (byte itr = 0; itr < count; itr++)
+            {
+                if (driverList[itr].LicenceName == licenceName)
+                    return driverList[itr];
+            }
             return null;
         }
         public byte GetNbrOfDrivers()
@@ -465,9 +475,9 @@ namespace Drive_LFSS.Game_
             }
             Driver driver = new Driver(this);
             driver.Init(packet);
-            
-            
-            
+
+
+
             lock (this) { driverList.Add(driver); }
             //Prevent the Main thread from Doing the driverList.update()
             
@@ -518,7 +528,7 @@ namespace Drive_LFSS.Game_
             Driver driver;
             if ((packet.driverTypeMask & Driver_Type_Flag.DRIVER_TYPE_AI) == Driver_Type_Flag.DRIVER_TYPE_AI)      //AI
             {
-                if ((index = GetLicenceIndexWithName(packet.connectionId, packet.driverName)) != 255)
+                if ((index = GetDriverIndexWith(packet.connectionId, packet.driverName)) != 255)
                 {
                     driverList[index].Init(packet);
                     driver = driverList[index];
@@ -532,7 +542,7 @@ namespace Drive_LFSS.Game_
             }
             else    //Human
             {
-                index = GetLicenceIndexWithName(packet.connectionId, packet.driverName);
+                index = GetDriverIndexWith(packet.connectionId, packet.driverName);
                 driverList[index].Init(packet);
                 driver = driverList[index];
             }
@@ -612,7 +622,7 @@ namespace Drive_LFSS.Game_
             else if (packet.chatUserType == Chat_Type.USER && !driver.IsBot())  //Player Chat
             {
                 if(driver.GetGuid() != 0)
-                    chatModo.AddNewLine(driver.DriverName,packet.message );
+                    chatModo.AddNewLine(driver.LicenceName,packet.message );
                 Program.ircClient.SendToChannel(GetSessionNameForLog() + " " + driver.DriverName.Replace("^", "\x03") + " Say: " + packet.message.Substring(packet.textStart).Replace("^", "\x03"));
                 Log.chat(GetSessionNameForLog() + " " + driver.DriverName + " Say: " + packet.message.Substring(packet.textStart).Replace("^", "\x03") + "\r\n");
             }

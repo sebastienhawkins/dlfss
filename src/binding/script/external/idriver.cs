@@ -33,5 +33,9 @@ namespace Drive_LFSS.Script_
         uint TimeFastestLapLastRace{get;}
         byte RacePosition{set;get;}
         void FinishRace();
+        void AddBadDriving();
+        void AddWarningChat();
+        int GetWarningChatCount();
+        void AddFloodChat();
     }
 }

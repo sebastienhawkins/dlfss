@@ -168,7 +168,7 @@ namespace Drive_LFSS.Game_
         private uint timer300 = 0;
         private int fetchingWaitDisplayIndex = 0;
         private string[] fetchingWaitDisplay = new string[4] { "|", "/", "-", "\\"}; 
-        
+
         protected virtual void update(uint diff)
         {
             if(timerBufferedButton < diff)
@@ -318,7 +318,6 @@ namespace Drive_LFSS.Game_
 
         }
 
-        
         public void SendGui(ushort guiEntry, string text)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
@@ -1191,7 +1190,7 @@ namespace Drive_LFSS.Game_
             {
                 SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + driver.DriverName);
                 SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + driver.GetSafePct()+" ^7%");
-                //SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^3");
+                SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^2ChatWarnScore ^7: ^3" + (driver.GetFloodChatCount() + (driver.GetWarningChatCount()* 3)).ToString());
                 //SendUpdateButton(Button_Entry.MYSTATUS_DRIFT_BEST, "^3");
                 //SendUpdateButton(Button_Entry.MYSTATUS_TIME_RACED, "^3" );
                 //SendUpdateButton(Button_Entry.MYSTATUS_TIME_SPEC, "^3" );
@@ -1201,17 +1200,22 @@ namespace Drive_LFSS.Game_
             else
             {
                 int badCount = 0;
+                int badChat = 0;
+                int floodChat = 0;
                 int lapCount = 0;
                 int finishCount = 0;
                 string _driverName = "";
                 Program.dlfssDatabase.Lock();
                 {
-                    System.Data.IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`warning_driving_count`,`driver_name` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(myStatusLicenceName) + "'");
+                    System.Data.IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`driver_name`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(myStatusLicenceName) + "'");
                     if (reader.Read())
                     {
                         uint _guid = (uint)reader.GetInt32(0);
-                        badCount = reader.GetInt32(1);
-                        _driverName = reader.GetString(2);
+                        _driverName = reader.GetString(1);
+                        badCount = reader.GetInt32(2);
+                        badChat = reader.GetInt32(3);
+                        floodChat = reader.GetInt32(4);
+
                         reader.Close(); reader.Dispose();
 
                         reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='" + _guid + "'");
@@ -1230,6 +1234,7 @@ namespace Drive_LFSS.Game_
                 int _safePct = driver.SetSafePct(badCount, finishCount, lapCount);
                 SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + _driverName);
                 SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + _safePct+" ^7%");
+                SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^2ChatWarnScore ^7: ^3"+(floodChat+(badChat*3)).ToString());
             }
 
 
