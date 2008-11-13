@@ -1190,7 +1190,7 @@ namespace Drive_LFSS.Game_
             if (myStatusLicenceName == driver.LicenceName)
             {
                 SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + driver.DriverName);
-                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + driver.GetSafePct()+"^7%");
+                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + driver.GetSafePct()+" ^7%");
                 //SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^3");
                 //SendUpdateButton(Button_Entry.MYSTATUS_DRIFT_BEST, "^3");
                 //SendUpdateButton(Button_Entry.MYSTATUS_TIME_RACED, "^3" );
@@ -1229,7 +1229,7 @@ namespace Drive_LFSS.Game_
                 Program.dlfssDatabase.Unlock();
                 int _safePct = driver.SetSafePct(badCount, finishCount, lapCount);
                 SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + _driverName);
-                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + _safePct+"^7%");
+                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + _safePct+" ^7%");
             }
 
 
@@ -1249,14 +1249,30 @@ namespace Drive_LFSS.Game_
             DateTime _lastSeen = ConvertX.UTCToDatetime(driver.pst.LastTime).AddHours(-5.0d);
             lastSeen = _lastSeen.ToShortDateString() +" "+ _lastSeen.ToShortTimeString();
 
-            SendUpdateButton(Button_Entry.MYSTATUS_WIN, "^2First Place ^7: ^3"+driver.pst.Win.ToString());
-            SendUpdateButton(Button_Entry.MYSTATUS_SECOND, "^2Second Place ^7: ^3" + driver.pst.Second.ToString());
-            SendUpdateButton(Button_Entry.MYSTATUS_THIRD, "^2Third Place ^7: ^3" + driver.pst.Third.ToString());
+            float winpc = 0;
+            float secondpc = 0;
+            float thirdpc = 0;
+            float polepc = 0;
+            float dragwinpc = 0;
+            if (driver.pst.Finished > 0)
+            {
+                winpc = driver.pst.Win * 100 / driver.pst.Finished;
+                secondpc = driver.pst.Second * 100 / driver.pst.Finished;
+                thirdpc = driver.pst.Third * 100 / driver.pst.Finished;
+            }
+            if (driver.pst.Quals > 0)
+                polepc = driver.pst.Pole * 100 / driver.pst.Quals;
+            if (driver.pst.Drags > 0)
+                dragwinpc = driver.pst.DragWins * 100 / driver.pst.Drags;
+
+            SendUpdateButton(Button_Entry.MYSTATUS_WIN, "^2First Place ^7: ^3"+driver.pst.Win.ToString()+" ^7- ^3"+winpc+" ^7%");
+            SendUpdateButton(Button_Entry.MYSTATUS_SECOND, "^2Second Place ^7: ^3" + driver.pst.Second.ToString() + " ^7- ^3" + secondpc + " ^7%");
+            SendUpdateButton(Button_Entry.MYSTATUS_THIRD, "^2Third Place ^7: ^3" + driver.pst.Third.ToString() + " ^7- ^3" + thirdpc + " ^7%");
             SendUpdateButton(Button_Entry.MYSTATUS_FINISH, "^2Races Finish ^7: ^3" + driver.pst.Finished.ToString());
             SendUpdateButton(Button_Entry.MYSTATUS_QUAL, "^2Qual Join ^7: ^3" + driver.pst.Quals.ToString());
-            SendUpdateButton(Button_Entry.MYSTATUS_POLE, "^2Pole Position ^7: ^3" + driver.pst.Pole.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_POLE, "^2Pole Position ^7: ^3" + driver.pst.Pole.ToString() + " ^7- ^3" + polepc + " ^7%");
             SendUpdateButton(Button_Entry.MYSTATUS_DRAGS, "^2Drag Join ^7: ^3" + driver.pst.Drags.ToString());
-            SendUpdateButton(Button_Entry.MYSTATUS_DRAGS_WIN, "^2Drags Win ^7: ^3" + driver.pst.DragWins.ToString());
+            SendUpdateButton(Button_Entry.MYSTATUS_DRAGS_WIN, "^2Drags Win ^7: ^3" + driver.pst.DragWins.ToString() + " ^7- ^3" + dragwinpc + " ^7%");
             SendUpdateButton(Button_Entry.MYSTATUS_DISTANCE, "^2Distance ^7: ^3" + (driver.pst.Distance/1000).ToString()+" ^7Km");
             SendUpdateButton(Button_Entry.MYSTATUS_FUEL, "^2Fuel burnt ^7: ^3" + (driver.pst.Fuel/100).ToString() + " ^7L");
             SendUpdateButton(Button_Entry.MYSTATUS_LAPS, "^2Lap count ^7: ^3" + driver.pst.Laps.ToString());

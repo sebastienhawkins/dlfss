@@ -662,10 +662,6 @@ namespace Drive_LFSS.Game_
                         //driverList[itr].ProcessRaceStart();
                 }
             }
-            
-
-            
-
         }      // State Change race/car
         protected sealed override void processPacket(PacketTiny packet)
         {
