@@ -878,6 +878,11 @@ namespace Drive_LFSS.Game_
                 {
                     driver.RemoveGui(Gui_Entry.TEXT);
                 } break;
+                case Button_Entry.RANK_HELP_TEXT:
+                {
+                    driver.RemoveButton(Button_Entry.RANK_HELP_TEXT);
+                    driver.RemoveButton(Button_Entry.RANK_HELP_BG);
+                } break;
                 case Button_Entry.RANK_BUTTON_TOP20:
                 {
                     driver.SendRankTop20();

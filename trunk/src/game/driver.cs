@@ -1005,8 +1005,8 @@ namespace Drive_LFSS.Game_
             if (firstTime)
                 EnterRaceFirstTime();
                
-            if(!session.IsInRaceStartGrid(guid))
-                SendFlagRace(Gui_Entry.FLAG_BLACK_NO_SCORE,30000);
+            if(session.GetRaceInProgressStatus() == Race_In_Progress_Status.RACE_PROGRESS_RACING && !session.IsInRaceStartGrid(guid))
+                SendFlagRace(Gui_Entry.FLAG_BLACK_NO_SCORE,10000);
         }
         private void EnterRaceFirstTime()
         {
