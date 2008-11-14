@@ -46,6 +46,11 @@ namespace Drive_LFSS.Game_
             command = new CommandInGame(this);
             chatModo = new ChatModo(this);
             connectionRequest = true;
+            if (!LoadFromDB())
+            {
+                SetConfigData("");
+                SaveToDB();
+            }
         }
         ~Session()
         {
@@ -111,7 +116,82 @@ namespace Drive_LFSS.Game_
         private Race race;
         private List<Driver> driverList;
         private ChatModo chatModo;
-        
+        private string motdMessage = "";
+        private string rulesMessage = "";
+        private string[] configData = new string[(int)Config_Session.END];
+        private uint TIME_YELLOW_MAX = 30000;
+
+        private void ApplyConfigData()
+        {
+            TIME_YELLOW_MAX = GetConfigUint32(Config_Session.YELLOW_TIME);
+
+            uint entry = GetConfigUint32(Config_Session.RESTRICTION_JOIN_ENTRY);
+            if (entry != 0)
+            {
+                SendMSXMessage("^7Join Restriction has been ^2Reloaded^7.");
+                race.LoadRestrictionJoin(entry);
+            }
+            entry = GetConfigUint32(Config_Session.RESTRICTION_RACE_ENTRY);
+            if (entry != 0)
+            {
+                SendMSXMessage("^7Race Restriction has been ^2Reloaded^7.");
+                race.LoadRestrictionRace(entry);
+            }
+            
+        }
+        private void SetConfigData(string configString)
+        {
+            string[] configStrings = configString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (configStrings.Length != (int)Config_Session.END)
+            {
+                configData = new string[(int)Config_Session.END];
+                for (byte itr = 0; itr < (byte)Config_Session.END; itr++)
+                    configData[itr] = "0";
+
+                configData[(int)Config_Session.YELLOW_TIME] = "30000";
+            }
+            configStrings.CopyTo(configData, 0);
+        }
+        internal ushort GetConfigUint16(Config_Session index)
+        {
+            return Convert.ToUInt16(configData[(int)index]);
+        }
+        internal uint GetConfigUint32(Config_Session index)
+        {
+            return Convert.ToUInt32(configData[(int)index]);
+        }
+        internal string GetConfigString(Config_Session index)
+        {
+            return configData[(int)index];
+        }
+        internal void SetConfigValue(Config_Session index, string value)
+        {
+            configData[(int)index] = value;
+        }
+        private bool LoadFromDB()
+        {
+            bool _return = false;
+            Program.dlfssDatabase.Lock();
+            {
+                System.Data.IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `config_data`,`motd_message`,`rules_message` FROM `session` WHERE `session_name`LIKE'" + sessionName + "'");
+                if (reader.Read())
+                {
+                    SetConfigData(reader.GetString(0));
+                    motdMessage = reader.GetString(1);
+                    rulesMessage = reader.GetString(2);
+                    _return = true;
+                }
+            }
+            Program.dlfssDatabase.Unlock();
+            
+            return _return;
+        }
+        private void SaveToDB()
+        {
+            Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `session` WHERE `session_name`LIKE'" + sessionName +"'");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `session` (`session_name`,`config_data`,`motd_message`,`rules_message`) VALUES ('" + sessionName + "', '" + String.Join(" ", configData) + "','" + motdMessage + "', '" + rulesMessage + "')");
+            sessionSaveInterval = 0;
+        }
         public void LoadRace(ushort entry)
         {
             race.LoadNextTrack(entry);
@@ -171,7 +251,6 @@ namespace Drive_LFSS.Game_
         {
             return race.StartGridHasDriverGuid(driverGuid);
         }
-        
         internal List<Driver> GetDriverList()
         {
             return driverList;
@@ -210,8 +289,14 @@ namespace Drive_LFSS.Game_
         }
         public void SetTimeYellowMax(uint value)
         {
+            TIME_YELLOW_MAX = value;
+            SetConfigValue(Config_Session.YELLOW_TIME,value.ToString());
             for (byte itr = 0; itr < driverList.Count; itr++)
-                driverList[itr].SetTimeYellowMax(value); 
+                driverList[itr].SetTimeYellowMax();
+        }
+        public uint GetTimeYellowMax()
+        {
+            return TIME_YELLOW_MAX;
         }
         public void SendResultGuiToAll(Dictionary<string, int> scoringResultTextDisplay)
         {
@@ -400,15 +485,20 @@ namespace Drive_LFSS.Game_
         {
             lock(rcMessageList){rcMessageList.Clear();}
         }*/
-        
-                
+
         private const uint TIMER_PING_PONG = 8000;
         private uint TimerPingPong = 7000;
+        private const uint TIMER_SAVE_INTERVAL = 60000;
+        private uint sessionSaveInterval = 0;
+
         internal void update(uint diff)
         {
             // For moment will test processPacket from the network thread! gave better reaction time.
             //ProcessReceivedPacket();
-
+            if (sessionSaveInterval > TIMER_SAVE_INTERVAL)
+                SaveToDB();
+            else
+                sessionSaveInterval += diff;
             if (TIMER_PING_PONG < (TimerPingPong += diff))
             {
                 AddToTcpSendingQueud(new Packet(Packet_Size.PACKET_SIZE_TINY, Packet_Type.PACKET_TINY_MULTI_PURPOSE, new PacketTiny(1, Tiny_Type.TINY_PING)));
@@ -882,6 +972,8 @@ namespace Drive_LFSS.Game_
                 {
                     driver.RemoveButton(Button_Entry.RANK_HELP_TEXT);
                     driver.RemoveButton(Button_Entry.RANK_HELP_BG);
+                    driver.RemoveButton(Button_Entry.RANK_HELP_BG_SHADOW);
+
                 } break;
                 case Button_Entry.RANK_BUTTON_TOP20:
                 {
@@ -1141,6 +1233,7 @@ namespace Drive_LFSS.Game_
         {
             Log.normal(GetSessionNameForLog() + " InSim v" + packet.inSimVersion + ", Licence: " + packet.productVersion + "." + packet.serverVersion + "\r\n");
             SendMSXMessage("^7D^3rive_LFSS ^7as come ^2Online.");
+            ApplyConfigData();
             #if DEBUG
             //race.ProcessVoteAction(Vote_Action.VOTE_END);
             #endif

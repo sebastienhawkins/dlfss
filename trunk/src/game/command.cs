@@ -447,7 +447,7 @@ namespace Drive_LFSS.Server_
         {
             if (args.Length != 2)
             {
-                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!yellowtime ^3#timeMax", DISPLAY_TIME);
+                driver.AddMessageMiddle("^7Invalid parameter count, Usage: ^2!yellowtime ^3#timeMaxSec", DISPLAY_TIME);
                 return;
             }
             uint value = 0;
@@ -457,13 +457,13 @@ namespace Drive_LFSS.Server_
                 driver.AddMessageMiddle("^1Invalid timeMax value : " + args[1], DISPLAY_TIME);
                 return;
             }
-            if(value < 3000)
+            if(value < 3)
             {
-                driver.AddMessageMiddle("^1TimeMax must be ^3> ^1then 3000.", DISPLAY_TIME);
+                driver.AddMessageMiddle("^1TimeMaxSec must be ^3> ^1then ^33^7.", DISPLAY_TIME);
                 return; 
             }
-            session.SetTimeYellowMax(value);
-            driver.AddMessageMiddle("^3Yellow time max is now:^7" + value.ToString()+ "^3.", DISPLAY_TIME);
+            session.SetTimeYellowMax(value*1000);
+            driver.AddMessageMiddle("^3Yellow time max is now : ^7" + value.ToString()+ "^3 seconds.", DISPLAY_TIME);
         }
         #endregion
     }

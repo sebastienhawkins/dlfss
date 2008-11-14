@@ -31,6 +31,13 @@ namespace Drive_LFSS.Definition_
         MAX_SPEED_ON = 7,
         END = 8,
     }
+    public enum Config_Session : byte
+    {
+        YELLOW_TIME = 0,
+        RESTRICTION_JOIN_ENTRY = 1,
+        RESTRICTION_RACE_ENTRY = 2,
+        END = 3,
+    }
     public enum Warning_Driving_Type : byte
     {
         NONE = 0,
@@ -142,6 +149,7 @@ namespace Drive_LFSS.Definition_
         RANK_SEARCH_BUTTON_CAR = 66,
         RANK_SEARCH_BUTTON_LICENCE = 67,
         RANK_HELP_BG = 159,
+        RANK_HELP_BG_SHADOW = 267,
         CANCEL_WARNING_DRIVING_1 = 68,
         CANCEL_WARNING_DRIVING_2 = 69,
         CANCEL_WARNING_DRIVING_3 = 70,
