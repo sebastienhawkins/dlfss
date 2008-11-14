@@ -71,7 +71,7 @@ namespace Drive_LFSS.Game_
                     session.SendMSXMessage("^7Admin ^8"+driverName+"^7 has come ^2online.");
                 ((Session)session).AddAdminOnline(connectionId);
             }
-            
+            SetTimeYellowMax();
             ProcessBFNClearAll(false);
             SetConfigData("");
             
@@ -546,13 +546,14 @@ namespace Drive_LFSS.Game_
         private uint TIME_YELLOW_1_10 = 3000;
         private uint TIME_YELLOW_1_3 = 10000;
         private uint TIME_YELLOW_2_3 = 20000;
-        public void SetTimeYellowMax(uint value)
+        public void SetTimeYellowMax()
         {
             timeYellowFlag = 0;
-            TIME_YELLOW_MAX = value;
-            TIME_YELLOW_1_10 = value / 10;
-            TIME_YELLOW_1_3 = value / 3;
-            TIME_YELLOW_2_3 = (uint)(value / 1.5d);
+            
+            TIME_YELLOW_MAX = session.GetTimeYellowMax();
+            TIME_YELLOW_1_10 = TIME_YELLOW_MAX / 10;
+            TIME_YELLOW_1_3 = TIME_YELLOW_MAX / 3;
+            TIME_YELLOW_2_3 = (uint)(TIME_YELLOW_MAX / 1.5d);
         }
         
         private static uint SAVE_INTERVAL = 60000;
@@ -858,6 +859,7 @@ namespace Drive_LFSS.Game_
         {
             configData[(int)index] = value;
         }
+        
         internal ISession ISession
         {
             get { return session; }

@@ -41,8 +41,9 @@ namespace Drive_LFSS.Game_
 
         protected RestrictionJoinInfo restrictionJoinInfo = null;
         protected RestrictionRaceInfo restrictionRaceInfo = null;
-        protected void LoadRestrictionJoin(uint entry)
+        public void LoadRestrictionJoin(uint entry)
         {
+            session.SetConfigValue(Config_Session.RESTRICTION_JOIN_ENTRY, entry.ToString());
             if(entry == 0)
             {
                 restrictionJoinInfo = null;
@@ -50,8 +51,9 @@ namespace Drive_LFSS.Game_
             }
             restrictionJoinInfo = Program.restrictionJoin.GetEntry(entry);
         }
-        protected void LoadRestrictionRace(uint entry)
+        public void LoadRestrictionRace(uint entry)
         {
+            session.SetConfigValue(Config_Session.RESTRICTION_RACE_ENTRY, entry.ToString());
             if (entry == 0)
             {
                 restrictionRaceInfo = null;
