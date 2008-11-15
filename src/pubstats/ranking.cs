@@ -379,16 +379,27 @@ namespace Drive_LFSS.Ranking_
         internal static string[] GetOverall(string licenceName)
         {
             string[] overall = new string[2]{"",""};
-            string query = "SELECT AVG(`race_win_rank`),AVG(`total_rank`) FROM `stats_rank_driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'";
+            string query = "SELECT COUNT(`licence_name`),SUM(`race_win_rank`),SUM(`total_rank`) FROM `stats_rank_driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'";
             Program.dlfssDatabase.Lock();
             {
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery(query);
                 if (reader.Read())
                 {
-                    if(!reader.IsDBNull(0))
-                        overall[0] = reader.GetInt32(0).ToString();
-                    if(!reader.IsDBNull(1))
-                        overall[1] = reader.GetInt32(1).ToString();
+                    int count = reader.GetInt32(0);
+                    if (count > 0)
+                    {
+                        string color = "";
+                        if (count < 6)
+                        {
+                            count = 6;
+                            color = "^6";
+                        }
+                        if (!reader.IsDBNull(1))
+                            overall[0] = color + (reader.GetInt32(1) / count).ToString();
+                        if (!reader.IsDBNull(2))
+                            overall[1] = color + (reader.GetInt32(2) / count).ToString();
+
+                    }
                 }
             }
             Program.dlfssDatabase.Unlock();

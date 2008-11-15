@@ -324,7 +324,7 @@ namespace Drive_LFSS.Server_
         }
         private void Test(Driver driver, string[] args)
         {
-            driver.SendGui((ushort)Gui_Entry.MYSTATUS,"");
+            driver.SendGui(Gui_Entry.MOTD);
         }
         private void Result(Driver driver, string[] args)
         {

@@ -332,7 +332,7 @@ namespace Drive_LFSS.Game_
                 RemoveGui(currentGui);
             SendGui(guiInfo);
         }
-        protected void SendGui(Gui_Entry guiEntry)
+        internal void SendGui(Gui_Entry guiEntry)
         {
             GuiTemplateInfo guiInfo = Program.guiTemplate.GetEntry((uint)guiEntry);
             SendGui(guiInfo);
@@ -600,6 +600,22 @@ namespace Drive_LFSS.Game_
             lock (bufferButtonPacket) { bufferButtonPacket.Enqueue(_packet); }
         }
 
+        internal void SendMotd()
+        {
+            string motd = session.GetMotdMessage();
+            if (motd != "")
+                SendGui((ushort)Gui_Entry.MOTD, motd);
+            else
+                SendGui(Gui_Entry.MOTD);
+        }
+        internal void SendRules()
+        {
+            string rules = session.GetRulesMessage();
+            if (rules != "")
+                SendGui((ushort)Gui_Entry.RULES, rules);
+            else
+                SendGui(Gui_Entry.RULES);
+        }
         internal void SendBanner()
         {
             //Send Banner

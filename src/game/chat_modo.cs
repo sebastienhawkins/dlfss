@@ -256,7 +256,7 @@ namespace Drive_LFSS.ChatModo_
 
             int indexStart = lineOftext.IndexOf(licenceName + " ^7: ^8")+(licenceName + " ^7: ^8").Length;
             int indexLength = 0;
-            if(indexStart > -1)
+            if (indexStart > -1 && indexStart < lineOftext.Length )
                 indexLength = lineOftext.IndexOf(" ^7- ^9", indexStart) - indexStart;
             if(indexLength > 0)
                 pmLicenceName = lineOftext.Substring(indexStart , indexLength);
