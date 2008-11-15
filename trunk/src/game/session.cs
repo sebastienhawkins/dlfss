@@ -72,6 +72,7 @@ namespace Drive_LFSS.Game_
             base.ConfigApply();
             race.ConfigApply();
             Driver.ConfigApply();
+            ReloadMessage();
         }
         internal void ConfigApplyToVote()
         {
@@ -121,6 +122,14 @@ namespace Drive_LFSS.Game_
         private string[] configData = new string[(int)Config_Session.END];
         private uint TIME_YELLOW_MAX = 30000;
 
+        public string GetMotdMessage()
+        {
+            return motdMessage;
+        }
+        public string GetRulesMessage()
+        {
+            return rulesMessage;
+        }
         private void ApplyConfigData()
         {
             TIME_YELLOW_MAX = GetConfigUint32(Config_Session.YELLOW_TIME);
@@ -181,15 +190,30 @@ namespace Drive_LFSS.Game_
                     rulesMessage = reader.GetString(2);
                     _return = true;
                 }
+                reader.Close(); reader.Dispose();
             }
             Program.dlfssDatabase.Unlock();
             
             return _return;
         }
+        public void ReloadMessage()
+        {
+            Program.dlfssDatabase.Lock();
+            {
+                System.Data.IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `motd_message`,`rules_message` FROM `session` WHERE `session_name`LIKE'" + sessionName + "'");
+                if (reader.Read())
+                {
+                    motdMessage = reader.GetString(0);
+                    rulesMessage = reader.GetString(1);
+                }
+                reader.Close(); reader.Dispose();
+            }
+            Program.dlfssDatabase.Unlock();
+        }
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `session` WHERE `session_name`LIKE'" + sessionName +"'");
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `session` (`session_name`,`config_data`,`motd_message`,`rules_message`) VALUES ('" + sessionName + "', '" + String.Join(" ", configData) + "','" + motdMessage + "', '" + rulesMessage + "')");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `session` (`session_name`,`config_data`,`motd_message`,`rules_message`) VALUES ('" + sessionName + "', '" + String.Join(" ", configData) + "','" + ConvertX.SQLString(motdMessage) + "', '" + ConvertX.SQLString(rulesMessage) + "')");
             sessionSaveInterval = 0;
         }
         public void LoadRace(ushort entry)
@@ -488,7 +512,7 @@ namespace Drive_LFSS.Game_
 
         private const uint TIMER_PING_PONG = 8000;
         private uint TimerPingPong = 7000;
-        private const uint TIMER_SAVE_INTERVAL = 60000;
+        private const uint TIMER_SAVE_INTERVAL = 600000;
         private uint sessionSaveInterval = 0;
 
         internal void update(uint diff)
@@ -875,7 +899,7 @@ namespace Drive_LFSS.Game_
                     if(!driver.HasGuiDisplay(Gui_Entry.MENU))
                         driver.SendMenuGui();
                 } break;
-                case Button_Entry.MOTD_BUTTON_DRIVE:
+                case Button_Entry.MOTD_BUTTON_CLOSE:
                 {
                     driver.RemoveGui(Gui_Entry.MOTD);
                 } break;
@@ -884,9 +908,18 @@ namespace Drive_LFSS.Game_
                 {
                     driver.SendHelpGui();
                 } break;
+                case Button_Entry.MENU_BUTTON_RULES:
+                case Button_Entry.MOTD_BUTTON_RULES:
+                {
+                    driver.SendRules();
+                } break;
+                case Button_Entry.MOTD_BUTTON_MOTD:
+                case Button_Entry.MENU_BUTTON_MOTD:
+                {
+                    driver.SendMotd();
+                } break;
                 case Button_Entry.MOTD_BUTTON_MENU:
                 {
-                    driver.RemoveGui(Gui_Entry.MOTD);
                     driver.SendMenuGui();
                 } break;
                 case Button_Entry.CONFIG_USER_ACC_ON:

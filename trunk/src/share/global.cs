@@ -106,7 +106,9 @@ namespace Drive_LFSS.Definition_
         VOTE_OPTION_5 = 14,
         VOTE_OPTION_6 = 15,
         MOTD_BACKGROUND = 2,
-        MOTD_BUTTON_DRIVE = 5,
+        MOTD_BUTTON_RULES = 270,
+        MOTD_BUTTON_MOTD = 275,
+        MOTD_BUTTON_CLOSE = 5,
         MOTD_BUTTON_HELP = 36,
         MOTD_BUTTON_MENU = 30,
         TRACK_PREFIX = 16,
@@ -169,6 +171,8 @@ namespace Drive_LFSS.Definition_
         MENU_BUTTON_SAY = 143,
         MENU_BUTTON_RELOAD = 144,
         MENU_BUTTON_EXIT = 145,
+        MENU_BUTTON_RULES = 276,
+        MENU_BUTTON_MOTD = 277,
         MENU_BUTTON_HELP = 156,
         TASKBAR_BUTTON_MENU = 161,
         TASKBAR_BUTTON_EXIT = 162,
@@ -251,6 +255,7 @@ namespace Drive_LFSS.Definition_
         MYSTATUS_RANKB3_WIN = 264,
         MYSTATUS_RANKB3_TOTAL = 265,
 
+
     }
     public enum Button_Styles_Flag : byte
     {
@@ -288,6 +293,7 @@ namespace Drive_LFSS.Definition_
         MENU = 18,
         NODE_TRAC = 19,
         MYSTATUS = 20,
+        RULES = 21,
     }
     
     public enum Button_Safe_Coord_Range

@@ -83,9 +83,9 @@ namespace Drive_LFSS.Game_
             }
             pb = Program.pubStats.GetPB(LicenceName, "");
             rank = Ranking.GetDriverRanks(LicenceName);
-            
+
             if (!session.IsFreezeMotdSend())
-                SendGui(Gui_Entry.MOTD);
+                SendMotd();
             SendAllStaticButton();
         }
         internal void ProcessCPR(PacketCPR packet)
