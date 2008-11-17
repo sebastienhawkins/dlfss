@@ -262,7 +262,7 @@ namespace Drive_LFSS
         }
         private static void InitLoging()
         {
-            if (!Log.Initialize(processPath + System.IO.Path.DirectorySeparatorChar + "Drive_LFSS.log"))
+            if (!Log.Initialize(processPath,"Drive_LFSS.log"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Can't initialize the log system, will now QUIT!\r\n\r\n");
@@ -481,9 +481,9 @@ namespace Drive_LFSS
 
         public static void Exit()
         {
-            Exit(true);
+            Exit(true,false);
         }
-        private static void Exit(bool real)
+        private static void Exit(bool real, bool crashLog)
         {
             Log.normal("Exit requested, please wait for all threads to exit...\r\n");
             CommandConsole.Exec("say all ^7D^3rive_LFSS ^7is going ^1Offline.");
@@ -495,7 +495,7 @@ namespace Drive_LFSS
             if (ircClient != null && ircClient.IsConnected)
                 ircClient.Disconnect();
 
-            Log.flush();
+            Log.flush(crashLog);
 
             //Abording a thread will create a UnhandleException, catching this exception , will what ever report a message.
             //This way completely Hiden from user + gave only 1 exception at a time! better this way.
@@ -524,7 +524,7 @@ namespace Drive_LFSS
             CommandConsole.Exec("say all ^7D^3rive_LFSS ^1Alert code 18 ;).");
             Log.error("Critical error, auto-shutdown in 20 Seconds...\r\n");
             Log.error("Exception was: " + args.ExceptionObject.ToString() + "\r\n");
-            Exit(false);
+            Exit(false,true);
             System.Threading.Thread.Sleep(15000);
             ConsoleExitTimer();
             System.Environment.Exit(0);
@@ -543,7 +543,7 @@ namespace Drive_LFSS
         private static void DisgraceExit()
         {
             Log.error("Application has been closed disgracefully, next time please type \"exit\". Exiting in 15 seconds.\r\n");
-            Exit(false);
+            Exit(false,true);
             System.Threading.Thread.Sleep(10000);
             ConsoleExitTimer();
             System.Environment.Exit(0);

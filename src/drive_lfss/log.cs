@@ -42,18 +42,19 @@ namespace Drive_LFSS.Log_
     {
         private static Log_Type logDisable = Log_Type.LOG_DISABLE;
         private static string logPath = "";
+        private static string logFileName = "";
 
         private static Mutex mutexConsoleColor = new Mutex();
         private static System.IO.StreamWriter streamWriter;
         private static List<string> stringWriter = new List<string>();
         private static bool isInitialized = false;
 
-        public static bool Initialize(string _logPath)
+        public static bool Initialize(string _logPath, string _logFileName)
         {
             if (isInitialized)
                 return true;
 
-            try { streamWriter = System.IO.File.CreateText(_logPath); }
+            try { streamWriter = System.IO.File.CreateText(_logPath +System.IO.Path.DirectorySeparatorChar+ _logFileName); }
             catch (System.Exception error)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -63,6 +64,7 @@ namespace Drive_LFSS.Log_
             streamWriter.Dispose();
             isInitialized = true;
             logPath = _logPath;
+            logFileName = _logFileName;
             ConfigApply();
             return true;
         }
@@ -74,10 +76,14 @@ namespace Drive_LFSS.Log_
         }
         public static void flush()
         {
+            flush(false);
+        }
+        public static void flush(bool crashLog)
+        {
             if (stringWriter.Count == 0)
                 return;
 
-            streamWriter = System.IO.File.AppendText(logPath);
+            streamWriter = System.IO.File.AppendText(logPath + System.IO.Path.DirectorySeparatorChar + logFileName);
             
             lock(streamWriter)
             {
@@ -91,6 +97,8 @@ namespace Drive_LFSS.Log_
 
                 stringWriter.Clear();
             }
+            if(crashLog)
+                System.IO.File.Copy(logPath + System.IO.Path.DirectorySeparatorChar + logFileName, logPath + System.IO.Path.DirectorySeparatorChar+"Crash-"+DateTime.Now.Ticks/10000000+".log",true);
         }
 
         public static void error(string msg)
