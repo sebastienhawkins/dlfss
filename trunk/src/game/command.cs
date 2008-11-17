@@ -339,7 +339,7 @@ namespace Drive_LFSS.Server_
             }
             Program.dlfssDatabase.Lock();
             {
-                Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `bad_word` VALUES('"+args[1].Replace("%", " ")+"','"+args[2]+"') ON DUPLICATE KEY UPDATE `word`='"+args[1].Replace("%"," ")+"',`mask`='"+args[2]+"'");
+                Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `bad_word` VALUES('"+ConvertX.SQLString(args[1].Replace("%", " "))+"','"+args[2]+"') ON DUPLICATE KEY UPDATE `word`='"+ConvertX.SQLString(args[1].Replace("%"," "))+"',`mask`='"+ConvertX.SQLString(args[2])+"'");
                 ChatModo.Initialize();
             }
             Program.dlfssDatabase.Unlock();
