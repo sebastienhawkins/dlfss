@@ -31,8 +31,8 @@ namespace Drive_LFSS.Game_
 
     class Race : Track, IRace, ITrack
 	{
-        private const int MIN_FORCED_FINISH_TIME = 40000;
-        private const int MAX_FORCED_FINISH_TIME = 120000;
+        private const int MIN_FORCED_FINISH_TIME = 60000;
+        private const int MAX_FORCED_FINISH_TIME = 300000;
         private const int PCT_FORCED_FINISH_TIME = 8;
         private const int GTH_TIME_DIFF_FROM_GREEN_LIGHT = 16000;
 

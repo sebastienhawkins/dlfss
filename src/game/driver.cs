@@ -379,6 +379,7 @@ namespace Drive_LFSS.Game_
         private string licenceName = "";
         private byte connectionId = 0;
         private string driverName = "";
+        private string tutorial = "";
         private byte driverModel = 0;
         private byte racePosition = 0;
         private uint timeTotalLastRace = 0;
@@ -730,32 +731,20 @@ namespace Drive_LFSS.Game_
         {
             Program.dlfssDatabase.Lock();
             {
-                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'");
+                IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`config_data`,`tutorial`,`race_count`,`race_finish_count`,`lap_count`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(licenceName) + "'");
                 if (reader.Read())
                 {
                     guid = (uint)reader.GetInt32(0);
                     SetConfigData(reader.GetString(1));
-                    badDrivingCount = reader.GetInt32(2);
-                    warningChatCount = reader.GetInt32(3);
-                    floodChatCount = reader.GetInt32(4);
-                    reader.Close();reader.Dispose();
-                    
-                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='"+guid+"'");
-                    if(reader.Read())
-                        totalLapCount = reader.GetInt32(0);
-                    reader.Close(); reader.Dispose();
-
-                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE (LOCATE(' " + guid + "',`grid_order`) > 0 OR LOCATE('" + guid + " ',`grid_order`) > 0) AND `race_laps`>1");
-                    if (reader.Read())
-                        totalRaceCount = reader.GetInt32(0);
-                    reader.Close(); reader.Dispose();
-
-                    reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE (LOCATE(' " + guid + "',`finish_order`) > 0 OR LOCATE('" + guid + " ',`finish_order`) > 0) AND `race_laps`>1");
-                    if (reader.Read())
-                        totalRaceFinishCount = reader.GetInt32(0);
-                    reader.Close(); reader.Dispose();
-
+                    tutorial = reader.GetString(2);
+                    totalRaceCount = reader.GetInt32(3);
+                    totalRaceFinishCount = reader.GetInt32(4);
+                    totalLapCount = reader.GetInt32(5);
+                    badDrivingCount = reader.GetInt32(6);
+                    warningChatCount = reader.GetInt32(7);
+                    floodChatCount = reader.GetInt32(8);
                 }
+                reader.Close(); reader.Dispose();
             }
             Program.dlfssDatabase.Unlock();
             SetSafePct();
@@ -769,7 +758,7 @@ namespace Drive_LFSS.Game_
         private void SaveToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count`,`last_connection_time`) VALUES ('" + guid + "', '" + ConvertX.SQLString(LicenceName) + "','" + ConvertX.SQLString(driverName) + "', '" + String.Join(" ", configData) + "','"+badDrivingCount+"', '" +warningChatCount + "', '" +floodChatCount + "', '" + (System.DateTime.Now.Ticks / 10000000) + "')");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`tutorial`,`race_count`,`race_finish_count`,`lap_count`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count`,`last_connection_time`) VALUES ('" + guid + "', '" + ConvertX.SQLString(LicenceName) + "','" + ConvertX.SQLString(driverName) + "', '" + String.Join(" ", configData) + "','" + tutorial + "','" + totalRaceCount + "','" + totalRaceFinishCount + "','" + totalLapCount +"','" + badDrivingCount + "', '" + warningChatCount + "', '" + floodChatCount + "', '" + (System.DateTime.Now.Ticks / 10000000) + "')");
             driverSaveInterval = 0;
         }
         private bool SetNewGuid()

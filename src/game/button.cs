@@ -1223,28 +1223,19 @@ namespace Drive_LFSS.Game_
                 string _driverName = "";
                 Program.dlfssDatabase.Lock();
                 {
-                    System.Data.IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`driver_name`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(myStatusLicenceName) + "'");
+                    System.Data.IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT `guid`,`driver_name`,`race_finish_count`,`lap_count`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count` FROM `driver` WHERE `licence_name`LIKE'" + ConvertX.SQLString(myStatusLicenceName) + "'");
                     if (reader.Read())
                     {
                         uint _guid = (uint)reader.GetInt32(0);
                         _driverName = reader.GetString(1);
-                        badCount = reader.GetInt32(2);
-                        badChat = reader.GetInt32(3);
-                        floodChat = reader.GetInt32(4);
-
-                        reader.Close(); reader.Dispose();
-
-                        reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid_driver`) FROM `driver_lap` WHERE `guid_driver`='" + _guid + "'");
-                        if (reader.Read())
-                            lapCount = reader.GetInt32(0);
-                        reader.Close(); reader.Dispose();
-
-                        reader = Program.dlfssDatabase.ExecuteQuery("SELECT COUNT(`guid`) FROM `race` WHERE (LOCATE(' " + _guid + "',`finish_order`) > 0 OR LOCATE('" + _guid + " ',`finish_order`) > 0) AND `race_laps`>1");
-                        if (reader.Read())
-                            finishCount = reader.GetInt32(0);
-                        reader.Close(); reader.Dispose();
+                        finishCount = reader.GetInt32(2);
+                        lapCount = reader.GetInt32(3);
+                        badCount = reader.GetInt32(4);
+                        badChat = reader.GetInt32(5);
+                        floodChat = reader.GetInt32(6);
 
                     }
+                    reader.Close(); reader.Dispose();
                 }
                 Program.dlfssDatabase.Unlock();
                 int _safePct = driver.SetSafePct(badCount, finishCount, lapCount);
