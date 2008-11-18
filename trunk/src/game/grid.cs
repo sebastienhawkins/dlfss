@@ -137,7 +137,7 @@ namespace Drive_LFSS.Game_
             NodeData node = Map.GetNode(car.TrackPrefix, car.GetNode());
             if (node == null)
             {
-                Log.error("checkNodePosition(car), Node requested don't exist, Track: " + car.TrackPrefix + ", Node:" + car.GetNode() + "\r\n");
+                //Log.error("checkNodePosition(car), Node requested don't exist, Track: " + car.TrackPrefix + ", Node:" + car.GetNode() + "\r\n");
                 return;
             }
             double trackOrientation = node.GetOrientation();

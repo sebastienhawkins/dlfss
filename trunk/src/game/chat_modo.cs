@@ -157,7 +157,12 @@ namespace Drive_LFSS.ChatModo_
                                     if (driver != null)
                                     {
                                         driver.AddFloodChat();
-                                        iSession.SendMSTMessage("/msg " + driver.DriverName + " ^8-> ^1STOP Flooding.");
+                                        driver.SendMTCMessage("^1STOP Flooding.");
+                                        driver.SendMTCMessage("^1STOP Flooding.");
+                                        driver.SendMTCMessage("^1STOP Flooding.");
+                                        driver.SendMTCMessage("^1STOP Flooding.");
+                                        driver.SendMTCMessage("^1STOP Flooding.");
+                                        iSession.SendMTCMessageToAllAdmin("/msg " + driver.DriverName + " ^7-> is ^3flood ^7warned.");
                                     }
                                 }
                                 else if (floodList[itr1.Current][itr2.Current][1] < SLEEP)
@@ -193,8 +198,10 @@ namespace Drive_LFSS.ChatModo_
                             if (driver != null)
                             {
                                 driver.AddWarningChat();
-                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^1is Bad talker.");
-                                iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1Ban ^8" + driver.DriverName + "^7?");
+                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^1Appears Belligerent.");
+                                driver.SendMTCMessage("^7Keep ^2good talking ^7at all Time.");
+                                //if (!driver.IsAdmin)
+                                 //   iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1Ban ^8" + driver.DriverName + "^7?");
                             }
 
                         }
@@ -223,7 +230,9 @@ namespace Drive_LFSS.ChatModo_
                             if (driver != null)
                             {
                                 driver.AddWarningChat();
-                                iSession.SendMSTMessage("/msg " + driver.DriverName + " ^8-> ^3check your language.");
+                                driver.SendMTCMessage("^7Keep ^2good talking ^7at all Time.");
+                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^3Seems annoying");
+                                //iSession.SendMSTMessage("/msg " + driver.DriverName + " ^8-> ^3check your language.");
                             }
                         }
                         else if (sosoWordList[itr.Current][1] < SLEEP)

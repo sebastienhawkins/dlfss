@@ -775,15 +775,15 @@ namespace Drive_LFSS.Game_
                 race.Init(packet);
             clientConnectionCount = packet.connectionCount;
             
-            if (packet.trackPrefix != oldTrackPrefix /*|| packet.raceInProgressStatus != oldRaceStatus*/)
+            if (packet.trackPrefix != oldTrackPrefix || packet.raceInProgressStatus != oldRaceStatus)
             {
                 for (byte itr = 0; itr < driverList.Count; itr++)
                 {
-                    //if (packet.trackPrefix != oldTrackPrefix) 
+                    if (packet.trackPrefix != oldTrackPrefix) 
                         driverList[itr].ProcessTrackChange();
 
-                    //if (oldRaceStatus == Race_In_Progress_Status.RACE_PROGRESS_NONE && packet.raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE)
-                        //driverList[itr].ProcessRaceStart();
+                    if (oldRaceStatus == Race_In_Progress_Status.RACE_PROGRESS_NONE && packet.raceInProgressStatus != Race_In_Progress_Status.RACE_PROGRESS_NONE)
+                        driverList[itr].ProcessRaceStart();
                 }
             }
         }      // State Change race/car
