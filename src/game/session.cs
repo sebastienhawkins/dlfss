@@ -1145,10 +1145,35 @@ namespace Drive_LFSS.Game_
                 {
                     driver.RankSearchAdd(packet.typedText);
                 }break;
+
                 case Button_Entry.MYSTATUS_BUTTON_SEARCH:
                 {
                     if (packet.typedText.Trim() != "")
                         driver.SearchMyStatus(packet.typedText);
+                } break;
+                case Button_Entry.MENU_BUTTON_SEARCH_RACE:
+                {
+                    command.Exec(driver, "!searchrace " + packet.typedText);
+                } break;
+                case Button_Entry.MENU_BUTTON_LOAD_RACE:
+                {
+                    command.Exec(driver, "!loadrace " + packet.typedText);
+                } break;
+                case Button_Entry.MENU_BUTTON_RELOAD:
+                {
+                    command.Exec(driver, "!reload " + packet.typedText);
+                } break;
+                case Button_Entry.MENU_BUTTON_SAY:
+                {
+                    command.Exec(driver, "!say " + packet.typedText);
+                } break;
+                case Button_Entry.MENU_BUTTON_YELLOW_TIME:
+                {
+                    command.Exec(driver, "!yellowtime " + packet.typedText);
+                } break;
+                case Button_Entry.MENU_BUTTON_BAD_WORD:
+                {
+                    command.Exec(driver, "!badword " + packet.typedText);
                 } break;
             }
         }

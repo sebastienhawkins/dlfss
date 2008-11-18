@@ -126,7 +126,7 @@ namespace Drive_LFSS.ChatModo_
         private const ushort TIMER_SOSO_WORD = 12000;
         private const ushort SOSO_WORD_MAX_COUNT = 3;
         private const uint TIMER_BAD_WORD = 300000;
-        private const ushort BAD_WORD_MAX_COUNT = 1;
+        private const ushort BAD_WORD_MAX_COUNT = 0;
 
         private void update()
         {
@@ -162,7 +162,7 @@ namespace Drive_LFSS.ChatModo_
                                         driver.SendMTCMessage("^1STOP Flooding.");
                                         driver.SendMTCMessage("^1STOP Flooding.");
                                         driver.SendMTCMessage("^1STOP Flooding.");
-                                        iSession.SendMTCMessageToAllAdmin("/msg " + driver.DriverName + " ^7-> is ^3flood ^7warned.");
+                                        iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^7-> ^3is flooding(^7" + driver.GetFloodChatCount() + "^3).");
                                     }
                                 }
                                 else if (floodList[itr1.Current][itr2.Current][1] < SLEEP)
@@ -198,7 +198,8 @@ namespace Drive_LFSS.ChatModo_
                             if (driver != null)
                             {
                                 driver.AddWarningChat();
-                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^1Appears Belligerent.");
+                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^1Appears Belligerent(^7"+driver.GetWarningChatCount()+"^1).");
+                                driver.SendMTCMessage("You ^1Appears Belligerent(^7" + driver.GetWarningChatCount() + "^1).");
                                 driver.SendMTCMessage("^7Keep ^2good talking ^7at all Time.");
                                 //if (!driver.IsAdmin)
                                  //   iSession.SendMSTMessage("/msg ^7C^3hatModo ^7: ^1Ban ^8" + driver.DriverName + "^7?");
@@ -230,8 +231,9 @@ namespace Drive_LFSS.ChatModo_
                             if (driver != null)
                             {
                                 driver.AddWarningChat();
+                                driver.SendMTCMessage("You ^1Appears annoying(^7" + driver.GetWarningChatCount() + "^1).");
                                 driver.SendMTCMessage("^7Keep ^2good talking ^7at all Time.");
-                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^3Seems annoying");
+                                iSession.SendMTCMessageToAllAdmin(driver.DriverName + " ^3Seems annoying(^7" + driver.GetWarningChatCount() + "^1).");
                                 //iSession.SendMSTMessage("/msg " + driver.DriverName + " ^8-> ^3check your language.");
                             }
                         }

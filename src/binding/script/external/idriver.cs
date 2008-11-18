@@ -36,6 +36,7 @@ namespace Drive_LFSS.Script_
         void AddBadDriving();
         void AddWarningChat();
         int GetWarningChatCount();
+        int GetFloodChatCount();
         void AddFloodChat();
     }
 }
