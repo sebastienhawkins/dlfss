@@ -595,12 +595,13 @@ namespace Drive_LFSS.Game_
 					                //if(driverCount > 1 && itr==0)
 						            //   winScore = winScore+1;
                                     goodResult = true;
-                                    scoringResultTextDisplay.Add("^7"+(itr+1).ToString() + "^2-^7 "+driver.DriverName,(int)Math.Round(winScore,0));
+                                    if (!scoringResultTextDisplay.ContainsKey("^7" + (itr + 1).ToString() + "^2-^7 " + driver.DriverName))
+                                        scoringResultTextDisplay.Add("^7"+(itr+1).ToString() + "^2-^7 "+driver.DriverName,(int)Math.Round(winScore,0));
                                 }
-                                else
+                                else if(!scoringResultTextDisplay.ContainsKey("^7" + (itr + 1).ToString() + "^2-^7 " + driver.DriverName))
                                     scoringResultTextDisplay.Add("^7" + (itr + 1).ToString() + "^2-^7 " + driver.DriverName, 0);   
                             }
-                            else
+                            else if (!scoringResultTextDisplay.ContainsKey((itr + 1).ToString() + "- ^1Driver Leaved"))
                                 scoringResultTextDisplay.Add((itr + 1).ToString() + "- ^1Driver Leaved", 0);
                             break;
                         }

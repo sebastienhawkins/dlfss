@@ -46,7 +46,10 @@ namespace Drive_LFSS.Game_
             orientation = _carInformation.heading;
             orientationSpeed = _carInformation.angleVelocity;
 
-
+            if (x == 0.0 && IsRacing())
+            {
+                Log.error("MCI is 0 and Driver Still on track\r\n");
+            }
             speedMs = _carInformation.speed / 327.68d;
             if (maxSpeedMs < speedMs)
                 maxSpeedMs = speedMs;
@@ -159,9 +162,7 @@ namespace Drive_LFSS.Game_
 
                 Log.feature(driver.DriverName + ", Done  " + (ushort)startSpeed + "-" + (ushort)endSpeed + " Km/h In: " + (decimal)_temp + "sec.\r\n");
                 if (driver.ISession.Script.CarAccelerationSucess((ICar)driver, (ushort)startSpeed, (ushort)endSpeed, _temp))
-                    return;
-                    
-                    
+                    return; 
             }
             internal double StartSpeed
             {

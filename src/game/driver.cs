@@ -375,6 +375,9 @@ namespace Drive_LFSS.Game_
         private bool isTimeDiffDisplay = true;
         private bool isTimeDiffSplit = true;
         private bool isMaxSpeedDisplay = true;
+        private bool isNodeTrajectory = false;
+        private bool isNodeOrientation = false;
+        private bool isNodeSideDisplay = false;
         private bool isAdmin = false;
         private string licenceName = "";
         private byte connectionId = 0;
@@ -810,7 +813,22 @@ namespace Drive_LFSS.Game_
            if (GetConfigUint16(Config_User.MAX_SPEED_ON) > 0)
                IsMaxSpeedDisplay = true;
            else
-               IsMaxSpeedDisplay = false;   
+               IsMaxSpeedDisplay = false;
+
+           if (GetConfigUint16(Config_User.NODE_TRAJECTORY) > 0)
+               IsNodeTrajectory = true;
+           else
+               IsNodeTrajectory = false;
+
+           if (GetConfigUint16(Config_User.NODE_ORIENTATION) > 0)
+               IsNodeOrientation = true;
+           else
+               IsNodeOrientation = false;
+
+           if (GetConfigUint16(Config_User.NODE_SIDE) > 0)
+               IsNodeSideDisplay = true;
+           else
+               IsNodeSideDisplay = false;
         }
         private void SetConfigData(string configString)
         {
@@ -828,6 +846,9 @@ namespace Drive_LFSS.Game_
                 configData[(int)Config_User.TIMEDIFF_LAP] = "1";
                 configData[(int)Config_User.TIMEDIFF_SPLIT] = "1";
                 configData[(int)Config_User.MAX_SPEED_ON] = "1";
+                configData[(int)Config_User.NODE_SIDE] = "0";
+                configData[(int)Config_User.NODE_ORIENTATION] = "0";
+                configData[(int)Config_User.NODE_TRAJECTORY] = "0";
             }
             configStrings.CopyTo(configData,0);
             ApplyConfigData();
@@ -860,7 +881,7 @@ namespace Drive_LFSS.Game_
             else
                 return null;
         }
-        public void SetSafePct()
+        internal void SetSafePct()
         {
             oldSafePct = safePct;
             safePct = SetSafePct(badDrivingCount, totalRaceFinishCount, totalLapCount);
@@ -913,6 +934,34 @@ namespace Drive_LFSS.Game_
                 SetConfigValue(Config_User.MAX_SPEED_ON, (isMaxSpeedDisplay ? "1" : "0"));
             }
         }
+        internal bool IsNodeTrajectory
+        {
+            get { return isNodeTrajectory; }
+            set
+            {
+                isNodeTrajectory = value;
+                SetConfigValue(Config_User.NODE_TRAJECTORY, (isNodeTrajectory ? "1" : "0"));
+            }
+        }
+        internal bool IsNodeOrientation
+        {
+            get { return isNodeOrientation; }
+            set
+            {
+                isNodeOrientation = value;
+                SetConfigValue(Config_User.NODE_ORIENTATION, (isNodeOrientation ? "1" : "0"));
+            }
+        }
+        internal bool IsNodeSideDisplay
+        {
+            get { return isNodeSideDisplay; }
+            set
+            {
+                isNodeSideDisplay = value;
+                SetConfigValue(Config_User.NODE_SIDE, (isNodeSideDisplay ? "1" : "0"));
+            }
+        }
+
         private void ClearPenalty()
         {
             penalityCurrent = Penalty_Type.NONE;
@@ -1031,7 +1080,6 @@ namespace Drive_LFSS.Game_
                     session.SendMSTMessage("/msg " + driverName + " ^2is " + (IsBot() ? "a ^7BOT" : "^7new")/*+"^2 with ^7" + carPrefix*/);
                 //AddMessageTop("^2Rank Detail, you have no rank for ^7"+((Driver)this).ISession.GetRaceTrackPrefix()+" ^2with car ^7"+carPrefix,3000);
             }
-            SetSafePct();
             if (!session.IsFreezeMotdSend() && safePct < 100)
                 session.SendMSTMessage("/msg ^2    and '^7" + safePct + "%^2' safe.");
         }
@@ -1183,23 +1231,28 @@ namespace Drive_LFSS.Game_
                 return;
             
             tracjectoryDisplay = trajDisplay;
-            //SendUpdateButton((ushort)Button_Entry.NODE_TRAJ_TO_TRACK, trajDisplay);
+            if(isNodeTrajectory)
+                SendUpdateButton((ushort)Button_Entry.NODE_TRAJ_TO_TRACK, trajDisplay);
         }
         private string orientationDisplay = "";
         public void SendOriDisplay(string oriDisplay)
         {
             if (orientationDisplay == oriDisplay)
                 return;
+            
             orientationDisplay = oriDisplay;
-            //SendUpdateButton((ushort)Button_Entry.NODE_ORIE_TO_TRACK, oriDisplay);
+            if(isNodeOrientation)
+                SendUpdateButton((ushort)Button_Entry.NODE_ORIE_TO_TRACK, oriDisplay);
         }
         private string pathDisplay = "";
         public void SendPathDisplay(string _pathDisplay)
         {
             if (pathDisplay == _pathDisplay)
                 return;
+
             pathDisplay = _pathDisplay;
-            //SendUpdateButton((ushort)Button_Entry.NODE_POS_TO_PATH, pathDisplay);
+            if(isNodeSideDisplay)
+                SendUpdateButton((ushort)Button_Entry.NODE_SIDE, pathDisplay);
         }
     }
 }

@@ -669,6 +669,14 @@ namespace Drive_LFSS.Game_
             SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_ALL, ((driver.IsTimeDiffSplitDisplay && driver.IsTimeDiffLapDisplay) ? "^7" : "^8") + " Time Diff");
             SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_LAP, (driver.IsTimeDiffLapDisplay ? "^7" : "^8") + " PB vs lap");
             SendUpdateButton(Button_Entry.CONFIG_USER_TIMEDIFF_SPLIT, (driver.IsTimeDiffSplitDisplay ? "^7" : "^8") + " PB vs Split");
+
+            if (driver.IsNodeTrajectory && driver.IsNodeSideDisplay && driver.IsNodeOrientation)
+                SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^7Track Info");
+            else
+                SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^8Track Info");
+            SendUpdateButton(Button_Entry.CONFIG_NODE_TRAJECTORY, (driver.IsNodeTrajectory ? "^7" : "^8") + "Trajectory");
+            SendUpdateButton(Button_Entry.CONFIG_NODE_SIDE, (driver.IsNodeSideDisplay ? "^7" : "^8") + "Side Distance");
+            SendUpdateButton(Button_Entry.CONFIG_NODE_ORIENTATION, (driver.IsNodeOrientation ? "^7" : "^8") + "Orientation");
         }
         internal void RemoveConfigGui()
         {
@@ -1333,7 +1341,7 @@ namespace Drive_LFSS.Game_
         }
         internal void RemoveNodeBar()
         {
-            RemoveButton(Button_Entry.NODE_POS_TO_PATH);
+            RemoveButton(Button_Entry.NODE_SIDE);
             RemoveButton(Button_Entry.NODE_ORIE_TO_TRACK);
             RemoveButton(Button_Entry.NODE_TRAJ_TO_TRACK);
         }
