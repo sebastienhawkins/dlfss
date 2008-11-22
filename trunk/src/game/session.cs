@@ -984,6 +984,78 @@ namespace Drive_LFSS.Game_
                         driver.IsMaxSpeedDisplay = true;
                     driver.SendUpdateButton(Button_Entry.CONFIG_USER_MAX_SPEED_ON, (driver.IsMaxSpeedDisplay ? "^7" : "^8") + " Max Speed");
                 } break;
+                case Button_Entry.CONFIG_NODE_SIDE:
+                {
+                    if (driver.IsNodeSideDisplay)
+                    {
+                        driver.IsNodeSideDisplay = false;
+                        driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^8Track Info");
+                        driver.RemoveButton(Button_Entry.NODE_SIDE);
+                    }
+                    else
+                    {
+                        driver.IsNodeSideDisplay = true;
+                        if(driver.IsNodeTrajectory && driver.IsNodeOrientation)
+                            driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^7Track Info");
+                    }
+                    driver.SendUpdateButton(Button_Entry.CONFIG_NODE_SIDE, (driver.IsNodeSideDisplay ? "^7" : "^8") + "Side Distance");
+                } break;
+                case Button_Entry.CONFIG_NODE_ORIENTATION:
+                {
+                    if (driver.IsNodeOrientation)
+                    {
+                        driver.IsNodeOrientation = false;
+                        driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^8Track Info");
+                        driver.RemoveButton(Button_Entry.NODE_ORIE_TO_TRACK);
+                    }
+                    else
+                    {
+                        driver.IsNodeOrientation = true;
+                        if (driver.IsNodeTrajectory && driver.IsNodeSideDisplay)
+                            driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^7Track Info");
+                    }
+                    driver.SendUpdateButton(Button_Entry.CONFIG_NODE_ORIENTATION, (driver.IsNodeOrientation ? "^7" : "^8") + "Orientation");
+                } break;
+                case Button_Entry.CONFIG_NODE_TRAJECTORY:
+                {
+                    if (driver.IsNodeTrajectory)
+                    {
+                        driver.IsNodeTrajectory = false;
+                        driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^8Track Info");
+                        driver.RemoveButton(Button_Entry.NODE_TRAJ_TO_TRACK);
+                    }
+                    else
+                    {
+                        driver.IsNodeTrajectory = true;
+                        if (driver.IsNodeOrientation && driver.IsNodeSideDisplay)
+                            driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^7Track Info");
+                    }
+                    driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TRAJECTORY, (driver.IsNodeTrajectory ? "^7" : "^8") + "Trajectory");
+                } break;
+                case Button_Entry.CONFIG_NODE_TITLE:
+                {
+                    if (driver.IsNodeTrajectory || driver.IsNodeSideDisplay || driver.IsNodeOrientation)
+                    {
+                        driver.IsNodeSideDisplay = false;
+                        driver.IsNodeOrientation = false;
+                        driver.IsNodeTrajectory = false;
+                        driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^8Track Info");
+                        driver.RemoveButton(Button_Entry.NODE_ORIE_TO_TRACK);
+                        driver.RemoveButton(Button_Entry.NODE_SIDE);
+                        driver.RemoveButton(Button_Entry.NODE_TRAJ_TO_TRACK);
+                    }
+                    else
+                    {
+                        driver.IsNodeSideDisplay = true;
+                        driver.IsNodeOrientation = true;
+                        driver.IsNodeTrajectory = true;
+                        driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TITLE, "^7Track Info");
+                    }
+                    driver.SendUpdateButton(Button_Entry.CONFIG_NODE_TRAJECTORY, (driver.IsNodeTrajectory ? "^7" : "^8") + "Trajectory");
+                    driver.SendUpdateButton(Button_Entry.CONFIG_NODE_SIDE, (driver.IsNodeSideDisplay ? "^7" : "^8") + "Side Distance");
+                    driver.SendUpdateButton(Button_Entry.CONFIG_NODE_ORIENTATION, (driver.IsNodeOrientation ? "^7" : "^8") + "Orientation");
+                
+                }break;
                 case Button_Entry.TASKBAR_BUTTON_EXIT:
                 {
                     driver.RemoveCurrentGui();
