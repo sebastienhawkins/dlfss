@@ -758,10 +758,28 @@ namespace Drive_LFSS.Game_
             query += "VALUES ('" + lap.RaceGuid + "','" + guid + "','" + lap.CarPrefix + "','" + session.GetRaceTrackPrefix() + "','" + (byte)lap.DriverMask + "','" + lap.SplitTime[1] + "','" + lap.SplitTime[2] + "','" + lap.SplitTime[3] + "','" + lap.LapTime + "','" + lap.TotalTime + "','" + lap.LapCompleted + "','" + ConvertX.DecimalInvariant<double>(lap.MaxSpeedMs) + "','" + (byte)lap.CurrentPenality + "','" + lap.PitStopCount + "','" + lap.YellowFlagCount + "','" + lap.BlueFlagCount + "')";
             Program.dlfssDatabase.ExecuteNonQuery(query);
         }
-        private void SaveToDB()
+        private void InsertToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `driver` WHERE `guid`=" + guid);
-            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`tutorial`,`race_count`,`race_finish_count`,`lap_count`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count`,`last_connection_time`) VALUES ('" + guid + "', '" + ConvertX.SQLString(LicenceName) + "','" + ConvertX.SQLString(driverName) + "', '" + String.Join(" ", configData) + "','" + tutorial + "','" + totalRaceCount + "','" + totalRaceFinishCount + "','" + totalLapCount +"','" + badDrivingCount + "', '" + warningChatCount + "', '" + floodChatCount + "', '" + (System.DateTime.Now.Ticks / 10000000) + "')");
+            Program.dlfssDatabase.ExecuteNonQuery("INSERT INTO `driver` (`guid`,`licence_name`,`driver_name`,`config_data`,`tutorial`,`race_count`,`race_finish_count`,`lap_count`,`warning_driving_count`,`warning_chat_count`,`flood_chat_count`,`last_connection_time`) VALUES ('" + guid + "', '" + ConvertX.SQLString(LicenceName) + "','" + ConvertX.SQLString(driverName) + "', '" + String.Join(" ", configData) + "','" + tutorial + "','" + totalRaceCount + "','" + totalRaceFinishCount + "','" + totalLapCount + "','" + badDrivingCount + "', '" + warningChatCount + "', '" + floodChatCount + "', '" + (System.DateTime.Now.Ticks / 10000000) + "')");
+            driverSaveInterval = 0;
+        }
+        private void SaveToDB()
+        {
+            string query = "UPDATE `driver` SET ";
+            query += "`driver_name` = '"+ConvertX.SQLString(driverName)+"',";
+            query += "`config_data`= '"+String.Join(" ", configData)+"',";
+            query += "`tutorial`='"+tutorial+"',";
+            query += "`race_count`='"+totalRaceCount+"',";
+            query += "`race_finish_count`='"+totalRaceFinishCount+"',";
+            query += "`lap_count`='"+totalLapCount+"',";
+            query += "`warning_driving_count`='"+badDrivingCount+"',";
+            query += "`warning_chat_count`='"+warningChatCount+"',";
+            query += "`flood_chat_count`='"+floodChatCount+"',";
+            query += "`last_connection_time`='"+(System.DateTime.Now.Ticks / 10000000)+"' ";
+            query += "WHERE `guid`='"+guid+"'";
+            Program.dlfssDatabase.ExecuteNonQuery(query);
+            
             driverSaveInterval = 0;
         }
         private bool SetNewGuid()
@@ -769,14 +787,17 @@ namespace Drive_LFSS.Game_
             bool returnValue = false;
             Program.dlfssDatabase.Lock();
             {
+
+                Program.dlfssDatabase.ExecuteNonQuery("LOCK TABLES `driver` WRITE");
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `driver`");
                 if (reader.Read())
                 {
                     guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
                     reader.Dispose();
-                    SaveToDB();
+                    InsertToDB();
                     returnValue = true;
                 }
+                Program.dlfssDatabase.ExecuteNonQuery("UNLOCK TABLES");
             }
             Program.dlfssDatabase.Unlock();
             return returnValue;

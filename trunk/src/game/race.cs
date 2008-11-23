@@ -447,27 +447,53 @@ namespace Drive_LFSS.Game_
             bool returnValue = false;
             Program.dlfssDatabase.Lock();
             {
+                Program.dlfssDatabase.ExecuteNonQuery("LOCK TABLES `race` WRITE");
                 IDataReader reader = Program.dlfssDatabase.ExecuteQuery("SELECT MAX(`guid`) FROM `race`");
                 if (reader.Read())
                 {
                     guid = reader.IsDBNull(0) ? 1 : (uint)reader.GetInt32(0) + 1;
                     returnValue = true;
                     reader.Dispose();
-                    SaveToDB();
+                    InsertToDB();
                 }
+                Program.dlfssDatabase.ExecuteNonQuery("UNLOCK TABLES");
             }
             Program.dlfssDatabase.Unlock();
             return returnValue;
         }
-        private void SaveToDB()
+        private void InsertToDB()
         {
             Program.dlfssDatabase.ExecuteNonQuery("DELETE FROM `race` WHERE `guid`='" + guid+"'");
+
             string query = "INSERT INTO `race` (`guid`,`qualify_race_guid`,`track_prefix`,`start_timestamp`,`end_timestamp`,`grid_order`,`finish_order`,`race_laps`,`race_status`,`race_feature`,`qualification_minute`,`weather_status`,`wind_status`)";
             query += "VALUES('" + guid + "','" + qualifyRaceGuid + "', '" + trackPrefix + "','" + ((UInt64)new TimeSpan(System.DateTime.Now.Ticks).TotalMilliseconds) + "','" + 0 + "','" + gridOrder + "','" + finishOrder + "','" + lapCount + "','" + (byte)raceInProgressStatus + "','" + (byte)raceFeatureMask + "','" + qualificationMinute + "','" + (byte)weatherStatus + "','" + (byte)windStatus + "')";
-            //Since this is GUID creation, important 1 at time is created.
             Program.dlfssDatabase.ExecuteNonQuery(query);
+            
             raceSaveInterval = 0;
             stateHasChange = false;
+            Log.database(session.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + lapCount + ", saved to database.\r\n");
+        }
+        private void SaveToDB()
+        {
+            string query = "UPDATE `race` SET ";
+            query += "`qualify_race_guid`='" + qualifyRaceGuid + "',";
+            query += "`track_prefix`='" + trackPrefix + "',";
+            query += "`start_timestamp`='" + ((UInt64)new TimeSpan(System.DateTime.Now.Ticks).TotalMilliseconds) + "',";
+            query += "`end_timestamp`='" + 0 + "',";
+            query += "`grid_order`='" + gridOrder + "',";
+            query += "`finish_order`='" + finishOrder + "',";
+            query += "`race_laps`='" + lapCount + "',";
+            query += "`race_status`='" + (byte)raceInProgressStatus + "',";
+            query += "`race_feature`='" + (byte)raceFeatureMask + "',";
+            query += "`qualification_minute`='" + qualificationMinute + "',";
+            query += "`weather_status`='" + (byte)weatherStatus + "',";
+            query += "`wind_status`='" + (byte)windStatus + "'";
+            query += " WHERE `guid`='"+guid+"'";
+            Program.dlfssDatabase.ExecuteNonQuery(query);
+            
+            raceSaveInterval = 0;
+            stateHasChange = false;
+
             Log.database(session.GetSessionNameForLog() + " RaceGuid: " + guid + ", TrackPrefix: " + trackPrefix + ", raceLaps: " + lapCount + ", saved to database.\r\n");
         }
         public bool CanVote()
