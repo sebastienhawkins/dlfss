@@ -354,8 +354,8 @@ namespace Drive_LFSS.Packet_
     {
         internal byte packetSize;
         internal byte packetType;
-        internal byte ReqI;
-        internal byte NumC;
+        internal byte requestId;
+        internal byte carCount;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst=8)]internal CarInformation[] carInformation;
     }
     [StructLayout(LayoutKind.Sequential)]public struct PacketMOD

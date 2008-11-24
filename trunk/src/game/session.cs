@@ -689,8 +689,8 @@ namespace Drive_LFSS.Game_
             byte carIndex;
             for (byte itr = 0; itr < carInformation.Length; itr++)
             {
-                
-                if (carInformation[itr].carId == 0)
+                 // posX == 0 , help bypass the LFS bug on Alternate MCI Good/Null packet.
+                if (carInformation[itr].carId == 0 || carInformation[itr].posX == 0)
                     continue;
 
                 carIndex = GetCarIndex(carInformation[itr].carId);
