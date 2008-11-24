@@ -46,10 +46,11 @@ namespace Drive_LFSS.Game_
             orientation = _carInformation.heading;
             orientationSpeed = _carInformation.angleVelocity;
 
-            if (x == 0.0 && IsRacing())
+            //Was to note the LFS server bug for Alternate Good/Null MCI packet
+            /*if (x == 0.0 && IsRacing())
             {
-                Log.error("MCI is 0 and Driver Still on track\r\n");
-            }
+                Log.error(ConvertX.RemoveColorCode(driverName)+" MCI is 0 and Driver Still on track\r\n");
+            }*/
             speedMs = _carInformation.speed / 327.68d;
             if (maxSpeedMs < speedMs)
                 maxSpeedMs = speedMs;
