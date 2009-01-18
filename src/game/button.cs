@@ -1206,15 +1206,15 @@ namespace Drive_LFSS.Game_
         {
             string[] overall = Ranking.GetOverall(myStatusLicenceName);
             
-            SendUpdateButton(Button_Entry.MYSTATUS_LICENCE_NAME, "^2LicenceName^7 : ^3" + myStatusLicenceName);
-            SendUpdateButton(Button_Entry.MYSTATUS_WIN_OVERALL, "^2WinOverall^7 : ^3" + overall[0]);
-            SendUpdateButton(Button_Entry.MYSTATUS_RANK_OVERALL, "^2RankOverall^7 : ^3" + overall[1]);
+            SendUpdateButton(Button_Entry.MYSTATUS_LICENCE_NAME, "^2Licence Name^7 : ^3" + myStatusLicenceName);
+            SendUpdateButton(Button_Entry.MYSTATUS_WIN_OVERALL, "^2Race Experience^7 : ^3" + overall[0]);
+            SendUpdateButton(Button_Entry.MYSTATUS_RANK_OVERALL, "^2Rank Overall^7 : ^3" + overall[1]);
 
             if (myStatusLicenceName == driver.LicenceName)
             {
-                SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + driver.DriverName);
-                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + driver.GetSafePct()+" ^7%");
-                SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^2ChatWarnScore ^7: ^3" + (driver.GetFloodChatCount() + (driver.GetWarningChatCount()* 3)).ToString());
+                SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2Driver Name^7 : ^3" + driver.DriverName);
+                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2Safe Driving^7 : ^3" + driver.GetSafePct()+" ^7%");
+                SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^2Chat Warning ^7: ^3" + (driver.GetFloodChatCount() + (driver.GetWarningChatCount()* 3)).ToString());
                 //SendUpdateButton(Button_Entry.MYSTATUS_DRIFT_BEST, "^3");
                 //SendUpdateButton(Button_Entry.MYSTATUS_TIME_RACED, "^3" );
                 //SendUpdateButton(Button_Entry.MYSTATUS_TIME_SPEC, "^3" );
@@ -1247,9 +1247,9 @@ namespace Drive_LFSS.Game_
                 }
                 Program.dlfssDatabase.Unlock();
                 int _safePct = driver.SetSafePct(badCount, finishCount, lapCount);
-                SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2DriverName^7 : ^3" + _driverName);
-                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2SafePct^7 : ^3" + _safePct+" ^7%");
-                SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^2ChatWarnScore ^7: ^3"+(floodChat+(badChat*3)).ToString());
+                SendUpdateButton(Button_Entry.MYSTATUS_DRIVER_NAME, "^2Driver Name^7 : ^3" + _driverName);
+                SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2Safe Driving^7 : ^3" + _safePct+" ^7%");
+                SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^2Chat Warning ^7: ^3"+(floodChat+(badChat*3)).ToString());
             }
 
 
