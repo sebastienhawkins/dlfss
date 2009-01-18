@@ -395,7 +395,7 @@ namespace Drive_LFSS.Ranking_
                             color = "^6";
                         }
                         if (!reader.IsDBNull(1))
-                            overall[0] = color + (reader.GetInt32(1) / count).ToString();
+                            overall[0] = color + (reader.GetInt32(1) /*/ count*/).ToString();
                         if (!reader.IsDBNull(2))
                             overall[1] = color + (reader.GetInt32(2) / count).ToString();
 
