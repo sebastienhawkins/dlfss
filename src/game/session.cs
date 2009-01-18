@@ -431,7 +431,7 @@ namespace Drive_LFSS.Game_
             }
             return 255;
         }
-        private byte GetFirstLicenceIndex(byte connectionId)
+        private byte GetFirstConnectionIdIndex(byte connectionId)
         {
             int count = driverList.Count;
             for (byte itr = 0; itr < count; itr++)
@@ -612,7 +612,7 @@ namespace Drive_LFSS.Game_
             //Prevent the Main thread from Doing the driverList.update()
             //Im not sure i love this design, since Mutex refresh time.
             byte index;
-            while ((index = GetFirstLicenceIndex(packet.connectionId)) != 255)
+            while ((index = GetFirstConnectionIdIndex(packet.connectionId)) != 255)
             {
                 driverList[index].ProcessCNLPacket(packet);
                 
@@ -656,7 +656,7 @@ namespace Drive_LFSS.Game_
             }
             else    //Human
             {
-                index = GetDriverIndexWith(packet.connectionId, packet.driverName);
+                index = GetConnectionIdNotBot(packet.connectionId);
                 driverList[index].Init(packet);
                 driver = driverList[index];
             }
@@ -718,7 +718,7 @@ namespace Drive_LFSS.Game_
             if (!IsExistconnectionId(packet.connectionId))
                 return;
 
-            Driver driver = driverList[GetFirstLicenceIndex(packet.connectionId)];
+            Driver driver = driverList[GetConnectionIdNotBot(packet.connectionId)];
 
             if (packet.message[packet.textStart] == commandPrefix) //Ingame Command
             {
