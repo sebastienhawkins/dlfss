@@ -718,7 +718,7 @@ namespace Drive_LFSS.Game_
             if (!IsExistconnectionId(packet.connectionId))
                 return;
 
-            Driver driver = driverList[GetConnectionIdNotBot(packet.connectionId)];
+            Driver driver = driverList[GetFirstConnectionIdIndex(packet.connectionId)];
 
             if (packet.message[packet.textStart] == commandPrefix) //Ingame Command
             {
