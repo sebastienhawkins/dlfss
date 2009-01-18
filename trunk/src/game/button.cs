@@ -1329,7 +1329,7 @@ namespace Drive_LFSS.Game_
 
                     buttonInfoCopy = (ButtonTemplateInfo)buttonScore.Clone();
                     buttonInfoCopy.Top = (byte)(((count) * buttonScore.Height) + buttonScore.Top + 1);
-                    buttonInfoCopy.Text = "^7" + itr.Current.Value.ToString() + "^2pt";
+                    buttonInfoCopy.Text = "^7" + itr.Current.Value.ToString() + "^2xp";
                     SendButton(newButtonId(buttonInfoCopy.Entry), buttonInfoCopy);
                     count++;
                 }
