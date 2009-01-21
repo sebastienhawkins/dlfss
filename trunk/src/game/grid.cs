@@ -211,7 +211,6 @@ namespace Drive_LFSS.Game_
                      && (-speedDiff / 100.0d * carBrakeValue[carAround.CarPrefix]) > dist 
                      && HasCollisionPath(carAround, car) )
                 {
-
                     /*if (((Driver)carAround).IsAdmin)
                     {
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_1, "^3CD " + (-speedDiff / 100.0d * carBrakeValue[carAround.CarPrefix]));
@@ -220,16 +219,21 @@ namespace Drive_LFSS.Game_
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_3, "^3SD ^7" + -speedDiff);
                         ((IButton)carAround).SendUpdateButton((ushort)Button_Entry.INFO_4, "^3B ^7" + carBrakeValue[carAround.CarPrefix]);
                     }*/
-
-                    if (car.IsBlueFlagActive() && !carAround.HasYellowFlagActive() && !carAround.IsBlueFlagActive())
+                    if (CarDriveOk(car))
                     {
-                        car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING,carAround.CarId);
-                        carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
+                        car.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, carAround.CarId);
+                        carAround.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, car.CarId);
                         Log.commandHelp("Warning Driving Part 1 Detected\r\n");
                         return;
                     }
-
-                    if (car.HasYellowFlagActive() && !carAround.HasYellowFlagActive() && !carAround.IsBlueFlagActive())
+                    if (!CarDriveOk(car) && CarDriveOk(carAround))
+                    {
+                        car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING,carAround.CarId);
+                        carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
+                        Log.commandHelp("Warning Driving Part 2 Detected\r\n");
+                        return;
+                    }
+                    /*if (car.HasYellowFlagActive() && !carAround.HasYellowFlagActive() && !carAround.IsBlueFlagActive())
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
@@ -243,11 +247,14 @@ namespace Drive_LFSS.Game_
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, car.CarId);
                         Log.commandHelp("Warning Driving Part 3 Detected\r\n");
                         return;
-                    }
+                    }*/
                 } 
             }
         }
-
+        private bool CarDriveOk(CarMotion car)
+        {
+            return !car.IsBlueFlagActive() && !car.IsLostControl() && !car.IsOutsideDrive() && !car.HasYellowFlagActive();
+        }
         //Badly need Car.GetSize()
         private double GetDistance3DSq(CarMotion car1, CarMotion car2)
         {

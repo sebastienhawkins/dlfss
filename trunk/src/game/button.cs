@@ -1251,8 +1251,6 @@ namespace Drive_LFSS.Game_
                 SendUpdateButton(Button_Entry.MYSTATUS_SAFEPCT, "^2Safe Driving^7 : ^3" + _safePct+" ^7%");
                 SendUpdateButton(Button_Entry.MYSTATUS_CHATWARN, "^2Chat Warning ^7: ^3"+(floodChat+(badChat*3)).ToString());
             }
-
-
         }
         private void SendPSTData()
         {
