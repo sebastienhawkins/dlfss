@@ -1,9 +1,10 @@
 <?php 
 
-$wrt = file_get_contents ("http://www.lfsworld.net/pubstat/get_stat2.php?version=1.4&user=dlfss&pass=dlfss&action=wr");
+$wrt = file_get_contents ("http://www.lfsworld.net/pubstat/get_stat2.php?version=1.4&user=dlhhh&pass=dl66fs&action=wr");
 
 $wrt = explode("\n",$wrt);
 
+//var_dump($wrt);exit;
 $wr = array();
 foreach($wrt as &$value)
 {
@@ -17,7 +18,7 @@ foreach($wrt as &$value)
 	$wr[$trackt][$value[2]] = $value[6];
 }
 
-$link = mysql_connect('192.168.101.200:33306', 'www', 'dexxa', true ,MYSQL_CLIENT_COMPRESS);
+$link = mysql_connect('192.168.77.101:33306', 'www', 'dexxa', true ,MYSQL_CLIENT_COMPRESS);
 if (!$link) {die(mysql_error());}
 if (!mysql_select_db('drive_lfss')){die(mysql_error());}
 
@@ -41,13 +42,13 @@ while ($row = mysql_fetch_array($result))
 {
 	array_push($licenceNames,$row[0]);
 }
-//mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72008^2/^7Nov^2/^705' WHERE `entry`IN(57)",$link);
+mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72009^2/^7Jan^2/^728' WHERE `entry`IN(57)",$link);
 
 
 foreach($licenceNames as $licenceName)
 {
-	if(!strstr($licenceName,"OBP 55"))
-		continue;
+	//if(!strstr($licenceName,"OBP 55"))
+	//	continue;
 	echo "Driver_Guid: $licenceName\n";
 	$driverGuids = "";
 	$result = mysql_query("SELECT `guid` FROM `driver` WHERE `licence_name`LIKE'$licenceName'" ,$link);
