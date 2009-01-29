@@ -4,7 +4,7 @@ Source Host: 192.168.101.200
 Source Database: drive_lfss
 Target Host: 192.168.101.200
 Target Database: drive_lfss
-Date: 11/13/2008 7:25:01 PM
+Date: 1/29/2009 12:33:04 AM
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -61,6 +61,9 @@ CREATE TABLE `driver` (
   `password` varchar(128) NOT NULL default '',
   `config_data` blob,
   `tutorial` varchar(255) NOT NULL default '',
+  `race_count` int(8) unsigned NOT NULL default '0',
+  `race_finish_count` int(8) unsigned NOT NULL default '0',
+  `lap_count` int(8) unsigned NOT NULL default '0',
   `warning_driving_count` int(8) unsigned NOT NULL default '0',
   `warning_chat_count` int(8) unsigned NOT NULL default '0',
   `flood_chat_count` int(8) unsigned NOT NULL default '0',
@@ -69,8 +72,8 @@ CREATE TABLE `driver` (
   `time_garage` int(12) unsigned NOT NULL default '0',
   `time_racing` int(12) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`),
-  UNIQUE KEY `licence_name` (`licence_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=3353 DEFAULT CHARSET=utf8;
+  KEY `licence_name` (`licence_name`)
+) ENGINE=MyISAM AUTO_INCREMENT=8925 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for driver_ban
@@ -94,7 +97,7 @@ DROP TABLE IF EXISTS `driver_lap`;
 CREATE TABLE `driver_lap` (
   `guid_race` int(11) unsigned NOT NULL default '0',
   `guid_driver` int(11) unsigned NOT NULL,
-  `car_prefix` varchar(3) NOT NULL,
+  `car_prefix` char(3) NOT NULL,
   `track_prefix` varchar(4) NOT NULL,
   `driver_mask` mediumint(5) unsigned NOT NULL default '0',
   `split_time_1` int(12) unsigned NOT NULL,
@@ -108,8 +111,11 @@ CREATE TABLE `driver_lap` (
   `pit_stop_count` tinyint(3) unsigned NOT NULL,
   `yellow_flag_count` smallint(4) unsigned NOT NULL default '0',
   `blue_flag_count` mediumint(4) unsigned NOT NULL default '0',
-  KEY `car_prefix` (`car_prefix`),
-  KEY `track_prefix` (`track_prefix`)
+  KEY `track` (`track_prefix`),
+  KEY `car` (`car_prefix`),
+  KEY `guid_driver` (`guid_driver`),
+  KEY `guid_race` (`guid_race`),
+  KEY `lap_time` (`lap_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -144,8 +150,9 @@ CREATE TABLE `race` (
   `qualification_minute` tinyint(3) unsigned NOT NULL default '0',
   `weather_status` tinyint(2) unsigned NOT NULL default '0',
   `wind_status` tinyint(2) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM AUTO_INCREMENT=14297 DEFAULT CHARSET=utf8;
+  PRIMARY KEY  (`guid`),
+  KEY `track` (`track_prefix`)
+) ENGINE=MyISAM AUTO_INCREMENT=31753 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for race_map
@@ -264,7 +271,7 @@ DROP TABLE IF EXISTS `stats_rank_driver`;
 CREATE TABLE `stats_rank_driver` (
   `licence_name` varchar(32) NOT NULL,
   `track_prefix` varchar(4) NOT NULL default '',
-  `car_prefix` varchar(3) NOT NULL default '',
+  `car_prefix` char(3) NOT NULL default '',
   `best_lap_rank` smallint(5) NOT NULL default '0',
   `average_lap_rank` smallint(5) NOT NULL default '0',
   `stability_rank` smallint(5) NOT NULL default '0',
@@ -272,8 +279,8 @@ CREATE TABLE `stats_rank_driver` (
   `total_rank` mediumint(8) unsigned NOT NULL default '0',
   `position` int(8) unsigned NOT NULL default '0',
   `change_mask` int(11) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`licence_name`,`track_prefix`,`car_prefix`),
-  KEY `prefix` (`track_prefix`,`car_prefix`)
+  KEY `prefix` (`track_prefix`,`car_prefix`),
+  KEY `licence` (`licence_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
