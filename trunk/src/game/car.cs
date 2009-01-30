@@ -438,6 +438,8 @@ namespace Drive_LFSS.Game_
             if (isLostControl != value)
             {
                 isLostControl = value;
+                if (isLostControl)
+                    TrySendCancelWarning();
                 /*if (isAdmin)
                 {
                     if (isLostControl)
