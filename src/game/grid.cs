@@ -223,14 +223,14 @@ namespace Drive_LFSS.Game_
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, car.CarId);
-                        Log.commandHelp("Warning Driving Part 1 Detected\r\n");
+                        Log.commandHelp("Warning Driving 1-DriverOk(" + ((Driver)car).LicenceName + "), DriverBad(" + ((Driver)carAround).LicenceName + ") Detected\r\n");
                         return;
                     }
                     if (!CarDriveOk(car) && CarDriveOk(carAround))
                     {
                         car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING,carAround.CarId);
                         carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
-                        Log.commandHelp("Warning Driving Part 2 Detected\r\n");
+                        Log.commandHelp("Warning Driving Part 2-DriverOk(" + ((Driver)carAround).LicenceName + "), DriverBad(" + ((Driver)car).LicenceName + ") Detected\r\n");
                         return;
                     }
                     /*if (car.HasYellowFlagActive() && !carAround.HasYellowFlagActive() && !carAround.IsBlueFlagActive())
@@ -441,11 +441,13 @@ namespace Drive_LFSS.Game_
         }
         private bool HasCollisionPath(CarMotion fromCar, CarMotion toCar)
         {
+            //TODO: GetAngle() is bad , should use Both TrackTrajectory and Perpendicular Distance
+            // if about same trackTraj and Perpendicular Distance is < CarSideToSideSize == Collision Path 
             double angle = GetAngle(fromCar, toCar);
 
             angle += 180.0f; //make it on 360
 
-            //Rotate +90
+            //Rotate +90, TODO reverse SIN and COS to make the rotation
             double rest = angle + 90.0d - 360.0d;
             if (rest > 0)
                 angle = rest;
@@ -454,8 +456,8 @@ namespace Drive_LFSS.Game_
 
             double angleDiff = GetAngleDiff(fromCar.GetTrajectory(),angle);
             //TODO: need to find the perfect angle, based on a static car ~size.
-            //12.0d was too big at very high speed
-            return ( (angleDiff <= 5.0d) && (angleDiff >= -5.0d ) );
+            //5.0d was too big at very high speed
+            return ( (angleDiff <= 4.0d) && (angleDiff >= -4.0d ) );
         }
     }
 }
