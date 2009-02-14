@@ -62,25 +62,20 @@ namespace Drive_LFSS.Game_
         {
             carContainer[car] = car.GetNode();
         }
-        internal void ProcessCarInformation(CarMotion car)
-        {
-           // if (car.GetSpeedMs() < 0.1) //About 0.01 m seconde
-               // return;
-            carContainer[car] = car.GetNode();
-
-            checkNodePosition(car);
-            checkCollision(car);
-            checkLostControl(car);
-
-            //if(((IDriver)car).IsAdmin)
-                //((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3Z ^7" + car.GetPosZ());
-        }
         internal void Remove(CarMotion car)
         {
             carContainer.Remove(car);
         }
+        internal void ProcessCarInformation(CarMotion car)
+        {
+            carContainer[car] = car.GetNode();
+            UpdateCollision(car);
+            UpdateNode(car);
+            //if(((IDriver)car).IsAdmin)
+            //((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_2, "^3Z ^7" + car.GetPosZ());
+        }
 
-        private CarMotion[] getCarAround(CarMotion car, byte nextNodeCount, byte previousNodeCount)
+        private CarMotion[] GetCarAround(CarMotion car, byte nextNodeCount, byte previousNodeCount)
         {
             List<CarMotion> carIds = new List<CarMotion>();
             byte itr;
@@ -93,11 +88,11 @@ namespace Drive_LFSS.Game_
                     newItr = carContainer[car] + itr;
                     if (newItr > nodeCount)
                         newItr = 0; 
-                    carIds.AddRange(findNodeCars((ushort)newItr));
+                    carIds.AddRange(GetNodeCars((ushort)newItr));
                 }
             }
 
-            carIds.AddRange(findNodeCars(carContainer[car]));
+            carIds.AddRange(GetNodeCars(carContainer[car]));
             
             if (previousNodeCount > 0)
             {
@@ -106,12 +101,12 @@ namespace Drive_LFSS.Game_
                     newItr = carContainer[car] - itr;
                     if (newItr < 0)
                         newItr = nodeCount + newItr; //Need to know witch is the first NODE, 0 or 1
-                    carIds.AddRange(findNodeCars((ushort)newItr));
+                    carIds.AddRange(GetNodeCars((ushort)newItr));
                 }
             }
             return carIds.ToArray();
         }
-        private CarMotion[] findNodeCars(ushort node)
+        private CarMotion[] GetNodeCars(ushort node)
         {
             List<CarMotion> carIds = new List<CarMotion>();
             Dictionary<CarMotion, ushort>.Enumerator itr = carContainer.GetEnumerator();
@@ -124,12 +119,7 @@ namespace Drive_LFSS.Game_
         }
 
         //Feature
-        private void checkLostControl(CarMotion car)
-        {
-            if (car.HasWarningDrivingCheck() && Math.Abs(car.GetOrientationSpeed()) > 115.0d)
-                car.TrySendCancelWarning();
-        }
-        private void checkNodePosition(CarMotion car)
+        private void UpdateNode(CarMotion car)
         {
             if (car.TrackPrefix.IndexOf("AU") != -1)
                 return;
@@ -189,13 +179,13 @@ namespace Drive_LFSS.Game_
                 //((IButton)car).SendUpdateButton((ushort)Button_Entry.INFO_5, drift ? "^1Drift" : "^2Grip");
             }
         }
-        private void checkCollision(CarMotion car)
+        private void UpdateCollision(CarMotion car)
         {
             if(car.HasWarningDrivingCheck())
                 return;
 
             CarMotion[] carArounds;
-            carArounds = getCarAround(car, 3, 3);
+            carArounds = GetCarAround(car, 3, 3);
             for (byte itr = 0; itr < carArounds.Length; itr++ )
             {
                 if (carArounds[itr].CarId == car.CarId || car.HasWarningDrivingCheck() ||carArounds[itr].HasWarningDrivingCheck()) //Remove Self
@@ -233,21 +223,6 @@ namespace Drive_LFSS.Game_
                         Log.commandHelp("Warning Driving Part 2-DriverOk(" + ((Driver)carAround).LicenceName + "), DriverBad(" + ((Driver)car).LicenceName + ") Detected\r\n");
                         return;
                     }
-                    /*if (car.HasYellowFlagActive() && !carAround.HasYellowFlagActive() && !carAround.IsBlueFlagActive())
-                    {
-                        car.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, carAround.CarId);
-                        carAround.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, car.CarId);
-                        Log.commandHelp("Warning Driving Part 2 Detected\r\n");
-                        return;
-                    }
-
-                    if (!car.HasYellowFlagActive() && !car.IsBlueFlagActive() && !car.IsLostControl())
-                    {
-                        car.SetWarningDrivingCheck(Warning_Driving_Type.VICTIM, carAround.CarId);
-                        carAround.SetWarningDrivingCheck(Warning_Driving_Type.BAD_DRIVING, car.CarId);
-                        Log.commandHelp("Warning Driving Part 3 Detected\r\n");
-                        return;
-                    }*/
                 } 
             }
         }

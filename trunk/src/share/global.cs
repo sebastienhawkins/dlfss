@@ -185,6 +185,7 @@ namespace Drive_LFSS.Definition_
         MENU_BUTTON_SEARCH_RACE = 152,
         MENU_BUTTON_LOAD_RACE = 153,
         MENU_BUTTON_BAD_WORD = 155,
+        MENU_BUTTON_TIMING = 207,
         TASKBAR_BUTTON_MENU = 161,
         TASKBAR_BUTTON_EXIT = 162,
         TASKBAR_BUTTON_CURRENT = 163,
@@ -305,6 +306,7 @@ namespace Drive_LFSS.Definition_
         NODE_TRAC = 19,
         MYSTATUS = 20,
         RULES = 21,
+        TIMING = 22,
     }
     
     public enum Button_Safe_Coord_Range
