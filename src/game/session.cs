@@ -1108,6 +1108,11 @@ namespace Drive_LFSS.Game_
                     driver.RemoveMenuGui();
                     driver.SendRankGui(Button_Entry.RANK_BUTTON_CURRENT);
                 } break;
+                case Button_Entry.MENU_BUTTON_TIMING:
+                {
+                    driver.RemoveMenuGui();
+                    driver.SendTimingGui(Button_Entry.RANK_BUTTON_CURRENT);
+                } break;
                 case Button_Entry.MENU_BUTTON_SCOREBOARD:
                 {
                     //driver.RemoveMenuGui();
