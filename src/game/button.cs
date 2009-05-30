@@ -27,6 +27,7 @@ namespace Drive_LFSS.Game_
     using Storage_;
     using Log_;
     using Ranking_;
+    using Config_;
 
     internal abstract class Button
     {
@@ -35,6 +36,9 @@ namespace Drive_LFSS.Game_
         {
             session = _session;
             driver = (Driver)this;
+
+            TIMER_BUFFERED_BUTTON = (uint)Config.GetIntValue("Button", "CycleTime"); // 50
+            MAX_BUTTON_BY_CYCLE = (uint)Config.GetIntValue("Button", "MaxPerCycle"); //5 
         }
         ~Button() 
         {
@@ -158,8 +162,8 @@ namespace Drive_LFSS.Game_
         private Queue<Packet> bufferButtonPacket = new Queue<Packet>();
 
         private uint timerBufferedButton = 0;
-        private const uint TIMER_BUFFERED_BUTTON = 50;
-        private const uint MAX_BUTTON_BY_CYCLE = 5;
+        private uint TIMER_BUFFERED_BUTTON = 50;
+        private uint MAX_BUTTON_BY_CYCLE = 5;
         private const uint TIMER_FLAG_RACE_UPDATE = 1500;
         private uint timerFlagRaceUpdate = TIMER_FLAG_RACE_UPDATE;
         private const uint TIMER_TIME_UPDATE = 1000;
