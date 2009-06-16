@@ -1,7 +1,7 @@
 <?php 
 
 //Collect Official World Record Time.
-$wrt = file_get_contents ("http://www.lfsworld.net/pubstat/get_stat2.php?version=1.4&user=dddd&pass=dl66fs&action=wr");
+$wrt = file_get_contents ("http://www.lfsworld.net/pubstat/get_stat2.php?version=1.4&user=greenseed&pass=amandabake&action=wr");
 $wrt = explode("\n",$wrt);
 if(count($wrt) < 941)
 {
@@ -51,7 +51,7 @@ while ($row = mysql_fetch_assoc($result))
 	array_push($drivers,$row);
 mysql_free_result($result);
 //Update Button Text For Last Rank Update
-mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72009^2/^7Jan^2/^729' WHERE `entry`IN(57)",$link);
+mysql_query("UPDATE `button_template` SET `width`=25,`text`='^0Last ^72009^2/^7Avr^2/^711' WHERE `entry`IN(57)",$link);
 
 foreach($trackNames as $trackName)
 {
@@ -99,8 +99,8 @@ foreach($trackNames as $trackName)
 			//echo "Driver_Guid: {$driver['licence_name']}\n";
 		
 			$rank = 0;
-			//Driver RaceCount
-			/*$query = "SELECT COUNT(`guid_driver`)
+			//Driver LapCount
+			$query = "SELECT COUNT(`guid_driver`)
 			FROM `driver_lap`
 			WHERE `driver_lap`.`guid_race`!=0 
 			AND `driver_lap`.`guid_driver`={$driver['guid']}
@@ -113,9 +113,9 @@ foreach($trackNames as $trackName)
 			//var_dump($row);
 			$driverRaceCount = $row[0];
 			//echo "RaceCount: $driverRaceCount\n";
-			if($driverRaceCount < 1)
+			if($driverRaceCount < 40)
 				continue;
-			*/
+			
 			//Driver Best
 			$query =   "SELECT `lap_time`
 			FROM `driver_lap`
@@ -215,7 +215,7 @@ foreach($trackNames as $trackName)
 						$_driverWinS = $winK + $driverCount-$itr + 1;
 						if($_driverWinS > 0)
 								$driverWinS += $_driverWinS ;
-						echo "$trackName | $carPrefix | $winK | $averageLapTime | $bestEver | $driverCount position: $itr | $_driverWinS | $driverWinS\n";
+						//echo "$trackName | $carPrefix | $winK | $averageLapTime | $bestEver | $driverCount position: $itr | $_driverWinS | $driverWinS\n";
 						break;
 					}
 				}
@@ -225,8 +225,9 @@ foreach($trackNames as $trackName)
 			//Compute total
 			
 			$rank = (int)(($driverBestS + ($driverBestS/2)) + ($driverAverageS+($driverAverageS/5))/*+ $driverStabilityS*/ + $driverWinS);
-			if($rank < 0)
-				$rank = 0;
+			if($rank < 1)
+				continue;
+			
 			
 			$PB_LOW = 1;
 			$PB_HIGH = 2;
@@ -276,17 +277,13 @@ foreach($trackNames as $trackName)
 					$changeMask += $POSITION_HIGH;
 				else if($row[8] < $driverBestS)
 					$changeMask += $POSITION_LOW;*/
+				mysql_free_result($result);
 			}
 			//continue;
 			
 			//echo "$driver[1] Global Ranking Score: $rank\n";
-			$result = mysql_query("DELETE FROM `drive_lfss`.`stats_rank_driver` WHERE `licence_name`LIKE'{$driver['licence_name']}' AND `track_prefix`='$trackName' AND `car_prefix`='$carPrefix'",$link);
-			if (!$result) {die(mysql_error());}
-			
-			
-			
-			$result = mysql_query("INSERT INTO `drive_lfss`.`stats_rank_driver` VALUES('{$driver['licence_name']}','$trackName','$carPrefix','$driverBestS','$driverAverageS','$driverStabilityS','$driverWinS','$rank','0','$changeMask')",$link);
-			if (!$result) {die(mysql_error());}
+			mysql_query("DELETE FROM `drive_lfss`.`stats_rank_driver` WHERE `licence_name`LIKE'{$driver['licence_name']}' AND `track_prefix`='$trackName' AND `car_prefix`='$carPrefix'",$link);
+			mysql_query("INSERT INTO `drive_lfss`.`stats_rank_driver` VALUES('{$driver['licence_name']}','$trackName','$carPrefix','$driverBestS','$driverAverageS','$driverStabilityS','$driverWinS','$rank','0','$changeMask')",$link);
 		}
 	}
 }
