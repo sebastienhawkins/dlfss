@@ -327,20 +327,21 @@ namespace Drive_LFSS.ChatModo_
             }
             //part 3
             //This is ugly and it to try catch a Spaced word, like "f u c k"
-            if ((sentenceMask & Word_Flag.IS_BAD) != Word_Flag.IS_BAD)
+           /* if ((sentenceMask & Word_Flag.IS_BAD) != Word_Flag.IS_BAD)
             {
                 jtr = wordScoreList.GetEnumerator();
                 while (jtr.MoveNext())
                 {
-                    if (lineOftext.Replace(" ", "").IndexOf(ConvertX.RemoveSpecialChar(jtr.Current.Key), StringComparison.InvariantCultureIgnoreCase) > -1)
+                    if (ConvertX.RemoveSpecialChar(lineOftext).IndexOf(ConvertX.RemoveSpecialChar(jtr.Current.Key), StringComparison.InvariantCultureIgnoreCase) > -1)
                     {
                         #if DEBUG
                         //iSession.SendMSTMessage("/msg ^7C^3hatModo^53 ^7:^2 CompleteLine ^7->^2" + jtr.Current.Key);
                         #endif
+
                         sentenceMask |= (Word_Flag)jtr.Current.Value;
                     }
                 }
-            }
+            } */
             //part 4 Flood
             if(floodList.ContainsKey(licenceName))
             {
