@@ -90,7 +90,7 @@ namespace Drive_LFSS.Server_
                 Log.command("Command.Exec(), Illegal command from User: " + driver.LicenceName + ", AccessLevel: " + (driver.IsAdmin ? "1" : "0") + ", CommandSend: " + _commandText + "\r\n");
                 return;
             }
-            if (command[args[0]].level == 2 && (driver.LicenceName != "greenseed" && driver.LicenceName != "drive_lfss"))
+            if (command[args[0]].level == 2 && (driver.LicenceName != "forcemagic" && driver.LicenceName != "greenseed" && driver.LicenceName != "drive_lfss"))
             {
                 driver.AddMessageMiddle("^2Must be ^7G^3reenseed ^2to ^1execute^2 that command: ^3" + args[0] + ".", DISPLAY_TIME);
                 return;
